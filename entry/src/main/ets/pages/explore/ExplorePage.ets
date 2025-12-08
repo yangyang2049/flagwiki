@@ -197,12 +197,52 @@ export struct ExplorePage {
           .height(20)
       }
       .padding(20)
-      .margin({ left: 16, right: 16, top: 16, bottom: 20 })
+      .margin({ left: 16, right: 16, top: 16 })
       .backgroundColor($r('app.color.bg_card'))
       .borderRadius(20)
       .alignItems(VerticalAlign.Center)
       .onClick(() => {
         router.pushUrl({ url: 'pages/memory/MemoryLevelsPage' });
+      })
+
+      // HeadsUp 卡片
+      Row() {
+        Column() {
+          Text('👀')
+            .fontSize(40)
+        }
+        .width(72)
+        .height(72)
+        .backgroundColor($r('app.color.bg_blue_light'))
+        .borderRadius(16)
+        .justifyContent(FlexAlign.Center)
+
+        Column() {
+          Text('国旗猜猜乐')
+            .fontSize(20)
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r('app.color.text_primary'))
+
+          Text('快速识别国旗，挑战你的反应')
+            .fontSize(14)
+            .fontColor($r('app.color.text_secondary'))
+            .margin({ top: 6 })
+        }
+        .alignItems(HorizontalAlign.Start)
+        .margin({ left: 16 })
+        .layoutWeight(1)
+
+        Image($r('app.media.icon_arrow_right'))
+          .width(20)
+          .height(20)
+      }
+      .padding(20)
+      .margin({ left: 16, right: 16, top: 16, bottom: 20 })
+      .backgroundColor($r('app.color.bg_card'))
+      .borderRadius(20)
+      .alignItems(VerticalAlign.Center)
+      .onClick(() => {
+        router.pushUrl({ url: 'pages/explore/HeadsUpPlayPage' });
       })
       }
       .width('100%')

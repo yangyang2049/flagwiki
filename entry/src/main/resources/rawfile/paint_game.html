@@ -20,7 +20,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #E1F5FE;
+            /* background-color 将通过 JavaScript 动态设置 */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             padding-top: 60px;
         }
@@ -34,6 +34,7 @@
             max-width: 600px;
             padding: 0 16px;
             height: calc(100% - 60px);
+            /* background-color 将通过 JavaScript 动态设置 */
         }
 
         .country-name {
@@ -52,7 +53,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #E1F5FE;
+            /* background-color 将通过 JavaScript 动态设置 */
         }
 
         #flag-svg svg {
@@ -247,6 +248,37 @@
         }
 
         let colorPalette = null;
+
+        // 设置背景色（从原生调用）
+        function setBackgroundColor(backgroundColor) {
+            console.log('Setting background color:', backgroundColor);
+            if (backgroundColor) {
+                // 设置 body 背景色
+                document.body.style.backgroundColor = backgroundColor;
+                document.body.style.setProperty('background-color', backgroundColor, 'important');
+                
+                // 设置 flag-svg 背景色
+                const flagSvg = document.getElementById('flag-svg');
+                if (flagSvg) {
+                    flagSvg.style.backgroundColor = backgroundColor;
+                    flagSvg.style.setProperty('background-color', backgroundColor, 'important');
+                }
+                
+                // 设置 game-container 背景色（如果有）
+                const gameContainer = document.querySelector('.game-container');
+                if (gameContainer) {
+                    gameContainer.style.backgroundColor = backgroundColor;
+                }
+            }
+        }
+        
+        // 页面加载时立即设置默认背景色（如果已传入）
+        window.addEventListener('DOMContentLoaded', function() {
+            // 如果已经有保存的背景色，立即应用
+            if (window.savedBackgroundColor) {
+                setBackgroundColor(window.savedBackgroundColor);
+            }
+        });
 
         // 设置游戏（从原生调用）
         function setupPaintGame(countryCode, countryName, colors, svgBase64) {

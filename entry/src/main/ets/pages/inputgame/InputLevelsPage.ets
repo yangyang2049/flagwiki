@@ -75,14 +75,11 @@ struct InputLevelsPage {
               .margin({ left: 16 })
               .layoutWeight(1)
 
-              // 锁定图标或箭头
+              // 箭头图标（仅已解锁关卡显示）
               if (this.isLevelUnlocked(level.id)) {
                 Image($r('app.media.icon_arrow_right'))
                   .width(20)
                   .height(20)
-              } else {
-                Text('🔒')
-                  .fontSize(20)
               }
             }
             .width('100%')

@@ -36,37 +36,35 @@ struct TopicDetailPage {
     // 显示loading
     this.isLoading = true;
     
-    // 异步加载国家数据
-    setTimeout(() => {
-      const countryList: Country[] = [];
-      const displayList: DisplayItem[] = [];
-      
-      for (const code of this.topic!.countryCodes) {
-        if (isInternationalOrg(code)) {
-          const org = getInternationalOrgByCode(code);
-          if (org) {
-            displayList.push({
-              code: org.code,
-              nameCN: org.nameCN,
-              name: org.name
-            });
-          }
-        } else {
-          const country = getCountryByCode(code);
-          if (country) {
-            countryList.push(country);
-            displayList.push({
-              code: country.code,
-              nameCN: country.nameCN,
-              name: country.name
-            });
-          }
+    // 同步加载国家数据（移除不必要的延迟）
+    const countryList: Country[] = [];
+    const displayList: DisplayItem[] = [];
+    
+    for (const code of this.topic.countryCodes) {
+      if (isInternationalOrg(code)) {
+        const org = getInternationalOrgByCode(code);
+        if (org) {
+          displayList.push({
+            code: org.code,
+            nameCN: org.nameCN,
+            name: org.name
+          });
+        }
+      } else {
+        const country = getCountryByCode(code);
+        if (country) {
+          countryList.push(country);
+          displayList.push({
+            code: country.code,
+            nameCN: country.nameCN,
+            name: country.name
+          });
         }
       }
-      this.countries = countryList;
-      this.displayItems = displayList;
-      this.isLoading = false;
-    }, 100);
+    }
+    this.countries = countryList;
+    this.displayItems = displayList;
+    this.isLoading = false;
   }
 
   build() {
@@ -116,34 +114,11 @@ struct TopicDetailPage {
             .justifyContent(FlexAlign.Center)
           } else {
             Grid() {
-              ForEach(this.displayItems, (item: DisplayItem) => {
+              ForEach(this.displayItems, (item: DisplayItem, index: number) => {
                 GridItem() {
-                  Column() {
-                    Image(getFlagImageSource(item.code))
-                      .width('100%')
-                      .height(60)
-                      .objectFit(ImageFit.Contain)
-                      .borderRadius(4)
-
-                    Text(item.nameCN)
-                      .fontSize(13)
-                      .fontColor($r('app.color.text_primary'))
-                      .margin({ top: 8 })
-                      .maxLines(1)
-                      .textOverflow({ overflow: TextOverflow.Ellipsis })
-                  }
-                  .width('100%')
-                  .padding(12)
-                  .backgroundColor($r('app.color.bg_card'))
-                  .borderRadius(12)
-                  .onClick(() => {
-                    router.pushUrl({
-                      url: 'pages/gallery/FlagDetailPage',
-                      params: { countryCode: item.code }
-                    });
-                  })
+                  this.FlagGridItem(item)
                 }
-              })
+              }, (item: DisplayItem, index: number) => `${item.code}_${index}`)
             }
             .columnsTemplate('1fr 1fr 1fr')
             .columnsGap(12)
@@ -151,6 +126,7 @@ struct TopicDetailPage {
             .width('100%')
             .layoutWeight(1)
             .padding({ left: 16, right: 16, top: 16, bottom: 16 })
+            .cachedCount(9)
           }
         }
         .width('100%')
@@ -174,5 +150,35 @@ struct TopicDetailPage {
     .title(this.topic?.name || '专题详情')
     .titleMode(NavigationTitleMode.Mini)
     .backgroundColor($r('app.color.bg_page'))
+  }
+
+  @Builder
+  FlagGridItem(item: DisplayItem) {
+    Column() {
+      Image(getFlagImageSource(item.code))
+        .width('100%')
+        .height(60)
+        .objectFit(ImageFit.Contain)
+        .borderRadius(4)
+
+      Text(item.nameCN)
+        .fontSize(13)
+        .fontColor($r('app.color.text_primary'))
+        .margin({ top: 8 })
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
+    }
+    .width('100%')
+    .padding(12)
+    .backgroundColor($r('app.color.bg_card'))
+    .borderRadius(12)
+    .onClick(() => {
+      router.pushUrl({
+        url: 'pages/gallery/FlagDetailPage',
+        params: { countryCode: item.code }
+      }).catch((err: Error) => {
+        console.error(`Navigation failed: ${err.message}`);
+      });
+    })
   }
 }

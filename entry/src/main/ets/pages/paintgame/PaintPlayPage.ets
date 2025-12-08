@@ -82,6 +82,7 @@ struct PaintPlayPage {
   @State levelCompleted: boolean = false;
   @State isWebReady: boolean = false;
   @State currentFlagPath: string = 'flags/us.svg';
+  @State backgroundColorStr: string = '#F5F6F7'; // 固定灰色背景
 
   private webController: web_webview.WebviewController = new web_webview.WebviewController();
   private context = getContext(this) as common.UIAbilityContext;
@@ -95,6 +96,7 @@ struct PaintPlayPage {
     this.currentLevel = getPaintLevel(this.categoryId, this.levelId);
     this.updateCurrentFlagPath();
   }
+
 
   private updateCurrentFlagPath(): void {
     if (this.currentLevel) {
@@ -140,6 +142,17 @@ struct PaintPlayPage {
     return country ? country.nameCN : code;
   }
 
+  private async setBackgroundColorInWeb(): Promise<void> {
+    try {
+      // 即使页面还没准备好，也先保存背景色，等页面加载时应用
+      await this.webController.runJavaScript(
+        `window.savedBackgroundColor = '${this.backgroundColorStr}'; if (typeof setBackgroundColor === 'function') { setBackgroundColor('${this.backgroundColorStr}'); }`
+      );
+    } catch (e) {
+      console.error('Failed to set background color:', e);
+    }
+  }
+
   private async setupGame(): Promise<void> {
     if (!this.currentLevel || !this.isWebReady) return;
 
@@ -162,6 +175,9 @@ struct PaintPlayPage {
 
     // 调用JS设置游戏，传入 Base64 编码的 SVG 内容
     try {
+      // 确保背景色已设置
+      await this.setBackgroundColorInWeb();
+      // 然后设置游戏
       await this.webController.runJavaScript(
         `if (typeof setupPaintGame === 'function') { setupPaintGame('${countryCode}', '${displayName}', ${colorsJson}, '${svgBase64}'); }`
       );
@@ -250,6 +266,8 @@ struct PaintPlayPage {
               .domStorageAccess(true)
               .onPageEnd(() => {
                 this.isWebReady = true;
+                // 页面加载完成后，先设置背景色，再设置游戏
+                this.setBackgroundColorInWeb();
                 this.setupGame();
               })
               .onConsole((event) => {
@@ -296,7 +314,7 @@ struct PaintPlayPage {
           }
           .width('100%')
           .height('100%')
-          .backgroundColor('#E1F5FE')
+          .backgroundColor(this.backgroundColorStr as ResourceColor)
 
           // 顶部状态栏
           Row() {

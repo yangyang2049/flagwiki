@@ -12,6 +12,8 @@ export struct HomePage {
 
   aboutToAppear() {
     this.weeklyFlag = getCurrentWeekFlag();
+    // 随机显示趣味知识
+    this.funFactIndex = Math.floor(Math.random() * this.funFacts.length);
   }
 
   private getRegionName(region: string): string {

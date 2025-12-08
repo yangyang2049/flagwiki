@@ -38,11 +38,25 @@ export const topics: TopicItem[] = [
     countryCodes: ['et', 'gh', 'gn', 'ml', 'sn', 'bf', 'bj', 'tg', 'cm', 'cg', 'cf', 'rw', 'zm', 'zw', 'mz', 'ke', 'tz', 'ug']
   },
   {
+    id: 'sun',
+    name: '太阳旗',
+    description: '国旗上绘有太阳图案的国家',
+    emoji: '☀️',
+    countryCodes: ['jp', 'bd', 'pw', 'ki', 'kz', 'kg', 'mw', 'na', 'ar', 'ag']
+  },
+  {
+    id: 'crescent-moon',
+    name: '星月旗',
+    description: '国旗上绘有星月标志的国家',
+    emoji: '🌙',
+    countryCodes: ['tr', 'pk', 'my', 'sg', 'dz', 'tn', 'mr', 'az', 'km', 'mv', 'ly', 'uz']
+  },
+  {
     id: 'animals',
     name: '国旗上的动物',
     description: '国旗上绘有动物图案的国家',
     emoji: '🦁',
-    countryCodes: ['al', 'bt', 'mx', 'lk', 'pg', 'zm', 'zw', 'ug', 'ec', 'bo', 'py', 'pe', 'es', 'kz']
+    countryCodes: ['al', 'bt', 'lk', 'pg', 'zm', 'zw', 'ug', 'ec', 'es', 'kz', 'mx', 'rs', 'me', 'eg']
   },
   {
     id: 'international',
