@@ -14,7 +14,7 @@ export const topics: TopicItem[] = [
     name: '北欧旗帜',
     description: '以北欧十字为特征的斯堪的纳维亚国家旗帜',
     emoji: '🇩🇰',
-    countryCodes: ['dk', 'se', 'no', 'fi', 'is', 'fo', 'ax']
+    countryCodes: ['dk', 'se', 'no', 'fi', 'is']
   },
   {
     id: 'tricolor',

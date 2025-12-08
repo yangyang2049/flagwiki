@@ -88,17 +88,30 @@ export class ScreenshotManager {
         createOption
       );
 
-      // 写入图片数据
+      // 写入图片数据 - 使用更安全的资源管理模式
       const file = await fs.open(photoAssetUri, fs.OpenMode.READ_WRITE);
       fileDescriptor = file.fd;
 
       try {
         await fs.write(file.fd, imageData);
-      } finally {
-        // 确保文件描述符总是被关闭
+        // 写入成功后立即关闭文件描述符
+        await fs.close(fileDescriptor);
+        fileDescriptor = null;
+      } catch (writeError) {
+        // 写入失败时也要关闭文件描述符
         if (fileDescriptor !== null) {
-          await fs.close(fileDescriptor);
+          try {
+            await fs.close(fileDescriptor);
+          } catch (closeError) {
+            console.error("[ScreenshotManager] Failed to close file descriptor after write error:", closeError);
+          }
           fileDescriptor = null;
+        }
+        // ArkTS 要求 throw 必须是 Error 类型
+        if (writeError instanceof Error) {
+          throw writeError;
+        } else {
+          throw new Error(`Failed to write screenshot: ${String(writeError)}`);
         }
       }
 
@@ -108,12 +121,15 @@ export class ScreenshotManager {
       const errorMsg = error instanceof Error ? error.message : String(error);
       console.error("[ScreenshotManager] Failed to save screenshot:", errorMsg);
 
-      // 尝试关闭可能未关闭的文件描述符
+      // 确保文件描述符在所有错误情况下都被关闭
       if (fileDescriptor !== null) {
         try {
           await fs.close(fileDescriptor);
+          fileDescriptor = null;
         } catch (closeError) {
-          console.error("[ScreenshotManager] Failed to close file descriptor:", closeError);
+          console.error("[ScreenshotManager] Failed to close file descriptor in error handler:", closeError);
+          // 即使关闭失败也要重置，避免重复关闭
+          fileDescriptor = null;
         }
       }
 

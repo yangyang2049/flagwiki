@@ -2,11 +2,17 @@ import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.Ab
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { preferences } from '@kit.ArkData';
+import { FavoritesManager } from '../utils/favoritesManager';
+import { GameProgressManager } from '../utils/GameProgressManager';
+import { PreferencesManager } from '../utils/PreferencesManager';
 
 const DOMAIN = 0x0000;
 
 export default class EntryAbility extends UIAbility {
   async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
+    // 初始化 PreferencesManager
+    PreferencesManager.init(this.context);
+
     try {
       // 加载保存的主题设置
       await this.loadAndApplyColorMode();
@@ -19,12 +25,29 @@ export default class EntryAbility extends UIAbility {
         hilog.error(DOMAIN, 'testTag', 'Failed to set default colorMode. Cause: %{public}s', JSON.stringify(setErr));
       }
     }
+
+    // 初始化收藏管理器
+    try {
+      await FavoritesManager.init(this.context);
+      hilog.info(DOMAIN, 'testTag', 'FavoritesManager initialized');
+    } catch (err) {
+      hilog.error(DOMAIN, 'testTag', 'Failed to init FavoritesManager. Cause: %{public}s', JSON.stringify(err));
+    }
+
+    // 初始化游戏进度管理器
+    try {
+      await GameProgressManager.init(this.context);
+      hilog.info(DOMAIN, 'testTag', 'GameProgressManager initialized');
+    } catch (err) {
+      hilog.error(DOMAIN, 'testTag', 'Failed to init GameProgressManager. Cause: %{public}s', JSON.stringify(err));
+    }
+
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
   }
 
   private async loadAndApplyColorMode(): Promise<void> {
     try {
-      const prefs = await preferences.getPreferences(this.context, 'app_settings');
+      const prefs = await PreferencesManager.getPreferences('app_settings');
       const savedColorMode: number = await prefs.get('colorMode', ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET) as number;
       const colorMode = savedColorMode as ConfigurationConstant.ColorMode;
       this.context.getApplicationContext().setColorMode(colorMode);

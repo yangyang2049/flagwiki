@@ -1,6 +1,7 @@
 import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
+import curves from '@ohos.curves';
 import { getCountryByCode } from '../../utils/countryData';
 import { MemoryLevel, getMemoryLevel } from './MemoryLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
@@ -31,7 +32,7 @@ struct MemoryPlayPage {
   @State isWin: boolean = false;
   @State flippingCardId: number = -1;  // 正在翻转的卡片ID
   @State flipAngles: Map<number, number> = new Map();  // 每张卡片的翻转角度
-  private timerId: number = -1;
+  private timerId: number | undefined = undefined;
   private context = getContext(this) as common.UIAbilityContext;
 
   aboutToAppear() {
@@ -79,6 +80,8 @@ struct MemoryPlayPage {
 
   private startTimer(): void {
     if (!this.level || this.level.timeLimit === 0) return;
+    // 防止重复启动定时器
+    if (this.timerId !== undefined) return;
 
     this.timerId = setInterval(() => {
       if (this.timeRemaining > 0) {
@@ -92,9 +95,9 @@ struct MemoryPlayPage {
   }
 
   private stopTimer(): void {
-    if (this.timerId !== -1) {
+    if (this.timerId !== undefined) {
       clearInterval(this.timerId);
-      this.timerId = -1;
+      this.timerId = undefined;
     }
   }
 
@@ -111,7 +114,7 @@ struct MemoryPlayPage {
     // 动画中途更新卡片状态（翻转到一半时显示正面）
     setTimeout(() => {
       this.cards[index] = this.createCard(card.id, card.code, true, card.isMatched);
-    }, 150);
+    }, 200);
 
     // 动画结束后处理逻辑
     setTimeout(() => {
@@ -127,9 +130,9 @@ struct MemoryPlayPage {
         // 检查是否匹配
         setTimeout(() => {
           this.checkMatch();
-        }, 600);
+        }, 500);
       }
-    }, 300);
+    }, 400);
   }
 
   private createCard(id: number, code: string, isFlipped: boolean, isMatched: boolean): Card {
@@ -174,7 +177,7 @@ struct MemoryPlayPage {
         const second = this.cards[secondIndex];
         this.cards[firstIndex] = this.createCard(first.id, first.code, false, first.isMatched);
         this.cards[secondIndex] = this.createCard(second.id, second.code, false, second.isMatched);
-      }, 150);
+      }, 200);
 
       // 动画结束后重置状态
       setTimeout(() => {
@@ -183,7 +186,7 @@ struct MemoryPlayPage {
         this.firstCard = null;
         this.secondCard = null;
         this.isProcessing = false;
-      }, 300);
+      }, 400);
     }
   }
 
@@ -399,8 +402,8 @@ struct MemoryPlayPage {
       y: card.isFlipped || card.isMatched ? 1 : 0.95
     })
     .animation({
-      duration: 300,
-      curve: Curve.EaseInOut
+      duration: 400,
+      curve: curves.springMotion(0.4, 0.8)
     })
     .onClick(() => {
       this.flipCard(card);

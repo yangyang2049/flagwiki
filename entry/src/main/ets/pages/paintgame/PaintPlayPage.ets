@@ -394,7 +394,7 @@ struct PaintPlayPage {
       // 完成的国旗展示
       Row({ space: 12 }) {
         ForEach(this.currentLevel?.flags || [], (code: string) => {
-          Image($rawfile(`flags/${code}.svg`))
+          Image($rawfile(this.getFlagImagePath(code)))
             .width(80)
             .height(50)
             .objectFit(ImageFit.Contain)

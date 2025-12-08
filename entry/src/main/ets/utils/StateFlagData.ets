@@ -445,7 +445,19 @@ const fileNameMap: Record<string, string> = {
   'castilla-la mancha': 'castile_la_mancha',
   'castile and león': 'castile_and_león',
   // 英国
-  'turks and caicos islands': 'turks_and_caicos'
+  'turks and caicos islands': 'turks_and_caicos',
+  // 巴西
+  'são paulo': 'sao_paulo',
+  'espírito santo': 'espirito_santo',
+  'ceará': 'ceara',
+  'maranhão': 'maranhao',
+  'piauí': 'piaui',
+  'paraná': 'parana',
+  'paraíba': 'paraiba',
+  'pará': 'para',
+  'goiás': 'goias',
+  'amapá': 'amapa',
+  'rondônia': 'rondonia'
 };
 
 // 需要使用PNG格式的州旗（SVG在HarmonyOS上不兼容）

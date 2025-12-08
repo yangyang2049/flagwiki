@@ -51,6 +51,14 @@ class GameProgressManagerClass {
       console.info('[GameProgressManager] Initialized successfully');
     } catch (err) {
       console.error('[GameProgressManager] Failed to initialize:', err);
+      // 初始化失败时重置 initPromise，允许重试
+      this.initPromise = null;
+      // ArkTS 要求 throw 必须是 Error 类型
+      if (err instanceof Error) {
+        throw err;
+      } else {
+        throw new Error(`Failed to initialize GameProgressManager: ${String(err)}`);
+      }
     }
   }
 

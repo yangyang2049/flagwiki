@@ -261,9 +261,23 @@ export function getCountriesByContinent(continent: Continent): Country[] {
     return Countries.filter(country => country.region === continent);
 }
 
-// 根据国家代码获取国家
+// 国家数据 Map 缓存（优化查找性能，从 O(n) 到 O(1)）
+let countryMapCache: Map<string, Country> | null = null;
+
+// 初始化国家数据 Map 缓存
+function initCountryMapCache(): void {
+    if (countryMapCache === null) {
+        countryMapCache = new Map();
+        for (const country of Countries) {
+            countryMapCache.set(country.code.toLowerCase(), country);
+        }
+    }
+}
+
+// 根据国家代码获取国家（使用 Map 缓存优化性能）
 export function getCountryByCode(code: string): Country | undefined {
-    return Countries.find(country => country.code.toLowerCase() === code.toLowerCase());
+    initCountryMapCache();
+    return countryMapCache?.get(code.toLowerCase());
 }
 
 // 获取所有洲
@@ -582,9 +596,23 @@ export const InternationalOrgs: InternationalOrg[] = [
     }
 ];
 
-// 根据代码获取国际组织
+// 国际组织数据 Map 缓存（优化查找性能，从 O(n) 到 O(1)）
+let internationalOrgMapCache: Map<string, InternationalOrg> | null = null;
+
+// 初始化国际组织数据 Map 缓存
+function initInternationalOrgMapCache(): void {
+    if (internationalOrgMapCache === null) {
+        internationalOrgMapCache = new Map();
+        for (const org of InternationalOrgs) {
+            internationalOrgMapCache.set(org.code.toLowerCase(), org);
+        }
+    }
+}
+
+// 根据代码获取国际组织（使用 Map 缓存优化性能）
 export function getInternationalOrgByCode(code: string): InternationalOrg | undefined {
-    return InternationalOrgs.find(org => org.code.toLowerCase() === code.toLowerCase());
+    initInternationalOrgMapCache();
+    return internationalOrgMapCache?.get(code.toLowerCase());
 }
 
 // 判断是否为国际组织

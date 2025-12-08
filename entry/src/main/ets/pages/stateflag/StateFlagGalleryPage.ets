@@ -42,29 +42,28 @@ struct StateFlagGalleryPage {
       } else if (this.countryData) {
         Column() {
           // 顶部国家信息
-          Row() {
+          Column() {
             Image($rawfile(`flags/${this.countryData.countryCode}.svg`))
-              .width(48)
-              .height(32)
+              .width(64)
+              .height(42)
               .objectFit(ImageFit.Contain)
-              .margin({ right: 12 })
+              .margin({ bottom: 8 })
 
-            Column() {
-              Text(this.countryData.countryNameCN)
-                .fontSize(18)
-                .fontWeight(FontWeight.Bold)
-                .fontColor($r('app.color.text_primary'))
-              Text(`共 ${this.countryData.states.length} 个${this.countryData.stateLabel}`)
-                .fontSize(13)
-                .fontColor($r('app.color.text_tertiary'))
-                .margin({ top: 2 })
-            }
-            .alignItems(HorizontalAlign.Start)
+            Text(this.countryData.countryNameCN)
+              .fontSize(18)
+              .fontWeight(FontWeight.Bold)
+              .fontColor($r('app.color.text_primary'))
+
+            Text(`共 ${this.countryData.states.length} 个${this.countryData.stateLabel}`)
+              .fontSize(13)
+              .fontColor($r('app.color.text_tertiary'))
+              .margin({ top: 4 })
           }
           .width('100%')
-          .padding(16)
+          .padding(20)
           .backgroundColor($r('app.color.bg_card'))
           .margin({ bottom: 12 })
+          .alignItems(HorizontalAlign.Center)
 
           // 州旗网格
           Grid() {
@@ -73,7 +72,7 @@ struct StateFlagGalleryPage {
                 Column() {
                   Image($rawfile(getStateFlagPath(this.countryData!.countryCode, state.code)))
                     .width('100%')
-                    .height(60)
+                    .height(72)
                     .objectFit(ImageFit.Contain)
                     .borderRadius(4)
 

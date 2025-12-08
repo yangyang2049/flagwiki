@@ -5,6 +5,7 @@ import { ExplorePage } from './explore/ExplorePage';
 import { ProfilePage } from './profile/ProfilePage';
 import { preferences } from '@kit.ArkData';
 import common from '@ohos.app.ability.common';
+import { PreferencesManager } from '../utils/PreferencesManager';
 
 interface TabItem {
   title: string;
@@ -41,7 +42,7 @@ struct Index {
 
   async aboutToAppear() {
     try {
-      this.prefs = await preferences.getPreferences(this.context, 'app_settings');
+      this.prefs = await PreferencesManager.getPreferences('app_settings');
     } catch (err) {
       console.error(`Failed to load preferences: ${JSON.stringify(err)}`);
     }

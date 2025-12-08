@@ -2,7 +2,8 @@ import router from '@ohos.router';
 import common from '@ohos.app.ability.common';
 import promptAction from '@ohos.promptAction';
 import { FavoritesManager, FavoriteItem } from '../../utils/favoritesManager';
-import { KnowledgeData } from '../../utils/knowledgeData';
+import { getFlagImageSource } from '../../utils/countryData';
+import { getStateFlagPath } from '../../utils/StateFlagData';
 
 @Entry
 @Component
@@ -37,6 +38,20 @@ export struct FavoritesPage {
     }
   }
 
+  private getStateFlagImagePath(pageUrl: string): string {
+    // 格式: stateflag:countryCode:stateCode
+    const parts = pageUrl.substring(10).split(':');
+    if (parts.length >= 2) {
+      return getStateFlagPath(parts[0], parts[1]);
+    }
+    return '';
+  }
+
+  private isValidStateFlagUrl(pageUrl: string): boolean {
+    const parts = pageUrl.substring(10).split(':');
+    return parts.length >= 2;
+  }
+
   private navigateToTool(pageUrl: string) {
     // 解析 pageUrl，格式为 "type:identifier"
     const parts = pageUrl.split(':');
@@ -57,16 +72,29 @@ export struct FavoritesPage {
     const type = parts[0];
     const identifier = parts.slice(1).join(':'); // 处理标题中可能包含冒号的情况
 
-    if (type === 'knowledge') {
-      // 知识库类型，根据标题查找内容
-      const knowledgeItem = KnowledgeData.getKnowledgeByTitle(identifier);
-      if (knowledgeItem) {
+    if (type === 'flag') {
+      // 国旗类型，导航到国旗详情页
+      router.pushUrl({
+        url: 'pages/gallery/FlagDetailPage',
+        params: {
+          countryCode: identifier
+        }
+      }, router.RouterMode.Standard).catch((err: Error) => {
+        console.error(`Failed to push url. Code: ${err.message}`);
+        promptAction.showToast({
+          message: '导航失败',
+          duration: 2000
+        });
+      });
+    } else if (type === 'stateflag') {
+      // 州旗类型，格式为 stateflag:countryCode:stateCode
+      const stateParts = identifier.split(':');
+      if (stateParts.length >= 2) {
         router.pushUrl({
-          url: 'pages/knowledge/KnowledgeDetailPage',
+          url: 'pages/stateflag/StateFlagDetailPage',
           params: {
-            title: knowledgeItem.title,
-            category: knowledgeItem.category,
-            content: knowledgeItem.content
+            countryCode: stateParts[0],
+            stateCode: stateParts[1]
           }
         }, router.RouterMode.Standard).catch((err: Error) => {
           console.error(`Failed to push url. Code: ${err.message}`);
@@ -74,11 +102,6 @@ export struct FavoritesPage {
             message: '导航失败',
             duration: 2000
           });
-        });
-      } else {
-        promptAction.showToast({
-          message: '未找到相关内容',
-          duration: 2000
         });
       }
     } else {
@@ -135,10 +158,29 @@ export struct FavoritesPage {
           ForEach(this.favorites, (item: FavoriteItem, index: number) => {
             ListItem() {
               Row() {
-                Image($r('app.media.icon_favorite_selected'))
-                  .width(20)
-                  .height(20)
-                  .margin({ right: 12 })
+                if (item.pageUrl.startsWith('flag:')) {
+                  // 国旗类型，显示国旗图片
+                  Image(getFlagImageSource(item.pageUrl.substring(5)))
+                    .width(32)
+                    .height(22)
+                    .objectFit(ImageFit.Contain)
+                    .margin({ right: 12 })
+                    .borderRadius(2)
+                } else if (item.pageUrl.startsWith('stateflag:') && this.isValidStateFlagUrl(item.pageUrl)) {
+                  // 州旗类型，显示州旗图片
+                  Image($rawfile(this.getStateFlagImagePath(item.pageUrl)))
+                    .width(32)
+                    .height(22)
+                    .objectFit(ImageFit.Contain)
+                    .margin({ right: 12 })
+                    .borderRadius(2)
+                } else {
+                  // 其他类型，显示收藏图标
+                  Image($r('app.media.icon_favorite_selected'))
+                    .width(20)
+                    .height(20)
+                    .margin({ right: 12 })
+                }
                 Text(item.name)
                   .fontSize(16)
                   .fontColor($r('app.color.text_primary'))

@@ -97,11 +97,18 @@ export class FavoritesManager {
       if (FavoritesManager.context) {
         try {
           await FavoritesManager.init(FavoritesManager.context);
+          // 初始化成功后重试
+          if (FavoritesManager.prefs) {
+            const favorites = await FavoritesManager.getFavorites();
+            return favorites.some(fav => fav.pageUrl === pageUrl);
+          }
         } catch (err) {
-          console.error(`Failed to init FavoritesManager in isFavorite: ${JSON.stringify(err)}`);
+          console.error(`[FavoritesManager] Failed to init in isFavorite: ${JSON.stringify(err)}`);
+          // 记录错误但允许后续重试
           return false;
         }
       } else {
+        console.warn('[FavoritesManager] Context not available, cannot initialize');
         return false;
       }
     }

@@ -9,6 +9,7 @@ import { Country, getCountryByCode, FlagDesign, getFlagDesign, getFlagImageSourc
 import { TextReaderUtil } from '../../utils/TextReaderUtil';
 import { screenshotManager } from '../../utils/ScreenshotManager';
 import { SaveFlagDialog } from '../../components/SaveFlagDialog';
+import { FavoritesManager } from '../../utils/favoritesManager';
 
 interface RouterParams {
   countryCode: string;
@@ -23,8 +24,11 @@ struct FlagDetailPage {
   @State isReading: boolean = false;
   @State isSharing: boolean = false;
   @State flagPixelMap: image.PixelMap | null = null;
+  @State isFavorite: boolean = false;
   private context = getContext(this) as common.UIAbilityContext;
   private readonly FLAG_CONTAINER_ID = 'flagImageContainer';
+  private readonly FLAG_DOWNLOAD_CONTAINER_ID = 'flagDownloadContainer';
+  private countryCode: string = '';
 
   // 保存对话框控制器
   private saveDialogController: CustomDialogController = new CustomDialogController({
@@ -58,6 +62,7 @@ struct FlagDetailPage {
   async aboutToAppear() {
     const params = router.getParams() as RouterParams;
     if (params && params.countryCode) {
+      this.countryCode = params.countryCode;
       if (isInternationalOrg(params.countryCode)) {
         this.internationalOrg = getInternationalOrgByCode(params.countryCode);
       } else {
@@ -77,6 +82,36 @@ struct FlagDetailPage {
 
     // 初始化截图管理器
     screenshotManager.init(this.getUIContext());
+
+    // 初始化收藏管理器并检查收藏状态
+    await FavoritesManager.init(this.context);
+    await this.checkFavoriteStatus();
+  }
+
+  private async checkFavoriteStatus(): Promise<void> {
+    const pageUrl = `flag:${this.countryCode}`;
+    this.isFavorite = await FavoritesManager.isFavorite(pageUrl);
+  }
+
+  private async toggleFavorite(): Promise<void> {
+    const name = this.internationalOrg?.nameCN || this.country?.nameCN || '未知';
+    const pageUrl = `flag:${this.countryCode}`;
+
+    if (this.isFavorite) {
+      await FavoritesManager.removeFavorite(pageUrl);
+      this.isFavorite = false;
+      promptAction.showToast({
+        message: '已取消收藏',
+        duration: 2000
+      });
+    } else {
+      await FavoritesManager.addFavorite({ name: name, pageUrl: pageUrl });
+      this.isFavorite = true;
+      promptAction.showToast({
+        message: '已添加到收藏',
+        duration: 2000
+      });
+    }
   }
 
   private releaseFlagPixelMap(): void {
@@ -98,6 +133,18 @@ struct FlagDetailPage {
         message: '正在准备图片...',
         duration: 1000
       });
+
+      // 先释放之前的 PixelMap，避免内存泄漏
+      this.releaseFlagPixelMap();
+      
+      // 如果已有对话框打开，先关闭并释放资源
+      if (this.saveDialogController) {
+        try {
+          this.saveDialogController.close();
+        } catch (e) {
+          console.warn('[FlagDetailPage] Failed to close existing dialog:', e);
+        }
+      }
 
       // 截取国旗容器快照
       const pixmap = await screenshotManager.captureSnapshot(this.FLAG_CONTAINER_ID);
@@ -150,11 +197,12 @@ struct FlagDetailPage {
   }
 
   private async doSaveFlag(): Promise<void> {
-    if (!this.flagPixelMap || !this.country) {
-      throw new Error('图片或国家信息不存在');
+    if (!this.flagPixelMap || (!this.country && !this.internationalOrg)) {
+      throw new Error('图片或组织信息不存在');
     }
 
-    const fileName = screenshotManager.generateFileName('国旗', this.country.nameCN);
+    const name = this.internationalOrg?.nameCN || this.country?.nameCN || '未知';
+    const fileName = screenshotManager.generateFileName('旗帜', name);
     const success = await screenshotManager.saveToGallery(
       this.flagPixelMap,
       fileName,
@@ -173,49 +221,64 @@ struct FlagDetailPage {
       TextReaderUtil.stopRead();
       this.isReading = false;
     }
+    // 页面销毁时释放 PixelMap，避免内存泄漏
+    this.releaseFlagPixelMap();
   }
 
   @Builder
   buildInternationalOrgPage() {
     if (this.internationalOrg) {
       Scroll() {
-      Column() {
-        // 旗帜图片
         Column() {
-          Image(getFlagImageSource(this.internationalOrg.code))
-            .width('100%')
-            .height(200)
-            .objectFit(ImageFit.Contain)
-        }
-        .width('100%')
-        .padding(24)
-        .backgroundColor($r('app.color.bg_secondary'))
-        .id(this.FLAG_CONTAINER_ID)
+          // 隐藏的下载容器（无 padding，仅用于截图）
+          Column() {
+            Image(getFlagImageSource(this.internationalOrg.code))
+              .width('100%')
+              .height(200)
+              .objectFit(ImageFit.Contain)
+          }
+          .width(400)
+          .height(200)
+          .backgroundColor(Color.White)
+          .id(this.FLAG_DOWNLOAD_CONTAINER_ID)
+          .position({ x: -1000, y: -1000 })
 
-        // 组织名称
-        Column() {
-          Text(this.internationalOrg.nameCN)
-            .fontSize(28)
-            .fontWeight(FontWeight.Bold)
-            .fontColor($r('app.color.text_primary'))
-            .textAlign(TextAlign.Center)
-            .maxLines(2)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-            .margin({ bottom: 4 })
+          // 旗帜图片（展示用，有 padding）
+          Column() {
+            Image(getFlagImageSource(this.internationalOrg.code))
+              .width('100%')
+              .height(200)
+              .objectFit(ImageFit.Contain)
+          }
+          .width('100%')
+          .padding(16)
+          .backgroundColor($r('app.color.bg_secondary'))
+          .id(this.FLAG_CONTAINER_ID)
 
-          Text(this.internationalOrg.name)
-            .fontSize(16)
-            .fontColor($r('app.color.text_secondary'))
-            .textAlign(TextAlign.Center)
-            .maxLines(2)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-        }
-        .width('100%')
-        .padding({ left: 16, right: 16, top: 20, bottom: 16 })
-        .alignItems(HorizontalAlign.Center)
+          // 组织名称
+          Column() {
+            Text(this.internationalOrg.nameCN)
+              .fontSize(28)
+              .fontWeight(FontWeight.Bold)
+              .fontColor($r('app.color.text_primary'))
+              .textAlign(TextAlign.Center)
+              .maxLines(2)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .margin({ bottom: 4 })
 
-        // 基本信息卡片
-        Row() {
+            Text(this.internationalOrg.name)
+              .fontSize(16)
+              .fontColor($r('app.color.text_secondary'))
+              .textAlign(TextAlign.Center)
+              .maxLines(2)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+          }
+          .width('100%')
+          .padding({ left: 16, right: 16, top: 20, bottom: 16 })
+          .alignItems(HorizontalAlign.Center)
+
+          // 基本信息卡片
+          Row() {
           Column() {
             Text('基本信息')
               .fontSize(16)
@@ -236,18 +299,62 @@ struct FlagDetailPage {
           .layoutWeight(1)
           .backgroundColor($r('app.color.bg_card'))
           .borderRadius(16)
+          }
+          .width('100%')
+          .padding({ left: 16, right: 16 })
+          .margin({ top: 8 })
+
+          // 底部操作按钮
+          Row({ space: 16 }) {
+          // 收藏按钮
+          Button() {
+            Row({ space: 8 }) {
+              Image(this.isFavorite ? $r('app.media.icon_favorite_selected') : $r('app.media.icon_favorite'))
+                .width(20)
+                .height(20)
+              Text(this.isFavorite ? '已收藏' : '收藏')
+                .fontSize(15)
+                .fontColor(this.isFavorite ? $r('app.color.button_primary') : $r('app.color.text_primary'))
+            }
+          }
+          .layoutWeight(1)
+          .height(48)
+          .backgroundColor($r('app.color.bg_card'))
+          .borderRadius(12)
+          .onClick(() => {
+            this.toggleFavorite();
+          })
+
+          // 下载按钮
+          Button() {
+            Row({ space: 8 }) {
+              Image($r('app.media.icon_download'))
+                .width(20)
+                .height(20)
+              Text('下载')
+                .fontSize(15)
+                .fontColor($r('app.color.text_primary'))
+            }
+          }
+          .layoutWeight(1)
+          .height(48)
+          .backgroundColor($r('app.color.bg_card'))
+          .borderRadius(12)
+          .onClick(() => {
+            this.onDownloadClick();
+          })
+          }
+          .width('100%')
+          .padding({ left: 16, right: 16 })
+          .margin({ top: 20, bottom: 24 })
         }
         .width('100%')
-        .padding({ left: 16, right: 16 })
-        .margin({ top: 8, bottom: 24 })
       }
       .width('100%')
-    }
-    .width('100%')
-    .height('100%')
-    .scrollBar(BarState.Off)
-    .edgeEffect(EdgeEffect.Spring)
-    .backgroundColor($r('app.color.bg_page'))
+      .height('100%')
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
+      .backgroundColor($r('app.color.bg_page'))
     }
   }
 
@@ -258,7 +365,20 @@ struct FlagDetailPage {
       } else if (this.country) {
         Scroll() {
           Column() {
-            // 国旗图片
+            // 隐藏的下载容器（无 padding，仅用于截图）
+            Column() {
+              Image(getFlagImageSource(this.country.code))
+                .width('100%')
+                .height(200)
+                .objectFit(ImageFit.Contain)
+            }
+            .width(400)
+            .height(200)
+            .backgroundColor(Color.White)
+            .id(this.FLAG_DOWNLOAD_CONTAINER_ID)
+            .position({ x: -1000, y: -1000 })
+
+            // 国旗图片（展示用，有 padding）
             Column() {
               Image(getFlagImageSource(this.country.code))
                 .width('100%')
@@ -266,7 +386,7 @@ struct FlagDetailPage {
                 .objectFit(ImageFit.Contain)
             }
             .width('100%')
-            .padding(24)
+            .padding(16)
             .backgroundColor($r('app.color.bg_secondary'))
             .id(this.FLAG_CONTAINER_ID)
 
@@ -351,7 +471,51 @@ struct FlagDetailPage {
             }
             .width('100%')
             .padding({ left: 16, right: 16 })
-            .margin({ top: 16, bottom: 24 })
+            .margin({ top: 16 })
+
+            // 底部操作按钮
+            Row({ space: 16 }) {
+              // 收藏按钮
+              Button() {
+                Row({ space: 8 }) {
+                  Image(this.isFavorite ? $r('app.media.icon_favorite_selected') : $r('app.media.icon_favorite'))
+                    .width(20)
+                    .height(20)
+                  Text(this.isFavorite ? '已收藏' : '收藏')
+                    .fontSize(15)
+                    .fontColor(this.isFavorite ? $r('app.color.button_primary') : $r('app.color.text_primary'))
+                }
+              }
+              .layoutWeight(1)
+              .height(48)
+              .backgroundColor($r('app.color.bg_card'))
+              .borderRadius(12)
+              .onClick(() => {
+                this.toggleFavorite();
+              })
+
+              // 下载按钮
+              Button() {
+                Row({ space: 8 }) {
+                  Image($r('app.media.icon_download'))
+                    .width(20)
+                    .height(20)
+                  Text('下载')
+                    .fontSize(15)
+                    .fontColor($r('app.color.text_primary'))
+                }
+              }
+              .layoutWeight(1)
+              .height(48)
+              .backgroundColor($r('app.color.bg_card'))
+              .borderRadius(12)
+              .onClick(() => {
+                this.onDownloadClick();
+              })
+            }
+            .width('100%')
+            .padding({ left: 16, right: 16 })
+            .margin({ top: 20, bottom: 24 })
           }
           .width('100%')
         }
@@ -380,11 +544,11 @@ struct FlagDetailPage {
   @Builder
   MenuBuilder() {
     Row({ space: 20 }) {
-      Image($r('app.media.icon_download'))
-        .width(22)
-        .height(22)
+      Image($r('app.media.icon_voice'))
+        .width(24)
+        .height(24)
         .onClick(() => {
-          this.onDownloadClick();
+          this.onReadClick();
         })
 
       Image($r('app.media.icon_share'))
@@ -392,13 +556,6 @@ struct FlagDetailPage {
         .height(22)
         .onClick(() => {
           this.onShareClick();
-        })
-
-      Image($r('app.media.icon_voice'))
-        .width(24)
-        .height(24)
-        .onClick(() => {
-          this.onReadClick();
         })
     }
     .height('100%')

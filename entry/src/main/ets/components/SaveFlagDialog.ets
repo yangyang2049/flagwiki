@@ -54,6 +54,7 @@ export struct SaveFlagDialog {
 
   private handleClose(): void {
     this.stopCountdown();
+    // 确保在关闭时调用 onClose 回调以释放 PixelMap
     if (this.onClose) {
       this.onClose();
     }

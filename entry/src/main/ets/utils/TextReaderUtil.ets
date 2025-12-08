@@ -23,7 +23,7 @@ export class TextReaderUtil {
       const READER_PARAM: TextReader.ReaderParam = {
         isVoiceBrandVisible: true,
         businessBrandInfo: {
-          panelName: '知识库',
+          panelName: '国旗知识',
         },
         displayTab: 2, // 设置只显示详情页
         minibarParams: {
@@ -90,7 +90,7 @@ export class TextReaderUtil {
         isClickable: true
       },
       author: {
-        text: '知识库',
+        text: '国旗知识',
         isClickable: false
       },
       date: {

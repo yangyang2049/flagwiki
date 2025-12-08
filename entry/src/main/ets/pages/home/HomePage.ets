@@ -142,19 +142,11 @@ export struct HomePage {
 
             Row() {
               // 国旗图片
-              Column() {
-                Image($rawfile(`flags/${this.weeklyFlag.countryCode}.svg`))
-                  .width(120)
-                  .height(80)
-                  .objectFit(ImageFit.Contain)
-                  .shadow({
-                    radius: 8,
-                    color: 'rgba(0, 0, 0, 0.1)',
-                    offsetX: 0,
-                    offsetY: 2
-                  })
-              }
-              .margin({ right: 16 })
+              Image($rawfile(`flags/${this.weeklyFlag.countryCode}.svg`))
+                .width(120)
+                .height(80)
+                .objectFit(ImageFit.Contain)
+                .margin({ right: 16 })
 
               // 国家信息
               Column() {

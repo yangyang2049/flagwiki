@@ -6,6 +6,9 @@ import { uniformTypeDescriptor } from '@kit.ArkData';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { Want } from '@kit.AbilityKit';
 import { ConfigurationConstant } from '@kit.AbilityKit';
+import router from '@ohos.router';
+import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
+import { PreferencesManager } from '../../utils/PreferencesManager';
 
 // 总关卡数
 const QUIZ_TOTAL_LEVELS = 10;
@@ -47,13 +50,12 @@ export struct ProfilePage {
 
   private async loadGameProgress(): Promise<void> {
     try {
-      if (!this.prefs) {
-        this.prefs = await preferences.getPreferences(this.context, 'app_settings');
-      }
-      this.quizLevel = await this.prefs.get('quizLevel', 1) as number;
-      this.fakeFlagLevel = await this.prefs.get('fakeFlagLevel', 1) as number;
-      this.inputLevel = await this.prefs.get('inputLevel', 1) as number;
-      this.triviaLevel = await this.prefs.get('triviaLevel', 1) as number;
+      // 使用 GameProgressManager 统一读取进度
+      await GameProgressManager.init(this.context);
+      this.quizLevel = await GameProgressManager.getUnlockedLevel(GameType.QUIZ);
+      this.fakeFlagLevel = await GameProgressManager.getUnlockedLevel(GameType.FAKE_FLAG);
+      this.inputLevel = await GameProgressManager.getUnlockedLevel(GameType.INPUT);
+      this.triviaLevel = await GameProgressManager.getUnlockedLevel(GameType.TRIVIA);
     } catch (err) {
       console.error(`Failed to load game progress: ${JSON.stringify(err)}`);
     }
@@ -62,7 +64,7 @@ export struct ProfilePage {
   private async loadColorMode(): Promise<void> {
     try {
       if (!this.prefs) {
-        this.prefs = await preferences.getPreferences(this.context, 'app_settings');
+        this.prefs = await PreferencesManager.getPreferences('app_settings');
       }
       const saved: number = await this.prefs.get('colorMode', ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET) as number;
       this.colorMode = saved as ConfigurationConstant.ColorMode;
@@ -75,7 +77,7 @@ export struct ProfilePage {
   private async saveColorMode(): Promise<void> {
     try {
       if (!this.prefs) {
-        this.prefs = await preferences.getPreferences(this.context, 'app_settings');
+        this.prefs = await PreferencesManager.getPreferences('app_settings');
       }
       await this.prefs.put('colorMode', this.colorMode);
       await this.prefs.flush();
@@ -361,6 +363,10 @@ export struct ProfilePage {
             // 我的收藏
             Column() {
               this.settingItem($r('app.media.icon_favorite'), '我的收藏', '', () => {
+                router.pushUrl({ url: 'pages/profile/FavoritesPage' })
+                  .catch((err: Error) => {
+                    console.error(`Failed to navigate to FavoritesPage: ${err.message}`);
+                  });
               })
             }
             .width('100%')
@@ -408,7 +414,7 @@ export struct ProfilePage {
             .margin({ top: 12, bottom: 0 })
 
             // 应用信息
-            Text('探索世界，从国旗开始 🌍')
+            Text('探索世界，从国旗开始 🚩')
               .fontSize(12)
               .fontColor($r('app.color.text_tertiary'))
               .textAlign(TextAlign.Center)
