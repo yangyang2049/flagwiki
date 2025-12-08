@@ -1,7 +1,7 @@
 import router from '@ohos.router';
 import { TopicItem, getAllTopics } from '../topic/TopicData';
 import { WeeklyFlagItem, getCurrentWeekFlag } from '../../utils/WeeklyFlagData';
-import { getCountryByCode } from '../../utils/countryData';
+import { getCountryByCode, getFlagImageSource } from '../../utils/countryData';
 
 @Component
 export struct HomePage {
@@ -77,7 +77,7 @@ export struct HomePage {
             // 扇形国旗装饰
             Stack() {
               // 印度 - 最左侧
-              Image($rawfile('flags/in.svg'))
+              Image(getFlagImageSource('in'))
                 .width(40)
                 .height(27)
                 .objectFit(ImageFit.Contain)
@@ -85,7 +85,7 @@ export struct HomePage {
                 .offset({ x: -32, y: 12 })
 
               // 美国 - 左侧
-              Image($rawfile('flags/us.svg'))
+              Image(getFlagImageSource('us'))
                 .width(42)
                 .height(28)
                 .objectFit(ImageFit.Contain)
@@ -93,7 +93,7 @@ export struct HomePage {
                 .offset({ x: -16, y: 4 })
 
               // 巴西 - 右侧
-              Image($rawfile('flags/br.svg'))
+              Image(getFlagImageSource('br'))
                 .width(42)
                 .height(28)
                 .objectFit(ImageFit.Contain)
@@ -101,7 +101,7 @@ export struct HomePage {
                 .offset({ x: 16, y: 4 })
 
               // 法国 - 最右侧
-              Image($rawfile('flags/fr.svg'))
+              Image(getFlagImageSource('fr'))
                 .width(40)
                 .height(27)
                 .objectFit(ImageFit.Contain)
@@ -109,7 +109,7 @@ export struct HomePage {
                 .offset({ x: 32, y: 12 })
 
               // 中国 - 中间，最上层
-              Image($rawfile('flags/cn.svg'))
+              Image(getFlagImageSource('cn'))
                 .width(48)
                 .height(32)
                 .objectFit(ImageFit.Contain)
@@ -144,7 +144,7 @@ export struct HomePage {
 
             Row() {
               // 国旗图片
-              Image($rawfile(`flags/${this.weeklyFlag.countryCode}.svg`))
+              Image(getFlagImageSource(this.weeklyFlag.countryCode))
                 .width(120)
                 .height(80)
                 .objectFit(ImageFit.Contain)

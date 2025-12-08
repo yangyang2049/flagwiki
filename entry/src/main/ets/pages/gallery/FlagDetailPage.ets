@@ -535,7 +535,6 @@ struct FlagDetailPage {
         .justifyContent(FlexAlign.Center)
       }
     }
-    .title(this.internationalOrg?.nameCN || this.country?.nameCN || '详情')
     .titleMode(NavigationTitleMode.Mini)
     .backgroundColor($r('app.color.bg_page'))
     .menus(this.MenuBuilder)

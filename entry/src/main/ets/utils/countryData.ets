@@ -492,11 +492,17 @@ export function getFlagDesign(code: string): FlagDesign | undefined {
 // 国际组织代码列表
 const INTERNATIONAL_ORGS = ['un', 'eu', 'olympic', 'nato', 'asean', 'au_org', 'arab_league', 'red_cross'];
 
+// 使用PNG格式的国家代码列表（目前为空，所有国家都使用SVG）
+const PNG_FLAG_COUNTRIES: string[] = [];
+
 // 根据国家代码获取旗帜图片资源
 export function getFlagImageSource(code: string): Resource | string {
     const lowerCode = code.toLowerCase();
     if (INTERNATIONAL_ORGS.includes(lowerCode)) {
         // 国际组织使用PNG图片
+        return $r(`app.media.flag_${lowerCode}`);
+    } else if (PNG_FLAG_COUNTRIES.includes(lowerCode)) {
+        // 指定国家使用PNG图片
         return $r(`app.media.flag_${lowerCode}`);
     } else {
         // 普通国家使用SVG图片
