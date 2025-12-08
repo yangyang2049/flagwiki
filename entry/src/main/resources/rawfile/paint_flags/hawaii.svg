@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" fill="none" viewBox="0 0 1200 600">
+  <g id="hawaii" clip-path="url(#clip0_1030_2055)">
+    <path id="Vector" fill="#012169" d="M0 0h1200v600H0V0Z"/>
+    <g id="Clip path group">
+      <mask id="mask0_1030_2055" width="600" height="350" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+        <g id="a">
+          <path id="Vector_2" fill="#fff" d="M0 0h600v350H0V0Z"/>
+        </g>
+      </mask>
+      <g mask="url(#mask0_1030_2055)">
+        <g id="Vector_3">
+          <path fill="#012169" d="m0 0 700 400Zm525 0L0 300Z"/>
+          <path stroke="#fff" stroke-width="60" d="m0 0 700 400M525 0 0 300"/>
+        </g>
+      </g>
+    </g>
+    <g id="Clip path group_2">
+      <mask id="mask1_1030_2055" width="550" height="325" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+        <g id="b">
+          <path id="Vector_4" fill="#fff" d="M0 0v150h550v150h-25L0 0Zm525 0H262.5v325H0v-25L525 0Z"/>
+        </g>
+      </mask>
+      <g mask="url(#mask1_1030_2055)">
+        <g id="Vector_5">
+          <path fill="#012169" d="m0 0 700 400Zm525 0L0 300Z"/>
+          <path stroke="#C8102E" stroke-width="40" d="m0 0 700 400M525 0 0 300"/>
+        </g>
+      </g>
+    </g>
+    <g id="Vector_6">
+      <path fill="#012169" d="M262.5 0v350ZM0 150h600Z"/>
+      <path stroke="#fff" stroke-width="100" d="M262.5 0v350M0 150h600"/>
+    </g>
+    <path id="1" fill="#EEE" d="M1200 0v100H550l-25-25V0h675Zm0 225v100H525V225h675Zm0 225v150H0V450h1200Z"/>
+    <path id="Vector_7" fill="#C8102E" d="M525 120v53.5L0 180v-60h525ZM232.5 0h60v300h-60V0Z"/>
+    <path id="2" fill="#DDD" d="M1200 75v75H525V75h675Zm0 225v75H0v-75h1200Zm0 225v75H0v-75h1200Z"/>
+    <path id="3" fill="#CCC" d="M1200 150v75.5H525V150h675Zm0 225v75H0v-75h1200Z"/>
+  </g>
+  <defs>
+    <clipPath id="clip0_1030_2055">
+      <path fill="#fff" d="M0 0h1200v600H0z"/>
+    </clipPath>
+  </defs>
+</svg>

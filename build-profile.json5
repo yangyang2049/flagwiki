@@ -1,0 +1,83 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "/Users/yangyangshi/.ohos/config/default_flagwiki_3btYG95tCnz_e8J2A_XMcq7YxPBlybSUB5hc80wYFZs=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001B5C8575F62B5E31A6F028C3B17249A20BD52736B54F76B16439E6D6E78B219F705ED57E4FE18956",
+          "profile": "/Users/yangyangshi/.ohos/config/default_flagwiki_3btYG95tCnz_e8J2A_XMcq7YxPBlybSUB5hc80wYFZs=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "/Users/yangyangshi/.ohos/config/default_flagwiki_3btYG95tCnz_e8J2A_XMcq7YxPBlybSUB5hc80wYFZs=.p12",
+          "storePassword": "0000001BFB80CB26C8A4FF4032DA4B3BE221E2A328648A81754C9D5FE6112BF3D951C5DAB054C55983E079"
+        }
+      },
+      {
+        "name": "release",
+        "type": "HarmonyOS",
+        "material": {
+          "storeFile": "/Users/yangyangshi/Documents/huawei_profile/douhua.p12",
+          "storePassword": "00000038A91D2E02E6D1D6C424660DEEA4AB199E1688FAE4B21FE861DA026E8EB225581F94FE1DAD6508D298193D84E837FE45BF5CDA327A796A9B48F4C651AE17F6572A1E5F86E7",
+          "keyAlias": "deveco",
+          "keyPassword": "0000003819235986D2C51D365914ACC1EEDE28065726568CC041B94775CE32CBA30853EE4C40E5B8A4D5C50C4845BC732D27936329D674A82CD70EEF35FBCF5C8250A4FD2D6BE032",
+          "signAlg": "SHA256withECDSA",
+          "profile": "/Users/yangyangshi/Documents/huawei_profile/flagRelease.p7b",
+          "certpath": "/Users/yangyangshi/Documents/huawei_profile/douhua_release.cer"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "targetSdkVersion": "6.0.0(20)",
+        "compatibleSdkVersion": "5.1.0(18)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      },
+      {
+        "name": "release",
+        "signingConfig": "release",
+        "targetSdkVersion": "6.0.0(20)",
+        "compatibleSdkVersion": "5.1.0(18)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug",
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default",
+            "release"
+          ]
+        }
+      ]
+    }
+  ]
+}

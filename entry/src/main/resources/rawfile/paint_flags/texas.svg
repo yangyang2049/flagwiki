@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" fill="none" viewBox="0 0 900 600">
+  <g id="texas" clip-path="url(#clip0_969_5689)">
+    <path id="2" fill="#EEE" d="M0 0h900v600H0V0Z"/>
+    <path id="1" fill="#CCC" d="M0 0h900v300H0V0Z"/>
+    <path id="3" fill="#DDD" d="M0 0h300v600H0V0Z"/>
+    <g id="Group">
+      <g id="b">
+        <path id="a" fill="#fff" d="m150 187.5-34.764 106.994 47.552 15.451"/>
+        <path id="a_2" fill="#fff" d="m150 187.5 34.764 106.994-47.552 15.451"/>
+      </g>
+      <g id="b_2">
+        <path id="a_3" fill="#fff" d="M256.994 265.242h-112.5v50"/>
+        <path id="a_4" fill="#fff" d="m256.994 265.242-91.015 66.126-29.389-40.451"/>
+      </g>
+      <g id="b_3">
+        <path id="a_5" fill="#fff" d="m216.126 391.016-34.765-106.994-47.552 15.451"/>
+        <path id="a_6" fill="#fff" d="m216.126 391.016-91.015-66.126 29.39-40.451"/>
+      </g>
+      <g id="b_4">
+        <path id="a_7" fill="#fff" d="m83.874 391.016 91.015-66.126-29.39-40.451"/>
+        <path id="a_8" fill="#fff" d="m83.874 391.016 34.765-106.994 47.552 15.451"/>
+      </g>
+      <g id="b_5">
+        <path id="a_9" fill="#fff" d="m43.006 265.234 91.015 66.126 29.389-40.451"/>
+        <path id="a_10" fill="#fff" d="M43.006 265.234h112.5v50"/>
+      </g>
+    </g>
+  </g>
+  <defs>
+    <clipPath id="clip0_969_5689">
+      <path fill="#fff" d="M0 0h900v600H0z"/>
+    </clipPath>
+  </defs>
+</svg>

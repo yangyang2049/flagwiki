@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600">
+  <rect fill="#003F87" width="900" height="600"/>
+  <circle cx="450" cy="300" r="200" fill="#ED1C24"/>
+  <circle cx="450" cy="300" r="140" fill="#fff"/>
+  <g fill="#003F87" transform="translate(450,300)">
+    <g id="rice">
+      <ellipse cx="0" cy="-80" rx="8" ry="25"/>
+    </g>
+    <use href="#rice" transform="rotate(0)"/>
+    <use href="#rice" transform="rotate(36)"/>
+    <use href="#rice" transform="rotate(72)"/>
+    <use href="#rice" transform="rotate(108)"/>
+    <use href="#rice" transform="rotate(144)"/>
+    <use href="#rice" transform="rotate(180)"/>
+    <use href="#rice" transform="rotate(216)"/>
+    <use href="#rice" transform="rotate(252)"/>
+    <use href="#rice" transform="rotate(288)"/>
+    <use href="#rice" transform="rotate(324)"/>
+  </g>
+</svg>
+

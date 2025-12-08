@@ -1,0 +1,184 @@
+{
+  "color": [
+    {
+      "name": "start_window_background",
+      "value": "#000000"
+    },
+    {
+      "name": "white",
+      "value": "#1C1C1E"
+    },
+    {
+      "name": "harmony_blue",
+      "value": "#5B9FFF"
+    },
+    {
+      "name": "harmony_dark",
+      "value": "#E5E5EA"
+    },
+    {
+      "name": "harmony_gray",
+      "value": "#8E8E93"
+    },
+    {
+      "name": "harmony_light",
+      "value": "#2C2C2E"
+    },
+    {
+      "name": "gray",
+      "value": "#636366"
+    },
+    {
+      "name": "gray_light",
+      "value": "#1C1C1E"
+    },
+    {
+      "name": "light_gray",
+      "value": "#48484A"
+    },
+    {
+      "name": "blue_light",
+      "value": "#1A2A3A"
+    },
+    {
+      "name": "yellow",
+      "value": "#FFB340"
+    },
+    {
+      "name": "blue",
+      "value": "#5B9FFF"
+    },
+    {
+      "name": "shadow",
+      "value": "#00000060"
+    },
+    {
+      "name": "background",
+      "value": "#000000"
+    },
+    {
+      "name": "error",
+      "value": "#FF453A"
+    },
+    {
+      "name": "button_primary",
+      "value": "#0A84FF"
+    },
+    {
+      "name": "text_primary",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "text_secondary",
+      "value": "#AEAEB2"
+    },
+    {
+      "name": "text_tertiary",
+      "value": "#6C6C70"
+    },
+    {
+      "name": "text_dark",
+      "value": "#E5E5EA"
+    },
+    {
+      "name": "bg_page",
+      "value": "#1C1C1E"
+    },
+    {
+      "name": "bg_card",
+      "value": "#2C2C2E"
+    },
+    {
+      "name": "bg_secondary",
+      "value": "#2C2C2E"
+    },
+    {
+      "name": "bg_tertiary",
+      "value": "#2C2C2E"
+    },
+    {
+      "name": "bg_quaternary",
+      "value": "#2C2C2E"
+    },
+    {
+      "name": "bg_blue_light",
+      "value": "#B3D9FF"
+    },
+    {
+      "name": "bg_green_light",
+      "value": "#1A2A1A"
+    },
+    {
+      "name": "bg_red_light",
+      "value": "#3A1A1A"
+    },
+    {
+      "name": "bg_yellow_light",
+      "value": "#3A2A1A"
+    },
+    {
+      "name": "bg_orange_light",
+      "value": "#3A2A1A"
+    },
+    {
+      "name": "color_green",
+      "value": "#52C41A"
+    },
+    {
+      "name": "color_orange",
+      "value": "#FF9500"
+    },
+    {
+      "name": "color_orange_red",
+      "value": "#FF6B35"
+    },
+    {
+      "name": "color_purple",
+      "value": "#AF52DE"
+    },
+    {
+      "name": "color_cyan",
+      "value": "#5AC8FA"
+    },
+    {
+      "name": "color_red",
+      "value": "#FF453A"
+    },
+    {
+      "name": "color_red_dark",
+      "value": "#FF3B30"
+    },
+    {
+      "name": "gray_disabled",
+      "value": "#636366"
+    },
+    {
+      "name": "gray_border",
+      "value": "#48484A"
+    },
+    {
+      "name": "gray_very_light",
+      "value": "#2C2C2E"
+    },
+    {
+      "name": "bg_page_alt",
+      "value": "#000000"
+    },
+    {
+      "name": "text_white",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "bg_title_bar",
+      "value": "#000000"
+    },
+    {
+      "name": "bg_tab_bar",
+      "value": "#000000"
+    },
+    {
+      "name": "bg_gallery",
+      "value": "#1C1C1E"
+    }
+  ]
+}
