@@ -20,9 +20,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* background-color 将通过 JavaScript 动态设置 */
+            /* 初始背景色，避免闪烁 */
+            background-color: #F5F6F7;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             padding-top: 60px;
+            transition: background-color 0.3s ease;
         }
 
         .game-container {
@@ -34,7 +36,9 @@
             max-width: 600px;
             padding: 0 16px;
             height: calc(100% - 60px);
-            /* background-color 将通过 JavaScript 动态设置 */
+            /* 初始背景色，避免闪烁 */
+            background-color: #F5F6F7;
+            transition: background-color 0.3s ease;
         }
 
         .country-name {
@@ -43,6 +47,12 @@
             color: #1677FF;
             text-align: center;
             margin-bottom: 16px;
+            transition: color 0.3s ease;
+        }
+        
+        /* 暗黑模式下的文字颜色 */
+        body.dark-mode .country-name {
+            color: #5B9FFF;
         }
 
         #flag-svg {
@@ -53,7 +63,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* background-color 将通过 JavaScript 动态设置 */
+            /* 初始背景色，避免闪烁 */
+            background-color: #F5F6F7;
+            transition: background-color 0.3s ease;
         }
 
         #flag-svg svg {
@@ -249,30 +261,45 @@
 
         let colorPalette = null;
 
-        // 设置背景色（从原生调用）
+        // 设置背景色（从原生调用，参考 setupPaintGame 的方式）
         function setBackgroundColor(backgroundColor) {
             console.log('Setting background color:', backgroundColor);
-            if (backgroundColor) {
-                // 设置 body 背景色
-                document.body.style.backgroundColor = backgroundColor;
-                document.body.style.setProperty('background-color', backgroundColor, 'important');
-                
-                // 设置 flag-svg 背景色
-                const flagSvg = document.getElementById('flag-svg');
-                if (flagSvg) {
-                    flagSvg.style.backgroundColor = backgroundColor;
-                    flagSvg.style.setProperty('background-color', backgroundColor, 'important');
-                }
-                
-                // 设置 game-container 背景色（如果有）
-                const gameContainer = document.querySelector('.game-container');
-                if (gameContainer) {
-                    gameContainer.style.backgroundColor = backgroundColor;
-                }
+            if (!backgroundColor) {
+                return;
+            }
+            
+            // 判断是否为暗黑模式（深色背景）
+            const isDarkMode = backgroundColor === '#1C1C1E' || 
+                             backgroundColor.toLowerCase() === '#1c1c1e' ||
+                             backgroundColor === '#000000' ||
+                             backgroundColor.toLowerCase() === '#000000';
+            
+            // 添加或移除暗黑模式类
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+            
+            // 设置 body 背景色（使用 transition 平滑过渡）
+            document.body.style.backgroundColor = backgroundColor;
+            document.body.style.setProperty('background-color', backgroundColor, 'important');
+            
+            // 设置 flag-svg 背景色
+            const flagSvg = document.getElementById('flag-svg');
+            if (flagSvg) {
+                flagSvg.style.backgroundColor = backgroundColor;
+                flagSvg.style.setProperty('background-color', backgroundColor, 'important');
+            }
+            
+            // 设置 game-container 背景色
+            const gameContainer = document.querySelector('.game-container');
+            if (gameContainer) {
+                gameContainer.style.backgroundColor = backgroundColor;
             }
         }
         
-        // 页面加载时立即设置默认背景色（如果已传入）
+        // 页面加载时立即尝试设置背景色（如果已传入）
         window.addEventListener('DOMContentLoaded', function() {
             // 如果已经有保存的背景色，立即应用
             if (window.savedBackgroundColor) {

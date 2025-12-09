@@ -1,9 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="600" fill="none" viewBox="0 0 1000 600">
   <g id="tennessee" clip-path="url(#clip0_969_5952)">
-    <path id="1" fill="#EEE" d="M0 0h1000v600H0V0Z"/>
+    <path id="1" fill="#EEE" d="M0 0h925v600H0V0Z"/>
+    <path id="2" fill="#DDD" d="M925 0h75v600h-75V0Z"/>
+    <path id="3" fill="#EEE" d="M937.5 0h62.5v600h-62.5V0Z"/>
     <path id="Vector" fill="#fff" d="M925 0h75v600h-75V0Z"/>
     <path id="Vector_2" fill="#002D65" d="M937.5 0h62.5v600h-62.5V0Z"/>
-    <path id="2" fill="#DDD" d="M937.5 0h62.5v600h-62.5V0Z"/>
     <g id="Group">
       <path id="Vector_3" fill="#fff" d="M462.5 462.5c89.746 0 162.5-72.754 162.5-162.5s-72.754-162.5-162.5-162.5S300 210.254 300 300s72.754 162.5 162.5 162.5Z"/>
       <path id="3" fill="#DDD" d="M462.5 450c82.843 0 150-67.157 150-150s-67.157-150-150-150-150 67.157-150 150 67.157 150 150 150Z"/>

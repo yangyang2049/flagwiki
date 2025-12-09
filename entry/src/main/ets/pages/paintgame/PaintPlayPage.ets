@@ -5,10 +5,14 @@
 import router from '@ohos.router';
 import web_webview from '@ohos.web.webview';
 import common from '@ohos.app.ability.common';
+import { ConfigurationConstant } from '@kit.AbilityKit';
+import { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
+import curves from '@ohos.curves';
 import { getCountryByCode, Country } from '../../utils/countryData';
 import { getPaintLevel, getFlagPaintInfo, getTotalLevels, PaintLevel } from './PaintGameData';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
+import { PreferencesManager } from '../../utils/PreferencesManager';
 
 interface RouterParams {
   categoryId: string;
@@ -72,7 +76,7 @@ const US_STATE_NAMES: Record<string, string> = {
 
 @Entry
 @Component
-struct PaintPlayPage {
+  struct PaintPlayPage {
   @State categoryId: string = 'world';
   @State levelId: number = 1;
   @State currentLevel: PaintLevel | undefined = undefined;
@@ -82,12 +86,13 @@ struct PaintPlayPage {
   @State levelCompleted: boolean = false;
   @State isWebReady: boolean = false;
   @State currentFlagPath: string = 'flags/us.svg';
-  @State backgroundColorStr: string = '#F5F6F7'; // 固定灰色背景
+  @State backgroundColorStr: string = '#F5F6F7'; // 默认浅色背景
+  @State webOpacity: number = 0; // Web 组件透明度，用于渐显动画
 
   private webController: web_webview.WebviewController = new web_webview.WebviewController();
   private context = getContext(this) as common.UIAbilityContext;
 
-  aboutToAppear() {
+  async aboutToAppear() {
     const params = router.getParams() as RouterParams;
     if (params) {
       this.categoryId = params.categoryId || 'world';
@@ -95,6 +100,58 @@ struct PaintPlayPage {
     }
     this.currentLevel = getPaintLevel(this.categoryId, this.levelId);
     this.updateCurrentFlagPath();
+    await this.updateBackgroundColor();
+  }
+
+  private async updateBackgroundColor(): Promise<void> {
+    try {
+      // 读取保存的主题设置
+      const prefs = await PreferencesManager.getPreferences('app_settings');
+      const savedColorMode: number = await prefs.get('colorMode', ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET) as number;
+      const colorMode = savedColorMode as ConfigurationConstant.ColorMode;
+
+      let isDarkMode = false;
+
+      if (colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK) {
+        // 明确设置为暗黑模式
+        isDarkMode = true;
+      } else if (colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET) {
+        // 跟随系统，尝试检测系统主题
+        // 通过检查资源管理器当前使用的资源类型来判断
+        try {
+          const resourceManager = this.context.resourceManager;
+          const config = await resourceManager.getConfiguration();
+          // 如果 colorMode 为 1，表示暗黑模式
+          if (config.colorMode === 1) {
+            isDarkMode = true;
+          }
+        } catch (e) {
+          // 如果检测失败，默认使用浅色
+          console.error(`Failed to detect system theme: ${JSON.stringify(e)}`);
+        }
+      }
+
+      // 设置背景色
+      if (isDarkMode) {
+        // 暗黑模式使用深黑色（非纯黑）
+        this.backgroundColorStr = '#1C1C1E';
+      } else {
+        // 浅色模式使用灰色
+        this.backgroundColorStr = '#F5F6F7';
+      }
+
+      // 如果 Web 已经准备好，立即注入背景色
+      if (this.isWebReady) {
+        await this.injectBackgroundColor();
+      }
+    } catch (err) {
+      console.error(`Failed to update background color: ${JSON.stringify(err)}`);
+      // 默认使用浅色背景
+      this.backgroundColorStr = '#F5F6F7';
+      if (this.isWebReady) {
+        await this.injectBackgroundColor();
+      }
+    }
   }
 
 
@@ -142,14 +199,17 @@ struct PaintPlayPage {
     return country ? country.nameCN : code;
   }
 
-  private async setBackgroundColorInWeb(): Promise<void> {
+  private async injectBackgroundColor(): Promise<void> {
     try {
-      // 即使页面还没准备好，也先保存背景色，等页面加载时应用
+      if (!this.isWebReady) {
+        return;
+      }
+      // 直接调用 HTML 中的 setBackgroundColor 函数
       await this.webController.runJavaScript(
-        `window.savedBackgroundColor = '${this.backgroundColorStr}'; if (typeof setBackgroundColor === 'function') { setBackgroundColor('${this.backgroundColorStr}'); }`
+        `if (typeof setBackgroundColor === 'function') { setBackgroundColor('${this.backgroundColorStr}'); }`
       );
     } catch (e) {
-      console.error('Failed to set background color:', e);
+      console.error('Failed to inject background color:', e);
     }
   }
 
@@ -158,7 +218,7 @@ struct PaintPlayPage {
 
     const countryCode = this.currentLevel.flags[this.currentFlagIndex];
     const colors = this.getCurrentFlagColors();
-    
+
     if (colors.length === 0) {
       console.error('No colors found for:', countryCode);
       return;
@@ -175,8 +235,8 @@ struct PaintPlayPage {
 
     // 调用JS设置游戏，传入 Base64 编码的 SVG 内容
     try {
-      // 确保背景色已设置
-      await this.setBackgroundColorInWeb();
+      // 先设置背景色
+      await this.injectBackgroundColor();
       // 然后设置游戏
       await this.webController.runJavaScript(
         `if (typeof setupPaintGame === 'function') { setupPaintGame('${countryCode}', '${displayName}', ${colorsJson}, '${svgBase64}'); }`
@@ -264,11 +324,27 @@ struct PaintPlayPage {
             })
               .javaScriptAccess(true)
               .domStorageAccess(true)
+              .opacity(this.webOpacity)
               .onPageEnd(() => {
                 this.isWebReady = true;
-                // 页面加载完成后，先设置背景色，再设置游戏
-                this.setBackgroundColorInWeb();
-                this.setupGame();
+                // 页面加载完成后，先设置背景色，再设置游戏，然后渐显
+                // 先保存背景色到 window，让 HTML 在 DOMContentLoaded 时就能应用
+                this.webController.runJavaScript(
+                  `window.savedBackgroundColor = '${this.backgroundColorStr}';`
+                ).then(() => {
+                  return this.injectBackgroundColor();
+                }).then(() => {
+                  return this.setupGame();
+                }).then(() => {
+                  // 背景色和游戏都设置好后，延迟一点再渐显，确保背景色已应用
+                  setTimeout(() => {
+                    this.webOpacity = 1;
+                  }, 200);
+                }).catch(() => {
+                  console.error('Failed to setup game');
+                  // 即使出错也显示
+                  this.webOpacity = 1;
+                });
               })
               .onConsole((event) => {
                 if (event) {
@@ -313,8 +389,9 @@ struct PaintPlayPage {
             }
           }
           .width('100%')
-          .height('100%')
-          .backgroundColor(this.backgroundColorStr as ResourceColor)
+            .height('100%')
+            .backgroundColor(this.backgroundColorStr as ResourceColor)
+            .transition(TransitionEffect.OPACITY.animation({ duration: 600, curve: curves.cubicBezier(0.4, 0.0, 0.2, 1.0) }))
 
           // 顶部状态栏
           Row() {
@@ -345,7 +422,7 @@ struct PaintPlayPage {
               .margin({ top: 4 })
             }
             .layoutWeight(1)
-            .alignItems(HorizontalAlign.Center)
+              .alignItems(HorizontalAlign.Center)
 
             // 提示按钮
             Image($r('app.media.icon_hint'))
@@ -356,9 +433,9 @@ struct PaintPlayPage {
               })
           }
           .width('100%')
-          .height(56)
-          .padding({ left: 16, right: 16 })
-          .backgroundColor(Color.Transparent)
+            .height(56)
+            .padding({ left: 16, right: 16 })
+            .backgroundColor(Color.Transparent)
 
           // 提示国旗显示
           if (this.showHint) {
@@ -369,26 +446,26 @@ struct PaintPlayPage {
                 .objectFit(ImageFit.Contain)
             }
             .width(160)
-            .height(110)
-            .backgroundColor(Color.White)
-            .borderRadius(8)
-            .justifyContent(FlexAlign.Center)
-            .shadow({
-              radius: 8,
-              color: 'rgba(0, 0, 0, 0.2)',
-              offsetX: 0,
-              offsetY: 3
-            })
-            .position({ x: '50%', y: 70 })
-            .translate({ x: '-50%' })
+              .height(110)
+              .backgroundColor(Color.White)
+              .borderRadius(8)
+              .justifyContent(FlexAlign.Center)
+              .shadow({
+                radius: 8,
+                color: 'rgba(0, 0, 0, 0.2)',
+                offsetX: 0,
+                offsetY: 3
+              })
+              .position({ x: '50%', y: 70 })
+              .translate({ x: '-50%' })
           }
         }
         .width('100%')
-        .height('100%')
+          .height('100%')
       }
     }
     .hideTitleBar(true)
-    .hideBackButton(true)
+      .hideBackButton(true)
   }
 
   @Builder
@@ -455,8 +532,8 @@ struct PaintPlayPage {
         })
     }
     .width('100%')
-    .height('100%')
-    .backgroundColor($r('app.color.bg_page'))
+      .height('100%')
+      .backgroundColor($r('app.color.bg_page'))
   }
 }
 

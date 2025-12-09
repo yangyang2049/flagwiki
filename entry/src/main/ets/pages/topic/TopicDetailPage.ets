@@ -37,34 +37,34 @@ struct TopicDetailPage {
     this.isLoading = true;
     
     // 同步加载国家数据（移除不必要的延迟）
-    const countryList: Country[] = [];
-    const displayList: DisplayItem[] = [];
-    
+      const countryList: Country[] = [];
+      const displayList: DisplayItem[] = [];
+      
     for (const code of this.topic.countryCodes) {
-      if (isInternationalOrg(code)) {
-        const org = getInternationalOrgByCode(code);
-        if (org) {
-          displayList.push({
-            code: org.code,
-            nameCN: org.nameCN,
-            name: org.name
-          });
-        }
-      } else {
-        const country = getCountryByCode(code);
-        if (country) {
-          countryList.push(country);
-          displayList.push({
-            code: country.code,
-            nameCN: country.nameCN,
-            name: country.name
-          });
+        if (isInternationalOrg(code)) {
+          const org = getInternationalOrgByCode(code);
+          if (org) {
+            displayList.push({
+              code: org.code,
+              nameCN: org.nameCN,
+              name: org.name
+            });
+          }
+        } else {
+          const country = getCountryByCode(code);
+          if (country) {
+            countryList.push(country);
+            displayList.push({
+              code: country.code,
+              nameCN: country.nameCN,
+              name: country.name
+            });
+          }
         }
       }
-    }
-    this.countries = countryList;
-    this.displayItems = displayList;
-    this.isLoading = false;
+      this.countries = countryList;
+      this.displayItems = displayList;
+      this.isLoading = false;
   }
 
   build() {

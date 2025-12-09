@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" fill="none" viewBox="0 0 900 600">
   <g id="texas" clip-path="url(#clip0_969_5689)">
-    <path id="2" fill="#EEE" d="M0 0h900v600H0V0Z"/>
-    <path id="1" fill="#CCC" d="M0 0h900v300H0V0Z"/>
-    <path id="3" fill="#DDD" d="M0 0h300v600H0V0Z"/>
+    <path id="2" fill="#EEE" d="M300 0h600v300H300V0Z"/>
+    <path id="1" fill="#CCC" d="M0 0h300v600H0V0Z"/>
+    <path id="3" fill="#DDD" d="M300 300h600v300H300V300Z"/>
     <g id="Group">
       <g id="b">
         <path id="a" fill="#fff" d="m150 187.5-34.764 106.994 47.552 15.451"/>

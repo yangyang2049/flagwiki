@@ -1,28 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="520" height="320" fill="none" viewBox="0 0 520 320">
   <g id="ohio" clip-path="url(#clip0_1030_1728)">
     <g id="1">
-      <mask id="mask0_1030_1728" width="520" height="320" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
-        <g id="d">
-          <path id="Vector" fill="#fff" stroke="#fff" stroke-width="20" d="m495.668 67.259-102.069 85.058L384.38 160l9.219 7.683 102.069 85.057L10 308.779V11.221l485.668 56.038Z"/>
-        </g>
-      </mask>
-      <g mask="url(#mask0_1030_1728)">
-        <g id="Group">
-          <g id="Vector_2">
-            <path fill="#fff" d="M520 60 0 0v320l520-60"/>
-            <path stroke="#EEE" stroke-width="80" d="M520 60 0 0v320l520-60"/>
-          </g>
-          <g id="Vector_3">
-            <path fill="#fff" d="M0 160h520Z"/>
-            <path stroke="#EEE" stroke-width="40" d="M0 160h520"/>
-          </g>
-        </g>
-      </g>
+      <path fill="#DDD" d="M0 0v320l320-160L0 0Z"/>
+      <path fill="#DDD" d="M320 0h200v53.33h-200V0Z"/>
+      <path fill="#DDD" d="M320 106.67h200v53.33h-200v-53.33Z"/>
+      <path fill="#DDD" d="M320 213.33h200v53.33h-200v-53.33Z"/>
+      <path fill="#DDD" d="M320 320h200v-53.33h-200V320Z"/>
     </g>
-    <path id="2" fill="#DDD" d="M0 0v320l320-160L0 0Z"/>
+    <g id="2">
+      <path fill="#002868" d="M98.88 200c22.091 0 40-17.909 40-40s-17.909-40-40-40-40 17.909-40 40 17.908 40 40 40Z"/>
+    </g>
     <g id="Group_2">
       <path id="Vector_4" fill="#fff" d="M98.88 220c33.137 0 60-26.863 60-60s-26.863-60-60-60-60 26.863-60 60 26.863 60 60 60Z"/>
-      <path id="3" fill="#EEE" d="M98.88 200c22.091 0 40-17.909 40-40s-17.909-40-40-40-40 17.909-40 40 17.908 40 40 40Z"/>
       <g id="e">
         <g id="c">
           <g id="b">

@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="750" height="500" fill="none" viewBox="0 0 750 500">
   <g id="north_carolina" clip-path="url(#clip0_969_6523)">
-    <path id="2" fill="#DDD" fill-rule="evenodd" d="M0 .047h750V500H0V.047Z" clip-rule="evenodd"/>
-    <path id="1" fill="#EEE" fill-rule="evenodd" d="M0 .047h750v250.065H0V.047Z" clip-rule="evenodd"/>
-    <path id="3" fill="#CCC" fill-rule="evenodd" d="M0 0h250.031v500H0V0Z" clip-rule="evenodd"/>
+    <path id="1" fill="#CCC" fill-rule="evenodd" d="M0 0h250.031v500H0V0Z" clip-rule="evenodd"/>
+    <path id="2" fill="#DDD" fill-rule="evenodd" d="M0 .047h750v250.065H0V.047Z" clip-rule="evenodd"/>
+    <path id="3" fill="#EEE" fill-rule="evenodd" d="M0 250.112h750v249.888H0V250.112Z" clip-rule="evenodd"/>
     <g id="Vector">
       <path fill="#FFCA00" fill-rule="evenodd" d="M37.395 117.305c-15.631 8.729-18.465 12.37-27.032 19.063l18.998.398c-.226 1.77-4.374 23.795-4.767 25.35 14.303-9.505 21.09-13.862 40.604-19.36 7.754-2.152-.61-10.03-1.417-12.126-5.301 2.393-9.377 5.234-13.285 8.716" clip-rule="evenodd"/>
       <path stroke="#002868" d="M37.395 117.305c-15.631 8.729-18.465 12.37-27.032 19.063l18.998.398c-.226 1.77-4.374 23.795-4.767 25.35 14.303-9.505 21.09-13.862 40.604-19.36 7.754-2.152-.61-10.03-1.417-12.126-5.301 2.393-9.377 5.234-13.285 8.716"/>
