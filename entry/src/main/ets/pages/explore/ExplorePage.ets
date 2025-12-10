@@ -1,13 +1,7 @@
 import router from '@ohos.router';
-import { hasAnyHistory } from '../../utils/FlagHistoryData';
 
 @Component
 export struct ExplorePage {
-  @State hasHistory: boolean = false;
-
-  aboutToAppear() {
-    this.hasHistory = hasAnyHistory();
-  }
 
   build() {
     Scroll() {
@@ -251,52 +245,6 @@ export struct ExplorePage {
       .onClick(() => {
         router.pushUrl({ url: 'pages/explore/HeadsUpPlayPage' });
       })
-
-      // 历史国旗卡片（仅当有历史数据时显示）
-      if (this.hasHistory) {
-        Row() {
-          Column() {
-            Text('📜')
-              .fontSize(40)
-          }
-          .width(72)
-          .height(72)
-          .backgroundColor($r('app.color.bg_blue_light'))
-          .borderRadius(16)
-          .justifyContent(FlexAlign.Center)
-
-          Column() {
-            Text('历史国旗')
-              .fontSize(20)
-              .fontWeight(FontWeight.Bold)
-              .fontColor($r('app.color.text_primary'))
-
-            Text('探索各国国旗的历史变迁')
-              .fontSize(14)
-              .fontColor($r('app.color.text_secondary'))
-              .margin({ top: 6 })
-          }
-          .alignItems(HorizontalAlign.Start)
-          .margin({ left: 16 })
-          .layoutWeight(1)
-
-          Image($r('app.media.icon_arrow_right'))
-            .width(20)
-            .height(20)
-        }
-        .padding(20)
-        .margin({ left: 16, right: 16, top: 16, bottom: 20 })
-        .backgroundColor($r('app.color.bg_card'))
-        .borderRadius(20)
-        .alignItems(VerticalAlign.Center)
-        .onClick(() => {
-          router.pushUrl({ url: 'pages/flaghistory/FlagHistoryListPage' });
-        })
-      } else {
-        // 如果没有历史数据，确保底部有足够的间距
-        Blank()
-          .height(20)
-      }
       }
       .width('100%')
     }
