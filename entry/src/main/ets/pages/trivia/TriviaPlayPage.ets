@@ -2,7 +2,7 @@ import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
 import { getCountryByCode } from '../../utils/countryData';
-import { TriviaLevel, TriviaQuestion, getTriviaLevel } from './TriviaLevels';
+import { TriviaLevel, TriviaQuestion, getTriviaLevel, getTotalTriviaLevels } from './TriviaLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 
 interface RouterParams {
@@ -11,7 +11,7 @@ interface RouterParams {
 
 @Entry
 @Component
-struct TriviaPlayPage {
+  struct TriviaPlayPage {
   @State level: TriviaLevel | undefined = undefined;
   @State currentIndex: number = 0;
   @State lives: number = 3;
@@ -209,7 +209,7 @@ struct TriviaPlayPage {
               })
             }
             .layoutWeight(1)
-            .justifyContent(FlexAlign.Center)
+              .justifyContent(FlexAlign.Center)
 
             Text(`${this.currentIndex + 1} / ${this.level?.questions.length}`)
               .fontSize(15)
@@ -219,7 +219,7 @@ struct TriviaPlayPage {
               .textAlign(TextAlign.End)
           }
           .width('100%')
-          .padding({ left: 20, right: 20, top: 12, bottom: 12 })
+            .padding({ left: 20, right: 20, top: 12, bottom: 12 })
 
           // 问题
           Column() {
@@ -231,7 +231,7 @@ struct TriviaPlayPage {
               .padding({ left: 20, right: 20 })
           }
           .width('100%')
-          .margin({ top: 60, bottom: 60 })
+            .margin({ top: 60, bottom: 60 })
 
           // 选项（使用打乱后的选项）
           Column() {
@@ -244,22 +244,22 @@ struct TriviaPlayPage {
                   .textAlign(TextAlign.Center)
               }
               .width('100%')
-              .height(56)
-              .justifyContent(FlexAlign.Center)
-              .backgroundColor(this.getOptionBackgroundColor(option))
-              .borderRadius(12)
-              .border({
-                width: 2,
-                color: this.getOptionBorderColor(option)
-              })
-              .margin({ bottom: 12 })
-              .onClick(() => {
-                this.selectOption(option);
-              })
+                .height(56)
+                .justifyContent(FlexAlign.Center)
+                .backgroundColor(this.getOptionBackgroundColor(option))
+                .borderRadius(12)
+                .border({
+                  width: 2,
+                  color: this.getOptionBorderColor(option)
+                })
+                .margin({ bottom: 12 })
+                .onClick(() => {
+                  this.selectOption(option);
+                })
             })
           }
           .width('100%')
-          .padding({ left: 20, right: 20 })
+            .padding({ left: 20, right: 20 })
 
           Blank()
 
@@ -278,8 +278,8 @@ struct TriviaPlayPage {
           }
         }
         .width('100%')
-        .height('100%')
-        .backgroundColor($r('app.color.bg_page'))
+          .height('100%')
+          .backgroundColor($r('app.color.bg_page'))
       } else {
         Column() {
           Text('加载中...')
@@ -287,13 +287,13 @@ struct TriviaPlayPage {
             .fontColor($r('app.color.text_tertiary'))
         }
         .width('100%')
-        .height('100%')
-        .justifyContent(FlexAlign.Center)
+          .height('100%')
+          .justifyContent(FlexAlign.Center)
       }
     }
     .title('')
-    .titleMode(NavigationTitleMode.Mini)
-    .backgroundColor($r('app.color.bg_page'))
+      .titleMode(NavigationTitleMode.Mini)
+      .backgroundColor($r('app.color.bg_page'))
   }
 
   @Builder
@@ -326,7 +326,7 @@ struct TriviaPlayPage {
             .fontColor($r('app.color.text_primary'))
         }
         .width('100%')
-        .padding({ top: 16, bottom: 16 })
+          .padding({ top: 16, bottom: 16 })
 
         Divider().color($r('app.color.gray_very_light'))
 
@@ -341,13 +341,13 @@ struct TriviaPlayPage {
             .fontColor($r('app.color.text_primary'))
         }
         .width('100%')
-        .padding({ top: 16, bottom: 16 })
+          .padding({ top: 16, bottom: 16 })
       }
       .width('100%')
-      .padding({ left: 24, right: 24 })
-      .margin({ top: 40 })
-      .backgroundColor($r('app.color.bg_card'))
-      .borderRadius(16)
+        .padding({ left: 24, right: 24 })
+        .margin({ top: 40 })
+        .backgroundColor($r('app.color.bg_card'))
+        .borderRadius(16)
 
       Blank()
 
@@ -362,7 +362,7 @@ struct TriviaPlayPage {
           router.back();
         })
 
-      Button('再来一次')
+      Button(this.level && this.level.id < getTotalTriviaLevels() ? '下一关' : '完美收官')
         .width('80%')
         .height(48)
         .fontSize(17)
@@ -372,13 +372,24 @@ struct TriviaPlayPage {
         .border({ width: 1, color: $r('app.color.button_primary') })
         .margin({ bottom: 32 })
         .onClick(() => {
-          this.restartGame();
+          if (this.level && this.level.id < getTotalTriviaLevels()) {
+            // 下一关
+            router.pushUrl({
+              url: 'pages/trivia/TriviaPlayPage',
+              params: {
+                levelId: this.level.id + 1
+              }
+            });
+          } else {
+            // 完美收官，退出
+            router.back();
+          }
         })
     }
     .width('100%')
-    .height('100%')
-    .padding({ left: 16, right: 16 })
-    .backgroundColor($r('app.color.bg_page'))
+      .height('100%')
+      .padding({ left: 16, right: 16 })
+      .backgroundColor($r('app.color.bg_page'))
   }
 }
 

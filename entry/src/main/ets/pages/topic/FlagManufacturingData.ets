@@ -196,3 +196,4 @@ export const flagManufacturingContent: ManufacturingSection[] = [
 export function getManufacturingContent(): ManufacturingSection[] {
    return flagManufacturingContent;
 }
+

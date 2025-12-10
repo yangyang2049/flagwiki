@@ -3,7 +3,7 @@ import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
 import curves from '@ohos.curves';
 import { getCountryByCode } from '../../utils/countryData';
-import { MemoryLevel, getMemoryLevel } from './MemoryLevels';
+import { MemoryLevel, getMemoryLevel, getAllMemoryLevels } from './MemoryLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 
 interface RouterParams {
@@ -19,7 +19,7 @@ interface Card {
 
 @Entry
 @Component
-struct MemoryPlayPage {
+  struct MemoryPlayPage {
   @State level: MemoryLevel | undefined = undefined;
   @State cards: Card[] = [];
   @State firstCard: Card | null = null;
@@ -309,8 +309,8 @@ struct MemoryPlayPage {
             .layoutWeight(1)
           }
           .width('100%')
-          .padding({ left: 20, right: 20, top: 16, bottom: 16 })
-          .backgroundColor($r('app.color.bg_card'))
+            .padding({ left: 20, right: 20, top: 16, bottom: 16 })
+            .backgroundColor($r('app.color.bg_card'))
 
           // 卡片网格 - 限制在屏幕内不滚动
           Grid() {
@@ -321,20 +321,20 @@ struct MemoryPlayPage {
             })
           }
           .columnsTemplate(this.getGridColumns())
-          .rowsTemplate(this.getGridRows())
-          .columnsGap(12)
-          .rowsGap(12)
-          .width('100%')
-          .layoutWeight(1)
-          .padding({ left: 16, right: 16, top: 12, bottom: 12 })
+            .rowsTemplate(this.getGridRows())
+            .columnsGap(12)
+            .rowsGap(12)
+            .width('100%')
+            .layoutWeight(1)
+            .padding({ left: 16, right: 16, top: 12, bottom: 12 })
         }
         .width('100%')
-        .height('100%')
-        .backgroundColor($r('app.color.bg_page'))
+          .height('100%')
+          .backgroundColor($r('app.color.bg_page'))
       }
       .title('')
-      .titleMode(NavigationTitleMode.Mini)
-      .backgroundColor($r('app.color.bg_page'))
+        .titleMode(NavigationTitleMode.Mini)
+        .backgroundColor($r('app.color.bg_page'))
 
       // 结果弹窗
       if (this.showResult) {
@@ -342,7 +342,7 @@ struct MemoryPlayPage {
       }
     }
     .width('100%')
-    .height('100%')
+      .height('100%')
   }
 
   @Builder
@@ -363,51 +363,51 @@ struct MemoryPlayPage {
             .fontColor($r('app.color.text_tertiary'))
         }
         .width('100%')
-        .height('100%')
-        .justifyContent(FlexAlign.Center)
-        .alignItems(HorizontalAlign.Center)
+          .height('100%')
+          .justifyContent(FlexAlign.Center)
+          .alignItems(HorizontalAlign.Center)
       }
     }
     .width('100%')
-    .height('100%')
-    .justifyContent(FlexAlign.Center)
-    .backgroundColor(card.isMatched ? $r('app.color.bg_green_light') :
-      (card.isFlipped ? $r('app.color.bg_card') : $r('app.color.bg_secondary')))
-    .borderRadius(this.getCardBorderRadius())
-    .border({
-      width: card.isMatched ? 2 : 1,
-      color: card.isMatched ? $r('app.color.color_green') : $r('app.color.gray_border')
-    })
-    .shadow(card.isFlipped || card.isMatched ? {
-      radius: 8,
-      color: 'rgba(0, 0, 0, 0.1)',
-      offsetX: 0,
-      offsetY: 2
-    } : {
-      radius: 0,
-      color: 'rgba(0, 0, 0, 0)',
-      offsetX: 0,
-      offsetY: 0
-    })
-    .rotate({
-      x: 0,
-      y: 1,
-      z: 0,
-      angle: this.getCardRotateAngle(card),
-      centerX: '50%',
-      centerY: '50%'
-    })
-    .scale({
-      x: card.isFlipped || card.isMatched ? 1 : 0.95,
-      y: card.isFlipped || card.isMatched ? 1 : 0.95
-    })
-    .animation({
-      duration: 400,
-      curve: curves.springMotion(0.4, 0.8)
-    })
-    .onClick(() => {
-      this.flipCard(card);
-    })
+      .height('100%')
+      .justifyContent(FlexAlign.Center)
+      .backgroundColor(card.isMatched ? $r('app.color.bg_green_light') :
+        (card.isFlipped ? $r('app.color.bg_card') : $r('app.color.bg_secondary')))
+      .borderRadius(this.getCardBorderRadius())
+      .border({
+        width: card.isMatched ? 2 : 1,
+        color: card.isMatched ? $r('app.color.color_green') : $r('app.color.gray_border')
+      })
+      .shadow(card.isFlipped || card.isMatched ? {
+        radius: 8,
+        color: 'rgba(0, 0, 0, 0.1)',
+        offsetX: 0,
+        offsetY: 2
+      } : {
+        radius: 0,
+        color: 'rgba(0, 0, 0, 0)',
+        offsetX: 0,
+        offsetY: 0
+      })
+      .rotate({
+        x: 0,
+        y: 1,
+        z: 0,
+        angle: this.getCardRotateAngle(card),
+        centerX: '50%',
+        centerY: '50%'
+      })
+      .scale({
+        x: card.isFlipped || card.isMatched ? 1 : 0.95,
+        y: card.isFlipped || card.isMatched ? 1 : 0.95
+      })
+      .animation({
+        duration: 400,
+        curve: curves.springMotion(0.4, 0.8)
+      })
+      .onClick(() => {
+        this.flipCard(card);
+      })
   }
 
   private getCardRotateAngle(card: Card): number {
@@ -462,7 +462,7 @@ struct MemoryPlayPage {
               .fontColor($r('app.color.text_primary'))
           }
           .width('100%')
-          .padding({ top: 12, bottom: 12 })
+            .padding({ top: 12, bottom: 12 })
 
           Divider().color($r('app.color.gray_very_light'))
 
@@ -477,13 +477,13 @@ struct MemoryPlayPage {
               .fontColor($r('app.color.text_primary'))
           }
           .width('100%')
-          .padding({ top: 12, bottom: 12 })
+            .padding({ top: 12, bottom: 12 })
         }
         .width('100%')
-        .padding({ left: 20, right: 20 })
-        .margin({ top: 20 })
-        .backgroundColor($r('app.color.bg_secondary'))
-        .borderRadius(12)
+          .padding({ left: 20, right: 20 })
+          .margin({ top: 20 })
+          .backgroundColor($r('app.color.bg_secondary'))
+          .borderRadius(12)
 
         // 按钮
         Row({ space: 12 }) {
@@ -499,27 +499,38 @@ struct MemoryPlayPage {
               router.back();
             })
 
-          Button('再来一次')
+          Button(this.level && this.level.id < getAllMemoryLevels().length ? '下一关' : '完美收官')
             .layoutWeight(1)
             .height(44)
             .fontSize(16)
             .fontWeight(FontWeight.Bold)
             .backgroundColor($r('app.color.button_primary'))
             .onClick(() => {
-              this.restartGame();
+              if (this.level && this.level.id < getAllMemoryLevels().length) {
+                // 下一关
+                router.pushUrl({
+                  url: 'pages/memory/MemoryPlayPage',
+                  params: {
+                    levelId: this.level.id + 1
+                  }
+                });
+              } else {
+                // 完美收官，退出
+                router.back();
+              }
             })
         }
         .width('100%')
-        .padding({ left: 20, right: 20 })
-        .margin({ top: 24, bottom: 24 })
+          .padding({ left: 20, right: 20 })
+          .margin({ top: 24, bottom: 24 })
       }
       .width('85%')
-      .constraintSize({ maxWidth: 320 })
-      .backgroundColor($r('app.color.bg_card'))
-      .borderRadius(20)
+        .constraintSize({ maxWidth: 320 })
+        .backgroundColor($r('app.color.bg_card'))
+        .borderRadius(20)
     }
     .width('100%')
-    .height('100%')
+      .height('100%')
   }
 }
 

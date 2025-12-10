@@ -2,7 +2,7 @@ import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
 import { getCountryByCode } from '../../utils/countryData';
-import { FakeFlagLevel, FakeFlagQuestion, getFakeFlagLevel } from './FakeFlagLevels';
+import { FakeFlagLevel, FakeFlagQuestion, getFakeFlagLevel, getAllFakeFlagLevels } from './FakeFlagLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 
 interface RouterParams {
@@ -11,7 +11,7 @@ interface RouterParams {
 
 @Entry
 @Component
-struct FakeFlagPlayPage {
+  struct FakeFlagPlayPage {
   @State level: FakeFlagLevel | undefined = undefined;
   @State currentIndex: number = 0;
   @State lives: number = 3;
@@ -245,7 +245,7 @@ struct FakeFlagPlayPage {
                 })
               }
               .layoutWeight(1)
-              .justifyContent(FlexAlign.Center)
+                .justifyContent(FlexAlign.Center)
 
               Text(`${this.currentIndex + 1} / ${this.level?.questions.length}`)
                 .fontSize(15)
@@ -255,14 +255,14 @@ struct FakeFlagPlayPage {
                 .textAlign(TextAlign.End)
             }
             .width('100%')
-            .padding({ left: 20, right: 20, top: 12, bottom: 12 })
+              .padding({ left: 20, right: 20, top: 12, bottom: 12 })
 
-          // 提示文字
-          Text('找出假旗')
-            .fontSize(20)
-            .fontWeight(FontWeight.Bold)
-            .fontColor($r('app.color.text_primary'))
-            .margin({ top: 60, bottom: 60 })
+            // 提示文字
+            Text('找出假旗')
+              .fontSize(20)
+              .fontWeight(FontWeight.Bold)
+              .fontColor($r('app.color.text_primary'))
+              .margin({ top: 60, bottom: 60 })
 
             // 4个国旗选项 - 2x2网格
             this.FlagGrid()
@@ -270,8 +270,8 @@ struct FakeFlagPlayPage {
             Blank()
           }
           .width('100%')
-          .height('100%')
-          .backgroundColor($r('app.color.bg_page'))
+            .height('100%')
+            .backgroundColor($r('app.color.bg_page'))
         } else {
           Column() {
             Text('加载中...')
@@ -279,13 +279,13 @@ struct FakeFlagPlayPage {
               .fontColor($r('app.color.text_tertiary'))
           }
           .width('100%')
-          .height('100%')
-          .justifyContent(FlexAlign.Center)
+            .height('100%')
+            .justifyContent(FlexAlign.Center)
         }
       }
       .title('')
-      .titleMode(NavigationTitleMode.Mini)
-      .backgroundColor($r('app.color.bg_page'))
+        .titleMode(NavigationTitleMode.Mini)
+        .backgroundColor($r('app.color.bg_page'))
 
       // 对比弹窗
       if (this.showCompareDialog) {
@@ -293,7 +293,7 @@ struct FakeFlagPlayPage {
       }
     }
     .width('100%')
-    .height('100%')
+      .height('100%')
   }
 
   @Builder
@@ -306,12 +306,12 @@ struct FakeFlagPlayPage {
       })
     }
     .columnsTemplate('1fr 1fr')
-    .rowsTemplate('1fr 1fr')
-    .columnsGap(16)
-    .rowsGap(16)
-    .width('100%')
-    .height(340)
-    .padding({ left: 20, right: 20 })
+      .rowsTemplate('1fr 1fr')
+      .columnsGap(16)
+      .rowsGap(16)
+      .width('100%')
+      .height(340)
+      .padding({ left: 20, right: 20 })
   }
 
   @Builder
@@ -331,22 +331,22 @@ struct FakeFlagPlayPage {
         .textOverflow({ overflow: TextOverflow.Ellipsis })
     }
     .width('100%')
-    .height('100%')
-    .justifyContent(FlexAlign.Center)
-    .backgroundColor(this.getCardBackgroundColor(code))
-    .borderRadius(12)
-    .border({
-      width: 2,
-      color: this.getCardBorderColor(code)
-    })
-    .scale({
-      x: this.animatingCode === code ? this.scaleValue : 1,
-      y: this.animatingCode === code ? this.scaleValue : 1
-    })
-    .animation({ duration: 150, curve: Curve.EaseOut })
-    .onClick(() => {
-      this.selectFlag(code);
-    })
+      .height('100%')
+      .justifyContent(FlexAlign.Center)
+      .backgroundColor(this.getCardBackgroundColor(code))
+      .borderRadius(12)
+      .border({
+        width: 2,
+        color: this.getCardBorderColor(code)
+      })
+      .scale({
+        x: this.animatingCode === code ? this.scaleValue : 1,
+        y: this.animatingCode === code ? this.scaleValue : 1
+      })
+      .animation({ duration: 150, curve: Curve.EaseOut })
+      .onClick(() => {
+        this.selectFlag(code);
+      })
   }
 
   @Builder
@@ -386,7 +386,7 @@ struct FakeFlagPlayPage {
           .position({ x: 8, y: 36 })
         }
         .width('90%')
-        .margin({ top: 20 })
+          .margin({ top: 20 })
 
         // 国家名称
         Text(this.getFakeCountryName())
@@ -434,18 +434,18 @@ struct FakeFlagPlayPage {
           })
       }
       .width('85%')
-      .constraintSize({ maxWidth: 320 })
-      .backgroundColor($r('app.color.bg_card'))
-      .borderRadius(20)
-      .shadow({
-        radius: 20,
-        color: 'rgba(0, 0, 0, 0.3)',
-        offsetX: 0,
-        offsetY: 4
-      })
+        .constraintSize({ maxWidth: 320 })
+        .backgroundColor($r('app.color.bg_card'))
+        .borderRadius(20)
+        .shadow({
+          radius: 20,
+          color: 'rgba(0, 0, 0, 0.3)',
+          offsetX: 0,
+          offsetY: 4
+        })
     }
     .width('100%')
-    .height('100%')
+      .height('100%')
   }
 
   private getFakeFlagSource(): string {
@@ -518,7 +518,7 @@ struct FakeFlagPlayPage {
             .fontColor($r('app.color.text_primary'))
         }
         .width('100%')
-        .padding({ top: 16, bottom: 16 })
+          .padding({ top: 16, bottom: 16 })
 
         Divider().color($r('app.color.gray_very_light'))
 
@@ -533,13 +533,13 @@ struct FakeFlagPlayPage {
             .fontColor($r('app.color.text_primary'))
         }
         .width('100%')
-        .padding({ top: 16, bottom: 16 })
+          .padding({ top: 16, bottom: 16 })
       }
       .width('100%')
-      .padding({ left: 24, right: 24 })
-      .margin({ top: 40 })
-      .backgroundColor($r('app.color.bg_card'))
-      .borderRadius(16)
+        .padding({ left: 24, right: 24 })
+        .margin({ top: 40 })
+        .backgroundColor($r('app.color.bg_card'))
+        .borderRadius(16)
 
       Blank()
 
@@ -554,7 +554,7 @@ struct FakeFlagPlayPage {
           router.back();
         })
 
-      Button('再来一次')
+      Button(this.level && this.level.id < getAllFakeFlagLevels().length ? '下一关' : '完美收官')
         .width('80%')
         .height(48)
         .fontSize(17)
@@ -564,13 +564,24 @@ struct FakeFlagPlayPage {
         .border({ width: 1, color: $r('app.color.button_primary') })
         .margin({ bottom: 32 })
         .onClick(() => {
-          this.restartGame();
+          if (this.level && this.level.id < getAllFakeFlagLevels().length) {
+            // 下一关
+            router.pushUrl({
+              url: 'pages/fakeflag/FakeFlagPlayPage',
+              params: {
+                levelId: this.level.id + 1
+              }
+            });
+          } else {
+            // 完美收官，退出
+            router.back();
+          }
         })
     }
     .width('100%')
-    .height('100%')
-    .padding({ left: 16, right: 16 })
-    .backgroundColor($r('app.color.bg_page'))
+      .height('100%')
+      .padding({ left: 16, right: 16 })
+      .backgroundColor($r('app.color.bg_page'))
   }
 }
 

@@ -2,7 +2,7 @@ import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
 import { getCountryByCode } from '../../utils/countryData';
-import { InputGameLevel, getInputGameLevel } from './InputGameLevels';
+import { InputGameLevel, getInputGameLevel, getTotalInputLevels } from './InputGameLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 
 interface RouterParams {
@@ -11,7 +11,7 @@ interface RouterParams {
 
 @Entry
 @Component
-struct InputPlayPage {
+  struct InputPlayPage {
   @State level: InputGameLevel | undefined = undefined;
   @State currentIndex: number = 0;
   @State lives: number = 3;
@@ -144,7 +144,7 @@ struct InputPlayPage {
               })
             }
             .layoutWeight(1)
-            .justifyContent(FlexAlign.Center)
+              .justifyContent(FlexAlign.Center)
 
             Text(`${this.currentIndex + 1} / ${this.level?.countries.length}`)
               .fontSize(15)
@@ -154,7 +154,7 @@ struct InputPlayPage {
               .textAlign(TextAlign.End)
           }
           .width('100%')
-          .padding({ left: 20, right: 20, top: 12, bottom: 12 })
+            .padding({ left: 20, right: 20, top: 12, bottom: 12 })
 
           // 国旗展示
           Column() {
@@ -164,7 +164,7 @@ struct InputPlayPage {
               .objectFit(ImageFit.Contain)
           }
           .width('100%')
-          .margin({ top: 40, bottom: 40 })
+            .margin({ top: 40, bottom: 40 })
 
           // 输入区域
           if (this.isCorrect) {
@@ -193,7 +193,7 @@ struct InputPlayPage {
                 })
             }
             .width('100%')
-            .padding({ left: 20, right: 20 })
+              .padding({ left: 20, right: 20 })
           } else {
             // 输入框和确认按钮
             Row() {
@@ -228,14 +228,14 @@ struct InputPlayPage {
                 })
             }
             .width('100%')
-            .padding({ left: 20, right: 20 })
+              .padding({ left: 20, right: 20 })
           }
 
           Blank()
         }
         .width('100%')
-        .height('100%')
-        .backgroundColor($r('app.color.bg_page'))
+          .height('100%')
+          .backgroundColor($r('app.color.bg_page'))
       } else {
         Column() {
           Text('加载中...')
@@ -243,13 +243,13 @@ struct InputPlayPage {
             .fontColor($r('app.color.text_tertiary'))
         }
         .width('100%')
-        .height('100%')
-        .justifyContent(FlexAlign.Center)
+          .height('100%')
+          .justifyContent(FlexAlign.Center)
       }
     }
     .title('')
-    .titleMode(NavigationTitleMode.Mini)
-    .backgroundColor($r('app.color.bg_page'))
+      .titleMode(NavigationTitleMode.Mini)
+      .backgroundColor($r('app.color.bg_page'))
   }
 
   @Builder
@@ -282,7 +282,7 @@ struct InputPlayPage {
             .fontColor($r('app.color.text_primary'))
         }
         .width('100%')
-        .padding({ top: 16, bottom: 16 })
+          .padding({ top: 16, bottom: 16 })
 
         Divider().color($r('app.color.gray_very_light'))
 
@@ -297,13 +297,13 @@ struct InputPlayPage {
             .fontColor($r('app.color.text_primary'))
         }
         .width('100%')
-        .padding({ top: 16, bottom: 16 })
+          .padding({ top: 16, bottom: 16 })
       }
       .width('100%')
-      .padding({ left: 24, right: 24 })
-      .margin({ top: 40 })
-      .backgroundColor($r('app.color.bg_card'))
-      .borderRadius(16)
+        .padding({ left: 24, right: 24 })
+        .margin({ top: 40 })
+        .backgroundColor($r('app.color.bg_card'))
+        .borderRadius(16)
 
       Blank()
 
@@ -318,7 +318,7 @@ struct InputPlayPage {
           router.back();
         })
 
-      Button('再来一次')
+      Button(this.level && this.level.id < getTotalInputLevels() ? '下一关' : '完美收官')
         .width('80%')
         .height(48)
         .fontSize(17)
@@ -328,13 +328,24 @@ struct InputPlayPage {
         .border({ width: 1, color: $r('app.color.button_primary') })
         .margin({ bottom: 32 })
         .onClick(() => {
-          this.restartGame();
+          if (this.level && this.level.id < getTotalInputLevels()) {
+            // 下一关
+            router.pushUrl({
+              url: 'pages/inputgame/InputPlayPage',
+              params: {
+                levelId: this.level.id + 1
+              }
+            });
+          } else {
+            // 完美收官，退出
+            router.back();
+          }
         })
     }
     .width('100%')
-    .height('100%')
-    .padding({ left: 16, right: 16 })
-    .backgroundColor($r('app.color.bg_page'))
+      .height('100%')
+      .padding({ left: 16, right: 16 })
+      .backgroundColor($r('app.color.bg_page'))
   }
 }
 

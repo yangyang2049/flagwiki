@@ -243,3 +243,4 @@ export const flagVexillologyContent: VexillologySection[] = [
 export function getVexillologyContent(): VexillologySection[] {
    return flagVexillologyContent;
 }
+

@@ -127,3 +127,4 @@ export const flagEtiquetteContent: EtiquetteSection[] = [
 export function getEtiquetteContent(): EtiquetteSection[] {
    return flagEtiquetteContent;
 }
+

@@ -85,7 +85,7 @@ export struct GalleryPage {
             })
         }
         .width('100%')
-        .padding({ left: 16, right: 16, top: 8, bottom: 8 })
+          .padding({ left: 16, right: 16, top: 8, bottom: 8 })
       }
 
       // 洲际筛选器
@@ -98,10 +98,10 @@ export struct GalleryPage {
         .padding({ left: 16, right: 16 })
       }
       .scrollable(ScrollDirection.Horizontal)
-      .scrollBar(BarState.Off)
-      .width('100%')
-      .height(44)
-      .backgroundColor($r('app.color.bg_title_bar'))
+        .scrollBar(BarState.Off)
+        .width('100%')
+        .height(44)
+        .backgroundColor($r('app.color.bg_title_bar'))
 
       // 国旗网格
       if (this.filteredCountries.length === 0) {
@@ -110,6 +110,12 @@ export struct GalleryPage {
             Text('未找到匹配的国家')
               .fontSize(16)
               .fontColor($r('app.color.text_tertiary'))
+
+            Text('修改关键词或选择"全部"或其他大洲')
+              .fontSize(12)
+              .fontColor($r('app.color.text_tertiary'))
+              .margin({ top: 8 })
+              .opacity(0.7)
           } else {
             Text('加载中...')
               .fontSize(16)
@@ -117,8 +123,9 @@ export struct GalleryPage {
           }
         }
         .width('100%')
-        .layoutWeight(1)
-        .justifyContent(FlexAlign.Center)
+          .layoutWeight(1)
+          .justifyContent(FlexAlign.Center)
+          .alignItems(HorizontalAlign.Center)
       } else {
         Grid() {
           ForEach(this.filteredCountries, (country: Country) => {
@@ -128,17 +135,17 @@ export struct GalleryPage {
           })
         }
         .columnsTemplate('1fr 1fr 1fr')
-        .columnsGap(12)
-        .rowsGap(16)
-        .padding({ left: 16, right: 16, top: 12, bottom: 16 })
-        .layoutWeight(1)
-        .backgroundColor($r('app.color.bg_gallery'))
-        .edgeEffect(EdgeEffect.Spring)
+          .columnsGap(12)
+          .rowsGap(16)
+          .padding({ left: 16, right: 16, top: 12, bottom: 16 })
+          .layoutWeight(1)
+          .backgroundColor($r('app.color.bg_gallery'))
+          .edgeEffect(EdgeEffect.Spring)
       }
     }
     .width('100%')
-    .height('100%')
-    .backgroundColor($r('app.color.bg_title_bar'))
+      .height('100%')
+      .backgroundColor($r('app.color.bg_title_bar'))
   }
 
   @Builder
@@ -177,8 +184,8 @@ export struct GalleryPage {
         .padding({ top: 10, bottom: 10, left: 4, right: 4 })
     }
     .width('100%')
-    .onClick(() => {
-      this.goToFlagDetail(country);
-    })
+      .onClick(() => {
+        this.goToFlagDetail(country);
+      })
   }
 }

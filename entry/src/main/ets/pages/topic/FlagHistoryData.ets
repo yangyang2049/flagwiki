@@ -205,3 +205,4 @@ export const flagHistoryContent: HistorySection[] = [
 export function getFlagHistoryContent(): HistorySection[] {
    return flagHistoryContent;
 }
+

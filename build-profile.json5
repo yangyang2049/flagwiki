@@ -7,11 +7,11 @@
         "material": {
           "certpath": "/Users/yangyangshi/.ohos/config/default_flagwiki_3btYG95tCnz_e8J2A_XMcq7YxPBlybSUB5hc80wYFZs=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001B5C8575F62B5E31A6F028C3B17249A20BD52736B54F76B16439E6D6E78B219F705ED57E4FE18956",
+          "keyPassword": "0000001B183781E4E397BA624E9594CD67E9DB84F4D68876504FD197A594FDEF0C87BA9E69CF6861C56D5C",
           "profile": "/Users/yangyangshi/.ohos/config/default_flagwiki_3btYG95tCnz_e8J2A_XMcq7YxPBlybSUB5hc80wYFZs=.p7b",
           "signAlg": "SHA256withECDSA",
           "storeFile": "/Users/yangyangshi/.ohos/config/default_flagwiki_3btYG95tCnz_e8J2A_XMcq7YxPBlybSUB5hc80wYFZs=.p12",
-          "storePassword": "0000001BFB80CB26C8A4FF4032DA4B3BE221E2A328648A81754C9D5FE6112BF3D951C5DAB054C55983E079"
+          "storePassword": "0000001BA361EE01A1FC00BA67543A234379319355D4B92FA0A05336E19847CD60A7E70A567BF6358BFB95"
         }
       },
       {

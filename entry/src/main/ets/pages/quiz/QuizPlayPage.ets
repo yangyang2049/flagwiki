@@ -5,7 +5,7 @@ import { systemShare } from '@kit.ShareKit';
 import { uniformTypeDescriptor } from '@kit.ArkData';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { Country, getCountryByCode, Countries } from '../../utils/countryData';
-import { QuizLevel, getQuizLevel } from './QuizLevels';
+import { QuizLevel, getQuizLevel, getAllQuizLevels } from './QuizLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 
 interface RouterParams {
@@ -20,7 +20,7 @@ interface QuizQuestion {
 
 @Entry
 @Component
-struct QuizPlayPage {
+  struct QuizPlayPage {
   @State quizType: string = 'flagToName';
   @State level: QuizLevel | undefined = undefined;
   @State questions: QuizQuestion[] = [];
@@ -224,7 +224,7 @@ struct QuizPlayPage {
               })
             }
             .layoutWeight(1)
-            .justifyContent(FlexAlign.Center)
+              .justifyContent(FlexAlign.Center)
 
             // 右侧：序号
             Text(`${this.currentIndex + 1} / ${this.questions.length}`)
@@ -235,7 +235,7 @@ struct QuizPlayPage {
               .textAlign(TextAlign.End)
           }
           .width('100%')
-          .padding({ left: 20, right: 20, top: 12, bottom: 12 })
+            .padding({ left: 20, right: 20, top: 12, bottom: 12 })
 
           // 连击提示
           if (this.combo >= 3) {
@@ -270,8 +270,8 @@ struct QuizPlayPage {
           }
         }
         .width('100%')
-        .height('100%')
-        .backgroundColor($r('app.color.bg_page'))
+          .height('100%')
+          .backgroundColor($r('app.color.bg_page'))
       } else {
         Column() {
           Text('加载中...')
@@ -279,13 +279,13 @@ struct QuizPlayPage {
             .fontColor($r('app.color.text_tertiary'))
         }
         .width('100%')
-        .height('100%')
-        .justifyContent(FlexAlign.Center)
+          .height('100%')
+          .justifyContent(FlexAlign.Center)
       }
     }
     .title('')
-    .titleMode(NavigationTitleMode.Mini)
-    .backgroundColor($r('app.color.bg_page'))
+      .titleMode(NavigationTitleMode.Mini)
+      .backgroundColor($r('app.color.bg_page'))
   }
 
   @Builder
@@ -299,9 +299,9 @@ struct QuizPlayPage {
           .objectFit(ImageFit.Contain)
       }
       .width('100%')
-      .padding(24)
-      .backgroundColor($r('app.color.bg_secondary'))
-      .margin({ bottom: 24 })
+        .padding(24)
+        .backgroundColor($r('app.color.bg_secondary'))
+        .margin({ bottom: 24 })
 
       Text('这是哪个国家的国旗？')
         .fontSize(18)
@@ -316,7 +316,7 @@ struct QuizPlayPage {
         })
       }
       .width('100%')
-      .padding({ left: 20, right: 20 })
+        .padding({ left: 20, right: 20 })
     }
     .width('100%')
   }
@@ -337,8 +337,8 @@ struct QuizPlayPage {
           .margin({ top: 8 })
       }
       .width('100%')
-      .padding(32)
-      .margin({ bottom: 24 })
+        .padding(32)
+        .margin({ bottom: 24 })
 
       Text('请选择正确的国旗')
         .fontSize(18)
@@ -355,12 +355,12 @@ struct QuizPlayPage {
         })
       }
       .columnsTemplate('1fr 1fr')
-      .rowsTemplate('1fr 1fr')
-      .columnsGap(12)
-      .rowsGap(12)
-      .width('100%')
-      .height(280)
-      .padding({ left: 20, right: 20 })
+        .rowsTemplate('1fr 1fr')
+        .columnsGap(12)
+        .rowsGap(12)
+        .width('100%')
+        .height(280)
+        .padding({ left: 20, right: 20 })
     }
     .width('100%')
   }
@@ -374,20 +374,20 @@ struct QuizPlayPage {
         .fontColor(this.getChoiceTextColor(index))
     }
     .width('100%')
-    .height(52)
-    .justifyContent(FlexAlign.Center)
-    .backgroundColor(this.getChoiceBackgroundColor(index))
-    .borderRadius(12)
-    .border({
-      width: 2,
-      color: this.getChoiceBorderColor(index)
-    })
-    .margin({ bottom: 12 })
-    .scale({ x: this.animatingIndex === index ? this.scaleValue : 1, y: this.animatingIndex === index ? this.scaleValue : 1 })
-    .animation({ duration: 150, curve: Curve.EaseOut })
-    .onClick(() => {
-      this.selectAnswer(index);
-    })
+      .height(52)
+      .justifyContent(FlexAlign.Center)
+      .backgroundColor(this.getChoiceBackgroundColor(index))
+      .borderRadius(12)
+      .border({
+        width: 2,
+        color: this.getChoiceBorderColor(index)
+      })
+      .margin({ bottom: 12 })
+      .scale({ x: this.animatingIndex === index ? this.scaleValue : 1, y: this.animatingIndex === index ? this.scaleValue : 1 })
+      .animation({ duration: 150, curve: Curve.EaseOut })
+      .onClick(() => {
+        this.selectAnswer(index);
+      })
   }
 
   @Builder
@@ -400,18 +400,18 @@ struct QuizPlayPage {
         .padding(12)
     }
     .width('100%')
-    .height('100%')
-    .backgroundColor(this.getChoiceBackgroundColor(index))
-    .borderRadius(12)
-    .border({
-      width: 1.5,
-      color: this.getChoiceBorderColor(index)
-    })
-    .scale({ x: this.animatingIndex === index ? this.scaleValue : 1, y: this.animatingIndex === index ? this.scaleValue : 1 })
-    .animation({ duration: 150, curve: Curve.EaseOut })
-    .onClick(() => {
-      this.selectAnswer(index);
-    })
+      .height('100%')
+      .backgroundColor(this.getChoiceBackgroundColor(index))
+      .borderRadius(12)
+      .border({
+        width: 1.5,
+        color: this.getChoiceBorderColor(index)
+      })
+      .scale({ x: this.animatingIndex === index ? this.scaleValue : 1, y: this.animatingIndex === index ? this.scaleValue : 1 })
+      .animation({ duration: 150, curve: Curve.EaseOut })
+      .onClick(() => {
+        this.selectAnswer(index);
+      })
   }
 
   private getChoiceBackgroundColor(index: number): Resource {
@@ -492,7 +492,7 @@ struct QuizPlayPage {
               .fontColor($r('app.color.text_primary'))
           }
           .width('100%')
-          .padding({ top: 16, bottom: 16 })
+            .padding({ top: 16, bottom: 16 })
 
           Divider().color($r('app.color.gray_very_light'))
 
@@ -507,7 +507,7 @@ struct QuizPlayPage {
               .fontColor($r('app.color.text_primary'))
           }
           .width('100%')
-          .padding({ top: 16, bottom: 16 })
+            .padding({ top: 16, bottom: 16 })
 
           Divider().color($r('app.color.gray_very_light'))
 
@@ -522,13 +522,13 @@ struct QuizPlayPage {
               .fontColor($r('app.color.text_primary'))
           }
           .width('100%')
-          .padding({ top: 16, bottom: 16 })
+            .padding({ top: 16, bottom: 16 })
         }
         .width('100%')
-        .padding({ left: 24, right: 24 })
-        .margin({ top: 32 })
-        .backgroundColor($r('app.color.bg_card'))
-        .borderRadius(16)
+          .padding({ left: 24, right: 24 })
+          .margin({ top: 32 })
+          .backgroundColor($r('app.color.bg_card'))
+          .borderRadius(16)
 
         Text('国旗小百科')
           .fontSize(12)
@@ -536,8 +536,8 @@ struct QuizPlayPage {
           .margin({ top: 16 })
       }
       .width('100%')
-      .padding({ left: 16, right: 16, bottom: 16 })
-      .backgroundColor($r('app.color.bg_page'))
+        .padding({ left: 16, right: 16, bottom: 16 })
+        .backgroundColor($r('app.color.bg_page'))
 
       Blank()
 
@@ -566,10 +566,10 @@ struct QuizPlayPage {
           })
       }
       .width('100%')
-      .padding({ left: 16, right: 16 })
-      .margin({ bottom: 16 })
+        .padding({ left: 16, right: 16 })
+        .margin({ bottom: 16 })
 
-      Button('再来一次')
+      Button(this.level && this.level.id < getAllQuizLevels().length ? '下一关' : '完美收官')
         .width('100%')
         .height(48)
         .fontSize(17)
@@ -579,12 +579,24 @@ struct QuizPlayPage {
         .border({ width: 1, color: $r('app.color.button_primary') })
         .margin({ left: 16, right: 16, bottom: 32 })
         .onClick(() => {
-          this.restartQuiz();
+          if (this.level && this.level.id < getAllQuizLevels().length) {
+            // 下一关
+            router.pushUrl({
+              url: 'pages/quiz/QuizPlayPage',
+              params: {
+                quizType: this.quizType,
+                levelId: this.level.id + 1
+              }
+            });
+          } else {
+            // 完美收官，退出
+            router.back();
+          }
         })
     }
     .width('100%')
-    .height('100%')
-    .backgroundColor($r('app.color.bg_page'))
+      .height('100%')
+      .backgroundColor($r('app.color.bg_page'))
   }
 
   private async onShareResult(): Promise<void> {

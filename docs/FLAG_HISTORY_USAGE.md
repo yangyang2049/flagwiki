@@ -13,7 +13,7 @@
 interface FlagHistoryItem {
   countryCode: string;  // 国家代码（如 'cn', 'us'）
   year: number;         // 年份
-  imagePath: string;    // 图片路径（相对于 resources/base/media/）
+  imagePath: string;    // 图片路径（资源名称，不含扩展名，位于 rawfile/flag_history/）
   description?: string; // 可选描述
 }
 ```
@@ -34,7 +34,7 @@ interface CountryFlagHistory {
 
 1. 访问维基百科页面：https://zh.wikipedia.org/wiki/各国国旗变迁时间轴
 2. 找到目标国家的历史国旗图片
-3. 下载图片并保存到 `entry/src/main/resources/base/media/` 目录
+3. 下载图片并保存到 `entry/src/main/resources/rawfile/flag_history/` 目录
 4. 图片命名格式：`flag_history_{countryCode}_{year}.png`
    - 例如：`flag_history_cn_1912.png`（中国1912年国旗）
 
@@ -67,9 +67,9 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
 ];
 ```
 
-### 步骤 3：注册图片资源
+### 步骤 3：放置图片资源
 
-在 `entry/src/main/resources/base/media/` 目录中放置图片文件，文件名必须与 `imagePath` 匹配。
+在 `entry/src/main/resources/rawfile/flag_history/` 目录中放置图片文件，文件名必须为 `{imagePath}.png`。
 
 ## 功能入口
 
@@ -82,7 +82,7 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
 
 ## 注意事项
 
-1. **图片资源**：所有历史国旗图片必须手动下载并添加到 `resources/base/media/` 目录
+1. **图片资源**：所有历史国旗图片必须手动下载并添加到 `resources/rawfile/flag_history/` 目录
 2. **数据格式**：年份按倒序排列（最新的在前）
 3. **条件显示**：如果没有历史数据，入口不会显示
 4. **图片命名**：必须遵循 `flag_history_{countryCode}_{year}` 格式
@@ -93,7 +93,7 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
    - 1912年：中华民国五色旗
    - 1949年：中华人民共和国国旗
 
-2. 保存图片到 `entry/src/main/resources/base/media/`：
+2. 保存图片到 `entry/src/main/resources/rawfile/flag_history/`：
    - `flag_history_cn_1912.png`
    - `flag_history_cn_1949.png`
 

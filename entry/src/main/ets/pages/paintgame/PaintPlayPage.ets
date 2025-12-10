@@ -580,7 +580,7 @@ const US_STATE_NAMES: Record<string, string> = {
       Blank()
 
       // 下一关按钮
-      Button(this.levelId < getTotalLevels(this.categoryId) ? '下一关' : '返回')
+      Button(this.levelId < getTotalLevels(this.categoryId) ? '下一关' : '完美收官')
         .width('80%')
         .height(48)
         .fontSize(17)
@@ -588,7 +588,12 @@ const US_STATE_NAMES: Record<string, string> = {
         .backgroundColor($r('app.color.button_primary'))
         .margin({ bottom: 16 })
         .onClick(() => {
-          this.onNextLevel();
+          if (this.levelId < getTotalLevels(this.categoryId)) {
+            this.onNextLevel();
+          } else {
+            // 完美收官，退出
+            router.back();
+          }
         })
 
       // 返回按钮

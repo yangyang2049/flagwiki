@@ -866,7 +866,7 @@ interface RouterParams {
   HistoricalFlagsBanner() {
     Row() {
       Column() {
-        // 标题行
+        // 标题行 - 完全复制涂鸦说明的样式
         Row() {
           Text('历史国旗')
             .fontSize(16)
@@ -875,52 +875,29 @@ interface RouterParams {
 
           Blank()
 
-          // 查看全部箭头
-          Text('›')
-            .fontSize(20)
-            .fontColor($r('app.color.text_primary'))
-            .onClick(() => {
-              router.pushUrl({
-                url: 'pages/flaghistory/FlagHistoryPage',
-                params: { countryCode: this.countryCode }
-              }).catch((err: Error) => {
-                console.error(`Navigation failed: ${err.message}`);
-              });
-            })
+          Image($r('app.media.icon_arrow_right'))
+            .width(20)
+            .height(20)
         }
         .width('100%')
+          .alignItems(VerticalAlign.Center)
           .margin({ bottom: 12 })
 
-        // 历史国旗Grid（最多显示6个）
+        // 历史国旗Grid（最多显示3个，只显示一行）
         Grid() {
-          ForEach(this.flagHistoryItems.slice(0, 6), (item: FlagHistoryItem, index: number) => {
+          ForEach(this.flagHistoryItems.slice(0, 3), (item: FlagHistoryItem, index: number) => {
             GridItem() {
               Column() {
-                Image($r(`app.media.${item.imagePath}`))
+                Image($rawfile(`flag_history/${item.imagePath}.png`))
                   .width('100%')
                   .height(60)
                   .objectFit(ImageFit.Contain)
                   .borderRadius(4)
-
-                Text(`${item.year}年`)
-                  .fontSize(11)
-                  .fontColor($r('app.color.text_secondary'))
-                  .margin({ top: 4 })
-                  .maxLines(1)
-                  .textOverflow({ overflow: TextOverflow.Ellipsis })
               }
               .width('100%')
                 .padding(8)
                 .backgroundColor($r('app.color.bg_secondary'))
                 .borderRadius(8)
-                .onClick(() => {
-                  router.pushUrl({
-                    url: 'pages/flaghistory/FlagHistoryPage',
-                    params: { countryCode: this.countryCode }
-                  }).catch((err: Error) => {
-                    console.error(`Navigation failed: ${err.message}`);
-                  });
-                })
             }
           }, (item: FlagHistoryItem, index: number) => `history_${item.countryCode}_${item.year}_${index}`)
         }
@@ -928,12 +905,20 @@ interface RouterParams {
           .columnsGap(8)
           .rowsGap(8)
           .width('100%')
-          .cachedCount(6)
+          .cachedCount(3)
       }
       .width('100%')
         .padding(16)
         .backgroundColor($r('app.color.bg_card'))
         .borderRadius(16)
+        .onClick(() => {
+          router.pushUrl({
+            url: 'pages/flaghistory/FlagHistoryPage',
+            params: { countryCode: this.countryCode }
+          }).catch((err: Error) => {
+            console.error(`Navigation failed: ${err.message}`);
+          });
+        })
     }
     .width('100%')
       .padding({ left: 16, right: 16 })
