@@ -88,52 +88,24 @@ function extractFlagHistory(html) {
   
   // 提取所有表格中的所有行（支持多个大洲的表格）
   const tableMatches = html.matchAll(/<table[^>]*class="[^"]*wikitable[^"]*"[^>]*>([\s\S]*?)<\/table>/g);
-  let allTables = [];
+  let allRows = [];
   let tableCount = 0;
   
   for (const tableMatch of tableMatches) {
     const tableContent = tableMatch[1];
-    // 提取表头行，获取年份列
-    const headerMatch = tableContent.match(/<tr[^>]*>([\s\S]*?)<\/tr>/);
-    if (!headerMatch) continue;
-    
-    const headerRow = headerMatch[1];
-    // 提取所有年份列（从表头中提取年份）
-    const yearColumns = [];
-    const headerCells = headerRow.match(/<th[^>]*>([\s\S]*?)<\/th>/g) || headerRow.match(/<td[^>]*>([\s\S]*?)<\/td>/g);
-    if (headerCells) {
-      headerCells.forEach((cell, index) => {
-        if (index === 0) return; // 跳过第一列（"国家/年代"）
-        const cellText = cell.replace(/<[^>]+>/g, '').trim();
-        // 尝试提取年份（4位数字）
-        const yearMatch = cellText.match(/(\d{4})/);
-        if (yearMatch) {
-          const year = parseInt(yearMatch[1]);
-          if (year >= 1000 && year <= 2100) {
-            yearColumns[index] = year;
-          }
-        } else if (cellText === '现行国旗' || cellText.includes('现行')) {
-          // 标记为当前年份（使用一个很大的年份，如3000）
-          yearColumns[index] = 3000;
-        }
-      });
-    }
-    
     const rows = tableContent.split('</tr>');
-    allTables.push({ rows, yearColumns });
+    allRows = allRows.concat(rows);
     tableCount++;
   }
   
-  if (allTables.length === 0) {
+  if (allRows.length === 0) {
     console.log('未找到表格');
     return { results, skippedCountries };
   }
   
-  console.log(`找到 ${tableCount} 个表格\n`);
+  console.log(`找到 ${tableCount} 个表格，共 ${allRows.length} 行数据\n`);
   
-  // 处理每个表格
-  for (const table of allTables) {
-    const { rows, yearColumns } = table;
+  const rows = allRows;
     
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
@@ -188,32 +160,43 @@ function extractFlagHistory(html) {
     }
     
     // 提取所有单元格中的图片和年份
-    // 表格格式：第一列是国家名，后续列是年份，每个单元格可能包含图片链接
-    // 年份应该从列索引对应的yearColumns中获取，而不是从单元格内容中提取
+    // 表格格式：第一列是国家名，后续列中每个单元格包含图片和年份数字
+    // 每个单元格的格式：<td><img>...</img><div>...</div>年份数字</td>
     const cells = row.match(/<td[^>]*>([\s\S]*?)<\/td>/g);
     if (!cells) continue;
     
     for (let j = 1; j < cells.length; j++) {
       const cell = cells[j];
       
-      // 从yearColumns中获取该列对应的年份
-      const year = yearColumns[j];
-      if (!year || year === 3000) {
-        // 如果是"现行国旗"列，尝试从单元格内容中提取年份，或使用当前年份
-        const yearMatch = cell.match(/(\d{4})/);
-        if (yearMatch) {
-          const extractedYear = parseInt(yearMatch[1]);
-          if (extractedYear >= 1000 && extractedYear <= 2100) {
-            // 使用提取的年份，但优先使用列标题的年份
-            continue; // 跳过，因为列标题中没有年份
-          }
-        }
-        continue; // 跳过没有年份的列
-      }
-      
       // 检查单元格是否包含图片（如果没有图片，跳过）
       const hasImage = cell.includes('<img') || cell.includes('/wiki/File:');
       if (!hasImage) continue;
+      
+      // 从单元格内容中提取年份（在div后面，直接是4位数字）
+      // 格式：<div style="clear: both; height: 1em"></div>1516
+      // 或者：<div>...</div>年份数字
+      // 年份通常在div标签后面，直接是4位数字
+      let year = null;
+      
+      // 方法1：匹配 <div>...</div>年份数字 格式
+      const yearMatch1 = cell.match(/<div[^>]*>[\s\S]*?<\/div>\s*(\d{4})\s*$/m);
+      if (yearMatch1) {
+        year = parseInt(yearMatch1[1]);
+      } else {
+        // 方法2：匹配单元格末尾的4位数字（年份通常在最后）
+        const yearMatch2 = cell.match(/(\d{4})\s*$/m);
+        if (yearMatch2) {
+          year = parseInt(yearMatch2[1]);
+        } else {
+          // 方法3：匹配任何位置的4位数字（作为最后手段）
+          const yearMatch3 = cell.match(/(\d{4})/);
+          if (yearMatch3) {
+            year = parseInt(yearMatch3[1]);
+          }
+        }
+      }
+      
+      if (!year || isNaN(year) || year < 1000 || year > 2100) continue;
       
       // 优先从img标签提取URL（这是最可靠的方式）
       const imgSrcMatch = cell.match(/<img[^>]*src="([^"]+)"[^>]*>/);
@@ -258,7 +241,6 @@ function extractFlagHistory(html) {
         });
       }
     }
-    }
   }
   
   return { results, skippedCountries };
@@ -272,7 +254,15 @@ async function main() {
   console.log(`已加载 ${Object.keys(COUNTRY_CODE_MAP).length} 个国家代码映射\n`);
   
   try {
-    const html = await fetchPage(WIKI_URL);
+    let html;
+    // 优先使用本地HTML文件（如果存在）
+    const localHtmlPath = path.join(__dirname, '..', 'flag-history.html');
+    if (fs.existsSync(localHtmlPath)) {
+      console.log('使用本地HTML文件...\n');
+      html = fs.readFileSync(localHtmlPath, 'utf-8');
+    } else {
+      html = await fetchPage(WIKI_URL);
+    }
     console.log('页面获取成功，正在解析数据...\n');
     
     const { results: data, skippedCountries } = extractFlagHistory(html);

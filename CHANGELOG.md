@@ -2,7 +2,36 @@
 
 ## [未发布]
 
+### 删除 (Removed)
+- **删除无效的anthems目录**：删除了 `entry/src/main/resources/base/media/anthems` 目录（导致编译错误的无效路径）
+- **清理未使用和重复文件**：删除了项目根目录下的未使用和重复文件
+  - 删除了 `Flag_of_FIAV.svg 1.png`（重复文件，FIAV PNG已正确放置在 `entry/src/main/resources/base/media/flag_fiav.png`）
+  - 删除了 `download_anthems.py`（未使用的Python脚本）
+  - 删除了 `IconPark - Icons Pack (Community)/` 目录（未使用的图标包，占用11MB空间，项目使用app.media中的图标资源）
+  - 删除了临时报告和评估文件：
+    - `UNUSED_FILES_REPORT.md`
+    - `CODE_REVIEW_2025-12-08_FULL.md`
+    - `CODE_REVIEW_2025-12-08.md`
+    - `PROJECT_EVALUATION.md`
+
 ### 修复
+- **涂鸦游戏WebView渐显效果**：为涂鸦游戏的WebView添加了平滑的渐显动画效果
+  - 使用`animateTo` API替代`setTimeout`，实现更平滑的渐显动画
+  - 添加了`transition`效果，动画时长400ms，使用`cubicBezier(0.42, 0, 0.58, 1)`缓动曲线（easeInOut效果）
+  - WebView初始透明度为0，在页面加载完成并设置好背景色和游戏后，平滑渐显到完全不透明
+  - 提升了用户体验，避免了WebView内容的突然出现
+  - 修复了编译错误：使用`curves.cubicBezier`替代不存在的`curves.easeInOut`
+- **涂鸦游戏深色模式检测优化**：改进了深色模式的检测和背景色处理
+  - 新增`detectDarkMode()`方法，单独处理深色模式检测（参考injectSVG的方式）
+  - 使用两种方法检测深色模式，按优先级：
+    1. 读取保存的主题设置（Preferences）- 最可靠的方法
+    2. 通过资源管理器检测系统主题（跟随系统模式时使用）
+  - 在WebView页面加载完成时（onPageEnd）重新检测并更新背景色，确保获取最新的颜色模式
+  - 根据深色模式正确设置背景色：深色模式使用`#1C1C1E`，浅色模式使用`#F5F6F7`
+  - 确保背景色在设置游戏之前正确注入，避免背景色闪烁
+  - 修复了编译错误：移除了不存在的`ApplicationContext.getColorMode()`方法调用
+  - 添加了详细的调试日志，帮助诊断深色模式检测问题
+  - 改进了系统主题检测逻辑，正确处理colorMode为0（浅色）和1（深色）的情况
 - **移除探索页面历史国旗功能**：从探索页面移除了历史国旗卡片和相关功能
   - 移除了`hasAnyHistory`导入和`hasHistory`状态变量
   - 移除了历史国旗卡片UI和路由跳转

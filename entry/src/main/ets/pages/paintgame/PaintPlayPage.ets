@@ -9,6 +9,7 @@ import { ConfigurationConstant } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
 import curves from '@ohos.curves';
+import { window } from '@kit.ArkUI';
 import { getCountryByCode, Country } from '../../utils/countryData';
 import { getPaintLevel, getFlagPaintInfo, getTotalLevels, PaintLevel } from './PaintGameData';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
@@ -103,35 +104,86 @@ const US_STATE_NAMES: Record<string, string> = {
     await this.updateBackgroundColor();
   }
 
-  private async updateBackgroundColor(): Promise<void> {
+  /**
+   * 检测当前是否为深色模式
+   * 参考injectSVG的方式，单独处理深色模式检测
+   */
+  private async detectDarkMode(): Promise<boolean> {
     try {
-      // 读取保存的主题设置
+      // 方法1：读取保存的主题设置（最可靠）
       const prefs = await PreferencesManager.getPreferences('app_settings');
       const savedColorMode: number = await prefs.get('colorMode', ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET) as number;
-      const colorMode = savedColorMode as ConfigurationConstant.ColorMode;
-
-      let isDarkMode = false;
+      const colorMode: ConfigurationConstant.ColorMode = savedColorMode as ConfigurationConstant.ColorMode;
+      console.info(`PaintPlayPage: Saved color mode from preferences: ${colorMode}`);
 
       if (colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK) {
         // 明确设置为暗黑模式
-        isDarkMode = true;
-      } else if (colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET) {
-        // 跟随系统，尝试检测系统主题
-        // 通过检查资源管理器当前使用的资源类型来判断
+        console.info(`PaintPlayPage: User explicitly set dark mode`);
+        return true;
+      }
+      if (colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) {
+        // 明确设置为浅色模式
+        console.info(`PaintPlayPage: User explicitly set light mode`);
+        return false;
+      }
+
+      // 方法2：跟随系统，通过资源管理器检测系统主题
+      // 当colorMode为NOT_SET时，需要检测系统的实际颜色模式
+      // 注意：当应用设置为"跟随系统"时，ApplicationContext已经设置为NOT_SET
+      // 此时资源管理器的配置应该反映系统的实际颜色模式（0=浅色, 1=深色）
+      if (colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET) {
         try {
           const resourceManager = this.context.resourceManager;
           const config = await resourceManager.getConfiguration();
-          // 如果 colorMode 为 1，表示暗黑模式
-          if (config.colorMode === 1) {
-            isDarkMode = true;
+          // colorMode: 0=浅色, 1=深色
+          // 当应用设置为"跟随系统"时，config.colorMode应该返回系统的实际颜色模式（0或1）
+          const configColorMode: number = config.colorMode as number;
+          console.info(`PaintPlayPage: System color mode from resourceManager: ${configColorMode}`);
+
+          // 如果 colorMode 为 1，表示系统当前是暗黑模式
+          if (configColorMode === 1 || configColorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK) {
+            console.info(`PaintPlayPage: Detected dark mode from system`);
+            return true;
           }
+          // 如果 colorMode 为 0，表示系统当前是浅色模式
+          if (configColorMode === 0 || configColorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) {
+            console.info(`PaintPlayPage: Detected light mode from system`);
+            return false;
+          }
+
+          // 如果值不是0或1，可能是2（NOT_SET），说明资源管理器还没有反映系统的实际颜色模式
+          // 此时默认返回浅色模式（更安全的选择）
+          console.warn(`PaintPlayPage: Unexpected colorMode value: ${configColorMode}, defaulting to light mode`);
+          return false;
         } catch (e) {
-          // 如果检测失败，默认使用浅色
-          console.error(`Failed to detect system theme: ${JSON.stringify(e)}`);
+          const errorMsg = e instanceof Error ? e.message : String(e);
+          console.error(`PaintPlayPage: Failed to detect system theme: ${errorMsg}`);
+          // 读取失败时，默认返回浅色模式
+          return false;
         }
       }
 
-      // 设置背景色
+      // 默认返回浅色模式
+      return false;
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      console.error(`Failed to detect dark mode: ${errorMsg}`);
+      // 默认使用浅色模式
+      return false;
+    }
+  }
+
+  /**
+   * 更新背景色（单独处理，像injectSVG一样）
+   * 根据深色模式检测结果设置对应的背景色
+   */
+  private async updateBackgroundColor(): Promise<void> {
+    try {
+      // 检测深色模式
+      const isDarkMode = await this.detectDarkMode();
+      console.info(`PaintPlayPage: Dark mode detected: ${isDarkMode}`);
+
+      // 根据深色模式设置背景色
       if (isDarkMode) {
         // 暗黑模式使用深黑色（非纯黑）
         this.backgroundColorStr = '#1C1C1E';
@@ -139,15 +191,18 @@ const US_STATE_NAMES: Record<string, string> = {
         // 浅色模式使用灰色
         this.backgroundColorStr = '#F5F6F7';
       }
+      console.info(`PaintPlayPage: Background color set to: ${this.backgroundColorStr}`);
 
       // 如果 Web 已经准备好，立即注入背景色
       if (this.isWebReady) {
         await this.injectBackgroundColor();
       }
     } catch (err) {
-      console.error(`Failed to update background color: ${JSON.stringify(err)}`);
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      console.error(`Failed to update background color: ${errorMsg}`);
       // 默认使用浅色背景
       this.backgroundColorStr = '#F5F6F7';
+      console.info(`PaintPlayPage: Using default light background: ${this.backgroundColorStr}`);
       if (this.isWebReady) {
         await this.injectBackgroundColor();
       }
@@ -325,25 +380,44 @@ const US_STATE_NAMES: Record<string, string> = {
               .javaScriptAccess(true)
               .domStorageAccess(true)
               .opacity(this.webOpacity)
+              .transition(TransitionEffect.OPACITY.animation({ duration: 400, curve: curves.cubicBezier(0.42, 0, 0.58, 1) }))
               .onPageEnd(() => {
                 this.isWebReady = true;
-                // 页面加载完成后，先设置背景色，再设置游戏，然后渐显
-                // 先保存背景色到 window，让 HTML 在 DOMContentLoaded 时就能应用
-                this.webController.runJavaScript(
-                  `window.savedBackgroundColor = '${this.backgroundColorStr}';`
-                ).then(() => {
-                  return this.injectBackgroundColor();
-                }).then(() => {
-                  return this.setupGame();
-                }).then(() => {
-                  // 背景色和游戏都设置好后，延迟一点再渐显，确保背景色已应用
-                  setTimeout(() => {
-                    this.webOpacity = 1;
-                  }, 200);
-                }).catch(() => {
-                  console.error('Failed to setup game');
-                  // 即使出错也显示
-                  this.webOpacity = 1;
+                // 页面加载完成后，重新检测深色模式并更新背景色（确保获取最新的颜色模式）
+                // 使用立即执行的异步函数处理
+                (async () => {
+                  await this.updateBackgroundColor();
+                  // 先保存背景色到 window，让 HTML 在 DOMContentLoaded 时就能应用
+                  this.webController.runJavaScript(
+                    `window.savedBackgroundColor = '${this.backgroundColorStr}';`
+                  ).then(() => {
+                    return this.injectBackgroundColor();
+                  }).then(() => {
+                    return this.setupGame();
+                  }).then(() => {
+                    // 背景色和游戏都设置好后，使用动画渐显，确保背景色已应用
+                    // 使用动画API实现平滑的渐显效果（easeInOut效果：cubicBezier(0.42, 0, 0.58, 1)）
+                    animateTo({
+                      duration: 400,
+                      curve: curves.cubicBezier(0.42, 0, 0.58, 1),
+                      onFinish: () => {
+                        // 动画完成后的回调（可选）
+                      }
+                    }, () => {
+                      this.webOpacity = 1;
+                    });
+                  }).catch(() => {
+                    console.error('Failed to setup game');
+                    // 即使出错也显示，使用动画
+                    animateTo({
+                      duration: 400,
+                      curve: curves.cubicBezier(0.42, 0, 0.58, 1)
+                    }, () => {
+                      this.webOpacity = 1;
+                    });
+                  });
+                })().catch((err: Error) => {
+                  console.error(`Failed to update background color: ${err.message}`);
                 });
               })
               .onConsole((event) => {
