@@ -231,6 +231,7 @@ export struct ProfilePage {
     return (this.quizLevel - 1) + (this.fakeFlagLevel - 1) + (this.inputLevel - 1) + (this.triviaLevel - 1);
   }
 
+
   private getTotalLevels(): number {
     return QUIZ_TOTAL_LEVELS + FAKE_FLAG_TOTAL_LEVELS + INPUT_TOTAL_LEVELS + TRIVIA_TOTAL_LEVELS;
   }
@@ -282,10 +283,10 @@ export struct ProfilePage {
                     .fontSize(40)
                 }
                 .width(64)
-                .height(64)
-                .backgroundColor($r('app.color.bg_yellow_light'))
-                .borderRadius(32)
-                .justifyContent(FlexAlign.Center)
+                  .height(64)
+                  .backgroundColor($r('app.color.bg_yellow_light'))
+                  .borderRadius(32)
+                  .justifyContent(FlexAlign.Center)
 
                 Column() {
                   Text('探索进度')
@@ -308,10 +309,10 @@ export struct ProfilePage {
                   .margin({ top: 4 })
                 }
                 .alignItems(HorizontalAlign.Start)
-                .margin({ left: 16 })
+                  .margin({ left: 16 })
               }
               .width('100%')
-              .margin({ bottom: 20 })
+                .margin({ bottom: 20 })
 
               // 各项进度
               ForEach(this.getChallengeProgressList(), (game: ChallengeProgress) => {
@@ -342,7 +343,7 @@ export struct ProfilePage {
                       .borderRadius(4)
                   }
                   .layoutWeight(1)
-                  .margin({ left: 12, right: 12 })
+                    .margin({ left: 12, right: 12 })
 
                   Text(`${game.current}/${game.total}`)
                     .fontSize(13)
@@ -351,14 +352,14 @@ export struct ProfilePage {
                     .textAlign(TextAlign.End)
                 }
                 .width('100%')
-                .margin({ bottom: 12 })
+                  .margin({ bottom: 12 })
               })
             }
             .width('100%')
-            .padding(20)
-            .backgroundColor($r('app.color.bg_card'))
-            .borderRadius(16)
-            .margin({ top: 16 })
+              .padding(20)
+              .backgroundColor($r('app.color.bg_card'))
+              .borderRadius(16)
+              .margin({ top: 16 })
 
             // 我的收藏
             Column() {
@@ -370,9 +371,9 @@ export struct ProfilePage {
               })
             }
             .width('100%')
-            .backgroundColor($r('app.color.bg_card'))
-            .borderRadius(12)
-            .margin({ top: 16, bottom: 0 })
+              .backgroundColor($r('app.color.bg_card'))
+              .borderRadius(12)
+              .margin({ top: 16, bottom: 0 })
 
             // 设置项
             Column() {
@@ -397,6 +398,10 @@ export struct ProfilePage {
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
+              Divider()
+                .strokeWidth(0.5)
+                .color($r('app.color.gray_border'))
+                .margin({ left: 16, right: 16 })
               this.settingItem($r('app.media.icon_all_application'), '关于应用', '', () => {
                 this.showAboutApp();
               })
@@ -409,9 +414,9 @@ export struct ProfilePage {
               })
             }
             .width('100%')
-            .backgroundColor($r('app.color.bg_card'))
-            .borderRadius(12)
-            .margin({ top: 12, bottom: 0 })
+              .backgroundColor($r('app.color.bg_card'))
+              .borderRadius(12)
+              .margin({ top: 12, bottom: 0 })
 
             // 应用信息
             Text('探索世界，从国旗开始 🚩')
@@ -421,17 +426,17 @@ export struct ProfilePage {
               .margin({ top: 40, bottom: 40 })
           }
           .width('100%')
-          .constraintSize({ maxWidth: 400 })
-          .padding({ left: 20, right: 20, bottom: 16 })
+            .constraintSize({ maxWidth: 400 })
+            .padding({ left: 20, right: 20, bottom: 16 })
         }
         .width('100%')
-        .justifyContent(FlexAlign.Center)
+          .justifyContent(FlexAlign.Center)
       }
       .width('100%')
-      .height('100%')
-      .scrollBar(BarState.Off)
-      .edgeEffect(EdgeEffect.Spring)
-      .align(Alignment.TopStart)
+        .height('100%')
+        .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring)
+        .align(Alignment.TopStart)
 
       // 主题设置对话框
       if (this.showThemeDialog) {
@@ -439,7 +444,7 @@ export struct ProfilePage {
       }
     }
     .width('100%')
-    .height('100%')
+      .height('100%')
   }
 
   @Builder
@@ -474,13 +479,13 @@ export struct ProfilePage {
       }
     }
     .width('100%')
-    .height(56)
-    .padding({ left: 16, right: 16 })
-    .onClick(() => {
-      if (onClick) {
-        onClick();
-      }
-    })
+      .height(56)
+      .padding({ left: 16, right: 16 })
+      .onClick(() => {
+        if (onClick) {
+          onClick();
+        }
+      })
   }
 
   @Builder
@@ -517,13 +522,13 @@ export struct ProfilePage {
       }
     }
     .width('100%')
-    .height(56)
-    .padding({ left: 16, right: 16 })
-    .onClick(() => {
-      if (onClick) {
-        onClick();
-      }
-    })
+      .height(56)
+      .padding({ left: 16, right: 16 })
+      .onClick(() => {
+        if (onClick) {
+          onClick();
+        }
+      })
   }
 
   @Builder
@@ -565,19 +570,19 @@ export struct ProfilePage {
           })
       }
       .width('80%')
-      .constraintSize({ maxWidth: 320 })
-      .padding({ left: 24, right: 24, top: 24, bottom: 24 })
-      .backgroundColor($r('app.color.bg_card'))
-      .borderRadius(16)
-      .shadow({
-        radius: 20,
-        color: $r('app.color.shadow'),
-        offsetX: 0,
-        offsetY: 4
-      })
+        .constraintSize({ maxWidth: 320 })
+        .padding({ left: 24, right: 24, top: 24, bottom: 24 })
+        .backgroundColor($r('app.color.bg_card'))
+        .borderRadius(16)
+        .shadow({
+          radius: 20,
+          color: $r('app.color.shadow'),
+          offsetX: 0,
+          offsetY: 4
+        })
     }
     .width('100%')
-    .height('100%')
+      .height('100%')
   }
 
   @Builder
@@ -596,12 +601,12 @@ export struct ProfilePage {
       }
     }
     .width('100%')
-    .padding({ top: 16, bottom: 16, left: 16, right: 16 })
-    .borderRadius(8)
-    .backgroundColor(this.colorMode === value ? $r('app.color.bg_blue_light') : $r('app.color.bg_secondary'))
-    .margin({ bottom: 12 })
-    .onClick(() => {
-      this.colorMode = value;
-    })
+      .padding({ top: 16, bottom: 16, left: 16, right: 16 })
+      .borderRadius(8)
+      .backgroundColor(this.colorMode === value ? $r('app.color.bg_blue_light') : $r('app.color.bg_secondary'))
+      .margin({ bottom: 12 })
+      .onClick(() => {
+        this.colorMode = value;
+      })
   }
 }

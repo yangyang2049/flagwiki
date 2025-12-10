@@ -10,6 +10,8 @@ import { TextReaderUtil } from '../../utils/TextReaderUtil';
 import { screenshotManager } from '../../utils/ScreenshotManager';
 import { SaveFlagDialog } from '../../components/SaveFlagDialog';
 import { FavoritesManager } from '../../utils/favoritesManager';
+import { getCoatOfArmsImageSource } from '../../utils/coatOfArmsUtil';
+import { getFlagHistory, FlagHistoryItem } from '../../utils/FlagHistoryData';
 
 interface RouterParams {
   countryCode: string;
@@ -17,7 +19,7 @@ interface RouterParams {
 
 @Entry
 @Component
-struct FlagDetailPage {
+  struct FlagDetailPage {
   @State country: Country | undefined = undefined;
   @State internationalOrg: InternationalOrg | undefined = undefined;
   @State flagDesign: FlagDesign | undefined = undefined;
@@ -25,6 +27,8 @@ struct FlagDetailPage {
   @State isSharing: boolean = false;
   @State flagPixelMap: image.PixelMap | null = null;
   @State isFavorite: boolean = false;
+  @State coatOfArmsResource: Resource | null = null;
+  @State flagHistoryItems: FlagHistoryItem[] = [];
   private context = getContext(this) as common.UIAbilityContext;
   private readonly FLAG_CONTAINER_ID = 'flagImageContainer';
   private readonly FLAG_DOWNLOAD_CONTAINER_ID = 'flagDownloadContainer';
@@ -68,6 +72,8 @@ struct FlagDetailPage {
       } else {
         this.country = getCountryByCode(params.countryCode);
         this.flagDesign = getFlagDesign(params.countryCode);
+        // 加载历史国旗数据（仅国家，不包括国际组织）
+        this.flagHistoryItems = getFlagHistory(this.countryCode);
       }
     }
 
@@ -86,6 +92,24 @@ struct FlagDetailPage {
     // 初始化收藏管理器并检查收藏状态
     await FavoritesManager.init(this.context);
     await this.checkFavoriteStatus();
+
+    // 加载国徽（仅国家，不包括国际组织）
+    if (this.country) {
+      this.loadCoatOfArms();
+    }
+  }
+
+  /**
+   * 加载国徽
+   */
+  private loadCoatOfArms(): void {
+    if (!this.country) return;
+
+    // 从media文件夹加载预下载的国徽
+    const resource = getCoatOfArmsImageSource(this.country.code);
+    if (resource) {
+      this.coatOfArmsResource = resource;
+    }
   }
 
   private async checkFavoriteStatus(): Promise<void> {
@@ -136,7 +160,7 @@ struct FlagDetailPage {
 
       // 先释放之前的 PixelMap，避免内存泄漏
       this.releaseFlagPixelMap();
-      
+
       // 如果已有对话框打开，先关闭并释放资源
       if (this.saveDialogController) {
         try {
@@ -238,10 +262,10 @@ struct FlagDetailPage {
               .objectFit(ImageFit.Contain)
           }
           .width(400)
-          .height(200)
-          .backgroundColor(Color.White)
-          .id(this.FLAG_DOWNLOAD_CONTAINER_ID)
-          .position({ x: -1000, y: -1000 })
+            .height(200)
+            .backgroundColor(Color.White)
+            .id(this.FLAG_DOWNLOAD_CONTAINER_ID)
+            .position({ x: -1000, y: -1000 })
 
           // 旗帜图片（展示用，有 padding）
           Column() {
@@ -251,9 +275,9 @@ struct FlagDetailPage {
               .objectFit(ImageFit.Contain)
           }
           .width('100%')
-          .padding(16)
-          .backgroundColor($r('app.color.bg_secondary'))
-          .id(this.FLAG_CONTAINER_ID)
+            .padding(16)
+            .backgroundColor($r('app.color.bg_secondary'))
+            .id(this.FLAG_CONTAINER_ID)
 
           // 组织名称
           Column() {
@@ -274,87 +298,95 @@ struct FlagDetailPage {
               .textOverflow({ overflow: TextOverflow.Ellipsis })
           }
           .width('100%')
-          .padding({ left: 16, right: 16, top: 20, bottom: 16 })
-          .alignItems(HorizontalAlign.Center)
+            .padding({ left: 16, right: 16, top: 20, bottom: 16 })
+            .alignItems(HorizontalAlign.Center)
 
           // 基本信息卡片
           Row() {
-          Column() {
-            Text('基本信息')
-              .fontSize(16)
-              .fontWeight(FontWeight.Bold)
-              .fontColor($r('app.color.text_primary'))
-              .margin({ bottom: 16 })
-              .alignSelf(ItemAlign.Start)
+            Column() {
+              Text('基本信息')
+                .fontSize(16)
+                .fontWeight(FontWeight.Bold)
+                .fontColor($r('app.color.text_primary'))
+                .margin({ bottom: 16 })
+                .alignSelf(ItemAlign.Start)
 
-            this.InfoItem('总部', this.internationalOrg.headquartersCN)
-            Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoItem('地区', this.internationalOrg.region)
-            Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoItem('组织类型', this.internationalOrg.orgTypeCN)
-            Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoItem('覆盖人口', this.formatPopulation(this.internationalOrg.population))
-          }
+              this.InfoItem('总部', this.internationalOrg.headquartersCN)
+              Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+              this.InfoItem('地区', this.internationalOrg.region)
+              Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+              this.InfoItem('组织类型', this.internationalOrg.orgTypeCN)
+              Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+              this.InfoItem('覆盖人口', this.formatPopulation(this.internationalOrg.population))
+              if (this.internationalOrg.website) {
+                Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+                this.InfoItem('网站', this.internationalOrg.website)
+              }
+              if (this.internationalOrg.description) {
+                Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+                this.DescriptionItem('简介', this.internationalOrg.description)
+              }
+            }
           .padding(16)
-          .layoutWeight(1)
-          .backgroundColor($r('app.color.bg_card'))
-          .borderRadius(16)
+              .layoutWeight(1)
+              .backgroundColor($r('app.color.bg_card'))
+              .borderRadius(16)
           }
           .width('100%')
-          .padding({ left: 16, right: 16 })
-          .margin({ top: 8 })
+            .padding({ left: 16, right: 16 })
+            .margin({ top: 8 })
 
           // 底部操作按钮
           Row({ space: 16 }) {
-          // 收藏按钮
-          Button() {
-            Row({ space: 8 }) {
-              Image(this.isFavorite ? $r('app.media.icon_favorite_selected') : $r('app.media.icon_favorite'))
-                .width(20)
-                .height(20)
-              Text(this.isFavorite ? '已收藏' : '收藏')
-                .fontSize(15)
-                .fontColor(this.isFavorite ? $r('app.color.button_primary') : $r('app.color.text_primary'))
+            // 收藏按钮
+            Button() {
+              Row({ space: 8 }) {
+                Image(this.isFavorite ? $r('app.media.icon_favorite_selected') : $r('app.media.icon_favorite'))
+                  .width(20)
+                  .height(20)
+                Text(this.isFavorite ? '已收藏' : '收藏')
+                  .fontSize(15)
+                  .fontColor(this.isFavorite ? $r('app.color.button_primary') : $r('app.color.text_primary'))
+              }
             }
-          }
           .layoutWeight(1)
-          .height(48)
-          .backgroundColor($r('app.color.bg_card'))
-          .borderRadius(12)
-          .onClick(() => {
-            this.toggleFavorite();
-          })
+              .height(48)
+              .backgroundColor($r('app.color.bg_card'))
+              .borderRadius(12)
+              .onClick(() => {
+                this.toggleFavorite();
+              })
 
-          // 下载按钮
-          Button() {
-            Row({ space: 8 }) {
-              Image($r('app.media.icon_download'))
-                .width(20)
-                .height(20)
-              Text('下载')
-                .fontSize(15)
-                .fontColor($r('app.color.text_primary'))
+            // 下载按钮
+            Button() {
+              Row({ space: 8 }) {
+                Image($r('app.media.icon_download'))
+                  .width(20)
+                  .height(20)
+                Text('下载')
+                  .fontSize(15)
+                  .fontColor($r('app.color.text_primary'))
+              }
             }
-          }
           .layoutWeight(1)
-          .height(48)
-          .backgroundColor($r('app.color.bg_card'))
-          .borderRadius(12)
-          .onClick(() => {
-            this.onDownloadClick();
-          })
+              .height(48)
+              .backgroundColor($r('app.color.bg_card'))
+              .borderRadius(12)
+              .onClick(() => {
+                this.onDownloadClick();
+              })
           }
           .width('100%')
-          .padding({ left: 16, right: 16 })
-          .margin({ top: 20, bottom: 24 })
+            .padding({ left: 16, right: 16 })
+            .margin({ top: 20, bottom: 24 })
         }
         .width('100%')
       }
       .width('100%')
-      .height('100%')
-      .scrollBar(BarState.Off)
-      .edgeEffect(EdgeEffect.Spring)
-      .backgroundColor($r('app.color.bg_page'))
+        .height('100%')
+        .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring)
+        .backgroundColor($r('app.color.bg_page'))
     }
   }
 
@@ -373,10 +405,10 @@ struct FlagDetailPage {
                 .objectFit(ImageFit.Contain)
             }
             .width(400)
-            .height(200)
-            .backgroundColor(Color.White)
-            .id(this.FLAG_DOWNLOAD_CONTAINER_ID)
-            .position({ x: -1000, y: -1000 })
+              .height(200)
+              .backgroundColor(Color.White)
+              .id(this.FLAG_DOWNLOAD_CONTAINER_ID)
+              .position({ x: -1000, y: -1000 })
 
             // 国旗图片（展示用，有 padding）
             Column() {
@@ -386,9 +418,9 @@ struct FlagDetailPage {
                 .objectFit(ImageFit.Contain)
             }
             .width('100%')
-            .padding(16)
-            .backgroundColor($r('app.color.bg_secondary'))
-            .id(this.FLAG_CONTAINER_ID)
+              .padding(16)
+              .backgroundColor($r('app.color.bg_secondary'))
+              .id(this.FLAG_CONTAINER_ID)
 
             // 国家名称
             Column() {
@@ -409,8 +441,8 @@ struct FlagDetailPage {
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
             }
             .width('100%')
-            .padding({ left: 16, right: 16, top: 20, bottom: 16 })
-            .alignItems(HorizontalAlign.Center)
+              .padding({ left: 16, right: 16, top: 20, bottom: 16 })
+              .alignItems(HorizontalAlign.Center)
 
             // 基本信息卡片
             Row() {
@@ -433,13 +465,13 @@ struct FlagDetailPage {
                 this.InfoItem('国家代码', this.country.code.toUpperCase())
               }
               .padding(16)
-              .layoutWeight(1)
-              .backgroundColor($r('app.color.bg_card'))
-              .borderRadius(16)
+                .layoutWeight(1)
+                .backgroundColor($r('app.color.bg_card'))
+                .borderRadius(16)
             }
             .width('100%')
-            .padding({ left: 16, right: 16 })
-            .margin({ top: 8 })
+              .padding({ left: 16, right: 16 })
+              .margin({ top: 8 })
 
             // 关于这面国旗
             Row() {
@@ -464,14 +496,50 @@ struct FlagDetailPage {
                   .textAlign(TextAlign.Start)
               }
               .padding(16)
-              .layoutWeight(1)
-              .backgroundColor($r('app.color.bg_card'))
-              .borderRadius(16)
-              .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+                .backgroundColor($r('app.color.bg_card'))
+                .borderRadius(16)
+                .alignItems(HorizontalAlign.Start)
             }
             .width('100%')
-            .padding({ left: 16, right: 16 })
-            .margin({ top: 16 })
+              .padding({ left: 16, right: 16 })
+              .margin({ top: 16 })
+
+            // 历史国旗banner（如果有历史数据且是国家，显示在国徽前面）
+            if (this.country && this.flagHistoryItems && this.flagHistoryItems.length > 0) {
+              this.HistoricalFlagsBanner()
+            }
+
+            // 国徽（如果有）
+            if (this.coatOfArmsResource) {
+              Row() {
+                Column() {
+                  Text('国徽')
+                    .fontSize(16)
+                    .fontWeight(FontWeight.Bold)
+                    .fontColor($r('app.color.text_primary'))
+                    .margin({ bottom: 16 })
+                    .alignSelf(ItemAlign.Start)
+
+                  Column() {
+                    Image(this.coatOfArmsResource)
+                      .width(200)
+                      .height(200)
+                      .objectFit(ImageFit.Contain)
+                  }
+                  .width('100%')
+                    .alignItems(HorizontalAlign.Center)
+                }
+                .padding(16)
+                  .layoutWeight(1)
+                  .backgroundColor($r('app.color.bg_card'))
+                  .borderRadius(16)
+                  .alignItems(HorizontalAlign.Start)
+              }
+              .width('100%')
+                .padding({ left: 16, right: 16 })
+                .margin({ top: 16 })
+            }
 
             // 底部操作按钮
             Row({ space: 16 }) {
@@ -487,12 +555,12 @@ struct FlagDetailPage {
                 }
               }
               .layoutWeight(1)
-              .height(48)
-              .backgroundColor($r('app.color.bg_card'))
-              .borderRadius(12)
-              .onClick(() => {
-                this.toggleFavorite();
-              })
+                .height(48)
+                .backgroundColor($r('app.color.bg_card'))
+                .borderRadius(12)
+                .onClick(() => {
+                  this.toggleFavorite();
+                })
 
               // 下载按钮
               Button() {
@@ -506,24 +574,24 @@ struct FlagDetailPage {
                 }
               }
               .layoutWeight(1)
-              .height(48)
-              .backgroundColor($r('app.color.bg_card'))
-              .borderRadius(12)
-              .onClick(() => {
-                this.onDownloadClick();
-              })
+                .height(48)
+                .backgroundColor($r('app.color.bg_card'))
+                .borderRadius(12)
+                .onClick(() => {
+                  this.onDownloadClick();
+                })
             }
             .width('100%')
-            .padding({ left: 16, right: 16 })
-            .margin({ top: 20, bottom: 24 })
+              .padding({ left: 16, right: 16 })
+              .margin({ top: 20, bottom: 24 })
           }
           .width('100%')
         }
         .width('100%')
-        .height('100%')
-        .scrollBar(BarState.Off)
-        .edgeEffect(EdgeEffect.Spring)
-        .backgroundColor($r('app.color.bg_page'))
+          .height('100%')
+          .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.Spring)
+          .backgroundColor($r('app.color.bg_page'))
       } else {
         Column() {
           Text('国家信息加载失败')
@@ -531,13 +599,13 @@ struct FlagDetailPage {
             .fontColor($r('app.color.text_tertiary'))
         }
         .width('100%')
-        .height('100%')
-        .justifyContent(FlexAlign.Center)
+          .height('100%')
+          .justifyContent(FlexAlign.Center)
       }
     }
     .titleMode(NavigationTitleMode.Mini)
-    .backgroundColor($r('app.color.bg_page'))
-    .menus(this.MenuBuilder)
+      .backgroundColor($r('app.color.bg_page'))
+      .menus(this.MenuBuilder)
   }
 
   @Builder
@@ -558,9 +626,28 @@ struct FlagDetailPage {
         })
     }
     .height('100%')
-    .justifyContent(FlexAlign.End)
-    .alignItems(VerticalAlign.Center)
-    .padding({ right: 16 })
+      .justifyContent(FlexAlign.End)
+      .alignItems(VerticalAlign.Center)
+      .padding({ right: 16 })
+  }
+
+  @Builder
+  DescriptionItem(label: string, value: string) {
+    Column() {
+      Text(label)
+        .fontSize(14)
+        .fontWeight(FontWeight.Medium)
+        .fontColor($r('app.color.text_secondary'))
+        .margin({ bottom: 8 })
+        .alignSelf(ItemAlign.Start)
+      Text(value)
+        .fontSize(15)
+        .fontColor($r('app.color.text_primary'))
+        .lineHeight(22)
+        .alignSelf(ItemAlign.Start)
+    }
+    .width('100%')
+      .alignItems(HorizontalAlign.Start)
   }
 
   @Builder
@@ -634,13 +721,19 @@ struct FlagDetailPage {
 
   private getReadContent(): string {
     const lines: string[] = [];
-    
+
     if (this.internationalOrg) {
       lines.push(`${this.internationalOrg.nameCN}，英文名${this.internationalOrg.name}。`);
       lines.push(`总部位于${this.internationalOrg.headquartersCN}。`);
       lines.push(`地区是${this.internationalOrg.region}。`);
       lines.push(`组织类型是${this.internationalOrg.orgTypeCN}。`);
       lines.push(`覆盖人口约${this.formatPopulation(this.internationalOrg.population)}。`);
+      if (this.internationalOrg.website) {
+        lines.push(`网站：${this.internationalOrg.website}。`);
+      }
+      if (this.internationalOrg.description) {
+        lines.push(`${this.internationalOrg.description}`);
+      }
     } else if (this.country) {
       lines.push(`${this.country.nameCN}，英文名${this.country.name}。`);
       lines.push(`首都是${this.country.capitalCN}。`);
@@ -727,7 +820,7 @@ struct FlagDetailPage {
 
   private buildShareText(): string {
     const lines: string[] = [];
-    
+
     if (this.internationalOrg) {
       lines.push(`🏳️ ${this.internationalOrg.nameCN} (${this.internationalOrg.name})`);
       lines.push('');
@@ -735,6 +828,13 @@ struct FlagDetailPage {
       lines.push(`🌍 地区：${this.internationalOrg.region}`);
       lines.push(`🏛️ 组织类型：${this.internationalOrg.orgTypeCN}`);
       lines.push(`👥 覆盖人口：${this.formatPopulation(this.internationalOrg.population)}`);
+      if (this.internationalOrg.website) {
+        lines.push(`🌐 网站：${this.internationalOrg.website}`);
+      }
+      if (this.internationalOrg.description) {
+        lines.push('');
+        lines.push(`📝 简介：${this.internationalOrg.description}`);
+      }
     } else if (this.country) {
       lines.push(`🏳️ ${this.country.nameCN} (${this.country.name})`);
       lines.push('');
@@ -760,6 +860,84 @@ struct FlagDetailPage {
     lines.push('—— 来自「国旗小百科」');
 
     return lines.join('\n');
+  }
+
+  @Builder
+  HistoricalFlagsBanner() {
+    Row() {
+      Column() {
+        // 标题行
+        Row() {
+          Text('历史国旗')
+            .fontSize(16)
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r('app.color.text_primary'))
+
+          Blank()
+
+          // 查看全部箭头
+          Text('›')
+            .fontSize(20)
+            .fontColor($r('app.color.text_primary'))
+            .onClick(() => {
+              router.pushUrl({
+                url: 'pages/flaghistory/FlagHistoryPage',
+                params: { countryCode: this.countryCode }
+              }).catch((err: Error) => {
+                console.error(`Navigation failed: ${err.message}`);
+              });
+            })
+        }
+        .width('100%')
+          .margin({ bottom: 12 })
+
+        // 历史国旗Grid（最多显示6个）
+        Grid() {
+          ForEach(this.flagHistoryItems.slice(0, 6), (item: FlagHistoryItem, index: number) => {
+            GridItem() {
+              Column() {
+                Image($r(`app.media.${item.imagePath}`))
+                  .width('100%')
+                  .height(60)
+                  .objectFit(ImageFit.Contain)
+                  .borderRadius(4)
+
+                Text(`${item.year}年`)
+                  .fontSize(11)
+                  .fontColor($r('app.color.text_secondary'))
+                  .margin({ top: 4 })
+                  .maxLines(1)
+                  .textOverflow({ overflow: TextOverflow.Ellipsis })
+              }
+              .width('100%')
+                .padding(8)
+                .backgroundColor($r('app.color.bg_secondary'))
+                .borderRadius(8)
+                .onClick(() => {
+                  router.pushUrl({
+                    url: 'pages/flaghistory/FlagHistoryPage',
+                    params: { countryCode: this.countryCode }
+                  }).catch((err: Error) => {
+                    console.error(`Navigation failed: ${err.message}`);
+                  });
+                })
+            }
+          }, (item: FlagHistoryItem, index: number) => `history_${item.countryCode}_${item.year}_${index}`)
+        }
+        .columnsTemplate('1fr 1fr 1fr')
+          .columnsGap(8)
+          .rowsGap(8)
+          .width('100%')
+          .cachedCount(6)
+      }
+      .width('100%')
+        .padding(16)
+        .backgroundColor($r('app.color.bg_card'))
+        .borderRadius(16)
+    }
+    .width('100%')
+      .padding({ left: 16, right: 16 })
+      .margin({ top: 16 })
   }
 }
 

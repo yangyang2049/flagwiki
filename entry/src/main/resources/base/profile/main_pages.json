@@ -20,6 +20,8 @@
     "pages/stateflag/StateFlagCountryListPage",
     "pages/stateflag/StateFlagGalleryPage",
     "pages/stateflag/StateFlagDetailPage",
-    "pages/profile/FavoritesPage"
+    "pages/profile/FavoritesPage",
+    "pages/flaghistory/FlagHistoryPage",
+    "pages/flaghistory/FlagHistoryListPage"
   ]
 }

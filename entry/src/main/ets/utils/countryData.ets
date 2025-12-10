@@ -21,6 +21,8 @@ export interface InternationalOrg {
     orgType: string;      // 组织类型
     orgTypeCN: string;   // 组织类型中文
     population: number;  // 覆盖人口
+    website?: string;    // 网站（可选，不可点击的文本）
+    description?: string; // 简介（可选）
 }
 
 // 国旗设计数据模型
@@ -490,7 +492,7 @@ export function getFlagDesign(code: string): FlagDesign | undefined {
 }
 
 // 国际组织代码列表
-const INTERNATIONAL_ORGS = ['un', 'eu', 'olympic', 'nato', 'asean', 'au_org', 'arab_league', 'red_cross'];
+const INTERNATIONAL_ORGS = ['un', 'eu', 'olympic', 'nato', 'asean', 'au_org', 'arab_league', 'red_cross', 'fiav'];
 
 // 使用PNG格式的国家代码列表（目前为空，所有国家都使用SVG）
 const PNG_FLAG_COUNTRIES: string[] = [];
@@ -521,7 +523,9 @@ export const InternationalOrgs: InternationalOrg[] = [
         region: '全球',
         orgType: 'Intergovernmental Organization',
         orgTypeCN: '政府间组织',
-        population: 8000000000  // 约80亿人
+        population: 8000000000,  // 约80亿人
+        website: 'https://www.un.org',
+        description: '联合国是第二次世界大战后成立的国际组织，致力于维护国际和平与安全、促进国际合作、发展国际法、保护人权。成立于1945年，现有193个会员国。'
     },
     {
         code: 'eu',
@@ -532,7 +536,9 @@ export const InternationalOrgs: InternationalOrg[] = [
         region: '欧洲',
         orgType: 'Supranational Union',
         orgTypeCN: '超国家联盟',
-        population: 447000000  // 约4.47亿人
+        population: 447000000,  // 约4.47亿人
+        website: 'https://european-union.europa.eu',
+        description: '欧盟是由27个欧洲国家组成的政治经济联盟，致力于促进成员国之间的和平、价值观和人民福祉。成立于1993年，拥有统一的货币欧元和共同市场。'
     },
     {
         code: 'olympic',
@@ -543,7 +549,9 @@ export const InternationalOrgs: InternationalOrg[] = [
         region: '全球',
         orgType: 'Sports Organization',
         orgTypeCN: '体育组织',
-        population: 8000000000  // 全球人口
+        population: 8000000000,  // 全球人口
+        website: 'https://olympics.com',
+        description: '国际奥林匹克委员会是负责组织和管理奥林匹克运动会的国际组织。成立于1894年，每四年举办一次夏季和冬季奥运会，旨在通过体育促进世界和平与友谊。'
     },
     {
         code: 'nato',
@@ -554,7 +562,9 @@ export const InternationalOrgs: InternationalOrg[] = [
         region: '欧洲、北美',
         orgType: 'Military Alliance',
         orgTypeCN: '军事联盟',
-        population: 950000000  // 约9.5亿人
+        population: 950000000,  // 约9.5亿人
+        website: 'https://www.nato.int',
+        description: '北大西洋公约组织是北美和欧洲国家组成的军事联盟，成立于1949年。旨在通过政治和军事手段保障成员国的自由和安全，实行集体防御原则。'
     },
     {
         code: 'asean',
@@ -565,7 +575,9 @@ export const InternationalOrgs: InternationalOrg[] = [
         region: '东南亚',
         orgType: 'Regional Organization',
         orgTypeCN: '区域组织',
-        population: 680000000  // 约6.8亿人
+        population: 680000000,  // 约6.8亿人
+        website: 'https://asean.org',
+        description: '东南亚国家联盟是东南亚10个国家组成的区域组织，成立于1967年。致力于促进区域经济合作、政治安全合作和社会文化合作，维护地区和平与稳定。'
     },
     {
         code: 'au_org',
@@ -576,7 +588,9 @@ export const InternationalOrgs: InternationalOrg[] = [
         region: '非洲',
         orgType: 'Regional Organization',
         orgTypeCN: '区域组织',
-        population: 1400000000  // 约14亿人
+        population: 1400000000,  // 约14亿人
+        website: 'https://au.int',
+        description: '非洲联盟是非洲55个成员国组成的区域组织，成立于2002年，前身是非洲统一组织。致力于促进非洲的团结、和平、安全与发展，推动非洲一体化进程。'
     },
     {
         code: 'arab_league',
@@ -587,7 +601,9 @@ export const InternationalOrgs: InternationalOrg[] = [
         region: '中东、北非',
         orgType: 'Regional Organization',
         orgTypeCN: '区域组织',
-        population: 450000000  // 约4.5亿人
+        population: 450000000,  // 约4.5亿人
+        website: 'https://www.lasportal.org',
+        description: '阿拉伯国家联盟是22个阿拉伯国家组成的区域组织，成立于1945年。旨在加强阿拉伯国家之间的合作，协调成员国的政策和活动，维护阿拉伯世界的共同利益。'
     },
     {
         code: 'red_cross',
@@ -598,7 +614,22 @@ export const InternationalOrgs: InternationalOrg[] = [
         region: '全球',
         orgType: 'Humanitarian Organization',
         orgTypeCN: '人道主义组织',
-        population: 8000000000  // 全球人口
+        population: 8000000000,  // 全球人口
+        website: 'https://www.icrc.org',
+        description: '国际红十字与红新月运动是全球最大的人道主义网络，由国际红十字委员会、红十字会与红新月会国际联合会以及各国红会组成。致力于在武装冲突和自然灾害中保护生命和尊严。'
+    },
+    {
+        code: 'fiav',
+        name: 'Fédération internationale des associations vexillologiques',
+        nameCN: '旗帜学协会国际联盟',
+        headquarters: 'Houston / London',
+        headquartersCN: '休斯顿 / 伦敦',
+        region: '全球',
+        orgType: 'International Association',
+        orgTypeCN: '国际协会',
+        population: 0,  // 成员协会及组织
+        website: 'http://www.fiav.org',
+        description: '旗帜学协会国际联盟是致力于旗帜学研究与推广的国际组织，成立于1969年，由惠特尼·史密斯创立。拥有55个成员协会及组织，促进全球旗帜学知识的交流与发展。协会旗帜图案为一个接绳结。'
     }
 ];
 

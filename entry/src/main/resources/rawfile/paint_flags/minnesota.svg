@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="600" fill="none" viewBox="0 0 1000 600">
   <g id="minnesota" clip-path="url(#clip0_969_6569)">
-    <path id="2" fill="#EEE" d="M0 0h1000v600H0V0Z"/>
     <path id="1" fill="#DDD" d="M0 0h560L390 300l170 300H0V0Z"/>
+    <path id="2" fill="#EEE" d="M0 0h1000v600H0V0Z"/>
     <g id="3">
       <g id="b">
         <path id="a" fill="#EEE" d="m210 190-34.442 83.149 33.921 35.698 49.229-1.256L210 190Z"/>
