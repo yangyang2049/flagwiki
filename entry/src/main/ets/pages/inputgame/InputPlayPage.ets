@@ -4,6 +4,8 @@ import common from '@ohos.app.ability.common';
 import { getCountryByCode } from '../../utils/countryData';
 import { InputGameLevel, getInputGameLevel, getTotalInputLevels } from './InputGameLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
+import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
+import { VibratorUtil } from '../../utils/VibratorUtil';
 
 interface RouterParams {
   levelId: number;
@@ -19,14 +21,24 @@ interface RouterParams {
   @State isCorrect: boolean = false;
   @State showResult: boolean = false;
   @State correctAnswers: number = 0;
+  @State flagVisible: boolean = false; // 国旗可见性
   private context = getContext(this) as common.UIAbilityContext;
 
-  aboutToAppear() {
+  async aboutToAppear() {
+    // 初始化音效播放器
+    await SoundEffectUtil.init(this.context);
+    await VibratorUtil.init(this.context);
+
     const params = router.getParams() as RouterParams;
     if (params) {
       const levelId = params.levelId || 1;
       this.loadLevel(levelId);
     }
+  }
+
+  aboutToDisappear() {
+    // 释放音效资源
+    SoundEffectUtil.release();
   }
 
   private loadLevel(levelId: number): void {
@@ -38,7 +50,18 @@ interface RouterParams {
       this.isCorrect = false;
       this.showResult = false;
       this.correctAnswers = 0;
+      // 第一个国旗立即显示
+      this.flagVisible = true;
     }
+  }
+
+  private animateFlag(): void {
+    // 立即隐藏当前国旗
+    this.flagVisible = false;
+    // 然后逐渐显示新国旗
+    setTimeout(() => {
+      this.flagVisible = true;
+    }, 50);
   }
 
   private getCurrentCountryCode(): string {
@@ -55,33 +78,35 @@ interface RouterParams {
     return country?.nameCN || '';
   }
 
-  private checkAnswer(): void {
+  private async checkAnswer(): Promise<void> {
     if (this.inputText.trim() === '') return;
+
+    // 点击振动反馈
+    VibratorUtil.vibrateTap();
 
     const correctName = this.getCurrentCountryName();
     const userInput = this.inputText.trim();
 
     // 检查答案是否正确（完全匹配或包含）
     if (userInput === correctName || correctName.includes(userInput) || userInput.includes(correctName)) {
+      // 播放正确答案音效和振动
+      await SoundEffectUtil.playCorrect();
+      VibratorUtil.vibrateCorrect();
       this.isCorrect = true;
       this.correctAnswers++;
-      promptAction.showToast({
-        message: '✓ 正确!',
-        duration: 1500
-      });
     } else {
+      // 播放错误答案音效和振动
+      await SoundEffectUtil.playIncorrect();
+      VibratorUtil.vibrateIncorrect();
       this.lives--;
-      promptAction.showToast({
-        message: '✗ 答案不正确',
-        duration: 1000
-      });
 
       setTimeout(() => {
         this.inputText = '';
       }, 300);
 
       if (this.lives <= 0) {
-        setTimeout(() => {
+        setTimeout(async () => {
+          await SoundEffectUtil.playOver();
           this.showGameOver();
         }, 1000);
       }
@@ -89,16 +114,25 @@ interface RouterParams {
   }
 
   private async nextQuestion(): Promise<void> {
+    // 播放按钮点击音效和振动
+    await SoundEffectUtil.playButton();
+    VibratorUtil.vibrateTap();
+
     if (!this.level) return;
 
     if (this.currentIndex < this.level.countries.length - 1) {
       this.currentIndex++;
       this.inputText = '';
       this.isCorrect = false;
+      // 触发国旗动画
+      this.animateFlag();
     } else {
       // 完成所有题目，解锁下一关
       await GameProgressManager.init(this.context);
       await GameProgressManager.unlockNextLevel(GameType.INPUT, this.level.id);
+      // 播放恭喜音效和振动
+      await SoundEffectUtil.playCongrats();
+      VibratorUtil.vibrateWin();
       this.showResult = true;
     }
   }
@@ -126,6 +160,8 @@ interface RouterParams {
     this.isCorrect = false;
     this.correctAnswers = 0;
     this.showResult = false;
+    // 第一个国旗立即显示
+    this.flagVisible = true;
     if (this.level) {
       this.lives = this.level.lives;
     }
@@ -171,6 +207,12 @@ interface RouterParams {
               .width('80%')
               .height(180)
               .objectFit(ImageFit.Contain)
+              .opacity(this.flagVisible ? 1 : 0)
+              .scale({ x: this.flagVisible ? 1 : 0.8, y: this.flagVisible ? 1 : 0.8 })
+              .animation({
+                duration: 300,
+                curve: Curve.EaseOut
+              })
           }
           .width('100%')
             .margin({ top: 40, bottom: 40 })
@@ -197,8 +239,8 @@ interface RouterParams {
                 .fontWeight(FontWeight.Bold)
                 .backgroundColor($r('app.color.button_primary'))
                 .margin({ top: 32 })
-                .onClick(() => {
-                  this.nextQuestion();
+                .onClick(async () => {
+                  await this.nextQuestion();
                 })
             }
             .width('100%')
@@ -220,8 +262,8 @@ interface RouterParams {
                 .onChange((value: string) => {
                   this.inputText = value;
                 })
-                .onSubmit(() => {
-                  this.checkAnswer();
+                .onSubmit(async () => {
+                  await this.checkAnswer();
                 })
 
               Button('确认')
@@ -232,8 +274,8 @@ interface RouterParams {
                 .backgroundColor($r('app.color.button_primary'))
                 .borderRadius(12)
                 .margin({ left: 12 })
-                .onClick(() => {
-                  this.checkAnswer();
+                .onClick(async () => {
+                  await this.checkAnswer();
                 })
             }
             .width('100%')
@@ -337,6 +379,7 @@ interface RouterParams {
         .border({ width: 1, color: $r('app.color.button_primary') })
         .margin({ bottom: 32 })
         .onClick(async () => {
+          await SoundEffectUtil.playButton();
           if (this.level && this.level.id < getTotalInputLevels()) {
             // 下一关 - 在当前页面重新加载数据
             await GameProgressManager.init(this.context);

@@ -4,6 +4,8 @@ import common from '@ohos.app.ability.common';
 import { getCountryByCode } from '../../utils/countryData';
 import { FakeFlagLevel, FakeFlagQuestion, getFakeFlagLevel, getAllFakeFlagLevels } from './FakeFlagLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
+import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
+import { VibratorUtil } from '../../utils/VibratorUtil';
 
 interface RouterParams {
   levelId: number;
@@ -23,14 +25,24 @@ interface RouterParams {
   @State animatingCode: string = '';
   @State scaleValue: number = 1;
   @State showCompareDialog: boolean = false;
+  @State flagVisible: boolean[] = [false, false, false, false];  // 国旗选项可见性
   private context = getContext(this) as common.UIAbilityContext;
 
-  aboutToAppear() {
+  async aboutToAppear() {
+    // 初始化音效播放器
+    await SoundEffectUtil.init(this.context);
+    await VibratorUtil.init(this.context);
+
     const params = router.getParams() as RouterParams;
     if (params) {
       const levelId = params.levelId || 1;
       this.loadLevel(levelId);
     }
+  }
+
+  aboutToDisappear() {
+    // 释放音效资源
+    SoundEffectUtil.release();
   }
 
   private loadLevel(levelId: number): void {
@@ -46,6 +58,9 @@ interface RouterParams {
       this.animatingCode = '';
       this.scaleValue = 1;
       this.showCompareDialog = false;
+      this.flagVisible = [false, false, false, false];
+      // 触发选项动画
+      this.animateFlags();
     }
   }
 
@@ -60,6 +75,9 @@ interface RouterParams {
     // 如果已答对、正在动画中、或者当前正在显示错误状态，则不处理
     if (this.isAnswered || this.animatingCode !== '' || this.selectedCode !== '') return;
 
+    // 点击振动反馈
+    VibratorUtil.vibrateTap();
+
     const question = this.getCurrentQuestion();
     if (!question) return;
 
@@ -70,13 +88,13 @@ interface RouterParams {
     // 动画结束后检查答案
     setTimeout(() => {
       this.scaleValue = 1;
-      setTimeout(() => {
-        this.checkAnswer(code);
+      setTimeout(async () => {
+        await this.checkAnswer(code);
       }, 100);
     }, 150);
   }
 
-  private checkAnswer(code: string): void {
+  private async checkAnswer(code: string): Promise<void> {
     const question = this.getCurrentQuestion();
     if (!question) return;
 
@@ -85,6 +103,9 @@ interface RouterParams {
     this.isCorrect = code === question.fakeCountryCode;
 
     if (this.isCorrect) {
+      // 播放正确答案音效和振动
+      await SoundEffectUtil.playCorrect();
+      VibratorUtil.vibrateCorrect();
       this.isAnswered = true;
       this.correctAnswers++;
       // 正确时显示对比弹窗（延迟弹出）
@@ -92,6 +113,9 @@ interface RouterParams {
         this.showCompareDialog = true;
       }, 800);
     } else {
+      // 播放错误答案音效和振动
+      await SoundEffectUtil.playIncorrect();
+      VibratorUtil.vibrateIncorrect();
       // 错误时扣除生命值，但允许继续选择
       this.lives--;
       // 短暂显示错误状态后重置选择
@@ -100,7 +124,8 @@ interface RouterParams {
       }, 800);
 
       if (this.lives <= 0) {
-        setTimeout(() => {
+        setTimeout(async () => {
+          await SoundEffectUtil.playOver();
           this.showGameOver();
         }, 1000);
         return;
@@ -109,6 +134,10 @@ interface RouterParams {
   }
 
   private async nextQuestion(): Promise<void> {
+    // 播放按钮点击音效和振动
+    await SoundEffectUtil.playButton();
+    VibratorUtil.vibrateTap();
+
     if (!this.level) return;
 
     this.showCompareDialog = false;
@@ -120,10 +149,16 @@ interface RouterParams {
       this.isCorrect = false;
       this.animatingCode = '';
       this.scaleValue = 1;
+      this.flagVisible = [false, false, false, false];
+      // 触发选项动画
+      this.animateFlags();
     } else {
       // 完成所有题目，解锁下一关
       await GameProgressManager.init(this.context);
       await GameProgressManager.unlockNextLevel(GameType.FAKE_FLAG, this.level.id);
+      // 播放恭喜音效和振动
+      await SoundEffectUtil.playCongrats();
+      VibratorUtil.vibrateWin();
       this.showResult = true;
     }
   }
@@ -145,6 +180,20 @@ interface RouterParams {
     });
   }
 
+  private animateFlags(): void {
+    // 重置所有选项为不可见
+    this.flagVisible = [false, false, false, false];
+    
+    // 逐个显示选项
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => {
+        const newVisible = [...this.flagVisible];
+        newVisible[i] = true;
+        this.flagVisible = newVisible;
+      }, i * 100); // 每个选项延迟100ms
+    }
+  }
+
   private restartGame(): void {
     this.currentIndex = 0;
     this.selectedCode = '';
@@ -155,8 +204,11 @@ interface RouterParams {
     this.showCompareDialog = false;
     this.animatingCode = '';
     this.scaleValue = 1;
+    this.flagVisible = [false, false, false, false];
     if (this.level) {
       this.lives = this.level.lives;
+      // 触发选项动画
+      this.animateFlags();
     }
   }
 
@@ -312,9 +364,9 @@ interface RouterParams {
   @Builder
   FlagGrid() {
     Grid() {
-      ForEach(this.getCurrentQuestion()?.countryCodes || [], (code: string) => {
+      ForEach(this.getCurrentQuestion()?.countryCodes || [], (code: string, index: number) => {
         GridItem() {
-          this.FlagCard(code)
+          this.FlagCard(code, index)
         }
       })
     }
@@ -328,7 +380,7 @@ interface RouterParams {
   }
 
   @Builder
-  FlagCard(code: string) {
+  FlagCard(code: string, index: number) {
     Column() {
       Image($rawfile(this.getFlagSourceForCode(code)))
         .width('90%')
@@ -344,22 +396,23 @@ interface RouterParams {
         .textOverflow({ overflow: TextOverflow.Ellipsis })
     }
     .width('100%')
-      .height('100%')
-      .justifyContent(FlexAlign.Center)
-      .backgroundColor(this.getCardBackgroundColor(code))
-      .borderRadius(12)
-      .border({
-        width: 2,
-        color: this.getCardBorderColor(code)
-      })
-      .scale({
-        x: this.animatingCode === code ? this.scaleValue : 1,
-        y: this.animatingCode === code ? this.scaleValue : 1
-      })
-      .animation({ duration: 150, curve: Curve.EaseOut })
-      .onClick(() => {
-        this.selectFlag(code);
-      })
+    .height('100%')
+    .justifyContent(FlexAlign.Center)
+    .backgroundColor(this.getCardBackgroundColor(code))
+    .borderRadius(12)
+    .border({
+      width: 2,
+      color: this.getCardBorderColor(code)
+    })
+    .opacity(this.flagVisible[index] ? 1 : 0)
+    .scale({
+      x: this.animatingCode === code ? this.scaleValue : (this.flagVisible[index] ? 1 : 0.8),
+      y: this.animatingCode === code ? this.scaleValue : (this.flagVisible[index] ? 1 : 0.8)
+    })
+    .animation({ duration: 300, curve: Curve.EaseOut })
+    .onClick(async () => {
+      await this.selectFlag(code);
+    })
   }
 
   @Builder
@@ -442,8 +495,8 @@ interface RouterParams {
           .fontWeight(FontWeight.Bold)
           .backgroundColor($r('app.color.button_primary'))
           .margin({ top: 24, bottom: 20 })
-          .onClick(() => {
-            this.nextQuestion();
+          .onClick(async () => {
+            await this.nextQuestion();
           })
       }
       .width('85%')
@@ -577,6 +630,7 @@ interface RouterParams {
         .border({ width: 1, color: $r('app.color.button_primary') })
         .margin({ bottom: 32 })
         .onClick(async () => {
+          await SoundEffectUtil.playButton();
           if (this.level && this.level.id < getAllFakeFlagLevels().length) {
             // 下一关 - 在当前页面重新加载数据
             await GameProgressManager.init(this.context);

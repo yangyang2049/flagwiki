@@ -7,6 +7,8 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { Country, getCountryByCode, Countries } from '../../utils/countryData';
 import { QuizLevel, getQuizLevel, getAllQuizLevels } from './QuizLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
+import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
+import { VibratorUtil } from '../../utils/VibratorUtil';
 
 interface RouterParams {
   quizType: string;
@@ -36,15 +38,25 @@ interface QuizQuestion {
   @State animatingIndex: number = -1;
   @State scaleValue: number = 1;
   @State isSharing: boolean = false;
+  @State optionVisible: boolean[] = [false, false, false, false];  // 选项可见性
   private context = getContext(this) as common.UIAbilityContext;
 
-  aboutToAppear() {
+  async aboutToAppear() {
+    // 初始化音效播放器和振动工具
+    await SoundEffectUtil.init(this.context);
+    await VibratorUtil.init(this.context);
+
     const params = router.getParams() as RouterParams;
     if (params) {
       this.quizType = params.quizType || 'flagToName';
       const levelId = params.levelId || 1;
       this.loadLevel(levelId);
     }
+  }
+
+  aboutToDisappear() {
+    // 释放音效资源
+    SoundEffectUtil.release();
   }
 
   private loadLevel(levelId: number): void {
@@ -61,7 +73,10 @@ interface QuizQuestion {
       this.showResult = false;
       this.animatingIndex = -1;
       this.scaleValue = 1;
+      this.optionVisible = [false, false, false, false];
       this.generateQuestions();
+      // 触发选项动画
+      this.animateOptions();
     }
   }
 
@@ -111,6 +126,9 @@ interface QuizQuestion {
   private selectAnswer(index: number): void {
     if (this.isAnswered || this.animatingIndex !== -1) return;
 
+    // 点击振动反馈
+    VibratorUtil.vibrateTap();
+
     // 开始动画
     this.animatingIndex = index;
     this.scaleValue = 1.1;
@@ -118,13 +136,13 @@ interface QuizQuestion {
     // 动画结束后检查答案
     setTimeout(() => {
       this.scaleValue = 1;
-      setTimeout(() => {
-        this.checkAnswer(index);
+      setTimeout(async () => {
+        await this.checkAnswer(index);
       }, 100);
     }, 150);
   }
 
-  private checkAnswer(index: number): void {
+  private async checkAnswer(index: number): Promise<void> {
     this.selectedIndex = index;
     this.isAnswered = true;
     this.animatingIndex = -1;
@@ -134,18 +152,25 @@ interface QuizQuestion {
     this.isCorrect = selectedCountry.code === question.correctCountry.code;
 
     if (this.isCorrect) {
+      // 播放正确答案音效和振动
+      await SoundEffectUtil.playCorrect();
+      VibratorUtil.vibrateCorrect();
       this.correctAnswers++;
       this.combo++;
       if (this.combo > this.maxCombo) {
         this.maxCombo = this.combo;
       }
     } else {
+      // 播放错误答案音效和振动
+      await SoundEffectUtil.playIncorrect();
+      VibratorUtil.vibrateIncorrect();
       this.lives--;
       this.combo = 0;
 
       if (this.lives <= 0) {
         // 延迟显示失败
-        setTimeout(() => {
+        setTimeout(async () => {
+          await SoundEffectUtil.playOver();
           this.showGameOver();
         }, 1500);
         return;
@@ -154,6 +179,10 @@ interface QuizQuestion {
   }
 
   private async nextQuestion(): Promise<void> {
+    // 播放按钮点击音效和振动
+    await SoundEffectUtil.playButton();
+    VibratorUtil.vibrateTap();
+    
     if (this.currentIndex < this.questions.length - 1) {
       this.currentIndex++;
       this.selectedIndex = -1;
@@ -161,12 +190,18 @@ interface QuizQuestion {
       this.isCorrect = false;
       this.animatingIndex = -1;
       this.scaleValue = 1;
+      this.optionVisible = [false, false, false, false];
+      // 触发选项动画
+      this.animateOptions();
     } else {
       // 完成所有题目，解锁下一关
       if (this.level) {
         await GameProgressManager.init(this.context);
         await GameProgressManager.unlockNextLevel(GameType.QUIZ, this.level.id);
       }
+      // 播放恭喜音效和振动
+      await SoundEffectUtil.playCongrats();
+      VibratorUtil.vibrateWin();
       this.showResult = true;
     }
   }
@@ -212,6 +247,20 @@ interface QuizQuestion {
   private getCorrectIndex(): number {
     const question = this.questions[this.currentIndex];
     return question.choices.findIndex(c => c.code === question.correctCountry.code);
+  }
+
+  private animateOptions(): void {
+    // 重置所有选项为不可见
+    this.optionVisible = [false, false, false, false];
+    
+    // 逐个显示选项
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => {
+        const newVisible = [...this.optionVisible];
+        newVisible[i] = true;
+        this.optionVisible = newVisible;
+      }, i * 100); // 每个选项延迟100ms
+    }
   }
 
   build() {
@@ -278,8 +327,8 @@ interface QuizQuestion {
               .fontWeight(FontWeight.Bold)
               .backgroundColor($r('app.color.button_primary'))
               .margin({ bottom: 32 })
-              .onClick(() => {
-                this.nextQuestion();
+              .onClick(async () => {
+                await this.nextQuestion();
               })
           }
         }
@@ -397,8 +446,12 @@ interface QuizQuestion {
         color: this.getChoiceBorderColor(index)
       })
       .margin({ bottom: 12 })
-      .scale({ x: this.animatingIndex === index ? this.scaleValue : 1, y: this.animatingIndex === index ? this.scaleValue : 1 })
-      .animation({ duration: 150, curve: Curve.EaseOut })
+      .opacity(this.optionVisible[index] ? 1 : 0)
+      .scale({ 
+        x: this.animatingIndex === index ? this.scaleValue : (this.optionVisible[index] ? 1 : 0.8), 
+        y: this.animatingIndex === index ? this.scaleValue : (this.optionVisible[index] ? 1 : 0.8) 
+      })
+      .animation({ duration: 300, curve: Curve.EaseOut })
       .onClick(() => {
         this.selectAnswer(index);
       })
@@ -414,18 +467,22 @@ interface QuizQuestion {
         .padding(12)
     }
     .width('100%')
-      .height('100%')
-      .backgroundColor(this.getChoiceBackgroundColor(index))
-      .borderRadius(12)
-      .border({
-        width: 1.5,
-        color: this.getChoiceBorderColor(index)
-      })
-      .scale({ x: this.animatingIndex === index ? this.scaleValue : 1, y: this.animatingIndex === index ? this.scaleValue : 1 })
-      .animation({ duration: 150, curve: Curve.EaseOut })
-      .onClick(() => {
-        this.selectAnswer(index);
-      })
+    .height('100%')
+    .backgroundColor(this.getChoiceBackgroundColor(index))
+    .borderRadius(12)
+    .border({
+      width: 1.5,
+      color: this.getChoiceBorderColor(index)
+    })
+    .opacity(this.optionVisible[index] ? 1 : 0)
+    .scale({ 
+      x: this.animatingIndex === index ? this.scaleValue : (this.optionVisible[index] ? 1 : 0.8), 
+      y: this.animatingIndex === index ? this.scaleValue : (this.optionVisible[index] ? 1 : 0.8) 
+    })
+    .animation({ duration: 300, curve: Curve.EaseOut })
+    .onClick(() => {
+      this.selectAnswer(index);
+    })
   }
 
   private getChoiceBackgroundColor(index: number): Resource {
@@ -569,40 +626,27 @@ interface QuizQuestion {
             this.onShareResult();
           })
 
-        Button('返回')
+        Button(this.level && this.level.id < getAllQuizLevels().length ? '下一关' : '完美收官')
           .layoutWeight(1)
           .height(48)
           .fontSize(17)
           .fontWeight(FontWeight.Bold)
           .backgroundColor($r('app.color.button_primary'))
-          .onClick(() => {
-            router.back();
+          .onClick(async () => {
+            if (this.level && this.level.id < getAllQuizLevels().length) {
+              // 下一关 - 在当前页面重新加载数据
+              await GameProgressManager.init(this.context);
+              await GameProgressManager.unlockNextLevel(GameType.QUIZ, this.level.id);
+              this.loadLevel(this.level.id + 1);
+            } else {
+              // 完美收官，退出
+              router.back();
+            }
           })
       }
       .width('100%')
         .padding({ left: 16, right: 16 })
-        .margin({ bottom: 16 })
-
-      Button(this.level && this.level.id < getAllQuizLevels().length ? '下一关' : '完美收官')
-        .width('100%')
-        .height(48)
-        .fontSize(17)
-        .fontWeight(FontWeight.Medium)
-        .fontColor($r('app.color.button_primary'))
-        .backgroundColor(Color.Transparent)
-        .border({ width: 1, color: $r('app.color.button_primary') })
-        .margin({ left: 16, right: 16, bottom: 32 })
-        .onClick(async () => {
-          if (this.level && this.level.id < getAllQuizLevels().length) {
-            // 下一关 - 在当前页面重新加载数据
-            await GameProgressManager.init(this.context);
-            await GameProgressManager.unlockNextLevel(GameType.QUIZ, this.level.id);
-            this.loadLevel(this.level.id + 1);
-          } else {
-            // 完美收官，退出
-            router.back();
-          }
-        })
+        .margin({ bottom: 32 })
     }
     .width('100%')
       .height('100%')

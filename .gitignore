@@ -11,3 +11,8 @@
 **/.test
 /.appanalyzer
 /AIRecitation
+# Icon pack folders
+/IconPark - Icons Pack (Community)/
+**/IconPark*/
+**/icons pack*/
+**/icons-pack*/

@@ -3,6 +3,8 @@ import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
 import { Country, Countries, getFlagImageSource } from '../../utils/countryData';
 import { PreferencesManager } from '../../utils/PreferencesManager';
+import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
+import { VibratorUtil } from '../../utils/VibratorUtil';
 
 const QUESTIONS_PER_SESSION = 10;
 const PREFS_NAME = 'heads_up_settings';
@@ -20,8 +22,17 @@ export struct HeadsUpPlayPage {
   private context = getContext(this) as common.UIAbilityContext;
 
   async aboutToAppear() {
+    // 初始化音效播放器和振动工具
+    await SoundEffectUtil.init(this.context);
+    await VibratorUtil.init(this.context);
+    
     await this.checkAndShowTutorial();
     this.startNewSession();
+  }
+
+  aboutToDisappear() {
+    // 释放音效资源
+    SoundEffectUtil.release();
   }
 
   private async checkAndShowTutorial(): Promise<void> {
@@ -90,25 +101,38 @@ export struct HeadsUpPlayPage {
     }
   }
 
-  private handleTap(): void {
+  private async handleTap(): Promise<void> {
     if (!this.currentCountry) return;
+
+    // 点击振动反馈
+    VibratorUtil.vibrateTap();
 
     if (!this.showAnswer) {
       // 第一次点击：显示答案
+      await SoundEffectUtil.playButton();
       this.showAnswer = true;
     } else {
       // 第二次点击：下一个
+      await SoundEffectUtil.playButton();
       this.currentIndex++;
       this.loadNextCountry();
     }
   }
 
-  private continueSession(): void {
+  private async continueSession(): Promise<void> {
+    // 播放按钮点击音效和振动
+    await SoundEffectUtil.playButton();
+    VibratorUtil.vibrateTap();
+    
     this.sessionNumber++;
     this.startNewSession();
   }
 
-  private exitGame(): void {
+  private async exitGame(): Promise<void> {
+    // 播放按钮点击音效和振动
+    await SoundEffectUtil.playButton();
+    VibratorUtil.vibrateTap();
+    
     router.back();
   }
 
@@ -191,8 +215,8 @@ export struct HeadsUpPlayPage {
     }
     .width('100%')
     .height('100%')
-    .onClick(() => {
-      this.handleTap();
+    .onClick(async () => {
+      await this.handleTap();
     })
   }
 
@@ -222,8 +246,8 @@ export struct HeadsUpPlayPage {
           .fontWeight(FontWeight.Medium)
           .backgroundColor($r('app.color.bg_card'))
           .fontColor($r('app.color.text_primary'))
-          .onClick(() => {
-            this.exitGame();
+          .onClick(async () => {
+            await this.exitGame();
           })
 
         Button('继续')
@@ -233,8 +257,8 @@ export struct HeadsUpPlayPage {
           .fontWeight(FontWeight.Bold)
           .backgroundColor($r('app.color.button_primary'))
           .margin({ left: 16 })
-          .onClick(() => {
-            this.continueSession();
+          .onClick(async () => {
+            await this.continueSession();
           })
       }
       .margin({ top: 20 })

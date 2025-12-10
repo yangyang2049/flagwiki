@@ -9,6 +9,8 @@ import { ConfigurationConstant } from '@kit.AbilityKit';
 import router from '@ohos.router';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { PreferencesManager } from '../../utils/PreferencesManager';
+import { VibratorUtil } from '../../utils/VibratorUtil';
+import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
 
 // 总关卡数
 const QUIZ_TOTAL_LEVELS = 10;
@@ -28,6 +30,8 @@ interface ChallengeProgress {
 export struct ProfilePage {
   @State colorMode: ConfigurationConstant.ColorMode = ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET;
   @State showThemeDialog: boolean = false;
+  @State vibrationEnabled: boolean = true; // 振动反馈开关，默认启用
+  @State soundEnabled: boolean = true; // 音效开关，默认启用
   @Prop @Watch('onRefreshKeyChanged') refreshKey: number = 0;
   private prefs: preferences.Preferences | null = null;
   private context = getContext(this) as common.UIAbilityContext;
@@ -41,11 +45,17 @@ export struct ProfilePage {
   async aboutToAppear() {
     await this.loadColorMode();
     await this.loadGameProgress();
+    await this.loadVibrationPreference();
+    await this.loadSoundPreference();
+    await VibratorUtil.init(this.context);
+    await SoundEffectUtil.init(this.context);
   }
 
   private onRefreshKeyChanged(): void {
     this.loadColorMode();
     this.loadGameProgress();
+    this.loadVibrationPreference();
+    this.loadSoundPreference();
   }
 
   private async loadGameProgress(): Promise<void> {
@@ -116,6 +126,58 @@ export struct ProfilePage {
       case ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET:
       default:
         return '跟随系统';
+    }
+  }
+
+  private async loadVibrationPreference(): Promise<void> {
+    try {
+      if (!this.prefs) {
+        this.prefs = await PreferencesManager.getPreferences('app_settings');
+      }
+      this.vibrationEnabled = await this.prefs.get('vibration_enabled', true) as boolean;
+    } catch (err) {
+      console.error(`Failed to load vibration preference: ${JSON.stringify(err)}`);
+      this.vibrationEnabled = true; // 默认启用
+    }
+  }
+
+  private async loadSoundPreference(): Promise<void> {
+    try {
+      if (!this.prefs) {
+        this.prefs = await PreferencesManager.getPreferences('app_settings');
+      }
+      this.soundEnabled = await this.prefs.get('sound_enabled', true) as boolean;
+    } catch (err) {
+      console.error(`Failed to load sound preference: ${JSON.stringify(err)}`);
+      this.soundEnabled = true; // 默认启用
+    }
+  }
+
+  private async saveSoundPreference(enabled: boolean): Promise<void> {
+    try {
+      if (!this.prefs) {
+        this.prefs = await PreferencesManager.getPreferences('app_settings');
+      }
+      await this.prefs.put('sound_enabled', enabled);
+      await this.prefs.flush();
+      this.soundEnabled = enabled;
+      await SoundEffectUtil.setEnabled(enabled);
+    } catch (err) {
+      console.error(`Failed to save sound preference: ${JSON.stringify(err)}`);
+    }
+  }
+
+  private async saveVibrationPreference(enabled: boolean): Promise<void> {
+    try {
+      if (!this.prefs) {
+        this.prefs = await PreferencesManager.getPreferences('app_settings');
+      }
+      await this.prefs.put('vibration_enabled', enabled);
+      await this.prefs.flush();
+      this.vibrationEnabled = enabled;
+      await VibratorUtil.setEnabled(enabled);
+    } catch (err) {
+      console.error(`Failed to save vibration preference: ${JSON.stringify(err)}`);
     }
   }
 
@@ -377,8 +439,22 @@ export struct ProfilePage {
 
             // 设置项
             Column() {
-              this.settingItemWithValue($r('app.media.icon_setting_config'), '深色模式', () => this.getThemeText(), () => {
+              this.settingItemWithValue(this.getThemeIcon(), '深色模式', () => this.getThemeText(), () => {
                 this.showThemeSettings();
+              })
+              Divider()
+                .strokeWidth(0.5)
+                .color($r('app.color.gray_border'))
+                .margin({ left: 16, right: 16 })
+              this.settingItemWithToggle($r('app.media.icon_sound'), '音效', this.soundEnabled, (enabled: boolean) => {
+                this.saveSoundPreference(enabled);
+              })
+              Divider()
+                .strokeWidth(0.5)
+                .color($r('app.color.gray_border'))
+                .margin({ left: 16, right: 16 })
+              this.settingItemWithToggle($r('app.media.icon_vibration'), '振动', this.vibrationEnabled, (enabled: boolean) => {
+                this.saveVibrationPreference(enabled);
               })
               Divider()
                 .strokeWidth(0.5)
@@ -529,6 +605,45 @@ export struct ProfilePage {
           onClick();
         }
       })
+  }
+
+  private getThemeIcon(): Resource {
+    // 根据当前颜色模式返回对应的图标
+    if (this.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK) {
+      return $r('app.media.icon_dark_mode');
+    } else if (this.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) {
+      return $r('app.media.icon_light_mode');
+    } else {
+      // 跟随系统模式，使用设置图标
+      return $r('app.media.icon_setting_config');
+    }
+  }
+
+  @Builder
+  settingItemWithToggle(icon: Resource, title: string, enabled: boolean, onToggle: (enabled: boolean) => void) {
+    Row() {
+      Row() {
+        Image(icon)
+          .width(16)
+          .height(16)
+          .margin({ right: 12 })
+        Text(title)
+          .fontSize(14)
+          .fontWeight(FontWeight.Medium)
+          .fontColor($r('app.color.text_primary'))
+      }
+      .layoutWeight(1)
+
+      Toggle({ type: ToggleType.Switch, isOn: enabled })
+        .selectedColor($r('app.color.button_primary'))
+        .switchPointColor($r('app.color.white'))
+        .onChange((isOn: boolean) => {
+          onToggle(isOn);
+        })
+    }
+    .width('100%')
+      .height(56)
+      .padding({ left: 16, right: 16 })
   }
 
   @Builder

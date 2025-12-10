@@ -4,6 +4,8 @@ import common from '@ohos.app.ability.common';
 import { getCountryByCode } from '../../utils/countryData';
 import { TriviaLevel, TriviaQuestion, getTriviaLevel, getTotalTriviaLevels } from './TriviaLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
+import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
+import { VibratorUtil } from '../../utils/VibratorUtil';
 
 interface RouterParams {
   levelId: number;
@@ -21,14 +23,24 @@ interface RouterParams {
   @State showResult: boolean = false;
   @State correctAnswers: number = 0;
   @State shuffledOptions: string[] = [];  // 打乱后的选项
+  @State optionVisible: boolean[] = [];  // 选项可见性
   private context = getContext(this) as common.UIAbilityContext;
 
-  aboutToAppear() {
+  async aboutToAppear() {
+    // 初始化音效播放器
+    await SoundEffectUtil.init(this.context);
+    await VibratorUtil.init(this.context);
+
     const params = router.getParams() as RouterParams;
     if (params) {
       const levelId = params.levelId || 1;
       this.loadLevel(levelId);
     }
+  }
+
+  aboutToDisappear() {
+    // 释放音效资源
+    SoundEffectUtil.release();
   }
 
   private loadLevel(levelId: number): void {
@@ -42,7 +54,10 @@ interface RouterParams {
       this.showResult = false;
       this.correctAnswers = 0;
       this.shuffledOptions = [];
+      this.optionVisible = [];
       this.initCurrentQuestionOptions();
+      // 触发选项动画
+      this.animateOptions();
     }
   }
 
@@ -73,8 +88,11 @@ interface RouterParams {
     }
   }
 
-  private selectOption(option: string): void {
+  private async selectOption(option: string): Promise<void> {
     if (this.isAnswered) return;
+
+    // 点击振动反馈
+    VibratorUtil.vibrateTap();
 
     const question = this.getCurrentQuestion();
     if (!question) return;
@@ -84,20 +102,19 @@ interface RouterParams {
     this.isCorrect = option === question.answer;
 
     if (this.isCorrect) {
+      // 播放正确答案音效和振动
+      await SoundEffectUtil.playCorrect();
+      VibratorUtil.vibrateCorrect();
       this.correctAnswers++;
-      promptAction.showToast({
-        message: '✓ 正确!',
-        duration: 1000
-      });
     } else {
+      // 播放错误答案音效和振动
+      await SoundEffectUtil.playIncorrect();
+      VibratorUtil.vibrateIncorrect();
       this.lives--;
-      promptAction.showToast({
-        message: '✗ 错误',
-        duration: 1000
-      });
 
       if (this.lives <= 0) {
-        setTimeout(() => {
+        setTimeout(async () => {
+          await SoundEffectUtil.playOver();
           this.showGameOver();
         }, 1500);
         return;
@@ -106,6 +123,10 @@ interface RouterParams {
   }
 
   private async nextQuestion(): Promise<void> {
+    // 播放按钮点击音效和振动
+    await SoundEffectUtil.playButton();
+    VibratorUtil.vibrateTap();
+
     if (!this.level) return;
 
     if (this.currentIndex < this.level.questions.length - 1) {
@@ -113,11 +134,17 @@ interface RouterParams {
       this.selectedOption = '';
       this.isAnswered = false;
       this.isCorrect = false;
+      this.optionVisible = [];
       this.initCurrentQuestionOptions();  // 为新题目打乱选项
+      // 触发选项动画
+      this.animateOptions();
     } else {
       // 完成所有题目，解锁下一关
       await GameProgressManager.init(this.context);
       await GameProgressManager.unlockNextLevel(GameType.TRIVIA, this.level.id);
+      // 播放恭喜音效和振动
+      await SoundEffectUtil.playCongrats();
+      VibratorUtil.vibrateWin();
       this.showResult = true;
     }
   }
@@ -146,9 +173,30 @@ interface RouterParams {
     this.isCorrect = false;
     this.correctAnswers = 0;
     this.showResult = false;
+    this.optionVisible = [];
     if (this.level) {
       this.lives = this.level.lives;
       this.initCurrentQuestionOptions();  // 重新打乱选项
+      // 触发选项动画
+      this.animateOptions();
+    }
+  }
+
+  private animateOptions(): void {
+    const question = this.getCurrentQuestion();
+    if (!question) return;
+    
+    const optionCount = question.options.length;
+    // 重置所有选项为不可见
+    this.optionVisible = new Array(optionCount).fill(false);
+    
+    // 逐个显示选项
+    for (let i = 0; i < optionCount; i++) {
+      setTimeout(() => {
+        const newVisible = [...this.optionVisible];
+        newVisible[i] = true;
+        this.optionVisible = newVisible;
+      }, i * 100); // 每个选项延迟100ms
     }
   }
 
@@ -246,7 +294,7 @@ interface RouterParams {
 
           // 选项（使用打乱后的选项）
           Column() {
-            ForEach(this.shuffledOptions, (option: string) => {
+            ForEach(this.shuffledOptions, (option: string, index: number) => {
               Row() {
                 Text(this.getOptionText(option))
                   .fontSize(16)
@@ -264,8 +312,14 @@ interface RouterParams {
                   color: this.getOptionBorderColor(option)
                 })
                 .margin({ bottom: 12 })
-                .onClick(() => {
-                  this.selectOption(option);
+                .opacity(this.optionVisible[index] ? 1 : 0)
+                .scale({ 
+                  x: this.optionVisible[index] ? 1 : 0.8, 
+                  y: this.optionVisible[index] ? 1 : 0.8 
+                })
+                .animation({ duration: 300, curve: Curve.EaseOut })
+                .onClick(async () => {
+                  await this.selectOption(option);
                 })
             })
           }
@@ -283,8 +337,8 @@ interface RouterParams {
               .fontWeight(FontWeight.Bold)
               .backgroundColor($r('app.color.button_primary'))
               .margin({ bottom: 32 })
-              .onClick(() => {
-                this.nextQuestion();
+              .onClick(async () => {
+                await this.nextQuestion();
               })
           }
         }
@@ -383,6 +437,7 @@ interface RouterParams {
         .border({ width: 1, color: $r('app.color.button_primary') })
         .margin({ bottom: 32 })
         .onClick(async () => {
+          await SoundEffectUtil.playButton();
           if (this.level && this.level.id < getTotalTriviaLevels()) {
             // 下一关 - 在当前页面重新加载数据
             await GameProgressManager.init(this.context);

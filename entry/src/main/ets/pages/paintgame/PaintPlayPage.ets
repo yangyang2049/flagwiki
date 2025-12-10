@@ -14,6 +14,8 @@ import { getCountryByCode, Country } from '../../utils/countryData';
 import { getPaintLevel, getFlagPaintInfo, getTotalLevels, PaintLevel } from './PaintGameData';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { PreferencesManager } from '../../utils/PreferencesManager';
+import { SoundEffectUtil, SoundType } from '../../utils/SoundEffectUtil';
+import { VibratorUtil } from '../../utils/VibratorUtil';
 
 interface RouterParams {
   categoryId: string;
@@ -83,17 +85,24 @@ const US_STATE_NAMES: Record<string, string> = {
   @State currentLevel: PaintLevel | undefined = undefined;
   @State currentFlagIndex: number = 0;
   @State showNextButton: boolean = false;
+  @State showNextButtonAnimated: boolean = false; // 按钮动画状态
   @State showHint: boolean = false;
   @State levelCompleted: boolean = false;
   @State isWebReady: boolean = false;
   @State currentFlagPath: string = 'flags/us.svg';
   @State backgroundColorStr: string = '#F5F6F7'; // 默认浅色背景
   @State webOpacity: number = 0; // Web 组件透明度，用于渐显动画
+  @State contentTranslateY: number = 0; // 内容向上移动的距离
+  @State showButtons: boolean = false; // 按钮是否显示
 
   private webController: web_webview.WebviewController = new web_webview.WebviewController();
   private context = getContext(this) as common.UIAbilityContext;
 
   async aboutToAppear() {
+    // 初始化音效播放器和振动工具
+    await SoundEffectUtil.init(this.context);
+    await VibratorUtil.init(this.context);
+
     const params = router.getParams() as RouterParams;
     if (params) {
       this.categoryId = params.categoryId || 'world';
@@ -102,6 +111,11 @@ const US_STATE_NAMES: Record<string, string> = {
     this.currentLevel = getPaintLevel(this.categoryId, this.levelId);
     this.updateCurrentFlagPath();
     await this.updateBackgroundColor();
+  }
+
+  aboutToDisappear() {
+    // 释放音效资源
+    SoundEffectUtil.release();
   }
 
   /**
@@ -302,7 +316,12 @@ const US_STATE_NAMES: Record<string, string> = {
   }
 
   private async onNext(): Promise<void> {
+    // 播放按钮点击音效和振动
+    await SoundEffectUtil.playButton();
+    VibratorUtil.vibrateTap();
+    
     this.showNextButton = false;
+    this.showNextButtonAnimated = false;
     this.showHint = false;
 
     if (!this.currentLevel) return;
@@ -329,15 +348,44 @@ const US_STATE_NAMES: Record<string, string> = {
   }
 
   private async onLevelComplete(): Promise<void> {
+    // 播放恭喜音效和振动
+    await SoundEffectUtil.playCongrats();
+    VibratorUtil.vibrateWin();
+    
     // 保存进度
     await GameProgressManager.init(this.context);
     const gameType = this.getGameType();
     await GameProgressManager.unlockNextLevel(gameType, this.levelId);
 
+    // 设置完成状态，内容从底部开始（初始位置在屏幕下方）
     this.levelCompleted = true;
+    this.contentTranslateY = 200; // 初始位置在屏幕下方200px
+    
+    // 延迟一帧后触发向上移动动画（从底部向上滑入）
+    setTimeout(() => {
+      animateTo({
+        duration: 500,
+        curve: Curve.EaseOut
+      }, () => {
+        this.contentTranslateY = 0; // 移动到最终位置（原始位置）
+      });
+    }, 50);
+
+    // 延迟显示按钮（在动画和音效播放后）
+    setTimeout(() => {
+      this.showButtons = true;
+    }, 600);
   }
 
   private async onNextLevel(): Promise<void> {
+    // 播放按钮点击音效和振动
+    await SoundEffectUtil.playButton();
+    VibratorUtil.vibrateTap();
+    
+    // 重置动画状态
+    this.contentTranslateY = 0;
+    this.showButtons = false;
+    
     const totalLevels = getTotalLevels(this.categoryId);
     if (this.levelId < totalLevels) {
       this.levelId++;
@@ -345,6 +393,7 @@ const US_STATE_NAMES: Record<string, string> = {
       this.currentFlagIndex = 0;
       this.levelCompleted = false;
       this.showNextButton = false;
+      this.showNextButtonAnimated = false;
       await this.setupGame();
     } else {
       // 所有关卡完成
@@ -352,7 +401,10 @@ const US_STATE_NAMES: Record<string, string> = {
     }
   }
 
-  private onHintTapped(): void {
+  private async onHintTapped(): Promise<void> {
+    // 播放提示音效和振动
+    await SoundEffectUtil.playSound(SoundType.HINT);
+    VibratorUtil.vibrateTap();
     this.showHint = !this.showHint;
   }
 
@@ -428,17 +480,28 @@ const US_STATE_NAMES: Record<string, string> = {
               })
               .javaScriptProxy({
                 object: {
-                  onPaintCorrect: () => {
+                  onPaintCorrect: async () => {
+                    // 播放正确答案音效和振动
+                    await SoundEffectUtil.playCorrect();
+                    VibratorUtil.vibrateCorrect();
+                    // 延迟显示按钮（在音效播放后）
                     this.showNextButton = true;
+                    setTimeout(() => {
+                      this.showNextButtonAnimated = true;
+                    }, 400);
                   },
-                  onPaintIncorrect: () => {
+                  onPaintIncorrect: async () => {
+                    // 播放错误答案音效和振动
+                    await SoundEffectUtil.playIncorrect();
+                    VibratorUtil.vibrateIncorrect();
                     // 错误时重置游戏
                     setTimeout(() => {
                       this.setupGame();
                     }, 2000);
                   },
-                  onPaintSound: () => {
-                    // 播放填色音效（可选）
+                  onPaintSound: async () => {
+                    // 播放填色音效
+                    await SoundEffectUtil.playSound(SoundType.TAP);
                   }
                 },
                 name: 'NativeInterface',
@@ -448,7 +511,7 @@ const US_STATE_NAMES: Record<string, string> = {
               .width('100%')
               .layoutWeight(1)
 
-            // 底部按钮区域
+            // 底部按钮区域（延迟显示）
             if (this.showNextButton) {
               Button(this.currentFlagIndex < (this.currentLevel?.flags.length || 0) - 1 ? '下一个' : '完成')
                 .width('80%')
@@ -457,8 +520,14 @@ const US_STATE_NAMES: Record<string, string> = {
                 .fontWeight(FontWeight.Bold)
                 .backgroundColor($r('app.color.button_primary'))
                 .margin({ bottom: 32 })
-                .onClick(() => {
-                  this.onNext();
+                .opacity(this.showNextButtonAnimated ? 1 : 0)
+                .scale({ x: this.showNextButtonAnimated ? 1 : 0.8, y: this.showNextButtonAnimated ? 1 : 0.8 })
+                .animation({
+                  duration: 300,
+                  curve: Curve.EaseOut
+                })
+                .onClick(async () => {
+                  await this.onNext();
                 })
             }
           }
@@ -473,7 +542,9 @@ const US_STATE_NAMES: Record<string, string> = {
             Image($r('app.media.icon_back'))
               .width(24)
               .height(24)
-              .onClick(() => {
+              .onClick(async () => {
+                await SoundEffectUtil.playButton();
+                VibratorUtil.vibrateTap();
                 router.back();
               })
 
@@ -545,70 +616,102 @@ const US_STATE_NAMES: Record<string, string> = {
   @Builder
   LevelCompleteView() {
     Column() {
-      Text('🎉')
-        .fontSize(72)
-        .margin({ top: 80 })
+      // 内容区域（从底部向上滑入）
+      Column() {
+        Text('🎉')
+          .fontSize(72)
+          .margin({ top: 80 })
 
-      Text('恭喜过关！')
-        .fontSize(28)
-        .fontWeight(FontWeight.Bold)
-        .fontColor($r('app.color.text_primary'))
-        .margin({ top: 24 })
+        Text('恭喜过关！')
+          .fontSize(28)
+          .fontWeight(FontWeight.Bold)
+          .fontColor($r('app.color.text_primary'))
+          .margin({ top: 24 })
 
-      Text(`第 ${this.levelId} 关`)
-        .fontSize(16)
-        .fontColor($r('app.color.text_secondary'))
-        .margin({ top: 8 })
+        Text(`第 ${this.levelId} 关`)
+          .fontSize(16)
+          .fontColor($r('app.color.text_secondary'))
+          .margin({ top: 8 })
 
-      // 完成的国旗展示
-      Row({ space: 12 }) {
-        ForEach(this.currentLevel?.flags || [], (code: string) => {
-          Image($rawfile(this.getFlagImagePath(code)))
-            .width(80)
-            .height(50)
-            .objectFit(ImageFit.Contain)
-            .shadow({
-              radius: 4,
-              color: 'rgba(0, 0, 0, 0.1)',
-              offsetX: 0,
-              offsetY: 2
-            })
-        })
+        // 完成的国旗展示
+        Row({ space: 12 }) {
+          ForEach(this.currentLevel?.flags || [], (code: string) => {
+            Image($rawfile(this.getFlagImagePath(code)))
+              .width(80)
+              .height(50)
+              .objectFit(ImageFit.Contain)
+              .shadow({
+                radius: 4,
+                color: 'rgba(0, 0, 0, 0.1)',
+                offsetX: 0,
+                offsetY: 2
+              })
+          })
+        }
+        .margin({ top: 32 })
       }
-      .margin({ top: 32 })
+      .width('100%')
+        .translate({ y: this.contentTranslateY })
+        .animation({
+          duration: 500,
+          curve: Curve.EaseOut
+        })
 
       Blank()
 
-      // 下一关按钮
-      Button(this.levelId < getTotalLevels(this.categoryId) ? '下一关' : '完美收官')
-        .width('80%')
-        .height(48)
-        .fontSize(17)
-        .fontWeight(FontWeight.Bold)
-        .backgroundColor($r('app.color.button_primary'))
-        .margin({ bottom: 16 })
-        .onClick(() => {
-          if (this.levelId < getTotalLevels(this.categoryId)) {
-            this.onNextLevel();
-          } else {
-            // 完美收官，退出
-            router.back();
-          }
-        })
+      // 按钮区域（延迟显示）
+      if (this.showButtons) {
+        Column() {
+          // 下一关按钮
+          Button(this.levelId < getTotalLevels(this.categoryId) ? '下一关' : '完美收官')
+            .width('80%')
+            .height(48)
+            .fontSize(17)
+            .fontWeight(FontWeight.Bold)
+            .backgroundColor($r('app.color.button_primary'))
+            .margin({ bottom: 16 })
+            .opacity(this.showButtons ? 1 : 0)
+            .scale({ x: this.showButtons ? 1 : 0.8, y: this.showButtons ? 1 : 0.8 })
+            .animation({
+              duration: 300,
+              curve: Curve.EaseOut
+            })
+            .onClick(async () => {
+              if (this.levelId < getTotalLevels(this.categoryId)) {
+                await this.onNextLevel();
+              } else {
+                // 完美收官，退出
+                await SoundEffectUtil.playButton();
+                VibratorUtil.vibrateTap();
+                router.back();
+              }
+            })
 
-      // 返回按钮
-      Button('返回')
-        .width('80%')
-        .height(48)
-        .fontSize(17)
-        .fontWeight(FontWeight.Medium)
-        .fontColor($r('app.color.button_primary'))
-        .backgroundColor(Color.Transparent)
-        .border({ width: 1, color: $r('app.color.button_primary') })
-        .margin({ bottom: 32 })
-        .onClick(() => {
-          router.back();
-        })
+          // 返回按钮
+          Button('返回')
+            .width('80%')
+            .height(48)
+            .fontSize(17)
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('app.color.button_primary'))
+            .backgroundColor(Color.Transparent)
+            .border({ width: 1, color: $r('app.color.button_primary') })
+            .margin({ bottom: 32 })
+            .opacity(this.showButtons ? 1 : 0)
+            .scale({ x: this.showButtons ? 1 : 0.8, y: this.showButtons ? 1 : 0.8 })
+            .animation({
+              duration: 300,
+              curve: Curve.EaseOut,
+              delay: 100
+            })
+            .onClick(async () => {
+              await SoundEffectUtil.playButton();
+              VibratorUtil.vibrateTap();
+              router.back();
+            })
+        }
+        .width('100%')
+      }
     }
     .width('100%')
       .height('100%')

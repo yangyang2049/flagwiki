@@ -2,7 +2,105 @@
 
 ## [未发布]
 
+### 新增 (Added)
+- **振动反馈功能**：为所有游戏添加触觉反馈
+  - 创建了VibratorUtil工具类，使用HarmonyOS的vibrator API提供振动反馈（参考morse项目实现）
+  - 支持四种振动类型：
+    - **点击振动（tap）**：轻触反馈，50ms短振
+    - **正确答案振动（correct）**：短促两次振动，表示答对
+    - **错误答案振动（incorrect）**：中长振动250ms，表示答错
+    - **胜利振动（win）**：三次短振，表示完成关卡
+  - 为所有游戏页面集成振动反馈：
+    - **QuizPlayPage**：选项点击、正确答案、错误答案、按钮点击、完成关卡
+    - **MemoryPlayPage**：卡片点击、匹配成功、匹配失败、按钮点击、完成关卡
+    - **TriviaPlayPage**：选项点击、正确答案、错误答案、按钮点击、完成关卡
+    - **InputPlayPage**：提交答案、正确答案、错误答案、按钮点击、完成关卡
+    - **FakeFlagPlayPage**：旗帜点击、正确答案、错误答案、按钮点击、完成关卡
+  - 在"我"页面（ProfilePage）添加振动设置开关，默认启用
+  - 振动设置使用Preferences持久化存储，可在设置中随时开启/关闭
+- **所有游戏音效功能**：为所有游戏添加音效播放功能
+  - 从flagame项目复制了14个音效文件（correct、incorrect、button、tap、success、congrats、over等）到rawfile/sfx目录
+  - 创建了SoundEffectUtil工具类，使用HarmonyOS的SoundPool API播放音效（参考morse项目实现）
+  - 为所有游戏页面集成音效播放：
+    - **QuizPlayPage**：正确答案、错误答案、按钮点击、游戏完成、游戏失败
+    - **MemoryPlayPage**：卡片匹配成功、匹配失败、游戏完成、游戏失败、按钮点击
+    - **TriviaPlayPage**：正确答案、错误答案、按钮点击、游戏完成、游戏失败
+    - **InputPlayPage**：正确答案、错误答案、按钮点击、游戏完成、游戏失败
+    - **FakeFlagPlayPage**：正确答案、错误答案、按钮点击、游戏完成、游戏失败
+    - **PaintPlayPage**：正确答案、错误答案、填色音效、提示音效、按钮点击、关卡完成
+  - 所有页面初始化时自动初始化音效播放器，页面销毁时释放资源
+  - 移除了轻触音效（tap），避免与结果音效混淆
+- **移除游戏反馈Toast**：移除所有游戏页面中的反馈提示toast
+  - 移除了TriviaPlayPage中的"✓ 正确!"和"✗ 错误"toast
+  - 移除了InputPlayPage中的"✓ 正确!"和"✗ 答案不正确"toast
+  - 保留音效反馈，提供更流畅的游戏体验
+- **选项逐个出现动画**：为所有有选项的游戏添加选项逐个出现的动画效果
+  - **QuizPlayPage**：选项和国旗选项逐个出现，每个选项延迟100ms，使用淡入和缩放动画
+  - **TriviaPlayPage**：选项逐个出现，每个选项延迟100ms，使用淡入和缩放动画
+  - **FakeFlagPlayPage**：国旗选项逐个出现，每个选项延迟100ms，使用淡入和缩放动画
+  - 动画在题目加载和切换到下一题时自动触发，提升视觉体验
+
+### 审查 (Review)
+- **项目不一致性审查**：完成项目不一致性审查，发现以下问题
+  - **PaintPlayPage缺少VibratorUtil初始化**：涂鸦游戏页面未初始化振动工具，与其他游戏页面不一致
+  - **错误处理方式不一致**：使用了5种不同的错误处理方式（JSON.stringify、err.message、类型检查等）
+  - **日志记录格式不一致**：使用了多种日志格式（带前缀、模板字符串、混合格式）
+  - **路由导航错误处理不一致**：部分页面有错误处理，部分没有
+  - **资源初始化顺序不一致**：不同页面的初始化顺序不同
+  - **错误变量命名不一致**：使用了err、error、e三种不同的变量名
+  - **Promise错误处理不一致**：混用了.catch()和try-catch
+  - 详细审查报告已保存到 `docs/INCONSISTENCY_REVIEW.md`
+- **项目不完整性审查**：完成项目不完整性审查，发现以下问题
+  - **HeadsUpPlayPage缺少音效和振动反馈**：HeadsUp游戏页面未集成音效和振动功能，与其他游戏页面不一致
+  - **未使用的音效类型**：SoundEffectUtil中定义了6种未使用的音效类型（POP, KEY, BIP, BER, GUESSED, WRONG）
+  - **playSuccess()方法未使用**：方法已实现但从未被调用
+  - **资源释放潜在问题**：SoundEffectUtil使用静态单例，多个页面释放资源可能存在竞态条件
+  - 详细审查报告已保存到 `docs/INCOMPLETENESS_REVIEW.md`
+
+### 新增 (Added)
+- **ProfilePage设置项图标**：为"我"页面的设置项添加图标
+  - 为振动反馈设置添加图标（使用`icon_vibration.svg`）
+  - 为音效反馈设置添加图标（使用`icon_sound.svg`，从IconPark复制）
+  - 为深色模式设置添加动态图标（根据当前模式显示`icon_dark_mode.svg`或`icon_light_mode.svg`）
+  - 修改`settingItemWithToggle`方法，添加图标参数支持
+  - 添加`getThemeIcon()`方法，根据当前颜色模式返回对应图标
+- **音效设置功能**：为SoundEffectUtil添加启用/禁用功能
+  - 添加`isEnabled`状态和`prefs`偏好设置存储
+  - 添加`setEnabled()`方法设置音效启用状态
+  - 添加`isSoundEnabled()`方法检查音效是否启用
+  - 在`playSound()`方法中添加启用检查，禁用时不播放音效
+  - 在ProfilePage添加音效设置开关，默认启用
+  - 音效设置使用Preferences持久化存储，可在设置中随时开启/关闭
+
 ### 修复 (Fixed)
+- **PaintPlayPage缺少VibratorUtil初始化**：为涂鸦游戏页面添加振动工具初始化和振动反馈功能
+  - 在`aboutToAppear()`中添加`VibratorUtil.init()`初始化
+  - 在`onNext()`中添加按钮点击振动反馈
+  - 在`onLevelComplete()`中添加关卡完成振动反馈（使用`vibrateWin()`）
+  - 在`onNextLevel()`中添加按钮点击振动反馈
+  - 在`onHintTapped()`中添加提示按钮点击振动反馈
+  - 在返回按钮点击时添加振动反馈
+  - 在`onPaintCorrect()`中添加正确答案振动反馈（使用`vibrateCorrect()`）
+  - 在`onPaintIncorrect()`中添加错误答案振动反馈（使用`vibrateIncorrect()`）
+  - 在完成页面按钮点击时添加振动反馈
+  - 现在与其他游戏页面保持一致的用户体验
+- **HeadsUpPlayPage缺少音效和振动反馈**：为HeadsUp游戏页面添加音效和振动反馈功能
+  - 在`aboutToAppear()`中初始化`SoundEffectUtil`和`VibratorUtil`
+  - 在`handleTap()`中添加点击音效和振动反馈
+  - 在`continueSession()`和`exitGame()`中添加按钮点击音效和振动反馈
+  - 在`aboutToDisappear()`中添加资源释放
+  - 现在与其他游戏页面保持一致的用户体验
+- **SoundEffectUtil资源释放改进**：使用引用计数机制改进资源管理
+  - 添加`refCount`引用计数，跟踪使用`SoundEffectUtil`的组件数量
+  - `init()`方法增加引用计数，`release()`方法减少引用计数
+  - 只有当引用计数为0时才真正释放资源，避免多个页面同时释放导致的竞态条件
+  - 添加详细的日志记录，便于调试和监控资源使用情况
+  - 提升了资源管理的健壮性和安全性
+- **MemoryPlayPage异步调用bug**：修复记忆游戏页面中缺少await的异步调用问题
+  - 修复了`checkMatch()`方法中`SoundEffectUtil.playCorrect()`和`SoundEffectUtil.playIncorrect()`缺少await的问题
+  - 将`checkMatch()`方法改为async函数，确保异步调用正确执行
+  - 修复了`aboutToDisappear()`中缺少`SoundEffectUtil.release()`的资源释放问题
+  - 确保页面销毁时正确释放音效资源，避免资源泄漏
 - **记忆游戏国旗翻转问题**：修复记忆游戏中卡片翻转时国旗也被翻转的问题
   - 对国旗图片应用反向旋转，抵消卡片容器的翻转效果
   - 确保国旗在卡片翻转时保持正常方向显示

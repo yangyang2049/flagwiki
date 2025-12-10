@@ -5,6 +5,8 @@ import curves from '@ohos.curves';
 import { getCountryByCode } from '../../utils/countryData';
 import { MemoryLevel, getMemoryLevel, getAllMemoryLevels } from './MemoryLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
+import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
+import { VibratorUtil } from '../../utils/VibratorUtil';
 
 interface RouterParams {
   levelId: number;
@@ -35,7 +37,11 @@ interface Card {
   private timerId: number | undefined = undefined;
   private context = getContext(this) as common.UIAbilityContext;
 
-  aboutToAppear() {
+  async aboutToAppear() {
+    // 初始化音效播放器
+    await SoundEffectUtil.init(this.context);
+    await VibratorUtil.init(this.context);
+
     const params = router.getParams() as RouterParams;
     if (params) {
       const levelId = params.levelId || 1;
@@ -65,6 +71,8 @@ interface Card {
 
   aboutToDisappear() {
     this.stopTimer();
+    // 释放音效资源
+    SoundEffectUtil.release();
   }
 
   private initCards(): void {
@@ -119,6 +127,9 @@ interface Card {
   private flipCard(card: Card): void {
     if (this.isProcessing || card.isFlipped || card.isMatched || this.flippingCardId !== -1) return;
 
+    // 点击振动反馈
+    VibratorUtil.vibrateTap();
+
     const index = this.cards.findIndex(c => c.id === card.id);
     if (index === -1) return;
 
@@ -143,8 +154,8 @@ interface Card {
         this.isProcessing = true;
 
         // 检查是否匹配
-        setTimeout(() => {
-          this.checkMatch();
+        setTimeout(async () => {
+          await this.checkMatch();
         }, 500);
       }
     }, 400);
@@ -154,7 +165,7 @@ interface Card {
     return { id: id, code: code, isFlipped: isFlipped, isMatched: isMatched };
   }
 
-  private checkMatch(): void {
+  private async checkMatch(): Promise<void> {
     if (!this.firstCard || !this.secondCard) return;
 
     const firstIndex = this.cards.findIndex(c => c.id === this.firstCard!.id);
@@ -163,7 +174,10 @@ interface Card {
     const secondId = this.secondCard.id;
 
     if (this.firstCard.code === this.secondCard.code) {
-      // 匹配成功
+      // 匹配成功 - 播放正确音效和振动
+      await SoundEffectUtil.playCorrect();
+      VibratorUtil.vibrateCorrect();
+
       const first = this.cards[firstIndex];
       const second = this.cards[secondIndex];
       this.cards[firstIndex] = this.createCard(first.id, first.code, first.isFlipped, true);
@@ -177,12 +191,17 @@ interface Card {
       // 检查是否完成
       if (this.matchedPairs === this.level?.pairs) {
         this.stopTimer();
-        setTimeout(() => {
+        setTimeout(async () => {
+          await SoundEffectUtil.playCongrats();
+          VibratorUtil.vibrateWin();
           this.gameOver(true);
         }, 500);
       }
     } else {
-      // 不匹配，翻回去 - 添加翻转动画
+      // 不匹配，翻回去 - 播放错误音效和振动
+      await SoundEffectUtil.playIncorrect();
+      VibratorUtil.vibrateIncorrect();
+
       this.flipAngles.set(firstId, 0);
       this.flipAngles.set(secondId, 0);
 
@@ -208,6 +227,11 @@ interface Card {
   private async gameOver(win: boolean): Promise<void> {
     this.isWin = win;
     this.showResult = true;
+
+    // 如果失败，播放结束音效
+    if (!win) {
+      await SoundEffectUtil.playOver();
+    }
 
     // 如果获胜，解锁下一关
     if (win && this.level) {
@@ -533,6 +557,8 @@ interface Card {
             .fontWeight(FontWeight.Bold)
             .backgroundColor($r('app.color.button_primary'))
             .onClick(async () => {
+              await SoundEffectUtil.playButton();
+              VibratorUtil.vibrateTap();
               if (this.level && this.level.id < getAllMemoryLevels().length) {
                 // 下一关 - 在当前页面重新加载数据
                 await GameProgressManager.init(this.context);
