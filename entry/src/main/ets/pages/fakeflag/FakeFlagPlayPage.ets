@@ -29,10 +29,23 @@ interface RouterParams {
     const params = router.getParams() as RouterParams;
     if (params) {
       const levelId = params.levelId || 1;
-      this.level = getFakeFlagLevel(levelId);
-      if (this.level) {
-        this.lives = this.level.lives;
-      }
+      this.loadLevel(levelId);
+    }
+  }
+
+  private loadLevel(levelId: number): void {
+    this.level = getFakeFlagLevel(levelId);
+    if (this.level) {
+      this.lives = this.level.lives;
+      this.currentIndex = 0;
+      this.selectedCode = '';
+      this.isAnswered = false;
+      this.isCorrect = false;
+      this.showResult = false;
+      this.correctAnswers = 0;
+      this.animatingCode = '';
+      this.scaleValue = 1;
+      this.showCompareDialog = false;
     }
   }
 
@@ -563,15 +576,12 @@ interface RouterParams {
         .backgroundColor(Color.Transparent)
         .border({ width: 1, color: $r('app.color.button_primary') })
         .margin({ bottom: 32 })
-        .onClick(() => {
+        .onClick(async () => {
           if (this.level && this.level.id < getAllFakeFlagLevels().length) {
-            // 下一关
-            router.pushUrl({
-              url: 'pages/fakeflag/FakeFlagPlayPage',
-              params: {
-                levelId: this.level.id + 1
-              }
-            });
+            // 下一关 - 在当前页面重新加载数据
+            await GameProgressManager.init(this.context);
+            await GameProgressManager.unlockNextLevel(GameType.FAKE_FLAG, this.level.id);
+            this.loadLevel(this.level.id + 1);
           } else {
             // 完美收官，退出
             router.back();

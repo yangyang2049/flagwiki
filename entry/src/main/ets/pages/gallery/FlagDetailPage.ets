@@ -276,7 +276,6 @@ interface RouterParams {
           }
           .width('100%')
             .padding(16)
-            .backgroundColor($r('app.color.bg_secondary'))
             .id(this.FLAG_CONTAINER_ID)
 
           // 组织名称
@@ -419,7 +418,6 @@ interface RouterParams {
             }
             .width('100%')
               .padding(16)
-              .backgroundColor($r('app.color.bg_secondary'))
               .id(this.FLAG_CONTAINER_ID)
 
             // 国家名称

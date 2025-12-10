@@ -39,12 +39,27 @@ interface Card {
     const params = router.getParams() as RouterParams;
     if (params) {
       const levelId = params.levelId || 1;
-      this.level = getMemoryLevel(levelId);
-      if (this.level) {
-        this.timeRemaining = this.level.timeLimit;
-        this.initCards();
-        this.startTimer();
-      }
+      this.loadLevel(levelId);
+    }
+  }
+
+  private loadLevel(levelId: number): void {
+    this.level = getMemoryLevel(levelId);
+    if (this.level) {
+      this.timeRemaining = this.level.timeLimit;
+      this.cards = [];
+      this.firstCard = null;
+      this.secondCard = null;
+      this.moves = 0;
+      this.matchedPairs = 0;
+      this.isProcessing = false;
+      this.showResult = false;
+      this.isWin = false;
+      this.flippingCardId = -1;
+      this.flipAngles = new Map();
+      this.stopTimer();
+      this.initCards();
+      this.startTimer();
     }
   }
 
@@ -349,11 +364,23 @@ interface Card {
   CardItem(card: Card) {
     Column() {
       if (card.isFlipped || card.isMatched) {
-        // 显示国旗
+        // 显示国旗 - 应用反向旋转以抵消卡片翻转
         Image($rawfile(`flags/${card.code}.svg`))
           .width('75%')
           .height('75%')
           .objectFit(ImageFit.Contain)
+          .rotate({
+            x: 0,
+            y: 1,
+            z: 0,
+            angle: -this.getCardRotateAngle(card),
+            centerX: '50%',
+            centerY: '50%'
+          })
+          .animation({
+            duration: 400,
+            curve: curves.springMotion(0.4, 0.8)
+          })
       } else {
         // 显示卡片背面
         Column() {
@@ -505,15 +532,12 @@ interface Card {
             .fontSize(16)
             .fontWeight(FontWeight.Bold)
             .backgroundColor($r('app.color.button_primary'))
-            .onClick(() => {
+            .onClick(async () => {
               if (this.level && this.level.id < getAllMemoryLevels().length) {
-                // 下一关
-                router.pushUrl({
-                  url: 'pages/memory/MemoryPlayPage',
-                  params: {
-                    levelId: this.level.id + 1
-                  }
-                });
+                // 下一关 - 在当前页面重新加载数据
+                await GameProgressManager.init(this.context);
+                await GameProgressManager.unlockNextLevel(GameType.MEMORY, this.level.id);
+                this.loadLevel(this.level.id + 1);
               } else {
                 // 完美收官，退出
                 router.back();

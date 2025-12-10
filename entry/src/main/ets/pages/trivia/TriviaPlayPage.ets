@@ -27,11 +27,22 @@ interface RouterParams {
     const params = router.getParams() as RouterParams;
     if (params) {
       const levelId = params.levelId || 1;
-      this.level = getTriviaLevel(levelId);
-      if (this.level) {
-        this.lives = this.level.lives;
-        this.initCurrentQuestionOptions();
-      }
+      this.loadLevel(levelId);
+    }
+  }
+
+  private loadLevel(levelId: number): void {
+    this.level = getTriviaLevel(levelId);
+    if (this.level) {
+      this.lives = this.level.lives;
+      this.currentIndex = 0;
+      this.selectedOption = '';
+      this.isAnswered = false;
+      this.isCorrect = false;
+      this.showResult = false;
+      this.correctAnswers = 0;
+      this.shuffledOptions = [];
+      this.initCurrentQuestionOptions();
     }
   }
 
@@ -371,15 +382,12 @@ interface RouterParams {
         .backgroundColor(Color.Transparent)
         .border({ width: 1, color: $r('app.color.button_primary') })
         .margin({ bottom: 32 })
-        .onClick(() => {
+        .onClick(async () => {
           if (this.level && this.level.id < getTotalTriviaLevels()) {
-            // 下一关
-            router.pushUrl({
-              url: 'pages/trivia/TriviaPlayPage',
-              params: {
-                levelId: this.level.id + 1
-              }
-            });
+            // 下一关 - 在当前页面重新加载数据
+            await GameProgressManager.init(this.context);
+            await GameProgressManager.unlockNextLevel(GameType.TRIVIA, this.level.id);
+            this.loadLevel(this.level.id + 1);
           } else {
             // 完美收官，退出
             router.back();

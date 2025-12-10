@@ -98,6 +98,7 @@ struct TriviaLevelsPage {
       .width('100%')
       .height('100%')
       .padding({ top: 8, bottom: 16 })
+      .scrollBar(BarState.Off)
     }
     .title('知识问答')
     .titleMode(NavigationTitleMode.Mini)

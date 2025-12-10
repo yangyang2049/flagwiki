@@ -2432,8 +2432,8 @@ export function getCountriesWithHistory(): string[] {
  * 检查是否有任何历史数据
  */
 export function hasAnyHistory(): boolean {
-  return FLAG_HISTORY_DATA.length > 0 && 
-         FLAG_HISTORY_DATA.some(item => item.history && item.history.length > 0);
+  return FLAG_HISTORY_DATA.length > 0 &&
+    FLAG_HISTORY_DATA.some(item => item.history && item.history.length > 0);
 }
 
 /**

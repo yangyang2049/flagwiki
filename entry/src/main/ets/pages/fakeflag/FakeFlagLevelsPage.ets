@@ -84,6 +84,7 @@ struct FakeFlagLevelsPage {
       .width('100%')
       .height('100%')
       .padding({ top: 12 })
+      .scrollBar(BarState.Off)
       .backgroundColor($r('app.color.bg_page'))
     }
     .title('假旗找茬')

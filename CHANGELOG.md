@@ -2,7 +2,16 @@
 
 ## [未发布]
 
+### 修复 (Fixed)
+- **记忆游戏国旗翻转问题**：修复记忆游戏中卡片翻转时国旗也被翻转的问题
+  - 对国旗图片应用反向旋转，抵消卡片容器的翻转效果
+  - 确保国旗在卡片翻转时保持正常方向显示
+
 ### 变更 (Changed)
+- **游戏页面下一关优化**：所有quiz类游戏页面的"下一关"按钮改为在当前页面重新加载数据，而不是push到新页面
+  - 修改了QuizPlayPage、TriviaPlayPage、InputPlayPage、FakeFlagPlayPage、MemoryPlayPage
+  - 避免了导航栈过长的问题，提升用户体验
+  - 添加了loadLevel方法来统一处理关卡数据的重新加载和状态重置
 - **阿富汗历史国旗数据更新**：添加2021年当前国旗，删除1000年数据
   - 从flag folder复制af.svg并转换为PNG格式，保存为flag_history_af_2021.png
   - 在FlagHistoryData.ets中添加2021年的数据条目，标记为"当前"国旗
@@ -84,6 +93,11 @@
     - `PROJECT_EVALUATION.md`
 
 ### 修复
+- **州旗列表页顶部区域间距优化**：修复州旗列表页顶部国家信息卡片的间距问题
+  - 将顶部卡片的 padding 从 20 调整为 24，与专题详情页保持一致
+  - 移除了顶部卡片的底部 margin，统一间距样式
+  - 为网格添加顶部 padding（top: 16），修复网格没有顶部间距的问题
+  - 参考 TopicDetailPage 的实现，保持页面样式一致性
 - **涂鸦游戏WebView渐显效果**：为涂鸦游戏的WebView添加了平滑的渐显动画效果
   - 使用`animateTo` API替代`setTimeout`，实现更平滑的渐显动画
   - 添加了`transition`效果，动画时长400ms，使用`cubicBezier(0.42, 0, 0.58, 1)`缓动曲线（easeInOut效果）

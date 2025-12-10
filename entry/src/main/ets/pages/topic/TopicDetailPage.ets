@@ -530,7 +530,7 @@ interface SimilarFlagPair {
     }
     .width('100%')
       .padding(12)
-      .backgroundColor($r('app.color.bg_card'))
+      .backgroundColor($r('app.color.bg_flag_topic'))
       .borderRadius(12)
       .onClick(() => {
         router.pushUrl({

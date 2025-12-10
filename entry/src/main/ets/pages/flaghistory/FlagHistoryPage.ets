@@ -90,7 +90,7 @@ import { getCountryByCode } from '../../utils/countryData';
                         Text('（当前）')
                           .fontSize(14)
                           .fontColor($r('app.color.text_secondary'))
-                          .margin({ left: 8 })
+                          .margin({ left: 2 })
                       }
                     }
                     .width('100%')

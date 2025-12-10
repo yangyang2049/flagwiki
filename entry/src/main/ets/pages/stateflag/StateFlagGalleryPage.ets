@@ -7,9 +7,10 @@ interface RouterParams {
 
 @Entry
 @Component
-struct StateFlagGalleryPage {
+  struct StateFlagGalleryPage {
   @State countryData: CountryStateData | undefined = undefined;
   @State isLoading: boolean = true;
+  @State clickedItemKey: string = '';
 
   aboutToAppear() {
     const params = router.getParams() as RouterParams;
@@ -36,9 +37,9 @@ struct StateFlagGalleryPage {
             .margin({ top: 12 })
         }
         .width('100%')
-        .height('100%')
-        .justifyContent(FlexAlign.Center)
-        .backgroundColor($r('app.color.bg_page'))
+          .height('100%')
+          .justifyContent(FlexAlign.Center)
+          .backgroundColor($r('app.color.bg_page'))
       } else if (this.countryData) {
         Column() {
           // 顶部国家信息
@@ -60,55 +61,58 @@ struct StateFlagGalleryPage {
               .margin({ top: 4 })
           }
           .width('100%')
-          .padding(20)
-          .backgroundColor($r('app.color.bg_card'))
-          .margin({ bottom: 12 })
-          .alignItems(HorizontalAlign.Center)
+            .padding(24)
+            .backgroundColor($r('app.color.bg_card'))
+            .alignItems(HorizontalAlign.Center)
 
           // 州旗网格
-          Grid() {
-            ForEach(this.countryData.states, (state: StateInfo) => {
-              GridItem() {
-                Column() {
-                  Image($rawfile(getStateFlagPath(this.countryData!.countryCode, state.code)))
-                    .width('100%')
-                    .height(72)
-                    .objectFit(ImageFit.Contain)
-                    .borderRadius(4)
+          Scroll() {
+            Grid() {
+              ForEach(this.countryData.states, (state: StateInfo) => {
+                GridItem() {
+                  Column() {
+                    Image($rawfile(getStateFlagPath(this.countryData!.countryCode, state.code)))
+                      .width('100%')
+                      .height(72)
+                      .objectFit(ImageFit.Contain)
+                      .borderRadius(4)
 
-                  Text(state.nameCN)
-                    .fontSize(12)
-                    .fontColor($r('app.color.text_primary'))
-                    .margin({ top: 8 })
-                    .maxLines(1)
-                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                    Text(state.nameCN)
+                      .fontSize(12)
+                      .fontColor($r('app.color.text_primary'))
+                      .margin({ top: 8 })
+                      .maxLines(1)
+                      .textOverflow({ overflow: TextOverflow.Ellipsis })
+                  }
+                  .width('100%')
+                    .padding(10)
+                    .backgroundColor($r('app.color.bg_card'))
+                    .borderRadius(12)
+                    .onClick(() => {
+                      router.pushUrl({
+                        url: 'pages/stateflag/StateFlagDetailPage',
+                        params: {
+                          countryCode: this.countryData!.countryCode,
+                          stateCode: state.code
+                        }
+                      });
+                    })
                 }
-                .width('100%')
-                .padding(10)
-                .backgroundColor($r('app.color.bg_card'))
-                .borderRadius(12)
-                .onClick(() => {
-                  router.pushUrl({
-                    url: 'pages/stateflag/StateFlagDetailPage',
-                    params: {
-                      countryCode: this.countryData!.countryCode,
-                      stateCode: state.code
-                    }
-                  });
-                })
-              }
-            })
+              })
+            }
+            .columnsTemplate('1fr 1fr 1fr')
+              .columnsGap(10)
+              .rowsGap(10)
+              .width('100%')
+              .padding({ left: 16, right: 16, top: 16, bottom: 16 })
           }
-          .columnsTemplate('1fr 1fr 1fr')
-          .columnsGap(10)
-          .rowsGap(10)
-          .width('100%')
           .layoutWeight(1)
-          .padding({ left: 16, right: 16, bottom: 16 })
+            .scrollBar(BarState.Off)
+            .edgeEffect(EdgeEffect.Spring)
         }
         .width('100%')
-        .height('100%')
-        .backgroundColor($r('app.color.bg_page'))
+          .height('100%')
+          .backgroundColor($r('app.color.bg_page'))
       } else {
         Column() {
           Text('暂无数据')
@@ -116,14 +120,14 @@ struct StateFlagGalleryPage {
             .fontColor($r('app.color.text_tertiary'))
         }
         .width('100%')
-        .height('100%')
-        .justifyContent(FlexAlign.Center)
-        .backgroundColor($r('app.color.bg_page'))
+          .height('100%')
+          .justifyContent(FlexAlign.Center)
+          .backgroundColor($r('app.color.bg_page'))
       }
     }
     .title(this.countryData ? `${this.countryData.countryNameCN}${this.countryData.stateLabel}旗` : '州旗画廊')
-    .titleMode(NavigationTitleMode.Mini)
-    .backgroundColor($r('app.color.bg_page'))
+      .titleMode(NavigationTitleMode.Mini)
+      .backgroundColor($r('app.color.bg_page'))
   }
 }
 

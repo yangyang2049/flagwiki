@@ -179,6 +179,10 @@
     {
       "name": "bg_gallery",
       "value": "#F5F6F7"
+    },
+    {
+      "name": "bg_flag_topic",
+      "value": "#FAFAFA"
     }
   ]
 }

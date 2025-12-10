@@ -98,6 +98,7 @@ struct InputLevelsPage {
       .width('100%')
       .height('100%')
       .padding({ top: 8, bottom: 16 })
+      .scrollBar(BarState.Off)
     }
     .title('拼写挑战')
     .titleMode(NavigationTitleMode.Mini)

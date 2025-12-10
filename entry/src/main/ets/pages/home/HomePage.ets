@@ -299,12 +299,12 @@ export struct HomePage {
             Text('›')
               .fontSize(22)
               .fontColor($r('app.color.button_primary'))
-              .onClick(() => {
-                router.pushUrl({ url: 'pages/topic/TopicListPage' });
-              })
           }
           .width('100%')
           .margin({ bottom: 16 })
+          .onClick(() => {
+            router.pushUrl({ url: 'pages/topic/TopicListPage' });
+          })
 
           // 横向滚动的专题卡片
           Scroll() {

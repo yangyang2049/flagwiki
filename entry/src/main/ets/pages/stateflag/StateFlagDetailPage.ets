@@ -218,7 +218,6 @@ struct StateFlagDetailPage {
             }
             .width('100%')
             .padding(16)
-            .backgroundColor($r('app.color.bg_secondary'))
             .id(this.FLAG_CONTAINER_ID)
 
             // 州名称
