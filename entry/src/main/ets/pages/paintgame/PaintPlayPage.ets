@@ -5,15 +5,12 @@
 import router from '@ohos.router';
 import web_webview from '@ohos.web.webview';
 import common from '@ohos.app.ability.common';
-import { ConfigurationConstant } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
 import curves from '@ohos.curves';
-import { window } from '@kit.ArkUI';
 import { getCountryByCode, Country } from '../../utils/countryData';
 import { getPaintLevel, getFlagPaintInfo, getTotalLevels, PaintLevel } from './PaintGameData';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
-import { PreferencesManager } from '../../utils/PreferencesManager';
 import { SoundEffectUtil, SoundType } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 
@@ -90,7 +87,6 @@ const US_STATE_NAMES: Record<string, string> = {
   @State levelCompleted: boolean = false;
   @State isWebReady: boolean = false;
   @State currentFlagPath: string = 'flags/us.svg';
-  @State backgroundColorStr: string = '#F5F6F7'; // 默认浅色背景
   @State webOpacity: number = 0; // Web 组件透明度，用于渐显动画
   @State contentTranslateY: number = 0; // 内容向上移动的距离
   @State showButtons: boolean = false; // 按钮是否显示
@@ -110,119 +106,12 @@ const US_STATE_NAMES: Record<string, string> = {
     }
     this.currentLevel = getPaintLevel(this.categoryId, this.levelId);
     this.updateCurrentFlagPath();
-    await this.updateBackgroundColor();
   }
 
   aboutToDisappear() {
     // 释放音效资源
     SoundEffectUtil.release();
   }
-
-  /**
-   * 检测当前是否为深色模式
-   * 参考injectSVG的方式，单独处理深色模式检测
-   */
-  private async detectDarkMode(): Promise<boolean> {
-    try {
-      // 方法1：读取保存的主题设置（最可靠）
-      const prefs = await PreferencesManager.getPreferences('app_settings');
-      const savedColorMode: number = await prefs.get('colorMode', ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET) as number;
-      const colorMode: ConfigurationConstant.ColorMode = savedColorMode as ConfigurationConstant.ColorMode;
-      console.info(`PaintPlayPage: Saved color mode from preferences: ${colorMode}`);
-
-      if (colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK) {
-        // 明确设置为暗黑模式
-        console.info(`PaintPlayPage: User explicitly set dark mode`);
-        return true;
-      }
-      if (colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) {
-        // 明确设置为浅色模式
-        console.info(`PaintPlayPage: User explicitly set light mode`);
-        return false;
-      }
-
-      // 方法2：跟随系统，通过资源管理器检测系统主题
-      // 当colorMode为NOT_SET时，需要检测系统的实际颜色模式
-      // 注意：当应用设置为"跟随系统"时，ApplicationContext已经设置为NOT_SET
-      // 此时资源管理器的配置应该反映系统的实际颜色模式（0=浅色, 1=深色）
-      if (colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET) {
-        try {
-          const resourceManager = this.context.resourceManager;
-          const config = await resourceManager.getConfiguration();
-          // colorMode: 0=浅色, 1=深色
-          // 当应用设置为"跟随系统"时，config.colorMode应该返回系统的实际颜色模式（0或1）
-          const configColorMode: number = config.colorMode as number;
-          console.info(`PaintPlayPage: System color mode from resourceManager: ${configColorMode}`);
-
-          // 如果 colorMode 为 1，表示系统当前是暗黑模式
-          if (configColorMode === 1 || configColorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK) {
-            console.info(`PaintPlayPage: Detected dark mode from system`);
-            return true;
-          }
-          // 如果 colorMode 为 0，表示系统当前是浅色模式
-          if (configColorMode === 0 || configColorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) {
-            console.info(`PaintPlayPage: Detected light mode from system`);
-            return false;
-          }
-
-          // 如果值不是0或1，可能是2（NOT_SET），说明资源管理器还没有反映系统的实际颜色模式
-          // 此时默认返回浅色模式（更安全的选择）
-          console.warn(`PaintPlayPage: Unexpected colorMode value: ${configColorMode}, defaulting to light mode`);
-          return false;
-        } catch (e) {
-          const errorMsg = e instanceof Error ? e.message : String(e);
-          console.error(`PaintPlayPage: Failed to detect system theme: ${errorMsg}`);
-          // 读取失败时，默认返回浅色模式
-          return false;
-        }
-      }
-
-      // 默认返回浅色模式
-      return false;
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : String(err);
-      console.error(`Failed to detect dark mode: ${errorMsg}`);
-      // 默认使用浅色模式
-      return false;
-    }
-  }
-
-  /**
-   * 更新背景色（单独处理，像injectSVG一样）
-   * 根据深色模式检测结果设置对应的背景色
-   */
-  private async updateBackgroundColor(): Promise<void> {
-    try {
-      // 检测深色模式
-      const isDarkMode = await this.detectDarkMode();
-      console.info(`PaintPlayPage: Dark mode detected: ${isDarkMode}`);
-
-      // 根据深色模式设置背景色
-      if (isDarkMode) {
-        // 暗黑模式使用深黑色（非纯黑）
-        this.backgroundColorStr = '#1C1C1E';
-      } else {
-        // 浅色模式使用灰色
-        this.backgroundColorStr = '#F5F6F7';
-      }
-      console.info(`PaintPlayPage: Background color set to: ${this.backgroundColorStr}`);
-
-      // 如果 Web 已经准备好，立即注入背景色
-      if (this.isWebReady) {
-        await this.injectBackgroundColor();
-      }
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : String(err);
-      console.error(`Failed to update background color: ${errorMsg}`);
-      // 默认使用浅色背景
-      this.backgroundColorStr = '#F5F6F7';
-      console.info(`PaintPlayPage: Using default light background: ${this.backgroundColorStr}`);
-      if (this.isWebReady) {
-        await this.injectBackgroundColor();
-      }
-    }
-  }
-
 
   private updateCurrentFlagPath(): void {
     if (this.currentLevel) {
@@ -268,22 +157,11 @@ const US_STATE_NAMES: Record<string, string> = {
     return country ? country.nameCN : code;
   }
 
-  private async injectBackgroundColor(): Promise<void> {
-    try {
-      if (!this.isWebReady) {
-        return;
-      }
-      // 直接调用 HTML 中的 setBackgroundColor 函数
-      await this.webController.runJavaScript(
-        `if (typeof setBackgroundColor === 'function') { setBackgroundColor('${this.backgroundColorStr}'); }`
-      );
-    } catch (e) {
-      console.error('Failed to inject background color:', e);
-    }
-  }
 
   private async setupGame(): Promise<void> {
-    if (!this.currentLevel || !this.isWebReady) return;
+    if (!this.currentLevel || !this.isWebReady) {
+      return;
+    }
 
     const countryCode = this.currentLevel.flags[this.currentFlagIndex];
     const colors = this.getCurrentFlagColors();
@@ -302,14 +180,11 @@ const US_STATE_NAMES: Record<string, string> = {
     // 加载 SVG 内容（Base64 编码）
     const svgBase64 = await this.loadSvgAsBase64(countryCode);
 
-    // 调用JS设置游戏，传入 Base64 编码的 SVG 内容
+    // 调用JS设置游戏
     try {
-      // 先设置背景色
-      await this.injectBackgroundColor();
-      // 然后设置游戏
-      await this.webController.runJavaScript(
-        `if (typeof setupPaintGame === 'function') { setupPaintGame('${countryCode}', '${displayName}', ${colorsJson}, '${svgBase64}'); }`
-      );
+      const escapedDisplayName = displayName.replace(/'/g, "\\'").replace(/"/g, '\\"');
+      const setupGameCode = `if (typeof setupPaintGame === 'function') { setupPaintGame('${countryCode}', '${escapedDisplayName}', ${colorsJson}, '${svgBase64}'); }`;
+      await this.webController.runJavaScript(setupGameCode);
     } catch (e) {
       console.error('Failed to setup game:', e);
     }
@@ -431,46 +306,31 @@ const US_STATE_NAMES: Record<string, string> = {
             })
               .javaScriptAccess(true)
               .domStorageAccess(true)
+              .backgroundColor($r('app.color.bg_page'))
               .opacity(this.webOpacity)
               .transition(TransitionEffect.OPACITY.animation({ duration: 400, curve: curves.cubicBezier(0.42, 0, 0.58, 1) }))
               .onPageEnd(() => {
                 this.isWebReady = true;
-                // 页面加载完成后，重新检测深色模式并更新背景色（确保获取最新的颜色模式）
-                // 使用立即执行的异步函数处理
-                (async () => {
-                  await this.updateBackgroundColor();
-                  // 先保存背景色到 window，让 HTML 在 DOMContentLoaded 时就能应用
-                  this.webController.runJavaScript(
-                    `window.savedBackgroundColor = '${this.backgroundColorStr}';`
-                  ).then(() => {
-                    return this.injectBackgroundColor();
-                  }).then(() => {
-                    return this.setupGame();
-                  }).then(() => {
-                    // 背景色和游戏都设置好后，使用动画渐显，确保背景色已应用
-                    // 使用动画API实现平滑的渐显效果（easeInOut效果：cubicBezier(0.42, 0, 0.58, 1)）
+                // 等待 HTML 和 JavaScript 函数加载完成
+                setTimeout(() => {
+                  this.setupGame().then(() => {
+                    // 使用动画渐显
                     animateTo({
-                      duration: 400,
-                      curve: curves.cubicBezier(0.42, 0, 0.58, 1),
-                      onFinish: () => {
-                        // 动画完成后的回调（可选）
-                      }
+                      duration: 300,
+                      curve: curves.cubicBezier(0.42, 0, 0.58, 1)
                     }, () => {
                       this.webOpacity = 1;
                     });
                   }).catch(() => {
-                    console.error('Failed to setup game');
-                    // 即使出错也显示，使用动画
+                    // 即使出错也显示
                     animateTo({
-                      duration: 400,
+                      duration: 300,
                       curve: curves.cubicBezier(0.42, 0, 0.58, 1)
                     }, () => {
                       this.webOpacity = 1;
                     });
                   });
-                })().catch((err: Error) => {
-                  console.error(`Failed to update background color: ${err.message}`);
-                });
+                }, 150);
               })
               .onConsole((event) => {
                 if (event) {
@@ -533,7 +393,7 @@ const US_STATE_NAMES: Record<string, string> = {
           }
           .width('100%')
             .height('100%')
-            .backgroundColor(this.backgroundColorStr as ResourceColor)
+            .backgroundColor($r('app.color.bg_page'))
             .transition(TransitionEffect.OPACITY.animation({ duration: 600, curve: curves.cubicBezier(0.4, 0.0, 0.2, 1.0) }))
 
           // 顶部状态栏

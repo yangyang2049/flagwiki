@@ -197,3 +197,5 @@ export function getManufacturingContent(): ManufacturingSection[] {
    return flagManufacturingContent;
 }
 
+
+
