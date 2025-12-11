@@ -5,6 +5,8 @@ import { image } from '@kit.ImageKit';
 import { systemShare } from '@kit.ShareKit';
 import { uniformTypeDescriptor } from '@kit.ArkData';
 import { BusinessError } from '@kit.BasicServicesKit';
+import fs from '@ohos.file.fs';
+import { fileUri } from '@kit.CoreFileKit';
 import { CountryStateData, StateInfo, getCountryStateData, getStateFlagPath } from '../../utils/StateFlagData';
 import { screenshotManager } from '../../utils/ScreenshotManager';
 import { SaveFlagDialog } from '../../components/SaveFlagDialog';
@@ -23,12 +25,14 @@ struct StateFlagDetailPage {
   @State stateInfo: StateInfo | undefined = undefined;
   @State isLoading: boolean = true;
   @State flagPixelMap: image.PixelMap | null = null;
+  @State sharePixelMap: image.PixelMap | null = null;
   @State isFavorite: boolean = false;
   @State isReading: boolean = false;
   @State isSharing: boolean = false;
   private context = getContext(this) as common.UIAbilityContext;
   private readonly FLAG_CONTAINER_ID = 'stateFlagContainer';
   private readonly FLAG_DOWNLOAD_CONTAINER_ID = 'stateFlagDownloadContainer';
+  private readonly SHARE_CONTAINER_ID = 'stateFlagShareContainer';
   private saveDialogController: CustomDialogController | null = null;
   private countryCode: string = '';
   private stateCode: string = '';
@@ -59,6 +63,17 @@ struct StateFlagDetailPage {
 
     // 初始化收藏管理器
     await FavoritesManager.init(this.context);
+  }
+
+  aboutToDisappear() {
+    // 页面销毁时停止朗读
+    if (this.isReading) {
+      TextReaderUtil.stopRead();
+      this.isReading = false;
+    }
+    // 页面销毁时释放 PixelMap，避免内存泄漏
+    this.releaseFlagPixelMap();
+    this.releaseSharePixelMap();
   }
 
   private async checkFavoriteStatus(): Promise<void> {
@@ -95,6 +110,17 @@ struct StateFlagDetailPage {
         console.warn('[StateFlagDetailPage] Failed to release pixelmap:', e);
       }
       this.flagPixelMap = null;
+    }
+  }
+
+  private releaseSharePixelMap(): void {
+    if (this.sharePixelMap) {
+      try {
+        this.sharePixelMap.release();
+      } catch (e) {
+        console.warn('[StateFlagDetailPage] Failed to release share pixelmap:', e);
+      }
+      this.sharePixelMap = null;
     }
   }
 
@@ -197,6 +223,17 @@ struct StateFlagDetailPage {
       } else if (this.countryData && this.stateInfo) {
         Scroll() {
           Column() {
+            // 隐藏的分享容器（包含州旗、基本信息）
+            Column() {
+              if (this.countryData && this.stateInfo) {
+                this.ShareContentBuilder()
+              }
+            }
+            .id(this.SHARE_CONTAINER_ID)
+            .position({ x: -1000, y: -1000 })
+            .width(400)
+            .backgroundColor($r('app.color.bg_page'))
+
             // 隐藏的下载容器（无 padding，仅用于截图）
             Column() {
               Image($rawfile(getStateFlagPath(this.countryData.countryCode, this.stateInfo.code)))
@@ -356,6 +393,69 @@ struct StateFlagDetailPage {
   }
 
   @Builder
+  ShareContentBuilder() {
+    if (this.countryData && this.stateInfo) {
+      Column({ space: 16 }) {
+        // 州旗图片
+        Column() {
+          Image($rawfile(getStateFlagPath(this.countryData.countryCode, this.stateInfo.code)))
+            .width('100%')
+            .height(240)
+            .objectFit(ImageFit.Contain)
+        }
+        .width('100%')
+          .padding(16)
+          .backgroundColor($r('app.color.bg_page'))
+
+        // 州名称
+        Column() {
+          Text(this.stateInfo.nameCN)
+            .fontSize(28)
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r('app.color.text_primary'))
+            .textAlign(TextAlign.Center)
+            .margin({ bottom: 4 })
+
+          Text(this.stateInfo.name)
+            .fontSize(16)
+            .fontColor($r('app.color.text_secondary'))
+            .textAlign(TextAlign.Center)
+        }
+        .width('100%')
+          .padding({ left: 16, right: 16, top: 20, bottom: 16 })
+          .alignItems(HorizontalAlign.Center)
+
+        // 基本信息卡片
+        Row() {
+          Column() {
+            Text('基本信息')
+              .fontSize(17)
+              .fontWeight(FontWeight.Bold)
+              .fontColor($r('app.color.text_primary'))
+              .alignSelf(ItemAlign.Start)
+              .margin({ bottom: 16 })
+
+            this.InfoRow('所属国家', `${this.countryData.countryEmoji} ${this.countryData.countryNameCN}`)
+            Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+            this.InfoRow('首府', this.stateInfo.capitalCN)
+            Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+            this.InfoRow('地区', this.stateInfo.regionCN)
+          }
+          .padding(20)
+          .layoutWeight(1)
+          .backgroundColor($r('app.color.bg_card'))
+          .borderRadius(16)
+        }
+        .width('100%')
+          .padding({ left: 16, right: 16 })
+      }
+      .width('100%')
+        .padding({ top: 20, bottom: 20 })
+        .backgroundColor($r('app.color.bg_page'))
+    }
+  }
+
+  @Builder
   InfoRow(label: string, value: string) {
     Row() {
       Text(label)
@@ -423,32 +523,113 @@ struct StateFlagDetailPage {
       duration: 1500
     });
 
-    try {
-      // 构建分享文本
-      const shareText = this.buildShareText();
+    let tempFilePath: string | null = null;
 
-      // 使用文本分享
+    try {
+      // 先释放之前的 PixelMap
+      this.releaseSharePixelMap();
+
+      // 截取分享容器内容（包含州旗、基本信息）
+      const pixmap = await screenshotManager.captureSnapshot(this.SHARE_CONTAINER_ID);
+      if (!pixmap) {
+        promptAction.showToast({
+          message: '截取图片失败',
+          duration: 2000
+        });
+        this.isSharing = false;
+        return;
+      }
+
+      this.sharePixelMap = pixmap;
+
+      // 创建图像打包器并打包为 ArrayBuffer
+      const imagePacker = image.createImagePacker();
+      const packOpts: image.PackingOption = {
+        format: 'image/jpeg',
+        quality: 90
+      };
+      
+      const imageData: ArrayBuffer = await imagePacker.packing(pixmap, packOpts);
+      console.info(`[StateFlagDetailPage] Image packed, data size: ${imageData.byteLength} bytes`);
+
+      // 保存到临时文件
+      const timestamp = Date.now();
+      tempFilePath = this.context.cacheDir + '/share_state_flag_' + timestamp + '.jpg';
+      
+      // 使用同步文件操作
+      const fileHandle = fs.openSync(tempFilePath, fs.OpenMode.CREATE | fs.OpenMode.WRITE_ONLY);
+      fs.writeSync(fileHandle.fd, imageData);
+      fs.closeSync(fileHandle);
+      
+      // 验证文件是否存在且不为空
+      const stat = fs.statSync(tempFilePath);
+      if (stat.size === 0) {
+        throw new Error('Image file is empty');
+      }
+      
+      console.info(`[StateFlagDetailPage] Image file created: ${tempFilePath}, size: ${stat.size} bytes`);
+
+      // 获取文件URI
+      const imageUri = fileUri.getUriFromPath(tempFilePath);
+      console.info(`[StateFlagDetailPage] Image URI: ${imageUri}`);
+      
+      // 获取图片类型描述符
+      const utdTypeId = uniformTypeDescriptor.getUniformDataTypeByFilenameExtension('.jpg', uniformTypeDescriptor.UniformDataType.IMAGE);
+      console.info(`[StateFlagDetailPage] UTD Type ID: ${utdTypeId}`);
+
+      // 使用图片URI分享
       const stateName = this.stateInfo.nameCN;
       const shareData = new systemShare.SharedData({
-        utd: uniformTypeDescriptor.UniformDataType.TEXT,
-        content: shareText,
+        utd: utdTypeId,
+        uri: imageUri,
         title: `${stateName}州旗`,
         description: '来自国旗小百科'
       });
+      
+      console.info(`[StateFlagDetailPage] ShareData created: utd=${utdTypeId}, uri=${imageUri}`);
 
       const controller = new systemShare.ShareController(shareData);
+      
+      // 显示分享面板
       await controller.show(this.context, {
         selectionMode: systemShare.SelectionMode.SINGLE,
-        previewMode: systemShare.SharePreviewMode.DEFAULT
+        previewMode: systemShare.SharePreviewMode.DETAIL
       });
+
+      console.info('[StateFlagDetailPage] Share panel opened successfully');
+      
+      // 分享成功后释放 PixelMap
+      this.releaseSharePixelMap();
+      
+      // 延迟删除文件，确保分享完成
+      setTimeout(() => {
+        if (tempFilePath) {
+          try {
+            fs.unlinkSync(tempFilePath);
+            console.info(`[StateFlagDetailPage] Temp file deleted: ${tempFilePath}`);
+          } catch (unlinkError) {
+            console.warn('[StateFlagDetailPage] Failed to delete temp file:', unlinkError);
+          }
+        }
+      }, 5000); // 5秒后删除
 
     } catch (err) {
       const error = err as BusinessError;
-      console.error(`Failed to share: code: ${error?.code}, message: ${error?.message}`);
+      console.error(`[StateFlagDetailPage] Failed to share: code: ${error?.code}, message: ${error?.message}`);
       promptAction.showToast({
         message: '分享失败',
         duration: 2000
       });
+      
+      // 清理资源
+      this.releaseSharePixelMap();
+      if (tempFilePath) {
+        try {
+          fs.unlinkSync(tempFilePath);
+        } catch (unlinkError) {
+          console.warn('[StateFlagDetailPage] Failed to delete temp file on error:', unlinkError);
+        }
+      }
     } finally {
       this.isSharing = false;
     }

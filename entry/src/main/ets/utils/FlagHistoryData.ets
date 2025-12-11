@@ -26,7 +26,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'ad',
     history: [
-      { countryCode: 'ad', year: 1000, imagePath: 'flag_history_ad_1000', description: '安道尔 1000年国旗' },
       { countryCode: 'ad', year: 1806, imagePath: 'flag_history_ad_1806', description: '安道尔 1806年国旗' },
       { countryCode: 'ad', year: 1812, imagePath: 'flag_history_ad_1812', description: '安道尔 1812年国旗' },
       { countryCode: 'ad', year: 1813, imagePath: 'flag_history_ad_1813', description: '安道尔 1813年国旗' },
@@ -36,7 +35,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'ae',
     history: [
-      { countryCode: 'ae', year: 1200, imagePath: 'flag_history_ae_1200', description: '阿联酋 1200年国旗' },
       { countryCode: 'ae', year: 1892, imagePath: 'flag_history_ae_1892', description: '阿联酋 1892年国旗' },
       { countryCode: 'ae', year: 1950, imagePath: 'flag_history_ae_1950', description: '阿联酋 1950年国旗' },
       { countryCode: 'ae', year: 1971, imagePath: 'flag_history_ae_1971', description: '阿联酋 1971年国旗' }
@@ -98,7 +96,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'am',
     history: [
-      { countryCode: 'am', year: 1200, imagePath: 'flag_history_am_1200', description: '亚美尼亚 1200年国旗' },
       { countryCode: 'am', year: 1453, imagePath: 'flag_history_am_1453', description: '亚美尼亚 1453年国旗' },
       { countryCode: 'am', year: 1828, imagePath: 'flag_history_am_1828', description: '亚美尼亚 1828年国旗' },
       { countryCode: 'am', year: 1858, imagePath: 'flag_history_am_1858', description: '亚美尼亚 1858年国旗' },
@@ -163,7 +160,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'az',
     history: [
-      { countryCode: 'az', year: 1200, imagePath: 'flag_history_az_1200', description: '阿塞拜疆 1200年国旗' },
       { countryCode: 'az', year: 1576, imagePath: 'flag_history_az_1576', description: '阿塞拜疆 1576年国旗' },
       { countryCode: 'az', year: 1736, imagePath: 'flag_history_az_1736', description: '阿塞拜疆 1736年国旗' },
       { countryCode: 'az', year: 1747, imagePath: 'flag_history_az_1747', description: '阿塞拜疆 1747年国旗' },
@@ -198,7 +194,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'bb',
     history: [
-      { countryCode: 'bb', year: 1500, imagePath: 'flag_history_bb_1500', description: '巴巴多斯 1500年国旗' },
       { countryCode: 'bb', year: 1632, imagePath: 'flag_history_bb_1632', description: '巴巴多斯 1632年国旗' },
       { countryCode: 'bb', year: 1801, imagePath: 'flag_history_bb_1801', description: '巴巴多斯 1801年国旗' },
       { countryCode: 'bb', year: 1885, imagePath: 'flag_history_bb_1885', description: '巴巴多斯 1885年国旗' },
@@ -241,7 +236,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'bg',
     history: [
-      { countryCode: 'bg', year: 1000, imagePath: 'flag_history_bg_1000', description: '保加利亚 1000年国旗' },
       { countryCode: 'bg', year: 1453, imagePath: 'flag_history_bg_1453', description: '保加利亚 1453年国旗' },
       { countryCode: 'bg', year: 1844, imagePath: 'flag_history_bg_1844', description: '保加利亚 1844年国旗' },
       { countryCode: 'bg', year: 1878, imagePath: 'flag_history_bg_1878', description: '保加利亚 1878年国旗' },
@@ -254,7 +248,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'bh',
     history: [
-      { countryCode: 'bh', year: 1000, imagePath: 'flag_history_bh_1000', description: '巴林 1000年国旗' },
       { countryCode: 'bh', year: 1820, imagePath: 'flag_history_bh_1820', description: '巴林 1820年国旗' },
       { countryCode: 'bh', year: 1932, imagePath: 'flag_history_bh_1932', description: '巴林 1932年国旗' },
       { countryCode: 'bh', year: 1972, imagePath: 'flag_history_bh_1972', description: '巴林 1972年国旗' },
@@ -264,7 +257,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'bi',
     history: [
-      { countryCode: 'bi', year: 1000, imagePath: 'flag_history_bi_1000', description: '布隆迪 1000年国旗' },
       { countryCode: 'bi', year: 1885, imagePath: 'flag_history_bi_1885', description: '布隆迪 1885年国旗' },
       { countryCode: 'bi', year: 1919, imagePath: 'flag_history_bi_1919', description: '布隆迪 1919年国旗' },
       { countryCode: 'bi', year: 1961, imagePath: 'flag_history_bi_1961', description: '布隆迪 1961年国旗' },
@@ -296,7 +288,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'bo',
     history: [
-      { countryCode: 'bo', year: 1100, imagePath: 'flag_history_bo_1100', description: '玻利维亚 1100年国旗' },
       { countryCode: 'bo', year: 1534, imagePath: 'flag_history_bo_1534', description: '玻利维亚 1534年国旗' },
       { countryCode: 'bo', year: 1717, imagePath: 'flag_history_bo_1717', description: '玻利维亚 1717年国旗' },
       { countryCode: 'bo', year: 1785, imagePath: 'flag_history_bo_1785', description: '玻利维亚 1785年国旗' },
@@ -308,7 +299,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'br',
     history: [
-      { countryCode: 'br', year: 1000, imagePath: 'flag_history_br_1000', description: '巴西 1000年国旗' },
       { countryCode: 'br', year: 1697, imagePath: 'flag_history_br_1697', description: '巴西 1697年国旗' },
       { countryCode: 'br', year: 1816, imagePath: 'flag_history_br_1816', description: '巴西 1816年国旗' },
       { countryCode: 'br', year: 1822, imagePath: 'flag_history_br_1822', description: '巴西 1822年国旗' },
@@ -322,7 +312,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'bs',
     history: [
-      { countryCode: 'bs', year: 1200, imagePath: 'flag_history_bs_1200', description: '巴哈马 1200年国旗' },
       { countryCode: 'bs', year: 1648, imagePath: 'flag_history_bs_1648', description: '巴哈马 1648年国旗' },
       { countryCode: 'bs', year: 1801, imagePath: 'flag_history_bs_1801', description: '巴哈马 1801年国旗' },
       { countryCode: 'bs', year: 1869, imagePath: 'flag_history_bs_1869', description: '巴哈马 1869年国旗' },
@@ -344,7 +333,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'bw',
     history: [
-      { countryCode: 'bw', year: 1200, imagePath: 'flag_history_bw_1200', description: '博茨瓦纳 1200年国旗' },
       { countryCode: 'bw', year: 1885, imagePath: 'flag_history_bw_1885', description: '博茨瓦纳 1885年国旗' },
       { countryCode: 'bw', year: 1966, imagePath: 'flag_history_bw_1966', description: '博茨瓦纳 1966年国旗' }
     ]
@@ -352,7 +340,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'by',
     history: [
-      { countryCode: 'by', year: 1200, imagePath: 'flag_history_by_1200', description: '白俄罗斯 1200年国旗' },
       { countryCode: 'by', year: 1793, imagePath: 'flag_history_by_1793', description: '白俄罗斯 1793年国旗' },
       { countryCode: 'by', year: 1858, imagePath: 'flag_history_by_1858', description: '白俄罗斯 1858年国旗' },
       { countryCode: 'by', year: 1883, imagePath: 'flag_history_by_1883', description: '白俄罗斯 1883年国旗' },
@@ -370,7 +357,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'bz',
     history: [
-      { countryCode: 'bz', year: 1000, imagePath: 'flag_history_bz_1000', description: '伯利兹 1000年国旗' },
       { countryCode: 'bz', year: 1519, imagePath: 'flag_history_bz_1519', description: '伯利兹 1519年国旗' },
       { countryCode: 'bz', year: 1821, imagePath: 'flag_history_bz_1821', description: '伯利兹 1821年国旗' },
       { countryCode: 'bz', year: 1823, imagePath: 'flag_history_bz_1823', description: '伯利兹 1823年国旗' },
@@ -385,7 +371,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'ca',
     history: [
-      { countryCode: 'ca', year: 1200, imagePath: 'flag_history_ca_1200', description: '加拿大 1200年国旗' },
       { countryCode: 'ca', year: 1606, imagePath: 'flag_history_ca_1606', description: '加拿大 1606年国旗' },
       { countryCode: 'ca', year: 1707, imagePath: 'flag_history_ca_1707', description: '加拿大 1707年国旗' },
       { countryCode: 'ca', year: 1801, imagePath: 'flag_history_ca_1801', description: '加拿大 1801年国旗' },
@@ -473,13 +458,13 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
       { countryCode: 'co', year: 1820, imagePath: 'flag_history_co_1820', description: '哥伦比亚 1820年国旗' },
       { countryCode: 'co', year: 1821, imagePath: 'flag_history_co_1821', description: '哥伦比亚 1821年国旗' },
       { countryCode: 'co', year: 1834, imagePath: 'flag_history_co_1834', description: '哥伦比亚 1834年国旗' },
-      { countryCode: 'co', year: 1861, imagePath: 'flag_history_co_1861', description: '哥伦比亚 1861年国旗' }
+      { countryCode: 'co', year: 1861, imagePath: 'flag_history_co_1861', description: '哥伦比亚 1861年国旗' },
+      { countryCode: 'co', year: 1886, imagePath: 'flag_history_co_1886', description: '哥伦比亚 1886年国旗（当前）' }
     ]
   },
   {
     countryCode: 'cr',
     history: [
-      { countryCode: 'cr', year: 1000, imagePath: 'flag_history_cr_1000', description: '哥斯达黎加 1000年国旗' },
       { countryCode: 'cr', year: 1506, imagePath: 'flag_history_cr_1506', description: '哥斯达黎加 1506年国旗' },
       { countryCode: 'cr', year: 1821, imagePath: 'flag_history_cr_1821', description: '哥斯达黎加 1821年国旗' },
       { countryCode: 'cr', year: 1823, imagePath: 'flag_history_cr_1823', description: '哥斯达黎加 1823年国旗' },
@@ -492,7 +477,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'cu',
     history: [
-      { countryCode: 'cu', year: 1200, imagePath: 'flag_history_cu_1200', description: '古巴 1200年国旗' },
       { countryCode: 'cu', year: 1506, imagePath: 'flag_history_cu_1506', description: '古巴 1506年国旗' },
       { countryCode: 'cu', year: 1898, imagePath: 'flag_history_cu_1898', description: '古巴 1898年国旗' },
       { countryCode: 'cu', year: 1902, imagePath: 'flag_history_cu_1902', description: '古巴 1902年国旗' }
@@ -516,7 +500,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'cy',
     history: [
-      { countryCode: 'cy', year: 1200, imagePath: 'flag_history_cy_1200', description: '塞浦路斯 1200年国旗' },
       { countryCode: 'cy', year: 1453, imagePath: 'flag_history_cy_1453', description: '塞浦路斯 1453年国旗' },
       { countryCode: 'cy', year: 1844, imagePath: 'flag_history_cy_1844', description: '塞浦路斯 1844年国旗' },
       { countryCode: 'cy', year: 1878, imagePath: 'flag_history_cy_1878', description: '塞浦路斯 1878年国旗' },
@@ -541,7 +524,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'de',
     history: [
-      { countryCode: 'de', year: 1000, imagePath: 'flag_history_de_1000', description: '德国 1000年国旗' },
       { countryCode: 'de', year: 1402, imagePath: 'flag_history_de_1402', description: '德国 1402年国旗' },
       { countryCode: 'de', year: 1815, imagePath: 'flag_history_de_1815', description: '德国 1815年国旗' },
       { countryCode: 'de', year: 1871, imagePath: 'flag_history_de_1871', description: '德国 1871年国旗' },
@@ -572,7 +554,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'dm',
     history: [
-      { countryCode: 'dm', year: 1200, imagePath: 'flag_history_dm_1200', description: '多米尼克 1200年国旗' },
       { countryCode: 'dm', year: 1663, imagePath: 'flag_history_dm_1663', description: '多米尼克 1663年国旗' },
       { countryCode: 'dm', year: 1715, imagePath: 'flag_history_dm_1715', description: '多米尼克 1715年国旗' },
       { countryCode: 'dm', year: 1763, imagePath: 'flag_history_dm_1763', description: '多米尼克 1763年国旗' },
@@ -659,7 +640,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'er',
     history: [
-      { countryCode: 'er', year: 1200, imagePath: 'flag_history_er_1200', description: '厄立特里亚 1200年国旗' },
       { countryCode: 'er', year: 1890, imagePath: 'flag_history_er_1890', description: '厄立特里亚 1890年国旗' },
       { countryCode: 'er', year: 1941, imagePath: 'flag_history_er_1941', description: '厄立特里亚 1941年国旗' },
       { countryCode: 'er', year: 1952, imagePath: 'flag_history_er_1952', description: '厄立特里亚 1952年国旗' },
@@ -690,7 +670,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'et',
     history: [
-      { countryCode: 'et', year: 1200, imagePath: 'flag_history_et_1200', description: '埃塞俄比亚 1200年国旗' },
       { countryCode: 'et', year: 1889, imagePath: 'flag_history_et_1889', description: '埃塞俄比亚 1889年国旗' },
       { countryCode: 'et', year: 1897, imagePath: 'flag_history_et_1897', description: '埃塞俄比亚 1897年国旗' },
       { countryCode: 'et', year: 1936, imagePath: 'flag_history_et_1936', description: '埃塞俄比亚 1936年国旗' },
@@ -717,7 +696,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'fj',
     history: [
-      { countryCode: 'fj', year: 1200, imagePath: 'flag_history_fj_1200', description: '斐济 1200年国旗' },
       { countryCode: 'fj', year: 1878, imagePath: 'flag_history_fj_1878', description: '斐济 1878年国旗' },
       { countryCode: 'fj', year: 1924, imagePath: 'flag_history_fj_1924', description: '斐济 1924年国旗' },
       { countryCode: 'fj', year: 1970, imagePath: 'flag_history_fj_1970', description: '斐济 1970年国旗' }
@@ -748,7 +726,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'ga',
     history: [
-      { countryCode: 'ga', year: 1000, imagePath: 'flag_history_ga_1000', description: '加蓬 1000年国旗' },
       { countryCode: 'ga', year: 1903, imagePath: 'flag_history_ga_1903', description: '加蓬 1903年国旗' },
       { countryCode: 'ga', year: 1959, imagePath: 'flag_history_ga_1959', description: '加蓬 1959年国旗' },
       { countryCode: 'ga', year: 1960, imagePath: 'flag_history_ga_1960', description: '加蓬 1960年国旗' }
@@ -757,7 +734,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'gb',
     history: [
-      { countryCode: 'gb', year: 1000, imagePath: 'flag_history_gb_1000', description: '英国 1000年国旗' },
       { countryCode: 'gb', year: 1707, imagePath: 'flag_history_gb_1707', description: '英国 1707年国旗' },
       { countryCode: 'gb', year: 1801, imagePath: 'flag_history_gb_1801', description: '英国 1801年国旗' }
     ]
@@ -765,7 +741,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'gd',
     history: [
-      { countryCode: 'gd', year: 1000, imagePath: 'flag_history_gd_1000', description: '格林纳达 1000年国旗' },
       { countryCode: 'gd', year: 1663, imagePath: 'flag_history_gd_1663', description: '格林纳达 1663年国旗' },
       { countryCode: 'gd', year: 1715, imagePath: 'flag_history_gd_1715', description: '格林纳达 1715年国旗' },
       { countryCode: 'gd', year: 1763, imagePath: 'flag_history_gd_1763', description: '格林纳达 1763年国旗' },
@@ -824,7 +799,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'gq',
     history: [
-      { countryCode: 'gq', year: 1200, imagePath: 'flag_history_gq_1200', description: '赤道几内亚 1200年国旗' },
       { countryCode: 'gq', year: 1667, imagePath: 'flag_history_gq_1667', description: '赤道几内亚 1667年国旗' },
       { countryCode: 'gq', year: 1707, imagePath: 'flag_history_gq_1707', description: '赤道几内亚 1707年国旗' },
       { countryCode: 'gq', year: 1750, imagePath: 'flag_history_gq_1750', description: '赤道几内亚 1750年国旗' },
@@ -874,7 +848,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'gw',
     history: [
-      { countryCode: 'gw', year: 1200, imagePath: 'flag_history_gw_1200', description: '几内亚比绍 1200年国旗' },
       { countryCode: 'gw', year: 1667, imagePath: 'flag_history_gw_1667', description: '几内亚比绍 1667年国旗' },
       { countryCode: 'gw', year: 1707, imagePath: 'flag_history_gw_1707', description: '几内亚比绍 1707年国旗' },
       { countryCode: 'gw', year: 1750, imagePath: 'flag_history_gw_1750', description: '几内亚比绍 1750年国旗' },
@@ -888,7 +861,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'gy',
     history: [
-      { countryCode: 'gy', year: 1000, imagePath: 'flag_history_gy_1000', description: '圭亚那 1000年国旗' },
       { countryCode: 'gy', year: 1581, imagePath: 'flag_history_gy_1581', description: '圭亚那 1581年国旗' },
       { countryCode: 'gy', year: 1795, imagePath: 'flag_history_gy_1795', description: '圭亚那 1795年国旗' },
       { countryCode: 'gy', year: 1806, imagePath: 'flag_history_gy_1806', description: '圭亚那 1806年国旗' },
@@ -913,7 +885,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'hr',
     history: [
-      { countryCode: 'hr', year: 1200, imagePath: 'flag_history_hr_1200', description: '克罗地亚 1200年国旗' },
       { countryCode: 'hr', year: 1401, imagePath: 'flag_history_hr_1401', description: '克罗地亚 1401年国旗' },
       { countryCode: 'hr', year: 1809, imagePath: 'flag_history_hr_1809', description: '克罗地亚 1809年国旗' },
       { countryCode: 'hr', year: 1848, imagePath: 'flag_history_hr_1848', description: '克罗地亚 1848年国旗' },
@@ -930,7 +901,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'ht',
     history: [
-      { countryCode: 'ht', year: 1000, imagePath: 'flag_history_ht_1000', description: '海地 1000年国旗' },
       { countryCode: 'ht', year: 1663, imagePath: 'flag_history_ht_1663', description: '海地 1663年国旗' },
       { countryCode: 'ht', year: 1715, imagePath: 'flag_history_ht_1715', description: '海地 1715年国旗' },
       { countryCode: 'ht', year: 1789, imagePath: 'flag_history_ht_1789', description: '海地 1789年国旗' },
@@ -946,7 +916,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'hu',
     history: [
-      { countryCode: 'hu', year: 1200, imagePath: 'flag_history_hu_1200', description: '匈牙利 1200年国旗' },
       { countryCode: 'hu', year: 1541, imagePath: 'flag_history_hu_1541', description: '匈牙利 1541年国旗' },
       { countryCode: 'hu', year: 1711, imagePath: 'flag_history_hu_1711', description: '匈牙利 1711年国旗' },
       { countryCode: 'hu', year: 1849, imagePath: 'flag_history_hu_1849', description: '匈牙利 1849年国旗' },
@@ -975,7 +944,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'ie',
     history: [
-      { countryCode: 'ie', year: 1200, imagePath: 'flag_history_ie_1200', description: '爱尔兰 1200年国旗' },
       { countryCode: 'ie', year: 1542, imagePath: 'flag_history_ie_1542', description: '爱尔兰 1542年国旗' },
       { countryCode: 'ie', year: 1801, imagePath: 'flag_history_ie_1801', description: '爱尔兰 1801年国旗' },
       { countryCode: 'ie', year: 1919, imagePath: 'flag_history_ie_1919', description: '爱尔兰 1919年国旗' }
@@ -984,7 +952,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'il',
     history: [
-      { countryCode: 'il', year: 1100, imagePath: 'flag_history_il_1100', description: '以色列 1100年国旗' },
       { countryCode: 'il', year: 1453, imagePath: 'flag_history_il_1453', description: '以色列 1453年国旗' },
       { countryCode: 'il', year: 1844, imagePath: 'flag_history_il_1844', description: '以色列 1844年国旗' },
       { countryCode: 'il', year: 1920, imagePath: 'flag_history_il_1920', description: '以色列 1920年国旗' },
@@ -1043,7 +1010,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'it',
     history: [
-      { countryCode: 'it', year: 1500, imagePath: 'flag_history_it_1500', description: '意大利 1500年国旗' },
       { countryCode: 'it', year: 1848, imagePath: 'flag_history_it_1848', description: '意大利 1848年国旗' },
       { countryCode: 'it', year: 1943, imagePath: 'flag_history_it_1943', description: '意大利 1943年国旗' },
       { countryCode: 'it', year: 1945, imagePath: 'flag_history_it_1945', description: '意大利 1945年国旗' },
@@ -1054,7 +1020,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'jm',
     history: [
-      { countryCode: 'jm', year: 1200, imagePath: 'flag_history_jm_1200', description: '牙买加 1200年国旗' },
       { countryCode: 'jm', year: 1655, imagePath: 'flag_history_jm_1655', description: '牙买加 1655年国旗' },
       { countryCode: 'jm', year: 1801, imagePath: 'flag_history_jm_1801', description: '牙买加 1801年国旗' },
       { countryCode: 'jm', year: 1875, imagePath: 'flag_history_jm_1875', description: '牙买加 1875年国旗' },
@@ -1066,7 +1031,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'jo',
     history: [
-      { countryCode: 'jo', year: 1200, imagePath: 'flag_history_jo_1200', description: '约旦 1200年国旗' },
       { countryCode: 'jo', year: 1453, imagePath: 'flag_history_jo_1453', description: '约旦 1453年国旗' },
       { countryCode: 'jo', year: 1844, imagePath: 'flag_history_jo_1844', description: '约旦 1844年国旗' },
       { countryCode: 'jo', year: 1920, imagePath: 'flag_history_jo_1920', description: '约旦 1920年国旗' },
@@ -1097,7 +1061,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'kg',
     history: [
-      { countryCode: 'kg', year: 1000, imagePath: 'flag_history_kg_1000', description: '吉尔吉斯斯坦 1000年国旗' },
       { countryCode: 'kg', year: 1858, imagePath: 'flag_history_kg_1858', description: '吉尔吉斯斯坦 1858年国旗' },
       { countryCode: 'kg', year: 1883, imagePath: 'flag_history_kg_1883', description: '吉尔吉斯斯坦 1883年国旗' },
       { countryCode: 'kg', year: 1920, imagePath: 'flag_history_kg_1920', description: '吉尔吉斯斯坦 1920年国旗' },
@@ -1109,7 +1072,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'kh',
     history: [
-      { countryCode: 'kh', year: 1000, imagePath: 'flag_history_kh_1000', description: '柬埔寨 1000年国旗' },
       { countryCode: 'kh', year: 1863, imagePath: 'flag_history_kh_1863', description: '柬埔寨 1863年国旗' },
       { countryCode: 'kh', year: 1887, imagePath: 'flag_history_kh_1887', description: '柬埔寨 1887年国旗' },
       { countryCode: 'kh', year: 1953, imagePath: 'flag_history_kh_1953', description: '柬埔寨 1953年国旗' },
@@ -1134,7 +1096,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'km',
     history: [
-      { countryCode: 'km', year: 1000, imagePath: 'flag_history_km_1000', description: '科摩罗 1000年国旗' },
       { countryCode: 'km', year: 1887, imagePath: 'flag_history_km_1887', description: '科摩罗 1887年国旗' },
       { countryCode: 'km', year: 1963, imagePath: 'flag_history_km_1963', description: '科摩罗 1963年国旗' },
       { countryCode: 'km', year: 1975, imagePath: 'flag_history_km_1975', description: '科摩罗 1975年国旗' },
@@ -1157,7 +1118,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'kp',
     history: [
-      { countryCode: 'kp', year: 1200, imagePath: 'flag_history_kp_1200', description: '朝鲜 1200年国旗' },
       { countryCode: 'kp', year: 1392, imagePath: 'flag_history_kp_1392', description: '朝鲜 1392年国旗' },
       { countryCode: 'kp', year: 1870, imagePath: 'flag_history_kp_1870', description: '朝鲜 1870年国旗' },
       { countryCode: 'kp', year: 1882, imagePath: 'flag_history_kp_1882', description: '朝鲜 1882年国旗' },
@@ -1165,7 +1125,7 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
       { countryCode: 'kp', year: 1893, imagePath: 'flag_history_kp_1893', description: '朝鲜 1893年国旗' },
       { countryCode: 'kp', year: 1899, imagePath: 'flag_history_kp_1899', description: '朝鲜 1899年国旗' },
       { countryCode: 'kp', year: 1936, imagePath: 'flag_history_kp_1936', description: '朝鲜 1936年国旗' },
-      { countryCode: 'kp', year: 1946, imagePath: 'flag_history_kp_1946', description: '朝鲜 1946年国旗' }
+      { countryCode: 'kp', year: 1948, imagePath: 'flag_history_kp_1948', description: '朝鲜 1948年国旗' }
     ]
   },
   {
@@ -1177,7 +1137,7 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
       { countryCode: 'kr', year: 1888, imagePath: 'flag_history_kr_1888', description: '韩国 1888年国旗' },
       { countryCode: 'kr', year: 1893, imagePath: 'flag_history_kr_1893', description: '韩国 1893年国旗' },
       { countryCode: 'kr', year: 1899, imagePath: 'flag_history_kr_1899', description: '韩国 1899年国旗' },
-      { countryCode: 'kr', year: 1912, imagePath: 'flag_history_kr_1912', description: '韩国 1912年国旗' },
+      { countryCode: 'kr', year: 1945, imagePath: 'flag_history_kr_1945', description: '韩国 1945年国旗' },
       { countryCode: 'kr', year: 1948, imagePath: 'flag_history_kr_1948', description: '韩国 1948年国旗' },
       { countryCode: 'kr', year: 1949, imagePath: 'flag_history_kr_1949', description: '韩国 1949年国旗' },
       { countryCode: 'kr', year: 1997, imagePath: 'flag_history_kr_1997', description: '韩国 1997年国旗' }
@@ -1186,7 +1146,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'kw',
     history: [
-      { countryCode: 'kw', year: 1200, imagePath: 'flag_history_kw_1200', description: '科威特 1200年国旗' },
       { countryCode: 'kw', year: 1752, imagePath: 'flag_history_kw_1752', description: '科威特 1752年国旗' },
       { countryCode: 'kw', year: 1898, imagePath: 'flag_history_kw_1898', description: '科威特 1898年国旗' },
       { countryCode: 'kw', year: 1899, imagePath: 'flag_history_kw_1899', description: '科威特 1899年国旗' },
@@ -1196,7 +1155,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'kz',
     history: [
-      { countryCode: 'kz', year: 1000, imagePath: 'flag_history_kz_1000', description: '哈萨克斯坦 1000年国旗' },
       { countryCode: 'kz', year: 1831, imagePath: 'flag_history_kz_1831', description: '哈萨克斯坦 1831年国旗' },
       { countryCode: 'kz', year: 1858, imagePath: 'flag_history_kz_1858', description: '哈萨克斯坦 1858年国旗' },
       { countryCode: 'kz', year: 1883, imagePath: 'flag_history_kz_1883', description: '哈萨克斯坦 1883年国旗' },
@@ -1228,7 +1186,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'lc',
     history: [
-      { countryCode: 'lc', year: 1200, imagePath: 'flag_history_lc_1200', description: '圣卢西亚 1200年国旗' },
       { countryCode: 'lc', year: 1663, imagePath: 'flag_history_lc_1663', description: '圣卢西亚 1663年国旗' },
       { countryCode: 'lc', year: 1715, imagePath: 'flag_history_lc_1715', description: '圣卢西亚 1715年国旗' },
       { countryCode: 'lc', year: 1743, imagePath: 'flag_history_lc_1743', description: '圣卢西亚 1743年国旗' },
@@ -1253,7 +1210,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'li',
     history: [
-      { countryCode: 'li', year: 1000, imagePath: 'flag_history_li_1000', description: '列支敦士登 1000年国旗' },
       { countryCode: 'li', year: 1400, imagePath: 'flag_history_li_1400', description: '列支敦士登 1400年国旗' },
       { countryCode: 'li', year: 1719, imagePath: 'flag_history_li_1719', description: '列支敦士登 1719年国旗' },
       { countryCode: 'li', year: 1852, imagePath: 'flag_history_li_1852', description: '列支敦士登 1852年国旗' },
@@ -1265,7 +1221,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'lk',
     history: [
-      { countryCode: 'lk', year: 1200, imagePath: 'flag_history_lk_1200', description: '斯里兰卡 1200年国旗' },
       { countryCode: 'lk', year: 1656, imagePath: 'flag_history_lk_1656', description: '斯里兰卡 1656年国旗' },
       { countryCode: 'lk', year: 1815, imagePath: 'flag_history_lk_1815', description: '斯里兰卡 1815年国旗' },
       { countryCode: 'lk', year: 1948, imagePath: 'flag_history_lk_1948', description: '斯里兰卡 1948年国旗' },
@@ -1297,7 +1252,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'lt',
     history: [
-      { countryCode: 'lt', year: 1000, imagePath: 'flag_history_lt_1000', description: '立陶宛 1000年国旗' },
       { countryCode: 'lt', year: 1795, imagePath: 'flag_history_lt_1795', description: '立陶宛 1795年国旗' },
       { countryCode: 'lt', year: 1858, imagePath: 'flag_history_lt_1858', description: '立陶宛 1858年国旗' },
       { countryCode: 'lt', year: 1883, imagePath: 'flag_history_lt_1883', description: '立陶宛 1883年国旗' },
@@ -1324,7 +1278,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'lv',
     history: [
-      { countryCode: 'lv', year: 1200, imagePath: 'flag_history_lv_1200', description: '拉脱维亚 1200年国旗' },
       { countryCode: 'lv', year: 1692, imagePath: 'flag_history_lv_1692', description: '拉脱维亚 1692年国旗' },
       { countryCode: 'lv', year: 1721, imagePath: 'flag_history_lv_1721', description: '拉脱维亚 1721年国旗' },
       { countryCode: 'lv', year: 1918, imagePath: 'flag_history_lv_1918', description: '拉脱维亚 1918年国旗' },
@@ -1360,7 +1313,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'mc',
     history: [
-      { countryCode: 'mc', year: 1000, imagePath: 'flag_history_mc_1000', description: '摩纳哥 1000年国旗' },
       { countryCode: 'mc', year: 1793, imagePath: 'flag_history_mc_1793', description: '摩纳哥 1793年国旗' },
       { countryCode: 'mc', year: 1881, imagePath: 'flag_history_mc_1881', description: '摩纳哥 1881年国旗' },
       { countryCode: 'mc', year: 1942, imagePath: 'flag_history_mc_1942', description: '摩纳哥 1942年国旗' },
@@ -1388,7 +1340,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'me',
     history: [
-      { countryCode: 'me', year: 1200, imagePath: 'flag_history_me_1200', description: '黑山 1200年国旗' },
       { countryCode: 'me', year: 1545, imagePath: 'flag_history_me_1545', description: '黑山 1545年国旗' },
       { countryCode: 'me', year: 1876, imagePath: 'flag_history_me_1876', description: '黑山 1876年国旗' },
       { countryCode: 'me', year: 1905, imagePath: 'flag_history_me_1905', description: '黑山 1905年国旗' },
@@ -1420,7 +1371,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'mk',
     history: [
-      { countryCode: 'mk', year: 1200, imagePath: 'flag_history_mk_1200', description: '北马其顿 1200年国旗' },
       { countryCode: 'mk', year: 1453, imagePath: 'flag_history_mk_1453', description: '北马其顿 1453年国旗' },
       { countryCode: 'mk', year: 1844, imagePath: 'flag_history_mk_1844', description: '北马其顿 1844年国旗' },
       { countryCode: 'mk', year: 1903, imagePath: 'flag_history_mk_1903', description: '北马其顿 1903年国旗' },
@@ -1445,7 +1395,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'mm',
     history: [
-      { countryCode: 'mm', year: 1200, imagePath: 'flag_history_mm_1200', description: '缅甸 1200年国旗' },
       { countryCode: 'mm', year: 1753, imagePath: 'flag_history_mm_1753', description: '缅甸 1753年国旗' },
       { countryCode: 'mm', year: 1885, imagePath: 'flag_history_mm_1885', description: '缅甸 1885年国旗' },
       { countryCode: 'mm', year: 1937, imagePath: 'flag_history_mm_1937', description: '缅甸 1937年国旗' },
@@ -1459,7 +1408,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'mn',
     history: [
-      { countryCode: 'mn', year: 1200, imagePath: 'flag_history_mn_1200', description: '蒙古 1200年国旗' },
       { countryCode: 'mn', year: 1862, imagePath: 'flag_history_mn_1862', description: '蒙古 1862年国旗' },
       { countryCode: 'mn', year: 1890, imagePath: 'flag_history_mn_1890', description: '蒙古 1890年国旗' },
       { countryCode: 'mn', year: 1911, imagePath: 'flag_history_mn_1911', description: '蒙古 1911年国旗' },
@@ -1473,7 +1421,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'mr',
     history: [
-      { countryCode: 'mr', year: 1200, imagePath: 'flag_history_mr_1200', description: '毛里塔尼亚 1200年国旗' },
       { countryCode: 'mr', year: 1900, imagePath: 'flag_history_mr_1900', description: '毛里塔尼亚 1900年国旗' },
       { countryCode: 'mr', year: 1959, imagePath: 'flag_history_mr_1959', description: '毛里塔尼亚 1959年国旗' },
       { countryCode: 'mr', year: 2017, imagePath: 'flag_history_mr_2017', description: '毛里塔尼亚 2017年国旗' }
@@ -1542,7 +1489,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'my',
     history: [
-      { countryCode: 'my', year: 1200, imagePath: 'flag_history_my_1200', description: '马来西亚 1200年国旗' },
       { countryCode: 'my', year: 1641, imagePath: 'flag_history_my_1641', description: '马来西亚 1641年国旗' },
       { countryCode: 'my', year: 1795, imagePath: 'flag_history_my_1795', description: '马来西亚 1795年国旗' },
       { countryCode: 'my', year: 1801, imagePath: 'flag_history_my_1801', description: '马来西亚 1801年国旗' },
@@ -1589,7 +1535,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'ng',
     history: [
-      { countryCode: 'ng', year: 1200, imagePath: 'flag_history_ng_1200', description: '尼日利亚 1200年国旗' },
       { countryCode: 'ng', year: 1886, imagePath: 'flag_history_ng_1886', description: '尼日利亚 1886年国旗' },
       { countryCode: 'ng', year: 1900, imagePath: 'flag_history_ng_1900', description: '尼日利亚 1900年国旗' },
       { countryCode: 'ng', year: 1960, imagePath: 'flag_history_ng_1960', description: '尼日利亚 1960年国旗' }
@@ -1598,7 +1543,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'ni',
     history: [
-      { countryCode: 'ni', year: 1000, imagePath: 'flag_history_ni_1000', description: '尼加拉瓜 1000年国旗' },
       { countryCode: 'ni', year: 1524, imagePath: 'flag_history_ni_1524', description: '尼加拉瓜 1524年国旗' },
       { countryCode: 'ni', year: 1821, imagePath: 'flag_history_ni_1821', description: '尼加拉瓜 1821年国旗' },
       { countryCode: 'ni', year: 1823, imagePath: 'flag_history_ni_1823', description: '尼加拉瓜 1823年国旗' },
@@ -1655,7 +1599,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'nz',
     history: [
-      { countryCode: 'nz', year: 1200, imagePath: 'flag_history_nz_1200', description: '新西兰 1200年国旗' },
       { countryCode: 'nz', year: 1834, imagePath: 'flag_history_nz_1834', description: '新西兰 1834年国旗' },
       { countryCode: 'nz', year: 1840, imagePath: 'flag_history_nz_1840', description: '新西兰 1840年国旗' },
       { countryCode: 'nz', year: 1867, imagePath: 'flag_history_nz_1867', description: '新西兰 1867年国旗' },
@@ -1715,7 +1658,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'ph',
     history: [
-      { countryCode: 'ph', year: 1200, imagePath: 'flag_history_ph_1200', description: '菲律宾 1200年国旗' },
       { countryCode: 'ph', year: 1535, imagePath: 'flag_history_ph_1535', description: '菲律宾 1535年国旗' },
       { countryCode: 'ph', year: 1762, imagePath: 'flag_history_ph_1762', description: '菲律宾 1762年国旗' },
       { countryCode: 'ph', year: 1764, imagePath: 'flag_history_ph_1764', description: '菲律宾 1764年国旗' },
@@ -1785,7 +1727,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'py',
     history: [
-      { countryCode: 'py', year: 1200, imagePath: 'flag_history_py_1200', description: '巴拉圭 1200年国旗' },
       { countryCode: 'py', year: 1537, imagePath: 'flag_history_py_1537', description: '巴拉圭 1537年国旗' },
       { countryCode: 'py', year: 1717, imagePath: 'flag_history_py_1717', description: '巴拉圭 1717年国旗' },
       { countryCode: 'py', year: 1785, imagePath: 'flag_history_py_1785', description: '巴拉圭 1785年国旗' },
@@ -1839,7 +1780,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'ru',
     history: [
-      { countryCode: 'ru', year: 1699, imagePath: 'flag_history_ru_1699', description: '俄罗斯 1699年国旗' },
       { countryCode: 'ru', year: 1858, imagePath: 'flag_history_ru_1858', description: '俄罗斯 1858年国旗' },
       { countryCode: 'ru', year: 1883, imagePath: 'flag_history_ru_1883', description: '俄罗斯 1883年国旗' },
       { countryCode: 'ru', year: 1918, imagePath: 'flag_history_ru_1918', description: '俄罗斯 1918年国旗' },
@@ -1879,7 +1819,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'sb',
     history: [
-      { countryCode: 'sb', year: 1200, imagePath: 'flag_history_sb_1200', description: '所罗门群岛 1200年国旗' },
       { countryCode: 'sb', year: 1886, imagePath: 'flag_history_sb_1886', description: '所罗门群岛 1886年国旗' },
       { countryCode: 'sb', year: 1942, imagePath: 'flag_history_sb_1942', description: '所罗门群岛 1942年国旗' },
       { countryCode: 'sb', year: 1945, imagePath: 'flag_history_sb_1945', description: '所罗门群岛 1945年国旗' },
@@ -1889,7 +1828,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'sc',
     history: [
-      { countryCode: 'sc', year: 1200, imagePath: 'flag_history_sc_1200', description: '塞舌尔 1200年国旗' },
       { countryCode: 'sc', year: 1756, imagePath: 'flag_history_sc_1756', description: '塞舌尔 1756年国旗' },
       { countryCode: 'sc', year: 1811, imagePath: 'flag_history_sc_1811', description: '塞舌尔 1811年国旗' },
       { countryCode: 'sc', year: 1976, imagePath: 'flag_history_sc_1976', description: '塞舌尔 1976年国旗' },
@@ -1900,7 +1838,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'sd',
     history: [
-      { countryCode: 'sd', year: 1200, imagePath: 'flag_history_sd_1200', description: '苏丹 1200年国旗' }
     ]
   },
   {
@@ -1929,7 +1866,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'si',
     history: [
-      { countryCode: 'si', year: 1200, imagePath: 'flag_history_si_1200', description: '斯洛文尼亚 1200年国旗' },
       { countryCode: 'si', year: 1848, imagePath: 'flag_history_si_1848', description: '斯洛文尼亚 1848年国旗' },
       { countryCode: 'si', year: 1868, imagePath: 'flag_history_si_1868', description: '斯洛文尼亚 1868年国旗' },
       { countryCode: 'si', year: 1918, imagePath: 'flag_history_si_1918', description: '斯洛文尼亚 1918年国旗' },
@@ -2017,7 +1953,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'st',
     history: [
-      { countryCode: 'st', year: 1200, imagePath: 'flag_history_st_1200', description: '圣多美和普林西比 1200年国旗' },
       { countryCode: 'st', year: 1667, imagePath: 'flag_history_st_1667', description: '圣多美和普林西比 1667年国旗' },
       { countryCode: 'st', year: 1707, imagePath: 'flag_history_st_1707', description: '圣多美和普林西比 1707年国旗' },
       { countryCode: 'st', year: 1750, imagePath: 'flag_history_st_1750', description: '圣多美和普林西比 1750年国旗' },
@@ -2110,7 +2045,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'tl',
     history: [
-      { countryCode: 'tl', year: 1200, imagePath: 'flag_history_tl_1200', description: '东帝汶 1200年国旗' },
       { countryCode: 'tl', year: 1702, imagePath: 'flag_history_tl_1702', description: '东帝汶 1702年国旗' },
       { countryCode: 'tl', year: 1707, imagePath: 'flag_history_tl_1707', description: '东帝汶 1707年国旗' },
       { countryCode: 'tl', year: 1750, imagePath: 'flag_history_tl_1750', description: '东帝汶 1750年国旗' },
@@ -2138,7 +2072,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'tn',
     history: [
-      { countryCode: 'tn', year: 1200, imagePath: 'flag_history_tn_1200', description: '突尼斯 1200年国旗' },
       { countryCode: 'tn', year: 1574, imagePath: 'flag_history_tn_1574', description: '突尼斯 1574年国旗' },
       { countryCode: 'tn', year: 1831, imagePath: 'flag_history_tn_1831', description: '突尼斯 1831年国旗' },
       { countryCode: 'tn', year: 1999, imagePath: 'flag_history_tn_1999', description: '突尼斯 1999年国旗' }
@@ -2153,7 +2086,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'tr',
     history: [
-      { countryCode: 'tr', year: 1200, imagePath: 'flag_history_tr_1200', description: '土耳其 1200年国旗' },
       { countryCode: 'tr', year: 1453, imagePath: 'flag_history_tr_1453', description: '土耳其 1453年国旗' },
       { countryCode: 'tr', year: 1844, imagePath: 'flag_history_tr_1844', description: '土耳其 1844年国旗' },
       { countryCode: 'tr', year: 1936, imagePath: 'flag_history_tr_1936', description: '土耳其 1936年国旗' }
@@ -2172,7 +2104,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'tv',
     history: [
-      { countryCode: 'tv', year: 1200, imagePath: 'flag_history_tv_1200', description: '图瓦卢 1200年国旗' },
       { countryCode: 'tv', year: 1892, imagePath: 'flag_history_tv_1892', description: '图瓦卢 1892年国旗' },
       { countryCode: 'tv', year: 1937, imagePath: 'flag_history_tv_1937', description: '图瓦卢 1937年国旗' },
       { countryCode: 'tv', year: 1976, imagePath: 'flag_history_tv_1976', description: '图瓦卢 1976年国旗' },
@@ -2193,10 +2124,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'ua',
     history: [
-      { countryCode: 'ua', year: 1200, imagePath: 'flag_history_ua_1200', description: '乌克兰 1200年国旗' },
-      { countryCode: 'ua', year: 1793, imagePath: 'flag_history_ua_1793', description: '乌克兰 1793年国旗' },
-      { countryCode: 'ua', year: 1858, imagePath: 'flag_history_ua_1858', description: '乌克兰 1858年国旗' },
-      { countryCode: 'ua', year: 1883, imagePath: 'flag_history_ua_1883', description: '乌克兰 1883年国旗' },
       { countryCode: 'ua', year: 1917, imagePath: 'flag_history_ua_1917', description: '乌克兰 1917年国旗' },
       { countryCode: 'ua', year: 1919, imagePath: 'flag_history_ua_1919', description: '乌克兰 1919年国旗' },
       { countryCode: 'ua', year: 1929, imagePath: 'flag_history_ua_1929', description: '乌克兰 1929年国旗' },
@@ -2218,7 +2145,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'us',
     history: [
-      { countryCode: 'us', year: 1235, imagePath: 'flag_history_us_1235', description: '美国 1235年国旗' },
       { countryCode: 'us', year: 1606, imagePath: 'flag_history_us_1606', description: '美国 1606年国旗' },
       { countryCode: 'us', year: 1707, imagePath: 'flag_history_us_1707', description: '美国 1707年国旗' },
       { countryCode: 'us', year: 1775, imagePath: 'flag_history_us_1775', description: '美国 1775年国旗' },
@@ -2263,7 +2189,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'uz',
     history: [
-      { countryCode: 'uz', year: 1000, imagePath: 'flag_history_uz_1000', description: '乌兹别克斯坦 1000年国旗' },
       { countryCode: 'uz', year: 1785, imagePath: 'flag_history_uz_1785', description: '乌兹别克斯坦 1785年国旗' },
       { countryCode: 'uz', year: 1920, imagePath: 'flag_history_uz_1920', description: '乌兹别克斯坦 1920年国旗' },
       { countryCode: 'uz', year: 1924, imagePath: 'flag_history_uz_1924', description: '乌兹别克斯坦 1924年国旗' },
@@ -2341,7 +2266,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'ws',
     history: [
-      { countryCode: 'ws', year: 1200, imagePath: 'flag_history_ws_1200', description: '萨摩亚 1200年国旗' },
       { countryCode: 'ws', year: 1900, imagePath: 'flag_history_ws_1900', description: '萨摩亚 1900年国旗' },
       { countryCode: 'ws', year: 1914, imagePath: 'flag_history_ws_1914', description: '萨摩亚 1914年国旗' },
       { countryCode: 'ws', year: 1922, imagePath: 'flag_history_ws_1922', description: '萨摩亚 1922年国旗' },
@@ -2399,7 +2323,6 @@ const FLAG_HISTORY_DATA: CountryFlagHistory[] = [
   {
     countryCode: 'zw',
     history: [
-      { countryCode: 'zw', year: 1200, imagePath: 'flag_history_zw_1200', description: '津巴布韦 1200年国旗' },
       { countryCode: 'zw', year: 1896, imagePath: 'flag_history_zw_1896', description: '津巴布韦 1896年国旗' },
       { countryCode: 'zw', year: 1923, imagePath: 'flag_history_zw_1923', description: '津巴布韦 1923年国旗' },
       { countryCode: 'zw', year: 1953, imagePath: 'flag_history_zw_1953', description: '津巴布韦 1953年国旗' },

@@ -23,6 +23,7 @@ interface RouterParams {
   @State correctAnswers: number = 0;
   @State flagVisible: boolean = false; // 国旗可见性
   private context = getContext(this) as common.UIAbilityContext;
+  private timeoutIds: number[] = []; // 存储所有setTimeout的ID，用于清理
 
   async aboutToAppear() {
     // 初始化音效播放器
@@ -37,11 +38,22 @@ interface RouterParams {
   }
 
   aboutToDisappear() {
+    // 清理所有setTimeout
+    this.clearAllTimeouts();
     // 释放音效资源
     SoundEffectUtil.release();
   }
 
+  private clearAllTimeouts(): void {
+    for (const id of this.timeoutIds) {
+      clearTimeout(id);
+    }
+    this.timeoutIds = [];
+  }
+
   private loadLevel(levelId: number): void {
+    // 清理之前的定时器
+    this.clearAllTimeouts();
     this.level = getInputGameLevel(levelId);
     if (this.level) {
       this.lives = this.level.lives;
@@ -59,9 +71,15 @@ interface RouterParams {
     // 立即隐藏当前国旗
     this.flagVisible = false;
     // 然后逐渐显示新国旗
-    setTimeout(() => {
+    const id = setTimeout(() => {
       this.flagVisible = true;
+      // 移除已执行的定时器ID
+      const index = this.timeoutIds.indexOf(id);
+      if (index > -1) {
+        this.timeoutIds.splice(index, 1);
+      }
     }, 50);
+    this.timeoutIds.push(id);
   }
 
   private getCurrentCountryCode(): string {
@@ -100,15 +118,27 @@ interface RouterParams {
       VibratorUtil.vibrateIncorrect();
       this.lives--;
 
-      setTimeout(() => {
+      const id1 = setTimeout(() => {
         this.inputText = '';
+        // 移除已执行的定时器ID
+        const index1 = this.timeoutIds.indexOf(id1);
+        if (index1 > -1) {
+          this.timeoutIds.splice(index1, 1);
+        }
       }, 300);
+      this.timeoutIds.push(id1);
 
       if (this.lives <= 0) {
-        setTimeout(async () => {
+        const id2 = setTimeout(async () => {
           await SoundEffectUtil.playOver();
           this.showGameOver();
+          // 移除已执行的定时器ID
+          const index2 = this.timeoutIds.indexOf(id2);
+          if (index2 > -1) {
+            this.timeoutIds.splice(index2, 1);
+          }
         }, 1000);
+        this.timeoutIds.push(id2);
       }
     }
   }

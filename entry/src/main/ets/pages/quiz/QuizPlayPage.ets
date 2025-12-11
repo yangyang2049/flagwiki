@@ -40,6 +40,7 @@ interface QuizQuestion {
   @State isSharing: boolean = false;
   @State optionVisible: boolean[] = [false, false, false, false];  // 选项可见性
   private context = getContext(this) as common.UIAbilityContext;
+  private timeoutIds: number[] = []; // 存储所有setTimeout的ID，用于清理
 
   async aboutToAppear() {
     // 初始化音效播放器和振动工具
@@ -55,11 +56,22 @@ interface QuizQuestion {
   }
 
   aboutToDisappear() {
+    // 清理所有setTimeout
+    this.clearAllTimeouts();
     // 释放音效资源
     SoundEffectUtil.release();
   }
 
+  private clearAllTimeouts(): void {
+    for (const id of this.timeoutIds) {
+      clearTimeout(id);
+    }
+    this.timeoutIds = [];
+  }
+
   private loadLevel(levelId: number): void {
+    // 清理之前的定时器
+    this.clearAllTimeouts();
     this.level = getQuizLevel(levelId);
     if (this.level) {
       this.lives = this.level.lives;
@@ -134,12 +146,24 @@ interface QuizQuestion {
     this.scaleValue = 1.1;
 
     // 动画结束后检查答案
-    setTimeout(() => {
+    const id1 = setTimeout(() => {
       this.scaleValue = 1;
-      setTimeout(async () => {
+      const id2 = setTimeout(async () => {
         await this.checkAnswer(index);
+        // 移除已执行的定时器ID
+        const index2 = this.timeoutIds.indexOf(id2);
+        if (index2 > -1) {
+          this.timeoutIds.splice(index2, 1);
+        }
       }, 100);
+      this.timeoutIds.push(id2);
+      // 移除已执行的定时器ID
+      const index1 = this.timeoutIds.indexOf(id1);
+      if (index1 > -1) {
+        this.timeoutIds.splice(index1, 1);
+      }
     }, 150);
+    this.timeoutIds.push(id1);
   }
 
   private async checkAnswer(index: number): Promise<void> {
@@ -169,10 +193,16 @@ interface QuizQuestion {
 
       if (this.lives <= 0) {
         // 延迟显示失败
-        setTimeout(async () => {
+        const id = setTimeout(async () => {
           await SoundEffectUtil.playOver();
           this.showGameOver();
+          // 移除已执行的定时器ID
+          const index = this.timeoutIds.indexOf(id);
+          if (index > -1) {
+            this.timeoutIds.splice(index, 1);
+          }
         }, 1500);
+        this.timeoutIds.push(id);
         return;
       }
     }
@@ -255,11 +285,17 @@ interface QuizQuestion {
     
     // 逐个显示选项
     for (let i = 0; i < 4; i++) {
-      setTimeout(() => {
+      const id = setTimeout(() => {
         const newVisible = [...this.optionVisible];
         newVisible[i] = true;
         this.optionVisible = newVisible;
+        // 移除已执行的定时器ID
+        const index = this.timeoutIds.indexOf(id);
+        if (index > -1) {
+          this.timeoutIds.splice(index, 1);
+        }
       }, i * 100); // 每个选项延迟100ms
+      this.timeoutIds.push(id);
     }
   }
 
@@ -430,21 +466,30 @@ interface QuizQuestion {
 
   @Builder
   ChoiceButton(text: string, index: number) {
-    Row() {
-      Text(text)
-        .fontSize(16)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(this.getChoiceTextColor(index))
+    Stack({ alignContent: Alignment.End }) {
+      Row() {
+        Text(text)
+          .fontSize(16)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(this.getChoiceTextColor(index))
+      }
+      .width('100%')
+        .height(52)
+        .justifyContent(FlexAlign.Center)
+        .backgroundColor(this.getChoiceBackgroundColor(index))
+        .borderRadius(12)
+        .border({
+          width: 2,
+          color: this.getChoiceBorderColor(index)
+        })
+
+      // 结果显示图标（在按钮缩放动画结束后显示）
+      if (this.isAnswered && this.animatingIndex === -1) {
+        this.ResultIcon(index, true)
+      }
     }
     .width('100%')
       .height(52)
-      .justifyContent(FlexAlign.Center)
-      .backgroundColor(this.getChoiceBackgroundColor(index))
-      .borderRadius(12)
-      .border({
-        width: 2,
-        color: this.getChoiceBorderColor(index)
-      })
       .margin({ bottom: 12 })
       .opacity(this.optionVisible[index] ? 1 : 0)
       .scale({ 
@@ -459,30 +504,39 @@ interface QuizQuestion {
 
   @Builder
   FlagChoiceButton(country: Country, index: number) {
-    Column() {
-      Image($rawfile(`flags/${country.code}.svg`))
-        .width('100%')
+    Stack({ alignContent: Alignment.TopStart }) {
+      Column() {
+        Image($rawfile(`flags/${country.code}.svg`))
+          .width('100%')
+          .height('100%')
+          .objectFit(ImageFit.Contain)
+          .padding(12)
+      }
+      .width('100%')
         .height('100%')
-        .objectFit(ImageFit.Contain)
-        .padding(12)
+        .backgroundColor(this.getChoiceBackgroundColor(index))
+        .borderRadius(12)
+        .border({
+          width: 1.5,
+          color: this.getChoiceBorderColor(index)
+        })
+
+      // 结果显示图标（在按钮缩放动画结束后显示）
+      if (this.isAnswered && this.animatingIndex === -1) {
+        this.ResultIcon(index, false)
+      }
     }
     .width('100%')
-    .height('100%')
-    .backgroundColor(this.getChoiceBackgroundColor(index))
-    .borderRadius(12)
-    .border({
-      width: 1.5,
-      color: this.getChoiceBorderColor(index)
-    })
-    .opacity(this.optionVisible[index] ? 1 : 0)
-    .scale({ 
-      x: this.animatingIndex === index ? this.scaleValue : (this.optionVisible[index] ? 1 : 0.8), 
-      y: this.animatingIndex === index ? this.scaleValue : (this.optionVisible[index] ? 1 : 0.8) 
-    })
-    .animation({ duration: 300, curve: Curve.EaseOut })
-    .onClick(() => {
-      this.selectAnswer(index);
-    })
+      .height('100%')
+      .opacity(this.optionVisible[index] ? 1 : 0)
+      .scale({ 
+        x: this.animatingIndex === index ? this.scaleValue : (this.optionVisible[index] ? 1 : 0.8), 
+        y: this.animatingIndex === index ? this.scaleValue : (this.optionVisible[index] ? 1 : 0.8) 
+      })
+      .animation({ duration: 300, curve: Curve.EaseOut })
+      .onClick(() => {
+        this.selectAnswer(index);
+      })
   }
 
   private getChoiceBackgroundColor(index: number): Resource {
@@ -528,6 +582,43 @@ interface QuizQuestion {
       return $r('app.color.color_red');
     }
     return $r('app.color.text_primary');
+  }
+
+  @Builder
+  ResultIcon(index: number, isTextOption: boolean) {
+    if (index === this.getCorrectIndex() || (index === this.selectedIndex && !this.isCorrect)) {
+      if (isTextOption) {
+        Stack() {
+          Column()
+            .width(28)
+            .height(28)
+            .backgroundColor(index === this.getCorrectIndex() ? $r('app.color.color_green') : $r('app.color.color_red'))
+            .borderRadius(14)
+          Text(index === this.getCorrectIndex() ? '✓' : '✗')
+            .fontSize(14)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(Color.White)
+        }
+        .opacity(1)
+          .animation({ duration: 200, curve: Curve.EaseOut })
+          .margin({ right: 12 })
+      } else {
+        Stack() {
+          Column()
+            .width(28)
+            .height(28)
+            .backgroundColor(index === this.getCorrectIndex() ? $r('app.color.color_green') : $r('app.color.color_red'))
+            .borderRadius(14)
+          Text(index === this.getCorrectIndex() ? '✓' : '✗')
+            .fontSize(14)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(Color.White)
+        }
+        .opacity(1)
+          .animation({ duration: 200, curve: Curve.EaseOut })
+          .position({ x: 8, y: 8 })
+      }
+    }
   }
 
   @Builder

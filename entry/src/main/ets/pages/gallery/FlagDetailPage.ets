@@ -5,6 +5,8 @@ import { systemShare } from '@kit.ShareKit';
 import { uniformTypeDescriptor } from '@kit.ArkData';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { image } from '@kit.ImageKit';
+import fs from '@ohos.file.fs';
+import { fileUri } from '@kit.CoreFileKit';
 import { Country, getCountryByCode, FlagDesign, getFlagDesign, getFlagImageSource, InternationalOrg, getInternationalOrgByCode, isInternationalOrg } from '../../utils/countryData';
 import { TextReaderUtil } from '../../utils/TextReaderUtil';
 import { screenshotManager } from '../../utils/ScreenshotManager';
@@ -29,9 +31,11 @@ interface RouterParams {
   @State isFavorite: boolean = false;
   @State coatOfArmsResource: Resource | null = null;
   @State flagHistoryItems: FlagHistoryItem[] = [];
+  @State sharePixelMap: image.PixelMap | null = null;
   private context = getContext(this) as common.UIAbilityContext;
   private readonly FLAG_CONTAINER_ID = 'flagImageContainer';
   private readonly FLAG_DOWNLOAD_CONTAINER_ID = 'flagDownloadContainer';
+  private readonly SHARE_CONTAINER_ID = 'flagShareContainer';
   private countryCode: string = '';
 
   // 保存对话框控制器
@@ -149,6 +153,17 @@ interface RouterParams {
     }
   }
 
+  private releaseSharePixelMap(): void {
+    if (this.sharePixelMap) {
+      try {
+        this.sharePixelMap.release();
+      } catch (e) {
+        console.warn('[FlagDetailPage] Failed to release share pixelmap:', e);
+      }
+      this.sharePixelMap = null;
+    }
+  }
+
   private async onDownloadClick(): Promise<void> {
     if (!this.country && !this.internationalOrg) return;
 
@@ -247,6 +262,7 @@ interface RouterParams {
     }
     // 页面销毁时释放 PixelMap，避免内存泄漏
     this.releaseFlagPixelMap();
+    this.releaseSharePixelMap();
   }
 
   @Builder
@@ -254,6 +270,17 @@ interface RouterParams {
     if (this.internationalOrg) {
       Scroll() {
         Column() {
+          // 隐藏的分享容器（包含旗帜、基本信息）
+          Column() {
+            if (this.internationalOrg) {
+              this.ShareContentBuilder()
+            }
+          }
+          .id(this.SHARE_CONTAINER_ID)
+          .position({ x: -1000, y: -1000 })
+          .width(400)
+          .backgroundColor($r('app.color.bg_page'))
+
           // 隐藏的下载容器（无 padding，仅用于截图）
           Column() {
             Image(getFlagImageSource(this.internationalOrg.code))
@@ -396,6 +423,17 @@ interface RouterParams {
       } else if (this.country) {
         Scroll() {
           Column() {
+            // 隐藏的分享容器（包含国旗、关于、关于这面国旗）
+            Column() {
+              if (this.country) {
+                this.ShareContentBuilder()
+              }
+            }
+            .id(this.SHARE_CONTAINER_ID)
+            .position({ x: -1000, y: -1000 })
+            .width(400)
+            .backgroundColor($r('app.color.bg_page'))
+
             // 隐藏的下载容器（无 padding，仅用于截图）
             Column() {
               Image(getFlagImageSource(this.country.code))
@@ -649,6 +687,181 @@ interface RouterParams {
   }
 
   @Builder
+  ShareContentBuilder() {
+    if (this.internationalOrg) {
+      // 国际组织分享内容
+      Column({ space: 16 }) {
+        // 旗帜图片
+        Column() {
+          Image(getFlagImageSource(this.internationalOrg.code))
+            .width('100%')
+            .height(200)
+            .objectFit(ImageFit.Contain)
+        }
+        .width('100%')
+          .padding(16)
+          .backgroundColor($r('app.color.bg_page'))
+
+        // 组织名称
+        Column() {
+          Text(this.internationalOrg.nameCN)
+            .fontSize(28)
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r('app.color.text_primary'))
+            .textAlign(TextAlign.Center)
+            .maxLines(2)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .margin({ bottom: 4 })
+
+          Text(this.internationalOrg.name)
+            .fontSize(16)
+            .fontColor($r('app.color.text_secondary'))
+            .textAlign(TextAlign.Center)
+            .maxLines(2)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+        }
+        .width('100%')
+          .padding({ left: 16, right: 16, top: 20, bottom: 16 })
+          .alignItems(HorizontalAlign.Center)
+
+        // 基本信息卡片
+        Row() {
+          Column() {
+            Text('基本信息')
+              .fontSize(16)
+              .fontWeight(FontWeight.Bold)
+              .fontColor($r('app.color.text_primary'))
+              .margin({ bottom: 16 })
+              .alignSelf(ItemAlign.Start)
+
+            this.InfoItem('总部', this.internationalOrg.headquartersCN)
+            Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+            this.InfoItem('地区', this.internationalOrg.region)
+            Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+            this.InfoItem('组织类型', this.internationalOrg.orgTypeCN)
+            Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+            this.InfoItem('覆盖人口', this.formatPopulation(this.internationalOrg.population))
+            if (this.internationalOrg.website) {
+              Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+              this.InfoItem('网站', this.internationalOrg.website)
+            }
+            if (this.internationalOrg.description) {
+              Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+              this.DescriptionItem('简介', this.internationalOrg.description)
+            }
+          }
+          .padding(16)
+            .layoutWeight(1)
+            .backgroundColor($r('app.color.bg_card'))
+            .borderRadius(16)
+        }
+        .width('100%')
+          .padding({ left: 16, right: 16 })
+      }
+      .width('100%')
+        .padding({ top: 20, bottom: 20 })
+        .backgroundColor($r('app.color.bg_page'))
+    } else if (this.country) {
+      Column({ space: 16 }) {
+        // 国旗图片
+        Column() {
+          Image(getFlagImageSource(this.country.code))
+            .width('100%')
+            .height(200)
+            .objectFit(ImageFit.Contain)
+        }
+        .width('100%')
+          .padding(16)
+          .backgroundColor($r('app.color.bg_page'))
+
+        // 国家名称
+        Column() {
+          Text(this.country.nameCN)
+            .fontSize(28)
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r('app.color.text_primary'))
+            .textAlign(TextAlign.Center)
+            .maxLines(2)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .margin({ bottom: 4 })
+
+          Text(this.country.name)
+            .fontSize(16)
+            .fontColor($r('app.color.text_secondary'))
+            .textAlign(TextAlign.Center)
+            .maxLines(2)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+        }
+        .width('100%')
+          .padding({ left: 16, right: 16, top: 20, bottom: 16 })
+          .alignItems(HorizontalAlign.Center)
+
+        // 基本信息卡片（关于）
+        Row() {
+          Column() {
+            Text('基本信息')
+              .fontSize(16)
+              .fontWeight(FontWeight.Bold)
+              .fontColor($r('app.color.text_primary'))
+              .margin({ bottom: 16 })
+              .alignSelf(ItemAlign.Start)
+
+            this.InfoItem('首都', this.country.capitalCN)
+            Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+            this.InfoItem('所属地区', this.getRegionName(this.country.region))
+            Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+            this.InfoItem('人口', this.formatPopulation(this.country.population))
+            Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+            this.InfoItem('面积', this.formatArea(this.country.area))
+            Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+            this.InfoItem('国家代码', this.country.code.toUpperCase())
+          }
+          .padding(16)
+            .layoutWeight(1)
+            .backgroundColor($r('app.color.bg_card'))
+            .borderRadius(16)
+        }
+        .width('100%')
+          .padding({ left: 16, right: 16 })
+
+        // 关于这面国旗
+        Row() {
+          Column() {
+            Text('关于这面国旗')
+              .fontSize(16)
+              .fontWeight(FontWeight.Bold)
+              .fontColor($r('app.color.text_primary'))
+              .margin({ bottom: 16 })
+              .alignSelf(ItemAlign.Start)
+
+            this.InfoItem('国旗比例', this.getFlagProportion())
+            Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+            this.InfoItem('采用日期', this.getFlagAdopted())
+            Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 16 })
+
+            Text(this.getFlagDescription())
+              .fontSize(14)
+              .fontColor($r('app.color.text_dark'))
+              .lineHeight(22)
+              .width('100%')
+              .textAlign(TextAlign.Start)
+          }
+          .padding(16)
+            .layoutWeight(1)
+            .backgroundColor($r('app.color.bg_card'))
+            .borderRadius(16)
+            .alignItems(HorizontalAlign.Start)
+        }
+        .width('100%')
+          .padding({ left: 16, right: 16 })
+      }
+      .width('100%')
+        .padding({ top: 20, bottom: 20 })
+        .backgroundColor($r('app.color.bg_page'))
+    }
+  }
+
+  @Builder
   InfoItem(label: string, value: string) {
     Row() {
       Text(label)
@@ -785,32 +998,113 @@ interface RouterParams {
       duration: 1500
     });
 
-    try {
-      // 构建分享文本
-      const shareText = this.buildShareText();
+    let tempFilePath: string | null = null;
 
-      // 使用文本分享
+    try {
+      // 先释放之前的 PixelMap
+      this.releaseSharePixelMap();
+
+      // 截取分享容器内容（包含国旗、关于、关于这面国旗）
+      const pixmap = await screenshotManager.captureSnapshot(this.SHARE_CONTAINER_ID);
+      if (!pixmap) {
+        promptAction.showToast({
+          message: '截取图片失败',
+          duration: 2000
+        });
+        this.isSharing = false;
+        return;
+      }
+
+      this.sharePixelMap = pixmap;
+
+      // 创建图像打包器并打包为 ArrayBuffer
+      const imagePacker = image.createImagePacker();
+      const packOpts: image.PackingOption = {
+        format: 'image/jpeg',
+        quality: 90
+      };
+      
+      const imageData: ArrayBuffer = await imagePacker.packing(pixmap, packOpts);
+      console.info(`[FlagDetailPage] Image packed, data size: ${imageData.byteLength} bytes`);
+
+      // 保存到临时文件
+      const timestamp = Date.now();
+      tempFilePath = this.context.cacheDir + '/share_flag_detail_' + timestamp + '.jpg';
+      
+      // 使用同步文件操作
+      const fileHandle = fs.openSync(tempFilePath, fs.OpenMode.CREATE | fs.OpenMode.WRITE_ONLY);
+      fs.writeSync(fileHandle.fd, imageData);
+      fs.closeSync(fileHandle);
+      
+      // 验证文件是否存在且不为空
+      const stat = fs.statSync(tempFilePath);
+      if (stat.size === 0) {
+        throw new Error('Image file is empty');
+      }
+      
+      console.info(`[FlagDetailPage] Image file created: ${tempFilePath}, size: ${stat.size} bytes`);
+
+      // 获取文件URI
+      const imageUri = fileUri.getUriFromPath(tempFilePath);
+      console.info(`[FlagDetailPage] Image URI: ${imageUri}`);
+      
+      // 获取图片类型描述符
+      const utdTypeId = uniformTypeDescriptor.getUniformDataTypeByFilenameExtension('.jpg', uniformTypeDescriptor.UniformDataType.IMAGE);
+      console.info(`[FlagDetailPage] UTD Type ID: ${utdTypeId}`);
+
+      // 使用图片URI分享
       const orgName = this.internationalOrg?.nameCN || this.country?.nameCN || '详情';
       const shareData = new systemShare.SharedData({
-        utd: uniformTypeDescriptor.UniformDataType.TEXT,
-        content: shareText,
+        utd: utdTypeId,
+        uri: imageUri,
         title: `${orgName}${this.internationalOrg ? '旗帜' : '国旗'}`,
         description: '来自国旗小百科'
       });
+      
+      console.info(`[FlagDetailPage] ShareData created: utd=${utdTypeId}, uri=${imageUri}`);
 
       const controller = new systemShare.ShareController(shareData);
+      
+      // 显示分享面板
       await controller.show(this.context, {
         selectionMode: systemShare.SelectionMode.SINGLE,
-        previewMode: systemShare.SharePreviewMode.DEFAULT
+        previewMode: systemShare.SharePreviewMode.DETAIL
       });
+
+      console.info('[FlagDetailPage] Share panel opened successfully');
+      
+      // 分享成功后释放 PixelMap
+      this.releaseSharePixelMap();
+      
+      // 延迟删除文件，确保分享完成
+      setTimeout(() => {
+        if (tempFilePath) {
+          try {
+            fs.unlinkSync(tempFilePath);
+            console.info(`[FlagDetailPage] Temp file deleted: ${tempFilePath}`);
+          } catch (unlinkError) {
+            console.warn('[FlagDetailPage] Failed to delete temp file:', unlinkError);
+          }
+        }
+      }, 5000); // 5秒后删除
 
     } catch (err) {
       const error = err as BusinessError;
-      console.error(`Failed to share: code: ${error?.code}, message: ${error?.message}`);
+      console.error(`[FlagDetailPage] Failed to share: code: ${error?.code}, message: ${error?.message}`);
       promptAction.showToast({
         message: '分享失败',
         duration: 2000
       });
+      
+      // 清理资源
+      this.releaseSharePixelMap();
+      if (tempFilePath) {
+        try {
+          fs.unlinkSync(tempFilePath);
+        } catch (unlinkError) {
+          console.warn('[FlagDetailPage] Failed to delete temp file on error:', unlinkError);
+        }
+      }
     } finally {
       this.isSharing = false;
     }
@@ -881,9 +1175,9 @@ interface RouterParams {
           .alignItems(VerticalAlign.Center)
           .margin({ bottom: 12 })
 
-        // 历史国旗Grid（最多显示3个，只显示一行）
+        // 历史国旗Grid（最多显示3个，只显示一行，显示最早的3个）
         Grid() {
-          ForEach(this.flagHistoryItems.slice(0, 3), (item: FlagHistoryItem, index: number) => {
+          ForEach(this.flagHistoryItems.slice().sort((a, b) => a.year - b.year).slice(0, 3), (item: FlagHistoryItem, index: number) => {
             GridItem() {
               Column() {
                 Image($rawfile(`flag_history/${item.imagePath}.png`))

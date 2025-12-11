@@ -27,6 +27,7 @@ interface RouterParams {
   @State showCompareDialog: boolean = false;
   @State flagVisible: boolean[] = [false, false, false, false];  // 国旗选项可见性
   private context = getContext(this) as common.UIAbilityContext;
+  private timeoutIds: number[] = []; // 存储所有setTimeout的ID，用于清理
 
   async aboutToAppear() {
     // 初始化音效播放器
@@ -41,11 +42,22 @@ interface RouterParams {
   }
 
   aboutToDisappear() {
+    // 清理所有setTimeout
+    this.clearAllTimeouts();
     // 释放音效资源
     SoundEffectUtil.release();
   }
 
+  private clearAllTimeouts(): void {
+    for (const id of this.timeoutIds) {
+      clearTimeout(id);
+    }
+    this.timeoutIds = [];
+  }
+
   private loadLevel(levelId: number): void {
+    // 清理之前的定时器
+    this.clearAllTimeouts();
     this.level = getFakeFlagLevel(levelId);
     if (this.level) {
       this.lives = this.level.lives;
@@ -86,12 +98,24 @@ interface RouterParams {
     this.scaleValue = 1.05;
 
     // 动画结束后检查答案
-    setTimeout(() => {
+    const id1 = setTimeout(() => {
       this.scaleValue = 1;
-      setTimeout(async () => {
+      const id2 = setTimeout(async () => {
         await this.checkAnswer(code);
+        // 移除已执行的定时器ID
+        const index2 = this.timeoutIds.indexOf(id2);
+        if (index2 > -1) {
+          this.timeoutIds.splice(index2, 1);
+        }
       }, 100);
+      this.timeoutIds.push(id2);
+      // 移除已执行的定时器ID
+      const index1 = this.timeoutIds.indexOf(id1);
+      if (index1 > -1) {
+        this.timeoutIds.splice(index1, 1);
+      }
     }, 150);
+    this.timeoutIds.push(id1);
   }
 
   private async checkAnswer(code: string): Promise<void> {
@@ -109,9 +133,15 @@ interface RouterParams {
       this.isAnswered = true;
       this.correctAnswers++;
       // 正确时显示对比弹窗（延迟弹出）
-      setTimeout(() => {
+      const id1 = setTimeout(() => {
         this.showCompareDialog = true;
+        // 移除已执行的定时器ID
+        const index1 = this.timeoutIds.indexOf(id1);
+        if (index1 > -1) {
+          this.timeoutIds.splice(index1, 1);
+        }
       }, 800);
+      this.timeoutIds.push(id1);
     } else {
       // 播放错误答案音效和振动
       await SoundEffectUtil.playIncorrect();
@@ -119,15 +149,27 @@ interface RouterParams {
       // 错误时扣除生命值，但允许继续选择
       this.lives--;
       // 短暂显示错误状态后重置选择
-      setTimeout(() => {
+      const id2 = setTimeout(() => {
         this.selectedCode = '';
+        // 移除已执行的定时器ID
+        const index2 = this.timeoutIds.indexOf(id2);
+        if (index2 > -1) {
+          this.timeoutIds.splice(index2, 1);
+        }
       }, 800);
+      this.timeoutIds.push(id2);
 
       if (this.lives <= 0) {
-        setTimeout(async () => {
+        const id3 = setTimeout(async () => {
           await SoundEffectUtil.playOver();
           this.showGameOver();
+          // 移除已执行的定时器ID
+          const index3 = this.timeoutIds.indexOf(id3);
+          if (index3 > -1) {
+            this.timeoutIds.splice(index3, 1);
+          }
         }, 1000);
+        this.timeoutIds.push(id3);
         return;
       }
     }
@@ -186,11 +228,17 @@ interface RouterParams {
     
     // 逐个显示选项
     for (let i = 0; i < 4; i++) {
-      setTimeout(() => {
+      const id = setTimeout(() => {
         const newVisible = [...this.flagVisible];
         newVisible[i] = true;
         this.flagVisible = newVisible;
+        // 移除已执行的定时器ID
+        const index = this.timeoutIds.indexOf(id);
+        if (index > -1) {
+          this.timeoutIds.splice(index, 1);
+        }
       }, i * 100); // 每个选项延迟100ms
+      this.timeoutIds.push(id);
     }
   }
 
@@ -398,7 +446,6 @@ interface RouterParams {
     .width('100%')
     .height('100%')
     .justifyContent(FlexAlign.Center)
-    .backgroundColor(this.getCardBackgroundColor(code))
     .borderRadius(12)
     .border({
       width: 2,
@@ -434,8 +481,6 @@ interface RouterParams {
             .height(100)
             .objectFit(ImageFit.Contain)
             .scale(this.getFakeFlagTransform())
-            .backgroundColor($r('app.color.bg_secondary'))
-            .borderRadius(8)
 
           // 左侧浮动X标记
           Stack() {
@@ -468,8 +513,6 @@ interface RouterParams {
             .width('100%')
             .height(100)
             .objectFit(ImageFit.Contain)
-            .backgroundColor($r('app.color.bg_secondary'))
-            .borderRadius(8)
 
           // 左侧浮动✓标记
           Stack() {
@@ -501,7 +544,7 @@ interface RouterParams {
       }
       .width('85%')
         .constraintSize({ maxWidth: 320 })
-        .backgroundColor($r('app.color.bg_card'))
+        .backgroundColor($r('app.color.bg_page'))
         .borderRadius(20)
         .shadow({
           radius: 20,

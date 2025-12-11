@@ -24,7 +24,10 @@ interface RouterParams {
   @State correctAnswers: number = 0;
   @State shuffledOptions: string[] = [];  // 打乱后的选项
   @State optionVisible: boolean[] = [];  // 选项可见性
+  @State animatingIndex: number = -1;  // 正在动画的选项索引
+  @State scaleValue: number = 1;  // 缩放值
   private context = getContext(this) as common.UIAbilityContext;
+  private timeoutIds: number[] = []; // 存储所有setTimeout的ID，用于清理
 
   async aboutToAppear() {
     // 初始化音效播放器
@@ -39,11 +42,22 @@ interface RouterParams {
   }
 
   aboutToDisappear() {
+    // 清理所有setTimeout
+    this.clearAllTimeouts();
     // 释放音效资源
     SoundEffectUtil.release();
   }
 
+  private clearAllTimeouts(): void {
+    for (const id of this.timeoutIds) {
+      clearTimeout(id);
+    }
+    this.timeoutIds = [];
+  }
+
   private loadLevel(levelId: number): void {
+    // 清理之前的定时器
+    this.clearAllTimeouts();
     this.level = getTriviaLevel(levelId);
     if (this.level) {
       this.lives = this.level.lives;
@@ -55,6 +69,8 @@ interface RouterParams {
       this.correctAnswers = 0;
       this.shuffledOptions = [];
       this.optionVisible = [];
+      this.animatingIndex = -1;
+      this.scaleValue = 1;
       this.initCurrentQuestionOptions();
       // 触发选项动画
       this.animateOptions();
@@ -89,7 +105,7 @@ interface RouterParams {
   }
 
   private async selectOption(option: string): Promise<void> {
-    if (this.isAnswered) return;
+    if (this.isAnswered || this.animatingIndex !== -1) return;
 
     // 点击振动反馈
     VibratorUtil.vibrateTap();
@@ -97,8 +113,42 @@ interface RouterParams {
     const question = this.getCurrentQuestion();
     if (!question) return;
 
+    // 找到选项的索引
+    const optionIndex = this.shuffledOptions.findIndex(opt => opt === option);
+    if (optionIndex === -1) return;
+
+    // 开始动画
+    this.animatingIndex = optionIndex;
+    this.scaleValue = 1.1;
+
+    // 动画结束后检查答案
+    const id1 = setTimeout(() => {
+      this.scaleValue = 1;
+      const id2 = setTimeout(async () => {
+        await this.checkAnswer(option);
+        // 移除已执行的定时器ID
+        const index2 = this.timeoutIds.indexOf(id2);
+        if (index2 > -1) {
+          this.timeoutIds.splice(index2, 1);
+        }
+      }, 100);
+      this.timeoutIds.push(id2);
+      // 移除已执行的定时器ID
+      const index1 = this.timeoutIds.indexOf(id1);
+      if (index1 > -1) {
+        this.timeoutIds.splice(index1, 1);
+      }
+    }, 150);
+    this.timeoutIds.push(id1);
+  }
+
+  private async checkAnswer(option: string): Promise<void> {
+    const question = this.getCurrentQuestion();
+    if (!question) return;
+
     this.selectedOption = option;
     this.isAnswered = true;
+    this.animatingIndex = -1;
     this.isCorrect = option === question.answer;
 
     if (this.isCorrect) {
@@ -113,10 +163,16 @@ interface RouterParams {
       this.lives--;
 
       if (this.lives <= 0) {
-        setTimeout(async () => {
+        const id = setTimeout(async () => {
           await SoundEffectUtil.playOver();
           this.showGameOver();
+          // 移除已执行的定时器ID
+          const index = this.timeoutIds.indexOf(id);
+          if (index > -1) {
+            this.timeoutIds.splice(index, 1);
+          }
         }, 1500);
+        this.timeoutIds.push(id);
         return;
       }
     }
@@ -134,6 +190,8 @@ interface RouterParams {
       this.selectedOption = '';
       this.isAnswered = false;
       this.isCorrect = false;
+      this.animatingIndex = -1;
+      this.scaleValue = 1;
       this.optionVisible = [];
       this.initCurrentQuestionOptions();  // 为新题目打乱选项
       // 触发选项动画
@@ -173,6 +231,8 @@ interface RouterParams {
     this.isCorrect = false;
     this.correctAnswers = 0;
     this.showResult = false;
+    this.animatingIndex = -1;
+    this.scaleValue = 1;
     this.optionVisible = [];
     if (this.level) {
       this.lives = this.level.lives;
@@ -192,11 +252,17 @@ interface RouterParams {
     
     // 逐个显示选项
     for (let i = 0; i < optionCount; i++) {
-      setTimeout(() => {
+      const id = setTimeout(() => {
         const newVisible = [...this.optionVisible];
         newVisible[i] = true;
         this.optionVisible = newVisible;
+        // 移除已执行的定时器ID
+        const index = this.timeoutIds.indexOf(id);
+        if (index > -1) {
+          this.timeoutIds.splice(index, 1);
+        }
       }, i * 100); // 每个选项延迟100ms
+      this.timeoutIds.push(id);
     }
   }
 
@@ -244,6 +310,65 @@ interface RouterParams {
       return $r('app.color.color_red');
     }
     return $r('app.color.gray_border');
+  }
+
+  @Builder
+  OptionButton(option: string, index: number) {
+    Stack({ alignContent: Alignment.End }) {
+      Row() {
+        Text(this.getOptionText(option))
+          .fontSize(16)
+          .fontWeight(FontWeight.Medium)
+          .fontColor($r('app.color.text_primary'))
+          .textAlign(TextAlign.Center)
+      }
+      .width('100%')
+        .height(56)
+        .justifyContent(FlexAlign.Center)
+        .backgroundColor(this.getOptionBackgroundColor(option))
+        .borderRadius(12)
+        .border({
+          width: 2,
+          color: this.getOptionBorderColor(option)
+        })
+
+      // 结果显示图标（在按钮缩放动画结束后显示）
+      if (this.isAnswered && this.animatingIndex === -1) {
+        this.ResultIcon(option)
+      }
+    }
+    .width('100%')
+      .height(56)
+      .margin({ bottom: 12 })
+      .opacity(this.optionVisible[index] ? 1 : 0)
+      .scale({ 
+        x: this.animatingIndex === index ? this.scaleValue : (this.optionVisible[index] ? 1 : 0.8), 
+        y: this.animatingIndex === index ? this.scaleValue : (this.optionVisible[index] ? 1 : 0.8) 
+      })
+      .animation({ duration: 300, curve: Curve.EaseOut })
+      .onClick(async () => {
+        await this.selectOption(option);
+      })
+  }
+
+  @Builder
+  ResultIcon(option: string) {
+    if (this.getCurrentQuestion() && (option === this.getCurrentQuestion()?.answer || (option === this.selectedOption && !this.isCorrect))) {
+      Stack() {
+        Column()
+          .width(28)
+          .height(28)
+          .backgroundColor(option === this.getCurrentQuestion()?.answer ? $r('app.color.color_green') : $r('app.color.color_red'))
+          .borderRadius(14)
+        Text(option === this.getCurrentQuestion()?.answer ? '✓' : '✗')
+          .fontSize(14)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(Color.White)
+      }
+      .opacity(1)
+        .animation({ duration: 200, curve: Curve.EaseOut })
+        .margin({ right: 12 })
+    }
   }
 
   build() {
@@ -295,32 +420,7 @@ interface RouterParams {
           // 选项（使用打乱后的选项）
           Column() {
             ForEach(this.shuffledOptions, (option: string, index: number) => {
-              Row() {
-                Text(this.getOptionText(option))
-                  .fontSize(16)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor($r('app.color.text_primary'))
-                  .textAlign(TextAlign.Center)
-              }
-              .width('100%')
-                .height(56)
-                .justifyContent(FlexAlign.Center)
-                .backgroundColor(this.getOptionBackgroundColor(option))
-                .borderRadius(12)
-                .border({
-                  width: 2,
-                  color: this.getOptionBorderColor(option)
-                })
-                .margin({ bottom: 12 })
-                .opacity(this.optionVisible[index] ? 1 : 0)
-                .scale({ 
-                  x: this.optionVisible[index] ? 1 : 0.8, 
-                  y: this.optionVisible[index] ? 1 : 0.8 
-                })
-                .animation({ duration: 300, curve: Curve.EaseOut })
-                .onClick(async () => {
-                  await this.selectOption(option);
-                })
+              this.OptionButton(option, index)
             })
           }
           .width('100%')

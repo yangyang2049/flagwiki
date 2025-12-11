@@ -75,7 +75,8 @@
 
         #flag-svg.disabled {
             pointer-events: none;
-            opacity: 0.7;
+            /* 答案正确时不降低透明度，保持旗帜清晰可见 */
+            /* opacity: 0.7; */
         }
 
         #color-palette {
@@ -141,7 +142,7 @@
         }
 
         .success-animation {
-            animation: successAnim 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.15) forwards;
+            animation: successAnim 1s cubic-bezier(0.17, 0.89, 0.32, 1.15) forwards;
         }
 
         .failure-animation {
@@ -168,7 +169,7 @@
 </head>
     <body style="background-color: transparent;">
     <div class="game-container">
-        <div class="country-name" id="country-name">国家名称</div>
+        <div class="country-name" id="country-name"></div>
         <div id="flag-svg"></div>
         <div id="color-palette"></div>
         <div id="success-mark" class="result-mark">👍</div>

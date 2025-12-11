@@ -93,6 +93,7 @@ const US_STATE_NAMES: Record<string, string> = {
 
   private webController: web_webview.WebviewController = new web_webview.WebviewController();
   private context = getContext(this) as common.UIAbilityContext;
+  private timeoutIds: number[] = []; // 存储所有setTimeout的ID，用于清理
 
   async aboutToAppear() {
     // 初始化音效播放器和振动工具
@@ -109,8 +110,17 @@ const US_STATE_NAMES: Record<string, string> = {
   }
 
   aboutToDisappear() {
+    // 清理所有setTimeout
+    this.clearAllTimeouts();
     // 释放音效资源
     SoundEffectUtil.release();
+  }
+
+  private clearAllTimeouts(): void {
+    for (const id of this.timeoutIds) {
+      clearTimeout(id);
+    }
+    this.timeoutIds = [];
   }
 
   private updateCurrentFlagPath(): void {
@@ -237,19 +247,31 @@ const US_STATE_NAMES: Record<string, string> = {
     this.contentTranslateY = 200; // 初始位置在屏幕下方200px
     
     // 延迟一帧后触发向上移动动画（从底部向上滑入）
-    setTimeout(() => {
+    const id1 = setTimeout(() => {
       animateTo({
-        duration: 500,
+        duration: 1200,
         curve: Curve.EaseOut
       }, () => {
         this.contentTranslateY = 0; // 移动到最终位置（原始位置）
       });
+      // 移除已执行的定时器ID
+      const index1 = this.timeoutIds.indexOf(id1);
+      if (index1 > -1) {
+        this.timeoutIds.splice(index1, 1);
+      }
     }, 50);
+    this.timeoutIds.push(id1);
 
     // 延迟显示按钮（在动画和音效播放后）
-    setTimeout(() => {
+    const id2 = setTimeout(() => {
       this.showButtons = true;
-    }, 600);
+      // 移除已执行的定时器ID
+      const index2 = this.timeoutIds.indexOf(id2);
+      if (index2 > -1) {
+        this.timeoutIds.splice(index2, 1);
+      }
+    }, 1300);
+    this.timeoutIds.push(id2);
   }
 
   private async onNextLevel(): Promise<void> {
@@ -312,7 +334,7 @@ const US_STATE_NAMES: Record<string, string> = {
               .onPageEnd(() => {
                 this.isWebReady = true;
                 // 等待 HTML 和 JavaScript 函数加载完成
-                setTimeout(() => {
+                const id = setTimeout(() => {
                   this.setupGame().then(() => {
                     // 使用动画渐显
                     animateTo({
@@ -330,7 +352,13 @@ const US_STATE_NAMES: Record<string, string> = {
                       this.webOpacity = 1;
                     });
                   });
+                  // 移除已执行的定时器ID
+                  const index = this.timeoutIds.indexOf(id);
+                  if (index > -1) {
+                    this.timeoutIds.splice(index, 1);
+                  }
                 }, 150);
+                this.timeoutIds.push(id);
               })
               .onConsole((event) => {
                 if (event) {
@@ -346,18 +374,30 @@ const US_STATE_NAMES: Record<string, string> = {
                     VibratorUtil.vibrateCorrect();
                     // 延迟显示按钮（在音效播放后）
                     this.showNextButton = true;
-                    setTimeout(() => {
+                    const id1 = setTimeout(() => {
                       this.showNextButtonAnimated = true;
+                      // 移除已执行的定时器ID
+                      const index1 = this.timeoutIds.indexOf(id1);
+                      if (index1 > -1) {
+                        this.timeoutIds.splice(index1, 1);
+                      }
                     }, 400);
+                    this.timeoutIds.push(id1);
                   },
                   onPaintIncorrect: async () => {
                     // 播放错误答案音效和振动
                     await SoundEffectUtil.playIncorrect();
                     VibratorUtil.vibrateIncorrect();
                     // 错误时重置游戏
-                    setTimeout(() => {
+                    const id2 = setTimeout(() => {
                       this.setupGame();
+                      // 移除已执行的定时器ID
+                      const index2 = this.timeoutIds.indexOf(id2);
+                      if (index2 > -1) {
+                        this.timeoutIds.splice(index2, 1);
+                      }
                     }, 2000);
+                    this.timeoutIds.push(id2);
                   },
                   onPaintSound: async () => {
                     // 播放填色音效
@@ -513,7 +553,7 @@ const US_STATE_NAMES: Record<string, string> = {
       .width('100%')
         .translate({ y: this.contentTranslateY })
         .animation({
-          duration: 500,
+          duration: 1200,
           curve: Curve.EaseOut
         })
 

@@ -36,6 +36,7 @@ interface Card {
   @State flipAngles: Map<number, number> = new Map();  // 每张卡片的翻转角度
   private timerId: number | undefined = undefined;
   private context = getContext(this) as common.UIAbilityContext;
+  private timeoutIds: number[] = []; // 存储所有setTimeout的ID，用于清理
 
   async aboutToAppear() {
     // 初始化音效播放器
@@ -50,6 +51,8 @@ interface Card {
   }
 
   private loadLevel(levelId: number): void {
+    // 清理之前的定时器
+    this.clearAllTimeouts();
     this.level = getMemoryLevel(levelId);
     if (this.level) {
       this.timeRemaining = this.level.timeLimit;
@@ -71,8 +74,17 @@ interface Card {
 
   aboutToDisappear() {
     this.stopTimer();
+    // 清理所有setTimeout
+    this.clearAllTimeouts();
     // 释放音效资源
     SoundEffectUtil.release();
+  }
+
+  private clearAllTimeouts(): void {
+    for (const id of this.timeoutIds) {
+      clearTimeout(id);
+    }
+    this.timeoutIds = [];
   }
 
   private initCards(): void {
@@ -138,12 +150,18 @@ interface Card {
     this.flipAngles.set(card.id, 180);
 
     // 动画中途更新卡片状态（翻转到一半时显示正面）
-    setTimeout(() => {
+    const id1 = setTimeout(() => {
       this.cards[index] = this.createCard(card.id, card.code, true, card.isMatched);
+      // 移除已执行的定时器ID
+      const index1 = this.timeoutIds.indexOf(id1);
+      if (index1 > -1) {
+        this.timeoutIds.splice(index1, 1);
+      }
     }, 200);
+    this.timeoutIds.push(id1);
 
     // 动画结束后处理逻辑
-    setTimeout(() => {
+    const id2 = setTimeout(() => {
       this.flippingCardId = -1;
 
       if (!this.firstCard) {
@@ -154,11 +172,23 @@ interface Card {
         this.isProcessing = true;
 
         // 检查是否匹配
-        setTimeout(async () => {
+        const id3 = setTimeout(async () => {
           await this.checkMatch();
+          // 移除已执行的定时器ID
+          const index3 = this.timeoutIds.indexOf(id3);
+          if (index3 > -1) {
+            this.timeoutIds.splice(index3, 1);
+          }
         }, 500);
+        this.timeoutIds.push(id3);
+      }
+      // 移除已执行的定时器ID
+      const index2 = this.timeoutIds.indexOf(id2);
+      if (index2 > -1) {
+        this.timeoutIds.splice(index2, 1);
       }
     }, 400);
+    this.timeoutIds.push(id2);
   }
 
   private createCard(id: number, code: string, isFlipped: boolean, isMatched: boolean): Card {
@@ -191,11 +221,17 @@ interface Card {
       // 检查是否完成
       if (this.matchedPairs === this.level?.pairs) {
         this.stopTimer();
-        setTimeout(async () => {
+        const id = setTimeout(async () => {
           await SoundEffectUtil.playCongrats();
           VibratorUtil.vibrateWin();
           this.gameOver(true);
+          // 移除已执行的定时器ID
+          const index = this.timeoutIds.indexOf(id);
+          if (index > -1) {
+            this.timeoutIds.splice(index, 1);
+          }
         }, 500);
+        this.timeoutIds.push(id);
       }
     } else {
       // 不匹配，翻回去 - 播放错误音效和振动
@@ -206,21 +242,33 @@ interface Card {
       this.flipAngles.set(secondId, 0);
 
       // 动画中途更新卡片状态
-      setTimeout(() => {
+      const id1 = setTimeout(() => {
         const first = this.cards[firstIndex];
         const second = this.cards[secondIndex];
         this.cards[firstIndex] = this.createCard(first.id, first.code, false, first.isMatched);
         this.cards[secondIndex] = this.createCard(second.id, second.code, false, second.isMatched);
+        // 移除已执行的定时器ID
+        const index1 = this.timeoutIds.indexOf(id1);
+        if (index1 > -1) {
+          this.timeoutIds.splice(index1, 1);
+        }
       }, 200);
+      this.timeoutIds.push(id1);
 
       // 动画结束后重置状态
-      setTimeout(() => {
+      const id2 = setTimeout(() => {
         this.flipAngles.delete(firstId);
         this.flipAngles.delete(secondId);
         this.firstCard = null;
         this.secondCard = null;
         this.isProcessing = false;
+        // 移除已执行的定时器ID
+        const index2 = this.timeoutIds.indexOf(id2);
+        if (index2 > -1) {
+          this.timeoutIds.splice(index2, 1);
+        }
       }, 400);
+      this.timeoutIds.push(id2);
     }
   }
 
@@ -249,9 +297,12 @@ interface Card {
     this.isProcessing = false;
     this.showResult = false;
     this.isWin = false;
+    this.flippingCardId = -1;
+    this.flipAngles = new Map();
 
     if (this.level) {
       this.timeRemaining = this.level.timeLimit;
+      this.stopTimer();
       this.initCards();
       this.startTimer();
     }
@@ -361,8 +412,8 @@ interface Card {
           }
           .columnsTemplate(this.getGridColumns())
             .rowsTemplate(this.getGridRows())
-            .columnsGap(12)
-            .rowsGap(12)
+            .columnsGap(4)
+            .rowsGap(4)
             .width('100%')
             .layoutWeight(1)
             .padding({ left: 16, right: 16, top: 12, bottom: 12 })
@@ -406,12 +457,11 @@ interface Card {
             curve: curves.springMotion(0.4, 0.8)
           })
       } else {
-        // 显示卡片背面
+        // 显示卡片背面 - 白色背景，旗帜emoji
         Column() {
-          Text('?')
+          Text('🏳️')
             .fontSize(this.getQuestionMarkSize())
             .fontWeight(FontWeight.Bold)
-            .fontColor($r('app.color.text_tertiary'))
         }
         .width('100%')
           .height('100%')
@@ -423,7 +473,7 @@ interface Card {
       .height('100%')
       .justifyContent(FlexAlign.Center)
       .backgroundColor(card.isMatched ? $r('app.color.bg_green_light') :
-        (card.isFlipped ? $r('app.color.bg_card') : $r('app.color.bg_secondary')))
+        (card.isFlipped ? $r('app.color.bg_secondary') : Color.White))
       .borderRadius(this.getCardBorderRadius())
       .border({
         width: card.isMatched ? 2 : 1,
@@ -550,7 +600,7 @@ interface Card {
               router.back();
             })
 
-          Button(this.level && this.level.id < getAllMemoryLevels().length ? '下一关' : '完美收官')
+          Button(this.isWin ? (this.level && this.level.id < getAllMemoryLevels().length ? '下一关' : '完美收官') : '重新开始')
             .layoutWeight(1)
             .height(44)
             .fontSize(16)
@@ -559,14 +609,20 @@ interface Card {
             .onClick(async () => {
               await SoundEffectUtil.playButton();
               VibratorUtil.vibrateTap();
-              if (this.level && this.level.id < getAllMemoryLevels().length) {
-                // 下一关 - 在当前页面重新加载数据
-                await GameProgressManager.init(this.context);
-                await GameProgressManager.unlockNextLevel(GameType.MEMORY, this.level.id);
-                this.loadLevel(this.level.id + 1);
+              if (this.isWin) {
+                // 胜利：下一关或退出
+                if (this.level && this.level.id < getAllMemoryLevels().length) {
+                  // 下一关 - 在当前页面重新加载数据
+                  await GameProgressManager.init(this.context);
+                  await GameProgressManager.unlockNextLevel(GameType.MEMORY, this.level.id);
+                  this.loadLevel(this.level.id + 1);
+                } else {
+                  // 完美收官，退出
+                  router.back();
+                }
               } else {
-                // 完美收官，退出
-                router.back();
+                // 失败：重新开始
+                this.restartGame();
               }
             })
         }
