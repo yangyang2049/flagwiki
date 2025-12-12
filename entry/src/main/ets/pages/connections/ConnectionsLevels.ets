@@ -22,7 +22,7 @@ export interface ConnectionsLevel {
 }
 
 // 主题名称映射（中文）
-const ThemeNames: Record<string, string> = {
+const ThemeNamesCN: Record<string, string> = {
   'Asia': '亚洲',
   'Europe': '欧洲',
   'Americas': '美洲',
@@ -71,6 +71,58 @@ const ThemeNames: Record<string, string> = {
   'Amazon River Countries': '亚马逊河国家',
   'Mekong River Countries': '湄公河国家',
   'Danube River Countries': '多瑙河国家'
+};
+
+// 主题名称映射（英文）
+const ThemeNamesEN: Record<string, string> = {
+  'Asia': 'Asia',
+  'Europe': 'Europe',
+  'Americas': 'Americas',
+  'Africa': 'Africa',
+  'Red Flags': 'Red Flags',
+  'Green Flags': 'Green Flags',
+  'Blue Flags': 'Blue Flags',
+  'Yellow Flags': 'Yellow Flags',
+  'Anglo-Saxon Flags': 'Anglo-Saxon Flags',
+  'Slavic Flags': 'Slavic Flags',
+  'Nordic Flags': 'Nordic Flags',
+  'Arab Flags': 'Arab Flags',
+  'East Asia': 'East Asia',
+  'South Asia': 'South Asia',
+  'West Asia': 'West Asia',
+  'Southeast Asia': 'Southeast Asia',
+  'North Africa': 'North Africa',
+  'East Africa': 'East Africa',
+  'South Africa': 'South Africa',
+  'West Africa': 'West Africa',
+  'North Europe': 'North Europe',
+  'East Europe': 'East Europe',
+  'West Europe': 'West Europe',
+  'South Europe': 'South Europe',
+  'Socialism Countries': 'Socialism Countries',
+  'Sun': 'Sun',
+  'Crescent and Star': 'Crescent and Star',
+  'Animal': 'Animal',
+  'Pan-African Colors': 'Pan-African Colors',
+  'Island Countries': 'Island Countries',
+  'Landlocked Countries': 'Landlocked Countries',
+  'Biggest Countries': 'Biggest Countries',
+  'Flags with Many Stripes': 'Flags with Many Stripes',
+  'Two-Color Flags': 'Two-Color Flags',
+  'Flags with Weapons': 'Flags with Weapons',
+  'Tiny Countries': 'Tiny Countries',
+  'Flags with Stars': 'Flags with Stars',
+  'Flags with Trees or Plants': 'Flags with Trees or Plants',
+  'Flags with Crowns': 'Flags with Crowns',
+  'Flags with the Southern Cross': 'Flags with the Southern Cross',
+  'Non-Rectangular Flags': 'Non-Rectangular Flags',
+  'Horizontal Tribands': 'Horizontal Tribands',
+  'Vertical Tribands': 'Vertical Tribands',
+  'Diagonal Stripes': 'Diagonal Stripes',
+  'Nile River Countries': 'Nile River Countries',
+  'Amazon River Countries': 'Amazon River Countries',
+  'Mekong River Countries': 'Mekong River Countries',
+  'Danube River Countries': 'Danube River Countries'
 };
 
 // 主题名到本地化资源键的映射（英文）
@@ -127,32 +179,23 @@ const ThemeResourceKeys: Record<string, string> = {
 
 // 获取本地化的主题名
 export function getLocalizedTheme(theme: string, context?: common.UIAbilityContext): string {
-  if (!context) {
-    // 如果没有上下文，返回中文映射或原始主题名
-    return ThemeNames[theme] || theme;
-  }
-
-  // 异步获取系统语言（这里需要同步处理，所以先尝试获取资源）
   try {
-    const resourceKey = ThemeResourceKeys[theme];
-    if (resourceKey) {
-      // 尝试获取英文资源
-      try {
-        const resourceId = $r(resourceKey).id;
-        const localizedText = context.resourceManager.getStringSync(resourceId);
-        if (localizedText && localizedText !== resourceKey) {
-          return localizedText;
-        }
-      } catch (e) {
-        // 如果获取失败，继续使用中文映射
-      }
+    // 从 AppStorage 获取当前语言设置
+    const currentLanguage = AppStorage.get<string>('currentLanguage') ?? 'zh';
+    const isEnglish = LocalizationUtil.isEnglish(currentLanguage);
+
+    if (isEnglish) {
+      // 英文环境，返回英文映射
+      return ThemeNamesEN[theme] || theme;
+    } else {
+      // 中文环境，返回中文映射
+      return ThemeNamesCN[theme] || theme;
     }
   } catch (e) {
-    // 如果出错，继续使用中文映射
+    console.error('Failed to get localized theme:', e);
+    // 出错时返回中文映射
+    return ThemeNamesCN[theme] || theme;
   }
-
-  // 默认返回中文映射或原始主题名
-  return ThemeNames[theme] || theme;
 }
 
 // 关卡数据 - 15关
@@ -408,3 +451,4 @@ export function getConnectionsLevel(levelId: number): ConnectionsLevel | undefin
 export function getTotalConnectionsLevels(): number {
   return ConnectionsLevels.length;
 }
+

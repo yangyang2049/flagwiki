@@ -4,7 +4,7 @@ import { getCountryByCode, Country, getFlagImageSource, getInternationalOrgByCod
 import { EtiquetteSection, getEtiquetteContent, getLocalizedEtiquetteContent } from './FlagEtiquetteData';
 import { ManufacturingSection, getManufacturingContent, getLocalizedManufacturingContent } from './FlagManufacturingData';
 import { VexillologySection, getVexillologyContent, getLocalizedVexillologyContent } from './FlagVexillologyData';
-import { HistorySection, getFlagHistoryContent, getLocalizedFlagHistoryContent } from './FlagHistoryData';
+import { HistorySection, getFlagHistoryContent, getLocalizedFlagHistoryContent } from './FiveStarRedFlagHistoryData';
 import { TextReaderUtil } from '../../utils/TextReaderUtil';
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
@@ -287,12 +287,15 @@ interface SimilarFlagPair {
   @Builder
   MenuBuilder() {
     Row({ space: 20 }) {
-      Image($r('app.media.icon_voice'))
-        .width(24)
-        .height(24)
-        .onClick(() => {
-          this.onReadClick();
-        })
+      // 只在中文环境下显示朗读按钮
+      if (!LocalizationUtil.isEnglish(this.currentLanguage)) {
+        Image($r('app.media.icon_voice'))
+          .width(24)
+          .height(24)
+          .onClick(() => {
+            this.onReadClick();
+          })
+      }
     }
     .height('100%')
       .justifyContent(FlexAlign.End)

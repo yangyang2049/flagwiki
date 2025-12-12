@@ -155,10 +155,37 @@ export struct ProfilePage {
       if (!this.prefs) {
         this.prefs = await PreferencesManager.getPreferences('app_settings');
       }
-      const saved: string = await this.prefs.get('language', 'zh') as string;
-      this.selectedLanguage = saved;
+      
+      // 检查是否已经保存过语言偏好
+      const hasLanguageKey = await this.prefs.has('language');
+      
+      if (hasLanguageKey) {
+        // 已保存过语言偏好，使用保存的值
+        const saved: string = await this.prefs.get('language', 'zh') as string;
+        this.selectedLanguage = saved;
+        console.info(`[ProfilePage] Using saved language preference: ${saved}`);
+      } else {
+        // 首次安装，检测系统语言
+        const systemLang = await LocalizationUtil.getSystemLanguage(this.context);
+        this.selectedLanguage = systemLang;
+        console.info(`[ProfilePage] First installation, detected system language: ${systemLang}`);
+        
+        // 保存检测到的系统语言作为初始偏好
+        await this.prefs.put('language', systemLang);
+        await this.prefs.flush();
+      }
+      
+      // 设置应用偏好语言
+      await this.setAppPreferredLanguage(this.selectedLanguage);
+      
+      // 同步到 AppStorage
+      AppStorage.setOrCreate('currentLanguage', this.selectedLanguage);
+      
     } catch (err) {
       console.error(`Failed to load language: ${JSON.stringify(err)}`);
+      // 出错时使用中文作为默认语言
+      this.selectedLanguage = 'zh';
+      AppStorage.setOrCreate('currentLanguage', 'zh');
     }
   }
 
@@ -175,14 +202,6 @@ export struct ProfilePage {
       
       // 同步到AppStorage
       AppStorage.setOrCreate('currentLanguage', this.selectedLanguage);
-      
-      // 显示提示
-      promptAction.showToast({
-        message: this.selectedLanguage === 'zh' ? 
-          '语言已切换，重启应用生效' : 
-          'Language switched, restart app to apply',
-        duration: 2000
-      });
     } catch (err) {
       console.error(`Failed to save language: ${JSON.stringify(err)}`);
       try {

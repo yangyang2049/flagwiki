@@ -2,7 +2,142 @@
 
 ## [未发布]
 
+### 优化 (Optimization)
+- **移除语言切换时的 Toast 提示**：在 ProfilePage 中切换语言时不再显示 toast 提示
+  - **修改内容**：移除了 `saveLanguage()` 方法中的 `promptAction.showToast()` 调用
+  - **效果**：切换语言时界面更加简洁，不会弹出提示消息
+  - **注意**：错误情况下的 toast 提示仍然保留
+
+### 重构 (Refactor)
+- **重命名文件以避免混淆**：将 `pages/topic/FlagHistoryData.ets` 重命名为 `FiveStarRedFlagHistoryData.ets`
+  - **原因**：避免与 `utils/FlagHistoryData.ets`（历史国旗数据工具）混淆
+  - **修改内容**：
+    - 创建新文件 `FiveStarRedFlagHistoryData.ets`（五星红旗历史知识数据）
+    - 更新 `TopicDetailPage.ets` 中的导入路径
+    - 删除旧文件 `FlagHistoryData.ets`
+  - **效果**：文件名更加明确，避免了与历史国旗数据工具的混淆
+
+### 审查 (Review)
+- **重复文件和相似名称文件审查**：完成了对整个项目的重复文件和相似名称文件的全面审查
+  - **审查结果**：
+    - 发现 2 个完全重复的资源文件（`layered_image.json`），但属于 HarmonyOS 正常的资源层级结构
+    - 发现 2 个同名但不同用途的文件（`FlagHistoryData.ets`），建议重命名以避免混淆
+    - 发现 2 个测试文件（`List.test.ets`），属于正常的测试文件结构
+    - 确认之前审查报告中提到的未使用文件（`CoatOfArmsDownloader.ets`、`CoatOfArmsDatabase.ets`、`download_anthems.py`）已被删除
+  - **资源文件层级**：
+    - `AppScope` 和 `entry` 下的同名资源文件是 HarmonyOS 的标准资源层级结构
+    - `AppScope` 是应用级资源，`entry` 是模块级资源，模块级资源会覆盖应用级资源
+    - 这是正常的设计模式，应该保留
+  - **建议**：
+    - **低优先级**：考虑重命名 `pages/topic/FlagHistoryData.ets` 为 `FlagHistoryContentData.ets` 或 `FiveStarRedFlagHistoryData.ets` 以避免与 `utils/FlagHistoryData.ets` 混淆
+  - **详细报告**：见 `docs/DUPLICATE_FILES_REVIEW.md`
+
 ### 修复 (Fixed)
+- **州旗页面完整本地化及界面优化**：完成了所有州旗相关页面的本地化和界面优化
+  - **StateFlagCountryListPage（州旗国家列表页）**：
+    - 添加 `@StorageLink('currentLanguage')` 监听语言变化
+    - 新增 `getCountryName()` 方法：根据语言返回国家名称（countryName / countryNameCN）
+    - 重构 `getStateCountText()` 方法：使用独立的本地化字符串资源
+      - 不再使用动态拼接公式，改为为每个国家单独配置本地化字符串
+      - 新增 11 组字符串资源（`state_count_jp` 到 `state_count_es`）
+      - 中文示例：`47 个都道府县`、`50 个州`、`13 个省`、`17 个行政区`
+      - 英文示例：`47 Prefectures`、`50 States`、`13 Provinces`、`17 Administrative Divisions`
+      - 不同国家使用正确的行政区划名称：
+        - 日本：Prefectures（都道府县）
+        - 美国/德国/澳大利亚/巴西：States（州）
+        - 加拿大：Provinces（省）
+        - 韩国：Administrative Divisions（行政区）
+        - 瑞士：Cantons（州）
+        - 英国：Countries（地区）
+        - 意大利：Regions（大区）
+        - 西班牙：Autonomous Communities（自治区）
+  - **StateFlagGalleryPage（州旗画廊页）**：
+    - 添加 `@StorageLink('currentLanguage')` 监听语言变化
+    - 新增本地化辅助方法：
+      - `getCountryName()`：国家名称（countryName / countryNameCN）
+      - `getStateName()`：州名称（name / nameCN）
+      - `getTotalCountText()`：使用独立的本地化字符串资源
+    - 本地化顶部区域：
+      - 国家名称：`Australia` / `澳大利亚`
+      - 总数文本：`Total 9 States` / `共 9 个州`
+      - 使用 switch 语句根据国家代码获取对应的本地化字符串
+      - 添加"Total"/"共"前缀
+    - 本地化网格中所有州名称
+    - **保留导航栏但隐藏标题**：使用空字符串 `.title('')` 保留返回按钮，但不显示标题文字
+  - **StateFlagDetailPage（州旗详情页）**：
+    - 改用 `AppStorage.get('currentLanguage')` 获取应用语言
+    - 新增本地化辅助方法：
+      - `getStateName()`：州名称（name / nameCN）
+      - `getCapitalName()`：首府名称（capital / capitalCN）
+      - `getRegionName()`：地区名称（region / regionCN）
+      - `getCountryName()`：国家名称（countryName / countryNameCN）
+    - 更新所有显示位置使用本地化方法：
+      - 标题和州名称显示
+      - 基本信息卡片（所属国家、首府、地区）
+      - 朗读内容
+      - 分享文本
+      - 文件名生成
+    - **保留导航栏但隐藏标题**：使用空字符串 `.title('')` 保留返回按钮和菜单，但不显示标题文字
+  - **效果**：
+    - 中文环境：显示 "美国"、"新南威尔士州"、"悉尼" 等中文名称
+    - 英文环境：显示 "United States"、"New South Wales"、"Sydney" 等英文名称
+    - 州数量格式正确适配语言（使用独立的本地化字符串）
+    - 界面更简洁：保留导航栏功能（返回按钮、菜单），但不显示标题文字
+
+- **英文环境下隐藏朗读按钮**：在英文环境下隐藏所有页面的朗读/阅读按钮
+  - **原因**：朗读功能主要支持中文，在英文环境下可能无法正常工作或效果不佳
+  - **修改的页面**：
+    - `FlagDetailPage.ets` - 国旗详情页
+    - `StateFlagDetailPage.ets` - 州旗详情页
+    - `TopicDetailPage.ets` - 专题详情页
+  - **实现方式**：在 `MenuBuilder()` 中添加语言判断
+    ```typescript
+    if (!LocalizationUtil.isEnglish(this.currentLanguage)) {
+      // 只在中文环境下显示朗读按钮
+      Image($r('app.media.icon_voice'))
+        // ...
+    }
+    ```
+  - **效果**：
+    - 中文环境：显示朗读按钮和分享按钮
+    - 英文环境：只显示分享按钮，隐藏朗读按钮
+    - 界面更加简洁，避免用户尝试使用不支持的功能
+
+- **应用语言初始化优化**：改进了应用首次安装时的语言检测和设置逻辑
+  - **首次安装**：自动检测系统语言并设置为应用默认语言
+    - 使用 `LocalizationUtil.getSystemLanguage()` 检测系统语言
+    - 将检测到的语言保存到 preferences 作为初始偏好
+    - 通过 `i18n.System.setAppPreferredLanguage()` 设置应用语言
+    - 同步到 `AppStorage` 供全局访问
+  - **后续启动**：使用用户保存的语言偏好设置
+    - 检查 preferences 中是否存在 'language' 键
+    - 如果存在，使用保存的语言偏好
+    - 如果不存在（首次安装），检测并保存系统语言
+  - **降级处理**：如果检测失败，默认使用中文
+  - **效果**：
+    - 英文系统用户首次安装后看到英文界面
+    - 中文系统用户首次安装后看到中文界面
+    - 用户手动切换语言后，应用记住用户的选择
+    - 所有页面和组件都能正确响应语言设置
+
+- **Connections 游戏主题本地化**：完成了 Connections 游戏中所有分组主题的完整本地化
+  - **问题**：切换应用语言后，分组主题名称仍然显示中文，其他元素正常显示英文
+  - **根本原因**：`getLocalizedTheme()` 使用 `resourceManager.getConfigurationSync()` 获取的是系统语言，而不是应用设置的语言
+  - **修复内容**：
+    - 创建独立的中英文主题名称映射表（`ThemeNamesCN` 和 `ThemeNamesEN`）
+    - 修改 `getLocalizedTheme()` 函数，从 `AppStorage.get('currentLanguage')` 获取应用当前语言
+    - 根据应用语言设置直接返回对应的主题名称映射
+    - 添加 47 个主题的中英文字符串资源（保留在资源文件中以供未来使用）
+  - **主题分类**：
+    - 地理区域：亚洲、欧洲、美洲、非洲及各子区域（东亚、南亚、北非等）
+    - 颜色分类：红色旗帜、绿色旗帜、蓝色旗帜、黄色旗帜
+    - 文化分类：盎格鲁-撒克逊旗帜、斯拉夫旗帜、北欧旗帜、阿拉伯旗帜
+    - 图案特征：太阳、新月和星星、动物、星星、树木或植物、王冠、武器等
+    - 国家特征：岛国、内陆国家、最大国家、小国、社会主义国家
+    - 设计特征：水平三色旗、垂直三色旗、对角条纹、双色旗帜、非矩形旗帜等
+    - 河流国家：尼罗河国家、亚马逊河国家、湄公河国家、多瑙河国家
+  - **效果**：Connections 游戏中的所有分组主题现在完全支持中英文，游戏体验更加国际化
+
 - **全面本地化审查和修复**：逐页、逐组件、逐 toast 审查并修复所有硬编码的中文字符串
   - **FakeFlagPlayPage 本地化修复**：
     - 修复 "加载中..." → 使用 `app.string.loading`

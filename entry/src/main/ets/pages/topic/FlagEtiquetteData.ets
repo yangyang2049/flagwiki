@@ -244,3 +244,4 @@ export function getLocalizedEtiquetteContent(language: string): EtiquetteSection
       contentEN: section.contentEN
    }));
 }
+

@@ -6,7 +6,7 @@
  * 1. 从维基百科页面 https://zh.wikipedia.org/wiki/各国国旗变迁时间轴 获取数据
  * 2. 解析表格中的图片链接和年份
  * 3. 下载图片并保存到 resources/base/media/ 目录
- * 4. 在 FlagHistoryData.ets 中添加数据条目
+ * 4. 在 utils/FlagHistoryData.ets 中添加数据条目
  * 
  * 注意：
  * - 此工具仅用于开发阶段预下载图片

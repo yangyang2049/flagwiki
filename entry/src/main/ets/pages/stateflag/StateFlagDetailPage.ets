@@ -44,8 +44,8 @@ struct StateFlagDetailPage {
   private currentLanguage: string = 'zh';
 
   async aboutToAppear() {
-    // 获取当前系统语言
-    this.currentLanguage = await LocalizationUtil.getSystemLanguage(this.context);
+    // 从 AppStorage 获取当前语言
+    this.currentLanguage = AppStorage.get<string>('currentLanguage') ?? 'zh';
     
     const params = router.getParams() as RouterParams;
     if (params && params.countryCode && params.stateCode) {
@@ -75,6 +75,26 @@ struct StateFlagDetailPage {
 
     // 检查是否需要显示复制提示
     this.checkAndShowCopyHint();
+  }
+  
+  private getStateName(): string {
+    if (!this.stateInfo) return '';
+    return LocalizationUtil.isEnglish(this.currentLanguage) ? this.stateInfo.name : this.stateInfo.nameCN;
+  }
+  
+  private getCapitalName(): string {
+    if (!this.stateInfo) return '';
+    return LocalizationUtil.isEnglish(this.currentLanguage) ? this.stateInfo.capital : this.stateInfo.capitalCN;
+  }
+  
+  private getRegionName(): string {
+    if (!this.stateInfo) return '';
+    return LocalizationUtil.isEnglish(this.currentLanguage) ? this.stateInfo.region : this.stateInfo.regionCN;
+  }
+  
+  private getCountryName(): string {
+    if (!this.countryData) return '';
+    return LocalizationUtil.isEnglish(this.currentLanguage) ? this.countryData.countryName : this.countryData.countryNameCN;
   }
 
   private async checkAndShowCopyHint(): Promise<void> {
@@ -267,7 +287,7 @@ struct StateFlagDetailPage {
     }
 
     const stateFlagText = this.context.resourceManager.getStringSync($r('app.string.state_flag').id);
-    const fileName = screenshotManager.generateFileName(stateFlagText, this.stateInfo.nameCN);
+    const fileName = screenshotManager.generateFileName(stateFlagText, this.getStateName());
     const success = await screenshotManager.saveToGallery(
       this.flagPixelMap,
       fileName,
@@ -337,7 +357,7 @@ struct StateFlagDetailPage {
 
             // 州名称（可复制）
             Column() {
-              Text(this.stateInfo.nameCN)
+              Text(this.getStateName())
                 .fontSize(28)
                 .fontWeight(FontWeight.Bold)
                 .fontColor($r('app.color.text_primary'))
@@ -373,11 +393,11 @@ struct StateFlagDetailPage {
                   .alignSelf(ItemAlign.Start)
                   .margin({ bottom: 16 })
 
-                this.InfoRow(this.context.resourceManager.getStringSync($r('app.string.belongs_to_country').id), `${this.countryData.countryEmoji} ${this.countryData.countryNameCN}`)
+                this.InfoRow(this.context.resourceManager.getStringSync($r('app.string.belongs_to_country').id), `${this.countryData.countryEmoji} ${this.getCountryName()}`)
                 Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.InfoRow(this.context.resourceManager.getStringSync($r('app.string.capital').id), this.stateInfo.capitalCN)
+                this.InfoRow(this.context.resourceManager.getStringSync($r('app.string.capital').id), this.getCapitalName())
                 Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.InfoRow(this.context.resourceManager.getStringSync($r('app.string.region').id), this.stateInfo.regionCN)
+                this.InfoRow(this.context.resourceManager.getStringSync($r('app.string.region').id), this.getRegionName())
               }
               .padding(20)
               .layoutWeight(1)
@@ -451,7 +471,7 @@ struct StateFlagDetailPage {
         .backgroundColor($r('app.color.bg_page'))
       }
     }
-    .title(this.stateInfo?.nameCN || this.context.resourceManager.getStringSync($r('app.string.state_flag_detail').id))
+    .title('')
     .titleMode(NavigationTitleMode.Mini)
     .backgroundColor($r('app.color.bg_page'))
     .menus(this.MenuBuilder)
@@ -494,12 +514,15 @@ struct StateFlagDetailPage {
   @Builder
   MenuBuilder() {
     Row({ space: 20 }) {
-      Image($r('app.media.icon_voice'))
-        .width(24)
-        .height(24)
-        .onClick(() => {
-          this.onReadClick();
-        })
+      // 只在中文环境下显示朗读按钮
+      if (!LocalizationUtil.isEnglish(this.currentLanguage)) {
+        Image($r('app.media.icon_voice'))
+          .width(24)
+          .height(24)
+          .onClick(() => {
+            this.onReadClick();
+          })
+      }
 
       Image($r('app.media.icon_share'))
         .width(22)
@@ -531,7 +554,7 @@ struct StateFlagDetailPage {
 
         // 州名称
         Column() {
-          Text(this.stateInfo.nameCN)
+          Text(this.getStateName())
             .fontSize(28)
             .fontWeight(FontWeight.Bold)
             .fontColor($r('app.color.text_primary'))
@@ -557,11 +580,11 @@ struct StateFlagDetailPage {
               .alignSelf(ItemAlign.Start)
               .margin({ bottom: 16 })
 
-            this.InfoRow(this.context.resourceManager.getStringSync($r('app.string.belongs_to_country').id), `${this.countryData.countryEmoji} ${this.countryData.countryNameCN}`)
+            this.InfoRow(this.context.resourceManager.getStringSync($r('app.string.belongs_to_country').id), `${this.countryData.countryEmoji} ${this.getCountryName()}`)
             Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoRow(this.context.resourceManager.getStringSync($r('app.string.capital').id), this.stateInfo.capitalCN)
+            this.InfoRow(this.context.resourceManager.getStringSync($r('app.string.capital').id), this.getCapitalName())
             Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoRow(this.context.resourceManager.getStringSync($r('app.string.region').id), this.stateInfo.regionCN)
+            this.InfoRow(this.context.resourceManager.getStringSync($r('app.string.region').id), this.getRegionName())
           }
           .padding(20)
           .layoutWeight(1)
@@ -783,11 +806,21 @@ struct StateFlagDetailPage {
     }
 
     const lines: string[] = [];
-    lines.push(`🏳️ ${this.stateInfo.nameCN} (${this.stateInfo.name})`);
-    lines.push('');
-    lines.push(`📍 所属国家：${this.countryData.countryEmoji} ${this.countryData.countryNameCN}`);
-    lines.push(`🏛️ 首府：${this.stateInfo.capitalCN}`);
-    lines.push(`🌍 地区：${this.stateInfo.regionCN}`);
+    const isEnglish = LocalizationUtil.isEnglish(this.currentLanguage);
+    
+    if (isEnglish) {
+      lines.push(`🏳️ ${this.getStateName()} (${this.stateInfo.nameCN})`);
+      lines.push('');
+      lines.push(`📍 Country: ${this.countryData.countryEmoji} ${this.getCountryName()}`);
+      lines.push(`🏛️ Capital: ${this.getCapitalName()}`);
+      lines.push(`🌍 Region: ${this.getRegionName()}`);
+    } else {
+      lines.push(`🏳️ ${this.getStateName()} (${this.stateInfo.name})`);
+      lines.push('');
+      lines.push(`📍 所属国家：${this.countryData.countryEmoji} ${this.getCountryName()}`);
+      lines.push(`🏛️ 首府：${this.getCapitalName()}`);
+      lines.push(`🌍 地区：${this.getRegionName()}`);
+    }
     lines.push('');
     lines.push('—— 来自「国旗小百科」');
 

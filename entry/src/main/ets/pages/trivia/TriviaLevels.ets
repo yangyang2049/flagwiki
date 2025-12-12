@@ -313,3 +313,4 @@ export function getTriviaLevel(levelId: number, context?: common.UIAbilityContex
 export function getTotalTriviaLevels(): number {
   return triviaQuestionsCN.length;
 }
+

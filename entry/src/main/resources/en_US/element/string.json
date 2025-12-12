@@ -442,7 +442,7 @@
     },
     {
       "name": "follow_system",
-      "value": "Follow System"
+      "value": "System Default"
     },
     {
       "name": "light",
@@ -678,7 +678,7 @@
     },
     {
       "name": "flag_history",
-      "value": "Flag History"
+      "value": "flag history"
     },
     {
       "name": "current",
@@ -1083,6 +1083,242 @@
     {
       "name": "flag_default_description",
       "value": "The flag of %s is an important symbol of the country, representing its history, culture, and values."
+    },
+    {
+      "name": "connectionsAsia",
+      "value": "Asia"
+    },
+    {
+      "name": "connectionsEurope",
+      "value": "Europe"
+    },
+    {
+      "name": "connectionsAmericas",
+      "value": "Americas"
+    },
+    {
+      "name": "connectionsAfrica",
+      "value": "Africa"
+    },
+    {
+      "name": "connectionsRedFlags",
+      "value": "Red Flags"
+    },
+    {
+      "name": "connectionsGreenFlags",
+      "value": "Green Flags"
+    },
+    {
+      "name": "connectionsBlueFlags",
+      "value": "Blue Flags"
+    },
+    {
+      "name": "connectionsYellowFlags",
+      "value": "Yellow Flags"
+    },
+    {
+      "name": "connectionsAngloSaxonFlags",
+      "value": "Anglo-Saxon Flags"
+    },
+    {
+      "name": "connectionsSlavicFlags",
+      "value": "Slavic Flags"
+    },
+    {
+      "name": "connectionsNordicFlags",
+      "value": "Nordic Flags"
+    },
+    {
+      "name": "connectionsArabFlags",
+      "value": "Arab Flags"
+    },
+    {
+      "name": "connectionsEastAsia",
+      "value": "East Asia"
+    },
+    {
+      "name": "connectionsSouthAsia",
+      "value": "South Asia"
+    },
+    {
+      "name": "connectionsWestAsia",
+      "value": "West Asia"
+    },
+    {
+      "name": "connectionsSoutheastAsia",
+      "value": "Southeast Asia"
+    },
+    {
+      "name": "connectionsNorthAfrica",
+      "value": "North Africa"
+    },
+    {
+      "name": "connectionsEastAfrica",
+      "value": "East Africa"
+    },
+    {
+      "name": "connectionsSouthAfrica",
+      "value": "South Africa"
+    },
+    {
+      "name": "connectionsWestAfrica",
+      "value": "West Africa"
+    },
+    {
+      "name": "connectionsNorthEurope",
+      "value": "North Europe"
+    },
+    {
+      "name": "connectionsEastEurope",
+      "value": "East Europe"
+    },
+    {
+      "name": "connectionsWestEurope",
+      "value": "West Europe"
+    },
+    {
+      "name": "connectionsSouthEurope",
+      "value": "South Europe"
+    },
+    {
+      "name": "connectionsSocialismCountries",
+      "value": "Socialism Countries"
+    },
+    {
+      "name": "connectionsSun",
+      "value": "Sun"
+    },
+    {
+      "name": "connectionsCrescentAndStar",
+      "value": "Crescent and Star"
+    },
+    {
+      "name": "connectionsAnimal",
+      "value": "Animal"
+    },
+    {
+      "name": "connectionsPanAfricanColors",
+      "value": "Pan-African Colors"
+    },
+    {
+      "name": "connectionsIslandCountries",
+      "value": "Island Countries"
+    },
+    {
+      "name": "connectionsLandlockedCountries",
+      "value": "Landlocked Countries"
+    },
+    {
+      "name": "connectionsBiggestCountries",
+      "value": "Biggest Countries"
+    },
+    {
+      "name": "connectionsFlagsWithManyStripes",
+      "value": "Flags with Many Stripes"
+    },
+    {
+      "name": "connectionsTwoColorFlags",
+      "value": "Two-Color Flags"
+    },
+    {
+      "name": "connectionsFlagsWithWeapons",
+      "value": "Flags with Weapons"
+    },
+    {
+      "name": "connectionsTinyCountries",
+      "value": "Tiny Countries"
+    },
+    {
+      "name": "connectionsFlagsWithStars",
+      "value": "Flags with Stars"
+    },
+    {
+      "name": "connectionsFlagsWithTreesOrPlants",
+      "value": "Flags with Trees or Plants"
+    },
+    {
+      "name": "connectionsFlagsWithCrowns",
+      "value": "Flags with Crowns"
+    },
+    {
+      "name": "connectionsFlagsWithSouthernCross",
+      "value": "Flags with the Southern Cross"
+    },
+    {
+      "name": "connectionsNonRectangularFlags",
+      "value": "Non-Rectangular Flags"
+    },
+    {
+      "name": "connectionsHorizontalTribands",
+      "value": "Horizontal Tribands"
+    },
+    {
+      "name": "connectionsVerticalTribands",
+      "value": "Vertical Tribands"
+    },
+    {
+      "name": "connectionsDiagonalStripes",
+      "value": "Diagonal Stripes"
+    },
+    {
+      "name": "connectionsNileRiverCountries",
+      "value": "Nile River Countries"
+    },
+    {
+      "name": "connectionsAmazonRiverCountries",
+      "value": "Amazon River Countries"
+    },
+    {
+      "name": "connectionsMekongRiverCountries",
+      "value": "Mekong River Countries"
+    },
+    {
+      "name": "connectionsDanubeRiverCountries",
+      "value": "Danube River Countries"
+    },
+    {
+      "name": "state_count_jp",
+      "value": "47 Prefectures"
+    },
+    {
+      "name": "state_count_us",
+      "value": "50 States"
+    },
+    {
+      "name": "state_count_de",
+      "value": "16 States"
+    },
+    {
+      "name": "state_count_au",
+      "value": "9 States"
+    },
+    {
+      "name": "state_count_br",
+      "value": "27 States"
+    },
+    {
+      "name": "state_count_ca",
+      "value": "13 Provinces"
+    },
+    {
+      "name": "state_count_kr",
+      "value": "17 Administrative Divisions"
+    },
+    {
+      "name": "state_count_ch",
+      "value": "26 Cantons"
+    },
+    {
+      "name": "state_count_gb",
+      "value": "4 Countries"
+    },
+    {
+      "name": "state_count_it",
+      "value": "20 Regions"
+    },
+    {
+      "name": "state_count_es",
+      "value": "17 Autonomous Communities"
     }
   ]
 }

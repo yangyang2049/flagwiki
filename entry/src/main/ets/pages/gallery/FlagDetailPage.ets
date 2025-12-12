@@ -772,12 +772,15 @@ interface RouterParams {
   @Builder
   MenuBuilder() {
     Row({ space: 20 }) {
-      Image($r('app.media.icon_voice'))
-        .width(24)
-        .height(24)
-        .onClick(() => {
-          this.onReadClick();
-        })
+      // 只在中文环境下显示朗读按钮
+      if (!LocalizationUtil.isEnglish(this.currentLanguage)) {
+        Image($r('app.media.icon_voice'))
+          .width(24)
+          .height(24)
+          .onClick(() => {
+            this.onReadClick();
+          })
+      }
 
       Image($r('app.media.icon_share'))
         .width(22)

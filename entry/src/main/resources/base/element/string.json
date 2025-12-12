@@ -1083,6 +1083,242 @@
     {
       "name": "flag_default_description",
       "value": "%s的国旗是这个国家的重要象征，代表着国家的历史、文化和价值观。"
+    },
+    {
+      "name": "connectionsAsia",
+      "value": "亚洲"
+    },
+    {
+      "name": "connectionsEurope",
+      "value": "欧洲"
+    },
+    {
+      "name": "connectionsAmericas",
+      "value": "美洲"
+    },
+    {
+      "name": "connectionsAfrica",
+      "value": "非洲"
+    },
+    {
+      "name": "connectionsRedFlags",
+      "value": "红色旗帜"
+    },
+    {
+      "name": "connectionsGreenFlags",
+      "value": "绿色旗帜"
+    },
+    {
+      "name": "connectionsBlueFlags",
+      "value": "蓝色旗帜"
+    },
+    {
+      "name": "connectionsYellowFlags",
+      "value": "黄色旗帜"
+    },
+    {
+      "name": "connectionsAngloSaxonFlags",
+      "value": "盎格鲁-撒克逊旗帜"
+    },
+    {
+      "name": "connectionsSlavicFlags",
+      "value": "斯拉夫旗帜"
+    },
+    {
+      "name": "connectionsNordicFlags",
+      "value": "北欧旗帜"
+    },
+    {
+      "name": "connectionsArabFlags",
+      "value": "阿拉伯旗帜"
+    },
+    {
+      "name": "connectionsEastAsia",
+      "value": "东亚"
+    },
+    {
+      "name": "connectionsSouthAsia",
+      "value": "南亚"
+    },
+    {
+      "name": "connectionsWestAsia",
+      "value": "西亚"
+    },
+    {
+      "name": "connectionsSoutheastAsia",
+      "value": "东南亚"
+    },
+    {
+      "name": "connectionsNorthAfrica",
+      "value": "北非"
+    },
+    {
+      "name": "connectionsEastAfrica",
+      "value": "东非"
+    },
+    {
+      "name": "connectionsSouthAfrica",
+      "value": "南非"
+    },
+    {
+      "name": "connectionsWestAfrica",
+      "value": "西非"
+    },
+    {
+      "name": "connectionsNorthEurope",
+      "value": "北欧"
+    },
+    {
+      "name": "connectionsEastEurope",
+      "value": "东欧"
+    },
+    {
+      "name": "connectionsWestEurope",
+      "value": "西欧"
+    },
+    {
+      "name": "connectionsSouthEurope",
+      "value": "南欧"
+    },
+    {
+      "name": "connectionsSocialismCountries",
+      "value": "社会主义国家"
+    },
+    {
+      "name": "connectionsSun",
+      "value": "太阳"
+    },
+    {
+      "name": "connectionsCrescentAndStar",
+      "value": "新月和星星"
+    },
+    {
+      "name": "connectionsAnimal",
+      "value": "动物"
+    },
+    {
+      "name": "connectionsPanAfricanColors",
+      "value": "泛非颜色"
+    },
+    {
+      "name": "connectionsIslandCountries",
+      "value": "岛国"
+    },
+    {
+      "name": "connectionsLandlockedCountries",
+      "value": "内陆国家"
+    },
+    {
+      "name": "connectionsBiggestCountries",
+      "value": "最大国家"
+    },
+    {
+      "name": "connectionsFlagsWithManyStripes",
+      "value": "多条纹旗帜"
+    },
+    {
+      "name": "connectionsTwoColorFlags",
+      "value": "双色旗帜"
+    },
+    {
+      "name": "connectionsFlagsWithWeapons",
+      "value": "带武器旗帜"
+    },
+    {
+      "name": "connectionsTinyCountries",
+      "value": "小国"
+    },
+    {
+      "name": "connectionsFlagsWithStars",
+      "value": "带星星旗帜"
+    },
+    {
+      "name": "connectionsFlagsWithTreesOrPlants",
+      "value": "带树木或植物旗帜"
+    },
+    {
+      "name": "connectionsFlagsWithCrowns",
+      "value": "带王冠旗帜"
+    },
+    {
+      "name": "connectionsFlagsWithSouthernCross",
+      "value": "带南十字星旗帜"
+    },
+    {
+      "name": "connectionsNonRectangularFlags",
+      "value": "非矩形旗帜"
+    },
+    {
+      "name": "connectionsHorizontalTribands",
+      "value": "水平三色旗"
+    },
+    {
+      "name": "connectionsVerticalTribands",
+      "value": "垂直三色旗"
+    },
+    {
+      "name": "connectionsDiagonalStripes",
+      "value": "对角条纹"
+    },
+    {
+      "name": "connectionsNileRiverCountries",
+      "value": "尼罗河国家"
+    },
+    {
+      "name": "connectionsAmazonRiverCountries",
+      "value": "亚马逊河国家"
+    },
+    {
+      "name": "connectionsMekongRiverCountries",
+      "value": "湄公河国家"
+    },
+    {
+      "name": "connectionsDanubeRiverCountries",
+      "value": "多瑙河国家"
+    },
+    {
+      "name": "state_count_jp",
+      "value": "47 个都道府县"
+    },
+    {
+      "name": "state_count_us",
+      "value": "50 个州"
+    },
+    {
+      "name": "state_count_de",
+      "value": "16 个州"
+    },
+    {
+      "name": "state_count_au",
+      "value": "9 个州"
+    },
+    {
+      "name": "state_count_br",
+      "value": "27 个州"
+    },
+    {
+      "name": "state_count_ca",
+      "value": "13 个省"
+    },
+    {
+      "name": "state_count_kr",
+      "value": "17 个行政区"
+    },
+    {
+      "name": "state_count_ch",
+      "value": "26 个州"
+    },
+    {
+      "name": "state_count_gb",
+      "value": "4 个地区"
+    },
+    {
+      "name": "state_count_it",
+      "value": "20 个大区"
+    },
+    {
+      "name": "state_count_es",
+      "value": "17 个自治区"
     }
   ]
 }
