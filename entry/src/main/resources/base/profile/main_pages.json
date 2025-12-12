@@ -16,6 +16,8 @@
     "pages/topic/TopicDetailPage",
     "pages/memory/MemoryLevelsPage",
     "pages/memory/MemoryPlayPage",
+    "pages/connections/ConnectionsLevelsPage",
+    "pages/connections/ConnectionsPlayPage",
     "pages/explore/HeadsUpPlayPage",
     "pages/stateflag/StateFlagCountryListPage",
     "pages/stateflag/StateFlagGalleryPage",

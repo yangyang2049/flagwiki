@@ -206,12 +206,17 @@ interface RouterParams {
   }
 
   private showGameOver(): void {
+    const challengeFailed = this.context.resourceManager.getStringSync($r('app.string.challenge_failed').id);
+    const correctFoundText = this.context.resourceManager.getStringSync($r('app.string.correct_found_count').id, this.correctAnswers.toString());
+    const backText = this.context.resourceManager.getStringSync($r('app.string.back').id);
+    const restartText = this.context.resourceManager.getStringSync($r('app.string.restart').id);
+    
     promptAction.showDialog({
-      title: '挑战失败',
-      message: `正确找出了 ${this.correctAnswers} 个假旗`,
+      title: challengeFailed,
+      message: correctFoundText,
       buttons: [
-        { text: '返回', color: '#666666' },
-        { text: '重新开始', color: '#1677FF' }
+        { text: backText, color: '#666666' },
+        { text: restartText, color: '#1677FF' }
       ]
     }).then((result) => {
       if (result.index === 0) {
@@ -344,7 +349,7 @@ interface RouterParams {
           Column() {
             // 顶部状态栏
             Row() {
-              Text(`第 ${this.level?.id} 关`)
+              Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString()))
                 .fontSize(15)
                 .fontWeight(FontWeight.Medium)
                 .fontColor($r('app.color.text_secondary'))
@@ -371,7 +376,7 @@ interface RouterParams {
               .padding({ left: 20, right: 20, top: 12, bottom: 12 })
 
             // 提示文字
-            Text('找出假旗')
+            Text(this.context.resourceManager.getStringSync($r('app.string.find_fake_flag').id))
               .fontSize(20)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
@@ -387,7 +392,7 @@ interface RouterParams {
             .backgroundColor($r('app.color.bg_page'))
         } else {
           Column() {
-            Text('加载中...')
+            Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
               .fontSize(16)
               .fontColor($r('app.color.text_tertiary'))
           }
@@ -531,7 +536,9 @@ interface RouterParams {
         .width('90%')
 
         // 按钮
-        Button(this.currentIndex < (this.level?.questions.length || 0) - 1 ? '下一题' : '查看结果')
+        Button(this.currentIndex < (this.level?.questions.length || 0) - 1 
+          ? this.context.resourceManager.getStringSync($r('app.string.next_question').id)
+          : this.context.resourceManager.getStringSync($r('app.string.view_results').id))
           .width('90%')
           .height(44)
           .fontSize(16)
@@ -604,20 +611,20 @@ interface RouterParams {
         .fontSize(64)
         .margin({ top: 60 })
 
-      Text('恭喜过关！')
+      Text($r('app.string.congratulations'))
         .fontSize(28)
         .fontWeight(FontWeight.Bold)
         .fontColor($r('app.color.text_primary'))
         .margin({ top: 24 })
 
-      Text(`第 ${this.level?.id} 关 · ${this.level?.name}`)
+      Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString()))
         .fontSize(16)
         .fontColor($r('app.color.text_secondary'))
         .margin({ top: 8 })
 
       Column() {
         Row() {
-          Text('正确找出')
+          Text(this.context.resourceManager.getStringSync($r('app.string.correct_found').id))
             .fontSize(16)
             .fontColor($r('app.color.text_secondary'))
           Blank()
@@ -632,7 +639,7 @@ interface RouterParams {
         Divider().color($r('app.color.gray_very_light'))
 
         Row() {
-          Text('剩余生命')
+          Text(this.context.resourceManager.getStringSync($r('app.string.remaining_lives').id))
             .fontSize(16)
             .fontColor($r('app.color.text_secondary'))
           Blank()
@@ -652,7 +659,7 @@ interface RouterParams {
 
       Blank()
 
-      Button('返回关卡列表')
+      Button(this.context.resourceManager.getStringSync($r('app.string.back_to_levels').id))
         .width('80%')
         .height(48)
         .fontSize(17)
@@ -663,7 +670,7 @@ interface RouterParams {
           router.back();
         })
 
-      Button(this.level && this.level.id < getAllFakeFlagLevels().length ? '下一关' : '完美收官')
+      Button(this.level && this.level.id < getAllFakeFlagLevels().length ? $r('app.string.next_level') : $r('app.string.perfect_finish'))
         .width('80%')
         .height(48)
         .fontSize(17)

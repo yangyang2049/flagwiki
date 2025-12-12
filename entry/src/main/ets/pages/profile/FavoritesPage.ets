@@ -30,7 +30,7 @@ export struct FavoritesPage {
     await this.loadFavorites();
     try {
       promptAction.showToast({
-        message: '已取消收藏',
+        message: $r('app.string.favorite_removed'),
         duration: 2000
       });
     } catch (err) {
@@ -62,7 +62,7 @@ export struct FavoritesPage {
       }, router.RouterMode.Standard).catch((err: Error) => {
         console.error(`Failed to push url. Code: ${err.message}`);
         promptAction.showToast({
-          message: '导航失败',
+          message: $r('app.string.navigation_failed'),
           duration: 2000
         });
       });
@@ -82,7 +82,7 @@ export struct FavoritesPage {
       }, router.RouterMode.Standard).catch((err: Error) => {
         console.error(`Failed to push url. Code: ${err.message}`);
         promptAction.showToast({
-          message: '导航失败',
+          message: $r('app.string.navigation_failed'),
           duration: 2000
         });
       });
@@ -99,7 +99,7 @@ export struct FavoritesPage {
         }, router.RouterMode.Standard).catch((err: Error) => {
           console.error(`Failed to push url. Code: ${err.message}`);
           promptAction.showToast({
-            message: '导航失败',
+            message: $r('app.string.navigation_failed'),
             duration: 2000
           });
         });
@@ -111,7 +111,7 @@ export struct FavoritesPage {
       }, router.RouterMode.Standard).catch((err: Error) => {
         console.error(`Failed to push url. Code: ${err.message}`);
         promptAction.showToast({
-          message: '导航失败',
+          message: $r('app.string.navigation_failed'),
           duration: 2000
         });
       });
@@ -147,7 +147,7 @@ export struct FavoritesPage {
     Navigation() {
       if (this.favorites.length === 0) {
         Column() {
-          Text('暂无收藏')
+          Text($r('app.string.no_favorites'))
             .fontSize(16)
             .fontColor($r('app.color.text_tertiary'))
             .margin({ top: 100 })
@@ -187,7 +187,7 @@ export struct FavoritesPage {
                   .layoutWeight(1)
                 if (this.isEditMode) {
                   Button() {
-                    Text('删除')
+                    Text($r('app.string.delete'))
                       .fontSize(14)
                       .fontColor($r('app.color.color_red'))
                   }
@@ -220,7 +220,7 @@ export struct FavoritesPage {
         .margin({ top: 16 })
       }
     }
-    .title('我的收藏')
+    .title($r('app.string.my_favorites'))
     .titleMode(NavigationTitleMode.Mini)
     .hideBackButton(false)
     .backgroundColor($r('app.color.bg_page'))

@@ -7,13 +7,16 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { image } from '@kit.ImageKit';
 import fs from '@ohos.file.fs';
 import { fileUri } from '@kit.CoreFileKit';
-import { Country, getCountryByCode, FlagDesign, getFlagDesign, getFlagImageSource, InternationalOrg, getInternationalOrgByCode, isInternationalOrg } from '../../utils/countryData';
+import { pasteboard } from '@kit.BasicServicesKit';
+import { PreferencesManager } from '../../utils/PreferencesManager';
+import { Country, getCountryByCode, FlagDesign, getFlagDesign, getFlagImageSource, InternationalOrg, getInternationalOrgByCode, isInternationalOrg, getLocalizedCountryName, getLocalizedCapital, getLocalizedRegionName, getLocalizedFlagDesign, getLocalizedOrgName, getLocalizedOrgHeadquarters } from '../../utils/countryData';
 import { TextReaderUtil } from '../../utils/TextReaderUtil';
 import { screenshotManager } from '../../utils/ScreenshotManager';
 import { SaveFlagDialog } from '../../components/SaveFlagDialog';
 import { FavoritesManager } from '../../utils/favoritesManager';
 import { getCoatOfArmsImageSource } from '../../utils/coatOfArmsUtil';
 import { getFlagHistory, FlagHistoryItem } from '../../utils/FlagHistoryData';
+import { LocalizationUtil } from '../../utils/LocalizationUtil';
 
 interface RouterParams {
   countryCode: string;
@@ -32,11 +35,14 @@ interface RouterParams {
   @State coatOfArmsResource: Resource | null = null;
   @State flagHistoryItems: FlagHistoryItem[] = [];
   @State sharePixelMap: image.PixelMap | null = null;
+  @State showCopyHint: boolean = false;
   private context = getContext(this) as common.UIAbilityContext;
   private readonly FLAG_CONTAINER_ID = 'flagImageContainer';
   private readonly FLAG_DOWNLOAD_CONTAINER_ID = 'flagDownloadContainer';
   private readonly SHARE_CONTAINER_ID = 'flagShareContainer';
+  private readonly COPY_HINT_PREF_KEY = 'detail_page_copy_hint_shown';
   private countryCode: string = '';
+  @StorageLink('currentLanguage') currentLanguage: string = 'zh';
 
   // 保存对话框控制器
   private saveDialogController: CustomDialogController = new CustomDialogController({
@@ -47,14 +53,14 @@ interface RouterParams {
       },
       onSaveSuccess: () => {
         promptAction.showToast({
-          message: '国旗图片已保存到相册',
+          message: $r('app.string.flag_saved'),
           duration: 2000
         });
         this.releaseFlagPixelMap();
       },
       onSaveError: (error: Error) => {
         promptAction.showToast({
-          message: `保存失败: ${error.message}`,
+          message: this.context.resourceManager.getStringSync($r('app.string.save_failed').id),
           duration: 2000
         });
         this.releaseFlagPixelMap();
@@ -68,6 +74,8 @@ interface RouterParams {
   });
 
   async aboutToAppear() {
+    // 获取当前系统语言（已通过 @StorageLink 自动同步）
+    
     const params = router.getParams() as RouterParams;
     if (params && params.countryCode) {
       this.countryCode = params.countryCode;
@@ -101,6 +109,54 @@ interface RouterParams {
     if (this.country) {
       this.loadCoatOfArms();
     }
+
+    // 检查是否需要显示复制提示
+    this.checkAndShowCopyHint();
+  }
+
+  private async checkAndShowCopyHint(): Promise<void> {
+    try {
+      const prefs = await PreferencesManager.getPreferences('app_settings');
+      const hintShown = await prefs.get(this.COPY_HINT_PREF_KEY, false);
+      if (!hintShown) {
+        // 延迟显示，确保页面已加载
+        setTimeout(() => {
+          this.showCopyHint = true;
+        }, 500);
+      }
+    } catch (err) {
+      console.error('[FlagDetailPage] Failed to check copy hint:', err);
+    }
+  }
+
+  private async dismissCopyHint(): Promise<void> {
+    this.showCopyHint = false;
+    try {
+      const prefs = await PreferencesManager.getPreferences('app_settings');
+      await prefs.put(this.COPY_HINT_PREF_KEY, true);
+      await prefs.flush();
+    } catch (err) {
+      console.error('[FlagDetailPage] Failed to save copy hint preference:', err);
+    }
+  }
+
+  private async copyToClipboard(text: string): Promise<void> {
+    try {
+      const pasteData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, text);
+      const systemPasteboard = pasteboard.getSystemPasteboard();
+      await systemPasteboard.setData(pasteData);
+      
+        promptAction.showToast({
+          message: $r('app.string.copied'),
+          duration: 1500
+        });
+    } catch (err) {
+      console.error('[FlagDetailPage] Failed to copy to clipboard:', err);
+      promptAction.showToast({
+        message: $r('app.string.copy_failed'),
+        duration: 2000
+      });
+    }
   }
 
   /**
@@ -122,21 +178,26 @@ interface RouterParams {
   }
 
   private async toggleFavorite(): Promise<void> {
-    const name = this.internationalOrg?.nameCN || this.country?.nameCN || '未知';
+    let name = this.context.resourceManager.getStringSync($r('app.string.unknown').id);
+    if (this.internationalOrg) {
+      name = getLocalizedOrgName(this.internationalOrg, this.currentLanguage);
+    } else if (this.country) {
+      name = getLocalizedCountryName(this.country, this.currentLanguage);
+    }
     const pageUrl = `flag:${this.countryCode}`;
 
     if (this.isFavorite) {
       await FavoritesManager.removeFavorite(pageUrl);
       this.isFavorite = false;
       promptAction.showToast({
-        message: '已取消收藏',
+        message: $r('app.string.favorited'),
         duration: 2000
       });
     } else {
       await FavoritesManager.addFavorite({ name: name, pageUrl: pageUrl });
       this.isFavorite = true;
       promptAction.showToast({
-        message: '已添加到收藏',
+        message: $r('app.string.favorited'),
         duration: 2000
       });
     }
@@ -169,7 +230,7 @@ interface RouterParams {
 
     try {
       promptAction.showToast({
-        message: '正在准备图片...',
+        message: $r('app.string.preparing_image'),
         duration: 1000
       });
 
@@ -189,7 +250,7 @@ interface RouterParams {
       const pixmap = await screenshotManager.captureSnapshot(this.FLAG_CONTAINER_ID);
       if (!pixmap) {
         promptAction.showToast({
-          message: '截取图片失败',
+          message: this.context.resourceManager.getStringSync($r('app.string.screenshot_failed').id),
           duration: 2000
         });
         return;
@@ -206,13 +267,13 @@ interface RouterParams {
           },
           onSaveSuccess: () => {
             promptAction.showToast({
-              message: '国旗图片已保存到相册',
+              message: this.context.resourceManager.getStringSync($r('app.string.flag_saved').id),
               duration: 2000
             });
           },
           onSaveError: (error: Error) => {
             promptAction.showToast({
-              message: `保存失败: ${error.message}`,
+              message: this.context.resourceManager.getStringSync($r('app.string.save_failed_with_error').id, error.message),
               duration: 2000
             });
             this.releaseFlagPixelMap();
@@ -229,7 +290,7 @@ interface RouterParams {
     } catch (error) {
       console.error('[FlagDetailPage] Download error:', error);
       promptAction.showToast({
-        message: '下载失败',
+        message: this.context.resourceManager.getStringSync($r('app.string.download_failed').id),
         duration: 2000
       });
     }
@@ -240,8 +301,14 @@ interface RouterParams {
       throw new Error('图片或组织信息不存在');
     }
 
-    const name = this.internationalOrg?.nameCN || this.country?.nameCN || '未知';
-    const fileName = screenshotManager.generateFileName('旗帜', name);
+    let name = this.context.resourceManager.getStringSync($r('app.string.unknown').id);
+    if (this.internationalOrg) {
+      name = getLocalizedOrgName(this.internationalOrg, this.currentLanguage);
+    } else if (this.country) {
+      name = getLocalizedCountryName(this.country, this.currentLanguage);
+    }
+    const flagText = this.context.resourceManager.getStringSync($r('app.string.flag').id);
+    const fileName = screenshotManager.generateFileName(flagText, name);
     const success = await screenshotManager.saveToGallery(
       this.flagPixelMap,
       fileName,
@@ -305,9 +372,9 @@ interface RouterParams {
             .padding(16)
             .id(this.FLAG_CONTAINER_ID)
 
-          // 组织名称
+          // 组织名称（可复制）
           Column() {
-            Text(this.internationalOrg.nameCN)
+            Text(getLocalizedOrgName(this.internationalOrg, this.currentLanguage))
               .fontSize(28)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
@@ -315,13 +382,23 @@ interface RouterParams {
               .maxLines(2)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
               .margin({ bottom: 4 })
+              .onClick(() => {
+                if (this.internationalOrg) {
+                  this.copyToClipboard(getLocalizedOrgName(this.internationalOrg, this.currentLanguage));
+                }
+              })
 
-            Text(this.internationalOrg.name)
+            Text(LocalizationUtil.isEnglish(this.currentLanguage) ? this.internationalOrg.nameCN : this.internationalOrg.name)
               .fontSize(16)
               .fontColor($r('app.color.text_secondary'))
               .textAlign(TextAlign.Center)
               .maxLines(2)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .onClick(() => {
+                if (this.internationalOrg) {
+                  this.copyToClipboard(LocalizationUtil.isEnglish(this.currentLanguage) ? this.internationalOrg.nameCN : this.internationalOrg.name);
+                }
+              })
           }
           .width('100%')
             .padding({ left: 16, right: 16, top: 20, bottom: 16 })
@@ -330,27 +407,27 @@ interface RouterParams {
           // 基本信息卡片
           Row() {
             Column() {
-              Text('基本信息')
+              Text(this.context.resourceManager.getStringSync($r('app.string.basic_info').id))
                 .fontSize(16)
                 .fontWeight(FontWeight.Bold)
                 .fontColor($r('app.color.text_primary'))
                 .margin({ bottom: 16 })
                 .alignSelf(ItemAlign.Start)
 
-              this.InfoItem('总部', this.internationalOrg.headquartersCN)
+              this.InfoItem($r('app.string.headquarters'), getLocalizedOrgHeadquarters(this.internationalOrg, this.currentLanguage))
               Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-              this.InfoItem('地区', this.internationalOrg.region)
+              this.InfoItem($r('app.string.region'), getLocalizedRegionName(this.internationalOrg.region, this.currentLanguage))
               Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-              this.InfoItem('组织类型', this.internationalOrg.orgTypeCN)
+              this.InfoItem($r('app.string.org_type'), LocalizationUtil.isEnglish(this.currentLanguage) ? this.internationalOrg.orgType : this.internationalOrg.orgTypeCN)
               Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-              this.InfoItem('覆盖人口', this.formatPopulation(this.internationalOrg.population))
+              this.InfoItem(this.context.resourceManager.getStringSync($r('app.string.coverage_population').id), this.formatPopulation(this.internationalOrg.population))
               if (this.internationalOrg.website) {
                 Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.InfoItem('网站', this.internationalOrg.website)
+                this.InfoItem(this.context.resourceManager.getStringSync($r('app.string.website').id), this.internationalOrg.website)
               }
               if (this.internationalOrg.description) {
                 Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.DescriptionItem('简介', this.internationalOrg.description)
+                this.DescriptionItem($r('app.string.description'), this.internationalOrg.description, true)
               }
             }
           .padding(16)
@@ -370,7 +447,7 @@ interface RouterParams {
                 Image(this.isFavorite ? $r('app.media.icon_favorite_selected') : $r('app.media.icon_favorite'))
                   .width(20)
                   .height(20)
-                Text(this.isFavorite ? '已收藏' : '收藏')
+                Text(this.isFavorite ? $r('app.string.favorited') : $r('app.string.favorite'))
                   .fontSize(15)
                   .fontColor(this.isFavorite ? $r('app.color.button_primary') : $r('app.color.text_primary'))
               }
@@ -389,7 +466,7 @@ interface RouterParams {
                 Image($r('app.media.icon_download'))
                   .width(20)
                   .height(20)
-                Text('下载')
+                Text($r('app.string.download'))
                   .fontSize(15)
                   .fontColor($r('app.color.text_primary'))
               }
@@ -417,7 +494,8 @@ interface RouterParams {
   }
 
   build() {
-    Navigation() {
+    Stack() {
+      Navigation() {
       if (this.internationalOrg) {
         this.buildInternationalOrgPage()
       } else if (this.country) {
@@ -458,9 +536,9 @@ interface RouterParams {
               .padding(16)
               .id(this.FLAG_CONTAINER_ID)
 
-            // 国家名称
+            // 国家名称（可复制）
             Column() {
-              Text(this.country.nameCN)
+              Text(getLocalizedCountryName(this.country, this.currentLanguage))
                 .fontSize(28)
                 .fontWeight(FontWeight.Bold)
                 .fontColor($r('app.color.text_primary'))
@@ -468,6 +546,11 @@ interface RouterParams {
                 .maxLines(2)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
                 .margin({ bottom: 4 })
+                .onClick(() => {
+                  if (this.country) {
+                    this.copyToClipboard(getLocalizedCountryName(this.country, this.currentLanguage));
+                  }
+                })
 
               Text(this.country.name)
                 .fontSize(16)
@@ -475,6 +558,11 @@ interface RouterParams {
                 .textAlign(TextAlign.Center)
                 .maxLines(2)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
+                .onClick(() => {
+                  if (this.country) {
+                    this.copyToClipboard(this.country.name);
+                  }
+                })
             }
             .width('100%')
               .padding({ left: 16, right: 16, top: 20, bottom: 16 })
@@ -483,22 +571,22 @@ interface RouterParams {
             // 基本信息卡片
             Row() {
               Column() {
-                Text('基本信息')
+                Text($r('app.string.basic_info'))
                   .fontSize(16)
                   .fontWeight(FontWeight.Bold)
                   .fontColor($r('app.color.text_primary'))
                   .margin({ bottom: 16 })
                   .alignSelf(ItemAlign.Start)
 
-                this.InfoItem('首都', this.country.capitalCN)
+                this.InfoItem($r('app.string.capital'), getLocalizedCapital(this.country, this.currentLanguage))
                 Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.InfoItem('所属地区', this.getRegionName(this.country.region))
+                this.InfoItem($r('app.string.region'), getLocalizedRegionName(this.country.region, this.currentLanguage))
                 Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.InfoItem('人口', this.formatPopulation(this.country.population))
+                this.InfoItem($r('app.string.population'), this.formatPopulation(this.country.population))
                 Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.InfoItem('面积', this.formatArea(this.country.area))
+                this.InfoItem($r('app.string.area'), this.formatArea(this.country.area))
                 Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.InfoItem('国家代码', this.country.code.toUpperCase())
+                this.InfoItem($r('app.string.country_code'), this.country.code.toUpperCase())
               }
               .padding(16)
                 .layoutWeight(1)
@@ -512,16 +600,16 @@ interface RouterParams {
             // 关于这面国旗
             Row() {
               Column() {
-                Text('关于这面国旗')
+                Text($r('app.string.about_flag'))
                   .fontSize(16)
                   .fontWeight(FontWeight.Bold)
                   .fontColor($r('app.color.text_primary'))
                   .margin({ bottom: 16 })
                   .alignSelf(ItemAlign.Start)
 
-                this.InfoItem('国旗比例', this.getFlagProportion())
+                this.InfoItem($r('app.string.flag_proportion'), this.getFlagProportion())
                 Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.InfoItem('采用日期', this.getFlagAdopted())
+                this.InfoItem($r('app.string.adopted_date'), this.getFlagAdopted())
                 Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 16 })
 
                 Text(this.getFlagDescription())
@@ -530,6 +618,9 @@ interface RouterParams {
                   .lineHeight(22)
                   .width('100%')
                   .textAlign(TextAlign.Start)
+                  .onClick(() => {
+                    this.copyToClipboard(this.getFlagDescription());
+                  })
               }
               .padding(16)
                 .layoutWeight(1)
@@ -550,7 +641,7 @@ interface RouterParams {
             if (this.coatOfArmsResource) {
               Row() {
                 Column() {
-                  Text('国徽')
+                  Text($r('app.string.coat_of_arms'))
                     .fontSize(16)
                     .fontWeight(FontWeight.Bold)
                     .fontColor($r('app.color.text_primary'))
@@ -585,7 +676,7 @@ interface RouterParams {
                   Image(this.isFavorite ? $r('app.media.icon_favorite_selected') : $r('app.media.icon_favorite'))
                     .width(20)
                     .height(20)
-                  Text(this.isFavorite ? '已收藏' : '收藏')
+                  Text(this.isFavorite ? $r('app.string.favorited') : $r('app.string.favorite'))
                     .fontSize(15)
                     .fontColor(this.isFavorite ? $r('app.color.button_primary') : $r('app.color.text_primary'))
                 }
@@ -604,7 +695,7 @@ interface RouterParams {
                   Image($r('app.media.icon_download'))
                     .width(20)
                     .height(20)
-                  Text('下载')
+                  Text($r('app.string.download'))
                     .fontSize(15)
                     .fontColor($r('app.color.text_primary'))
                 }
@@ -630,9 +721,9 @@ interface RouterParams {
           .backgroundColor($r('app.color.bg_page'))
       } else {
         Column() {
-          Text('国家信息加载失败')
-            .fontSize(16)
-            .fontColor($r('app.color.text_tertiary'))
+        Text($r('app.string.unknown'))
+          .fontSize(16)
+          .fontColor($r('app.color.text_tertiary'))
         }
         .width('100%')
           .height('100%')
@@ -642,6 +733,40 @@ interface RouterParams {
     .titleMode(NavigationTitleMode.Mini)
       .backgroundColor($r('app.color.bg_page'))
       .menus(this.MenuBuilder)
+
+    // 复制提示 Snackbar（底部显示）
+    if (this.showCopyHint) {
+      this.CopyHintSnackbar()
+    }
+    }
+    .width('100%')
+    .height('100%')
+    .alignContent(Alignment.Bottom)
+  }
+
+  @Builder
+  CopyHintSnackbar() {
+    Row() {
+      Text($r('app.string.copy_hint'))
+        .fontSize(14)
+        .fontColor(Color.White)
+        .layoutWeight(1)
+
+      Button() {
+        Text($r('app.string.got_it'))
+          .fontSize(14)
+          .fontColor(Color.White)
+      }
+      .type(ButtonType.Normal)
+      .backgroundColor(Color.Transparent)
+      .onClick(() => {
+        this.dismissCopyHint();
+      })
+    }
+    .padding({ left: 16, right: 16, top: 12, bottom: 12 })
+    .margin({ left: 16, right: 16, bottom: 16 })
+    .backgroundColor('rgba(0, 0, 0, 0.85)')
+    .borderRadius(12)
   }
 
   @Builder
@@ -668,7 +793,7 @@ interface RouterParams {
   }
 
   @Builder
-  DescriptionItem(label: string, value: string) {
+  DescriptionItem(label: Resource | string, value: string, copyable: boolean = false) {
     Column() {
       Text(label)
         .fontSize(14)
@@ -681,6 +806,11 @@ interface RouterParams {
         .fontColor($r('app.color.text_primary'))
         .lineHeight(22)
         .alignSelf(ItemAlign.Start)
+        .onClick(() => {
+          if (copyable) {
+            this.copyToClipboard(value);
+          }
+        })
     }
     .width('100%')
       .alignItems(HorizontalAlign.Start)
@@ -704,7 +834,7 @@ interface RouterParams {
 
         // 组织名称
         Column() {
-          Text(this.internationalOrg.nameCN)
+          Text(getLocalizedOrgName(this.internationalOrg, this.currentLanguage))
             .fontSize(28)
             .fontWeight(FontWeight.Bold)
             .fontColor($r('app.color.text_primary'))
@@ -713,7 +843,7 @@ interface RouterParams {
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .margin({ bottom: 4 })
 
-          Text(this.internationalOrg.name)
+          Text(LocalizationUtil.isEnglish(this.currentLanguage) ? this.internationalOrg.nameCN : this.internationalOrg.name)
             .fontSize(16)
             .fontColor($r('app.color.text_secondary'))
             .textAlign(TextAlign.Center)
@@ -727,27 +857,27 @@ interface RouterParams {
         // 基本信息卡片
         Row() {
           Column() {
-            Text('基本信息')
+            Text($r('app.string.basic_info'))
               .fontSize(16)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
               .margin({ bottom: 16 })
               .alignSelf(ItemAlign.Start)
 
-            this.InfoItem('总部', this.internationalOrg.headquartersCN)
+            this.InfoItem($r('app.string.headquarters'), getLocalizedOrgHeadquarters(this.internationalOrg, this.currentLanguage))
             Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoItem('地区', this.internationalOrg.region)
+            this.InfoItem($r('app.string.region'), getLocalizedRegionName(this.internationalOrg.region, this.currentLanguage))
             Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoItem('组织类型', this.internationalOrg.orgTypeCN)
+            this.InfoItem($r('app.string.org_type'), LocalizationUtil.isEnglish(this.currentLanguage) ? this.internationalOrg.orgType : this.internationalOrg.orgTypeCN)
             Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoItem('覆盖人口', this.formatPopulation(this.internationalOrg.population))
+            this.InfoItem(this.context.resourceManager.getStringSync($r('app.string.coverage_population').id), this.formatPopulation(this.internationalOrg.population))
             if (this.internationalOrg.website) {
               Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-              this.InfoItem('网站', this.internationalOrg.website)
+              this.InfoItem(this.context.resourceManager.getStringSync($r('app.string.website').id), this.internationalOrg.website)
             }
             if (this.internationalOrg.description) {
               Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-              this.DescriptionItem('简介', this.internationalOrg.description)
+              this.DescriptionItem($r('app.string.description'), this.internationalOrg.description, true)
             }
           }
           .padding(16)
@@ -776,7 +906,7 @@ interface RouterParams {
 
         // 国家名称
         Column() {
-          Text(this.country.nameCN)
+          Text(getLocalizedCountryName(this.country, this.currentLanguage))
             .fontSize(28)
             .fontWeight(FontWeight.Bold)
             .fontColor($r('app.color.text_primary'))
@@ -785,7 +915,7 @@ interface RouterParams {
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .margin({ bottom: 4 })
 
-          Text(this.country.name)
+          Text(LocalizationUtil.isEnglish(this.currentLanguage) ? this.country.nameCN : this.country.name)
             .fontSize(16)
             .fontColor($r('app.color.text_secondary'))
             .textAlign(TextAlign.Center)
@@ -799,22 +929,22 @@ interface RouterParams {
         // 基本信息卡片（关于）
         Row() {
           Column() {
-            Text('基本信息')
+            Text($r('app.string.basic_info'))
               .fontSize(16)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
               .margin({ bottom: 16 })
               .alignSelf(ItemAlign.Start)
 
-            this.InfoItem('首都', this.country.capitalCN)
+            this.InfoItem($r('app.string.capital'), getLocalizedCapital(this.country, this.currentLanguage))
             Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoItem('所属地区', this.getRegionName(this.country.region))
+            this.InfoItem($r('app.string.region'), getLocalizedRegionName(this.country.region, this.currentLanguage))
             Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoItem('人口', this.formatPopulation(this.country.population))
+            this.InfoItem($r('app.string.population'), this.formatPopulation(this.country.population))
             Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoItem('面积', this.formatArea(this.country.area))
+            this.InfoItem($r('app.string.area'), this.formatArea(this.country.area))
             Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoItem('国家代码', this.country.code.toUpperCase())
+            this.InfoItem($r('app.string.country_code'), this.country.code.toUpperCase())
           }
           .padding(16)
             .layoutWeight(1)
@@ -827,16 +957,16 @@ interface RouterParams {
         // 关于这面国旗
         Row() {
           Column() {
-            Text('关于这面国旗')
+            Text($r('app.string.about_flag'))
               .fontSize(16)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
               .margin({ bottom: 16 })
               .alignSelf(ItemAlign.Start)
 
-            this.InfoItem('国旗比例', this.getFlagProportion())
+            this.InfoItem($r('app.string.flag_proportion'), this.getFlagProportion())
             Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoItem('采用日期', this.getFlagAdopted())
+            this.InfoItem($r('app.string.adopted_date'), this.getFlagAdopted())
             Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 16 })
 
             Text(this.getFlagDescription())
@@ -862,7 +992,7 @@ interface RouterParams {
   }
 
   @Builder
-  InfoItem(label: string, value: string) {
+  InfoItem(label: Resource | string, value: string) {
     Row() {
       Text(label)
         .fontSize(14)
@@ -874,33 +1004,57 @@ interface RouterParams {
         .fontColor($r('app.color.text_primary'))
     }
     .width('100%')
+    .onClick(() => {
+      this.copyToClipboard(value);
+    })
   }
 
   private getRegionName(region: string): string {
-    const regionMap: Record<string, string> = {
-      'Asia': '亚洲',
-      'Europe': '欧洲',
-      'Africa': '非洲',
-      'Americas': '美洲',
-      'Oceania': '大洋洲'
-    };
-    return regionMap[region] || region;
+    return getLocalizedRegionName(region, this.currentLanguage);
   }
 
   private formatPopulation(population: number): string {
-    if (population >= 100000000) {
-      return (population / 100000000).toFixed(2) + ' 亿人';
-    } else if (population >= 10000) {
-      return (population / 10000).toFixed(0) + ' 万人';
+    const isEnglish = LocalizationUtil.isEnglish(this.currentLanguage);
+    
+    if (isEnglish) {
+      // English format: use thousand, million, billion
+      if (population >= 1000000000) {
+        return (population / 1000000000).toFixed(2) + ' billion';
+      } else if (population >= 1000000) {
+        return (population / 1000000).toFixed(2) + ' million';
+      } else if (population >= 1000) {
+        return (population / 1000).toFixed(0) + ' thousand';
+      }
+      return population.toString();
+    } else {
+      // Chinese format: use 万 and 亿
+      if (population >= 100000000) {
+        return (population / 100000000).toFixed(2) + ' 亿人';
+      } else if (population >= 10000) {
+        return (population / 10000).toFixed(0) + ' 万人';
+      }
+      return population.toString() + ' 人';
     }
-    return population.toString() + ' 人';
   }
 
   private formatArea(area: number): string {
-    if (area >= 10000) {
-      return (area / 10000).toFixed(2) + ' 万平方公里';
+    const isEnglish = LocalizationUtil.isEnglish(this.currentLanguage);
+    
+    if (isEnglish) {
+      // English format: use thousand, million for square kilometers
+      if (area >= 1000000) {
+        return (area / 1000000).toFixed(2) + ' million km²';
+      } else if (area >= 1000) {
+        return (area / 1000).toFixed(0) + ' thousand km²';
+      }
+      return area.toFixed(0) + ' km²';
+    } else {
+      // Chinese format: use 万平方公里
+      if (area >= 10000) {
+        return (area / 10000).toFixed(2) + ' 万平方公里';
+      }
+      return area.toFixed(0) + ' 平方公里';
     }
-    return area.toFixed(0) + ' 平方公里';
   }
 
   private getFlagDescription(): string {
@@ -908,51 +1062,87 @@ interface RouterParams {
       return '';
     }
 
-    // 使用 flagDesign 中的中文描述
-    if (this.flagDesign && this.flagDesign.designCN) {
-      return this.flagDesign.designCN;
+    // 使用本地化的标志设计描述
+    if (this.flagDesign) {
+      return getLocalizedFlagDesign(this.flagDesign, this.currentLanguage);
     }
 
-    return `${this.country.nameCN}的国旗是这个国家的重要象征，代表着国家的历史、文化和价值观。`;
+    // 如果没有设计描述，返回默认描述
+    const countryName = getLocalizedCountryName(this.country, this.currentLanguage);
+    return this.context.resourceManager.getStringSync($r('app.string.flag_default_description').id, countryName);
   }
 
   private getFlagProportion(): string {
     if (this.flagDesign && this.flagDesign.proportion) {
       return this.flagDesign.proportion;
     }
-    return '未知';
+    return this.context.resourceManager.getStringSync($r('app.string.unknown').id);
   }
 
   private getFlagAdopted(): string {
     if (this.flagDesign && this.flagDesign.adopted) {
       return this.flagDesign.adopted;
     }
-    return '未知';
+    return this.context.resourceManager.getStringSync($r('app.string.unknown').id);
   }
 
   private getReadContent(): string {
     const lines: string[] = [];
+    const isEnglish = LocalizationUtil.isEnglish(this.currentLanguage);
 
     if (this.internationalOrg) {
-      lines.push(`${this.internationalOrg.nameCN}，英文名${this.internationalOrg.name}。`);
-      lines.push(`总部位于${this.internationalOrg.headquartersCN}。`);
-      lines.push(`地区是${this.internationalOrg.region}。`);
-      lines.push(`组织类型是${this.internationalOrg.orgTypeCN}。`);
-      lines.push(`覆盖人口约${this.formatPopulation(this.internationalOrg.population)}。`);
+      const orgName = getLocalizedOrgName(this.internationalOrg, this.currentLanguage);
+      const otherName = isEnglish ? this.internationalOrg.nameCN : this.internationalOrg.name;
+      const headquarters = getLocalizedOrgHeadquarters(this.internationalOrg, this.currentLanguage);
+      const region = getLocalizedRegionName(this.internationalOrg.region, this.currentLanguage);
+      const orgType = isEnglish ? this.internationalOrg.orgType : this.internationalOrg.orgTypeCN;
+      
+      if (isEnglish) {
+        lines.push(`${orgName}, also known as ${otherName}.`);
+        lines.push(`Headquarters is located in ${headquarters}.`);
+        lines.push(`Region: ${region}.`);
+        lines.push(`Organization type: ${orgType}.`);
+        lines.push(`Coverage population: approximately ${this.formatPopulation(this.internationalOrg.population)}.`);
+      } else {
+        lines.push(`${orgName}${this.context.resourceManager.getStringSync($r('app.string.also_known_as').id, otherName)}。`);
+        lines.push(this.context.resourceManager.getStringSync($r('app.string.headquarters_located').id, headquarters) + '。');
+        lines.push(this.context.resourceManager.getStringSync($r('app.string.region_is').id, region) + '。');
+        lines.push(this.context.resourceManager.getStringSync($r('app.string.org_type_is').id, orgType) + '。');
+        lines.push(this.context.resourceManager.getStringSync($r('app.string.coverage_population_approx').id, this.formatPopulation(this.internationalOrg.population)) + '。');
+      }
       if (this.internationalOrg.website) {
-        lines.push(`网站：${this.internationalOrg.website}。`);
+        if (isEnglish) {
+          lines.push(this.context.resourceManager.getStringSync($r('app.string.website_colon_en').id, this.internationalOrg.website) + '.');
+        } else {
+          lines.push(this.context.resourceManager.getStringSync($r('app.string.website_colon').id, this.internationalOrg.website) + '。');
+        }
       }
       if (this.internationalOrg.description) {
         lines.push(`${this.internationalOrg.description}`);
       }
     } else if (this.country) {
-      lines.push(`${this.country.nameCN}，英文名${this.country.name}。`);
-      lines.push(`首都是${this.country.capitalCN}。`);
-      lines.push(`所属地区是${this.getRegionName(this.country.region)}。`);
-      lines.push(`人口${this.formatPopulation(this.country.population)}。`);
-      lines.push(`面积${this.formatArea(this.country.area)}。`);
-      lines.push(`国旗比例为${this.getFlagProportion()}。`);
-      lines.push(`采用日期是${this.getFlagAdopted()}。`);
+      const countryName = getLocalizedCountryName(this.country, this.currentLanguage);
+      const otherName = isEnglish ? this.country.nameCN : this.country.name;
+      const capital = getLocalizedCapital(this.country, this.currentLanguage);
+      const region = getLocalizedRegionName(this.country.region, this.currentLanguage);
+      
+      if (isEnglish) {
+        lines.push(`${countryName}${this.context.resourceManager.getStringSync($r('app.string.also_known_as_en').id, otherName)}.`);
+        lines.push(this.context.resourceManager.getStringSync($r('app.string.capital_colon_en').id, capital) + '.');
+        lines.push(this.context.resourceManager.getStringSync($r('app.string.region_colon_en').id, region) + '.');
+        lines.push(this.context.resourceManager.getStringSync($r('app.string.population_colon_en').id, this.formatPopulation(this.country.population)) + '.');
+        lines.push(this.context.resourceManager.getStringSync($r('app.string.area_colon_en').id, this.formatArea(this.country.area)) + '.');
+        lines.push(this.context.resourceManager.getStringSync($r('app.string.flag_proportion_en').id, this.getFlagProportion()) + '.');
+        lines.push(this.context.resourceManager.getStringSync($r('app.string.adopted_date_en').id, this.getFlagAdopted()) + '.');
+      } else {
+        lines.push(`${countryName}${this.context.resourceManager.getStringSync($r('app.string.also_known_as').id, otherName)}。`);
+        lines.push(this.context.resourceManager.getStringSync($r('app.string.capital_is').id, capital) + '。');
+        lines.push(this.context.resourceManager.getStringSync($r('app.string.region_belongs').id, region) + '。');
+        lines.push(this.context.resourceManager.getStringSync($r('app.string.population_colon').id, this.formatPopulation(this.country.population)) + '。');
+        lines.push(this.context.resourceManager.getStringSync($r('app.string.area_colon').id, this.formatArea(this.country.area)) + '。');
+        lines.push(this.context.resourceManager.getStringSync($r('app.string.flag_proportion_is').id, this.getFlagProportion()) + '。');
+        lines.push(this.context.resourceManager.getStringSync($r('app.string.adopted_date_is').id, this.getFlagAdopted()) + '。');
+      }
       lines.push(this.getFlagDescription());
     } else {
       return '';
@@ -966,23 +1156,28 @@ interface RouterParams {
       TextReaderUtil.stopRead();
       this.isReading = false;
       promptAction.showToast({
-        message: '已停止朗读',
+        message: this.context.resourceManager.getStringSync($r('app.string.stop_reading').id),
         duration: 2000
       });
     } else {
       try {
-        const title = this.internationalOrg?.nameCN || this.country?.nameCN || '详情';
+        let title = this.context.resourceManager.getStringSync($r('app.string.details').id);
+        if (this.internationalOrg) {
+          title = getLocalizedOrgName(this.internationalOrg, this.currentLanguage);
+        } else if (this.country) {
+          title = getLocalizedCountryName(this.country, this.currentLanguage);
+        }
         const content = this.getReadContent();
         await TextReaderUtil.startRead(this.context, title, content);
         this.isReading = true;
         promptAction.showToast({
-          message: '开始朗读',
+          message: this.context.resourceManager.getStringSync($r('app.string.start_reading').id),
           duration: 2000
         });
       } catch (err) {
         console.error(`Failed to start read: ${JSON.stringify(err)}`);
         promptAction.showToast({
-          message: '朗读功能暂不可用',
+          message: this.context.resourceManager.getStringSync($r('app.string.reading_unavailable').id),
           duration: 2000
         });
       }
@@ -994,7 +1189,7 @@ interface RouterParams {
 
     this.isSharing = true;
     promptAction.showToast({
-      message: '正在准备分享...',
+      message: this.context.resourceManager.getStringSync($r('app.string.preparing_share').id),
       duration: 1500
     });
 
@@ -1008,7 +1203,7 @@ interface RouterParams {
       const pixmap = await screenshotManager.captureSnapshot(this.SHARE_CONTAINER_ID);
       if (!pixmap) {
         promptAction.showToast({
-          message: '截取图片失败',
+          message: this.context.resourceManager.getStringSync($r('app.string.screenshot_failed').id),
           duration: 2000
         });
         this.isSharing = false;
@@ -1053,12 +1248,21 @@ interface RouterParams {
       console.info(`[FlagDetailPage] UTD Type ID: ${utdTypeId}`);
 
       // 使用图片URI分享
-      const orgName = this.internationalOrg?.nameCN || this.country?.nameCN || '详情';
+      let orgName = this.context.resourceManager.getStringSync($r('app.string.details').id);
+      if (this.internationalOrg) {
+        orgName = getLocalizedOrgName(this.internationalOrg, this.currentLanguage);
+      } else if (this.country) {
+        orgName = getLocalizedCountryName(this.country, this.currentLanguage);
+      }
+      const isEnglish = LocalizationUtil.isEnglish(this.currentLanguage);
+      const flagTypeText = this.internationalOrg 
+        ? this.context.resourceManager.getStringSync($r('app.string.flag').id)
+        : this.context.resourceManager.getStringSync($r('app.string.national_flag').id);
       const shareData = new systemShare.SharedData({
         utd: utdTypeId,
         uri: imageUri,
-        title: `${orgName}${this.internationalOrg ? '旗帜' : '国旗'}`,
-        description: '来自国旗小百科'
+        title: `${orgName} ${flagTypeText}`,
+        description: this.context.resourceManager.getStringSync($r('app.string.from_app').id)
       });
       
       console.info(`[FlagDetailPage] ShareData created: utd=${utdTypeId}, uri=${imageUri}`);
@@ -1092,7 +1296,7 @@ interface RouterParams {
       const error = err as BusinessError;
       console.error(`[FlagDetailPage] Failed to share: code: ${error?.code}, message: ${error?.message}`);
       promptAction.showToast({
-        message: '分享失败',
+        message: this.context.resourceManager.getStringSync($r('app.string.share_failed').id),
         duration: 2000
       });
       
@@ -1112,36 +1316,81 @@ interface RouterParams {
 
   private buildShareText(): string {
     const lines: string[] = [];
+    const isEnglish = LocalizationUtil.isEnglish(this.currentLanguage);
 
     if (this.internationalOrg) {
-      lines.push(`🏳️ ${this.internationalOrg.nameCN} (${this.internationalOrg.name})`);
+      const orgName = getLocalizedOrgName(this.internationalOrg, this.currentLanguage);
+      const otherName = isEnglish ? this.internationalOrg.nameCN : this.internationalOrg.name;
+      const headquarters = getLocalizedOrgHeadquarters(this.internationalOrg, this.currentLanguage);
+      const region = getLocalizedRegionName(this.internationalOrg.region, this.currentLanguage);
+      const orgType = isEnglish ? this.internationalOrg.orgType : this.internationalOrg.orgTypeCN;
+      
+      lines.push(`🏳️ ${orgName} (${otherName})`);
       lines.push('');
-      lines.push(`📍 总部：${this.internationalOrg.headquartersCN}`);
-      lines.push(`🌍 地区：${this.internationalOrg.region}`);
-      lines.push(`🏛️ 组织类型：${this.internationalOrg.orgTypeCN}`);
-      lines.push(`👥 覆盖人口：${this.formatPopulation(this.internationalOrg.population)}`);
-      if (this.internationalOrg.website) {
-        lines.push(`🌐 网站：${this.internationalOrg.website}`);
-      }
-      if (this.internationalOrg.description) {
-        lines.push('');
-        lines.push(`📝 简介：${this.internationalOrg.description}`);
+      if (isEnglish) {
+        lines.push(`📍 ${this.context.resourceManager.getStringSync($r('app.string.headquarters').id)}: ${headquarters}`);
+        lines.push(`🌍 ${this.context.resourceManager.getStringSync($r('app.string.region').id)}: ${region}`);
+        lines.push(`🏛️ ${this.context.resourceManager.getStringSync($r('app.string.org_type').id)}: ${orgType}`);
+        lines.push(`👥 ${this.context.resourceManager.getStringSync($r('app.string.coverage_population').id)}: ${this.formatPopulation(this.internationalOrg.population)}`);
+        if (this.internationalOrg.website) {
+          lines.push(`🌐 ${this.context.resourceManager.getStringSync($r('app.string.website').id)}: ${this.internationalOrg.website}`);
+        }
+        if (this.internationalOrg.description) {
+          lines.push('');
+          lines.push(`📝 ${this.context.resourceManager.getStringSync($r('app.string.description').id)}: ${this.internationalOrg.description}`);
+        }
+      } else {
+        lines.push(`📍 ${this.context.resourceManager.getStringSync($r('app.string.headquarters').id)}：${headquarters}`);
+        lines.push(`🌍 ${this.context.resourceManager.getStringSync($r('app.string.region').id)}：${region}`);
+        lines.push(`🏛️ ${this.context.resourceManager.getStringSync($r('app.string.org_type').id)}：${orgType}`);
+        lines.push(`👥 ${this.context.resourceManager.getStringSync($r('app.string.coverage_population').id)}：${this.formatPopulation(this.internationalOrg.population)}`);
+        if (this.internationalOrg.website) {
+          lines.push(`🌐 ${this.context.resourceManager.getStringSync($r('app.string.website').id)}：${this.internationalOrg.website}`);
+        }
+        if (this.internationalOrg.description) {
+          lines.push('');
+          lines.push(`📝 ${this.context.resourceManager.getStringSync($r('app.string.description').id)}：${this.internationalOrg.description}`);
+        }
       }
     } else if (this.country) {
-      lines.push(`🏳️ ${this.country.nameCN} (${this.country.name})`);
+      const countryName = getLocalizedCountryName(this.country, this.currentLanguage);
+      const otherName = isEnglish ? this.country.nameCN : this.country.name;
+      const capital = getLocalizedCapital(this.country, this.currentLanguage);
+      const region = getLocalizedRegionName(this.country.region, this.currentLanguage);
+      
+      lines.push(`🏳️ ${countryName} (${otherName})`);
       lines.push('');
-      lines.push(`📍 首都：${this.country.capitalCN}`);
-      lines.push(`🌍 地区：${this.getRegionName(this.country.region)}`);
-      lines.push(`👥 人口：${this.formatPopulation(this.country.population)}`);
-      lines.push(`📐 面积：${this.formatArea(this.country.area)}`);
+      if (isEnglish) {
+        lines.push(`📍 ${this.context.resourceManager.getStringSync($r('app.string.capital').id)}: ${capital}`);
+        lines.push(`🌍 ${this.context.resourceManager.getStringSync($r('app.string.region').id)}: ${region}`);
+        lines.push(`👥 ${this.context.resourceManager.getStringSync($r('app.string.population').id)}: ${this.formatPopulation(this.country.population)}`);
+        lines.push(`📐 ${this.context.resourceManager.getStringSync($r('app.string.area').id)}: ${this.formatArea(this.country.area)}`);
 
-      if (this.flagDesign) {
-        lines.push('');
-        lines.push(`📏 国旗比例：${this.flagDesign.proportion}`);
-        lines.push(`📅 采用日期：${this.flagDesign.adopted}`);
-        if (this.flagDesign.designCN) {
+        if (this.flagDesign) {
           lines.push('');
-          lines.push(`🎨 ${this.flagDesign.designCN}`);
+          lines.push(`📏 ${this.context.resourceManager.getStringSync($r('app.string.flag_proportion').id)}: ${this.flagDesign.proportion}`);
+          lines.push(`📅 ${this.context.resourceManager.getStringSync($r('app.string.adopted_date').id)}: ${this.flagDesign.adopted}`);
+          const designDesc = getLocalizedFlagDesign(this.flagDesign, this.currentLanguage);
+          if (designDesc) {
+            lines.push('');
+            lines.push(`🎨 ${designDesc}`);
+          }
+        }
+      } else {
+        lines.push(`📍 ${this.context.resourceManager.getStringSync($r('app.string.capital').id)}：${capital}`);
+        lines.push(`🌍 ${this.context.resourceManager.getStringSync($r('app.string.region').id)}：${region}`);
+        lines.push(`👥 ${this.context.resourceManager.getStringSync($r('app.string.population').id)}：${this.formatPopulation(this.country.population)}`);
+        lines.push(`📐 ${this.context.resourceManager.getStringSync($r('app.string.area').id)}：${this.formatArea(this.country.area)}`);
+
+        if (this.flagDesign) {
+          lines.push('');
+          lines.push(`📏 ${this.context.resourceManager.getStringSync($r('app.string.flag_proportion').id)}：${this.flagDesign.proportion}`);
+          lines.push(`📅 ${this.context.resourceManager.getStringSync($r('app.string.adopted_date').id)}：${this.flagDesign.adopted}`);
+          const designDesc = getLocalizedFlagDesign(this.flagDesign, this.currentLanguage);
+          if (designDesc) {
+            lines.push('');
+            lines.push(`🎨 ${designDesc}`);
+          }
         }
       }
     } else {
@@ -1149,7 +1398,8 @@ interface RouterParams {
     }
 
     lines.push('');
-    lines.push('—— 来自「国旗小百科」');
+    const fromAppText = this.context.resourceManager.getStringSync($r('app.string.from_app').id);
+    lines.push(`—— ${fromAppText}`);
 
     return lines.join('\n');
   }
@@ -1160,7 +1410,7 @@ interface RouterParams {
       Column() {
         // 标题行 - 完全复制涂鸦说明的样式
         Row() {
-          Text('历史国旗')
+          Text($r('app.string.historical_flags'))
             .fontSize(16)
             .fontWeight(FontWeight.Bold)
             .fontColor($r('app.color.text_primary'))

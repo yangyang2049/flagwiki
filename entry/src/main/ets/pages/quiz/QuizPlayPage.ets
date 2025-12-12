@@ -4,11 +4,15 @@ import common from '@ohos.app.ability.common';
 import { systemShare } from '@kit.ShareKit';
 import { uniformTypeDescriptor } from '@kit.ArkData';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { image } from '@kit.ImageKit';
+import fs from '@ohos.file.fs';
+import { fileUri } from '@kit.CoreFileKit';
 import { Country, getCountryByCode, Countries } from '../../utils/countryData';
 import { QuizLevel, getQuizLevel, getAllQuizLevels } from './QuizLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
+import { screenshotManager } from '../../utils/ScreenshotManager';
 
 interface RouterParams {
   quizType: string;
@@ -38,14 +42,19 @@ interface QuizQuestion {
   @State animatingIndex: number = -1;
   @State scaleValue: number = 1;
   @State isSharing: boolean = false;
+  @State sharePixelMap: image.PixelMap | null = null;
   @State optionVisible: boolean[] = [false, false, false, false];  // 选项可见性
   private context = getContext(this) as common.UIAbilityContext;
+  private readonly SHARE_CONTAINER_ID = 'quizShareContainer';
   private timeoutIds: number[] = []; // 存储所有setTimeout的ID，用于清理
 
   async aboutToAppear() {
     // 初始化音效播放器和振动工具
     await SoundEffectUtil.init(this.context);
     await VibratorUtil.init(this.context);
+
+    // 初始化截图管理器
+    screenshotManager.init(this.getUIContext());
 
     const params = router.getParams() as RouterParams;
     if (params) {
@@ -60,6 +69,19 @@ interface QuizQuestion {
     this.clearAllTimeouts();
     // 释放音效资源
     SoundEffectUtil.release();
+    // 释放分享 PixelMap
+    this.releaseSharePixelMap();
+  }
+
+  private releaseSharePixelMap(): void {
+    if (this.sharePixelMap) {
+      try {
+        this.sharePixelMap.release();
+      } catch (e) {
+        console.warn('[QuizPlayPage] Failed to release share pixelmap:', e);
+      }
+      this.sharePixelMap = null;
+    }
   }
 
   private clearAllTimeouts(): void {
@@ -237,12 +259,18 @@ interface QuizQuestion {
   }
 
   private showGameOver(): void {
+    const challengeFailed = this.context.resourceManager.getStringSync($r('app.string.challenge_failed').id);
+    const correctAnswersText = this.context.resourceManager.getStringSync($r('app.string.correct_answers_count').id, this.correctAnswers.toString());
+    const maxComboText = this.context.resourceManager.getStringSync($r('app.string.max_combo').id, this.maxCombo.toString());
+    const backText = this.context.resourceManager.getStringSync($r('app.string.back').id);
+    const restartText = this.context.resourceManager.getStringSync($r('app.string.restart').id);
+    
     promptAction.showDialog({
-      title: '挑战失败',
-      message: `正确回答了 ${this.correctAnswers} 道题\n最高连击 ${this.maxCombo}`,
+      title: challengeFailed,
+      message: `${correctAnswersText}\n${maxComboText}`,
       buttons: [
-        { text: '返回', color: '#666666' },
-        { text: '重新开始', color: '#1677FF' }
+        { text: backText, color: '#666666' },
+        { text: restartText, color: '#1677FF' }
       ]
     }).then((result) => {
       if (result.index === 0) {
@@ -271,7 +299,9 @@ interface QuizQuestion {
   }
 
   private getTitle(): string {
-    return this.quizType === 'flagToName' ? '看旗猜国名' : '看名猜国旗';
+    return this.quizType === 'flagToName' 
+      ? this.context.resourceManager.getStringSync($r('app.string.quiz_flag_to_name').id)
+      : this.context.resourceManager.getStringSync($r('app.string.quiz_name_to_flag').id);
   }
 
   private getCorrectIndex(): number {
@@ -301,90 +331,378 @@ interface QuizQuestion {
 
   build() {
     Navigation() {
-      if (this.showResult) {
-        this.ResultView()
-      } else if (this.questions.length > 0) {
-        Column() {
-          // 顶部状态栏
-          Row() {
-            // 左侧：第几关
-            Text(`第 ${this.level?.id} 关`)
-              .fontSize(15)
-              .fontWeight(FontWeight.Medium)
-              .fontColor($r('app.color.text_secondary'))
-              .layoutWeight(1)
-
-            // 中间：生命值
-            Row() {
-              ForEach(Array.from({ length: this.level?.lives || 5 }), (_: undefined, index: number) => {
-                Text(index < this.lives ? '❤️' : '🖤')
-                  .fontSize(14)
-                  .margin({ left: 1, right: 1 })
-              })
+      Column() {
+        if (this.showResult) {
+          this.ResultView()
+        } else if (this.questions.length > 0) {
+          Column() {
+            // 隐藏的分享容器（包含问题 UI）
+            Column() {
+              if (this.questions.length > 0) {
+                this.ShareContentBuilder()
+              }
             }
-            .layoutWeight(1)
-              .justifyContent(FlexAlign.Center)
+            .id(this.SHARE_CONTAINER_ID)
+            .position({ x: -1000, y: -1000 })
+            .width(400)
+            .backgroundColor($r('app.color.bg_page'))
 
-            // 右侧：序号
-            Text(`${this.currentIndex + 1} / ${this.questions.length}`)
-              .fontSize(15)
-              .fontWeight(FontWeight.Medium)
-              .fontColor($r('app.color.text_secondary'))
-              .layoutWeight(1)
-              .textAlign(TextAlign.End)
+            Column() {
+              // 顶部状态栏
+              Row() {
+                // 左侧：第几关
+                Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString()))
+                  .fontSize(15)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor($r('app.color.text_secondary'))
+                  .layoutWeight(1)
+
+                // 中间：生命值
+                Row() {
+                  ForEach(Array.from({ length: this.level?.lives || 5 }), (_: undefined, index: number) => {
+                    Text(index < this.lives ? '❤️' : '🖤')
+                      .fontSize(14)
+                      .margin({ left: 1, right: 1 })
+                  })
+                }
+                .layoutWeight(1)
+                  .justifyContent(FlexAlign.Center)
+
+                // 右侧：序号
+                Text(`${this.currentIndex + 1} / ${this.questions.length}`)
+                  .fontSize(15)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor($r('app.color.text_secondary'))
+                  .layoutWeight(1)
+                  .textAlign(TextAlign.End)
+              }
+              .width('100%')
+                .padding({ left: 20, right: 20, top: 12, bottom: 12 })
+
+              // 连击提示
+              if (this.combo >= 3) {
+                Text(`🔥 ${this.context.resourceManager.getStringSync($r('app.string.combo_streak').id, this.combo.toString())}`)
+                  .fontSize(16)
+                  .fontWeight(FontWeight.Bold)
+                  .fontColor($r('app.color.color_orange'))
+                  .padding({ top: 8, bottom: 8 })
+              }
+
+              // 题目区域
+              if (this.quizType === 'flagToName') {
+                this.FlagToNameQuestion()
+              } else {
+                this.NameToFlagQuestion()
+              }
+
+              Blank()
+
+              // 下一题按钮
+              if (this.isAnswered) {
+                Button(this.currentIndex < this.questions.length - 1 
+                  ? this.context.resourceManager.getStringSync($r('app.string.next_question').id)
+                  : this.context.resourceManager.getStringSync($r('app.string.view_results').id))
+                  .width('80%')
+                  .height(48)
+                  .fontSize(17)
+                  .fontWeight(FontWeight.Bold)
+                  .backgroundColor($r('app.color.button_primary'))
+                  .margin({ bottom: 32 })
+                  .onClick(async () => {
+                    await this.nextQuestion();
+                  })
+              }
+            }
+            .width('100%')
+              .height('100%')
+              .backgroundColor($r('app.color.bg_page'))
+          }
+        } else {
+          Column() {
+            Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
+              .fontSize(16)
+              .fontColor($r('app.color.text_tertiary'))
           }
           .width('100%')
-            .padding({ left: 20, right: 20, top: 12, bottom: 12 })
-
-          // 连击提示
-          if (this.combo >= 3) {
-            Text(`🔥 ${this.combo} 连击！`)
-              .fontSize(16)
-              .fontWeight(FontWeight.Bold)
-              .fontColor($r('app.color.color_orange'))
-              .padding({ top: 8, bottom: 8 })
-          }
-
-          // 题目区域
-          if (this.quizType === 'flagToName') {
-            this.FlagToNameQuestion()
-          } else {
-            this.NameToFlagQuestion()
-          }
-
-          Blank()
-
-          // 下一题按钮
-          if (this.isAnswered) {
-            Button(this.currentIndex < this.questions.length - 1 ? '下一题' : '查看结果')
-              .width('80%')
-              .height(48)
-              .fontSize(17)
-              .fontWeight(FontWeight.Bold)
-              .backgroundColor($r('app.color.button_primary'))
-              .margin({ bottom: 32 })
-              .onClick(async () => {
-                await this.nextQuestion();
-              })
-          }
+            .height('100%')
+            .justifyContent(FlexAlign.Center)
         }
-        .width('100%')
-          .height('100%')
-          .backgroundColor($r('app.color.bg_page'))
-      } else {
-        Column() {
-          Text('加载中...')
-            .fontSize(16)
-            .fontColor($r('app.color.text_tertiary'))
-        }
-        .width('100%')
-          .height('100%')
-          .justifyContent(FlexAlign.Center)
       }
+      .width('100%')
+        .height('100%')
     }
     .title('')
-      .titleMode(NavigationTitleMode.Mini)
-      .backgroundColor($r('app.color.bg_page'))
+    .titleMode(NavigationTitleMode.Mini)
+    .backgroundColor($r('app.color.bg_page'))
+    .menus(this.MenuBuilder)
+  }
+
+  @Builder
+  MenuBuilder() {
+    Row({ space: 20 }) {
+      Image($r('app.media.icon_share'))
+        .width(22)
+        .height(22)
+        .onClick(() => {
+          this.onShareClick();
+        })
+    }
+    .height('100%')
+      .justifyContent(FlexAlign.End)
+      .alignItems(VerticalAlign.Center)
+      .padding({ right: 16 })
+  }
+
+  @Builder
+  ShareContentBuilder() {
+    if (this.questions.length > 0 && this.currentIndex < this.questions.length) {
+      Column({ space: 16 }) {
+        // 关卡信息
+        Row() {
+          Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString()))
+            .fontSize(16)
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('app.color.text_secondary'))
+            .layoutWeight(1)
+
+          Text(`${this.currentIndex + 1} / ${this.questions.length}`)
+            .fontSize(16)
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('app.color.text_secondary'))
+            .textAlign(TextAlign.End)
+        }
+        .width('100%')
+          .padding({ left: 16, right: 16, top: 20, bottom: 12 })
+
+        // 问题内容
+        if (this.quizType === 'flagToName') {
+          // 看旗猜名
+          Column() {
+            // 显示国旗
+            Column() {
+              Image($rawfile(`flags/${this.questions[this.currentIndex].correctCountry.code}.svg`))
+                .width('80%')
+                .height(160)
+                .objectFit(ImageFit.Contain)
+            }
+            .width('100%')
+              .padding(24)
+              .backgroundColor($r('app.color.bg_secondary'))
+              .margin({ bottom: 24 })
+
+            Text(this.context.resourceManager.getStringSync($r('app.string.which_country_flag').id))
+              .fontSize(18)
+              .fontWeight(FontWeight.Medium)
+              .fontColor($r('app.color.text_primary'))
+              .margin({ bottom: 20 })
+
+            // 选项
+            Column() {
+              ForEach(this.questions[this.currentIndex].choices, (country: Country, index: number) => {
+                Row() {
+                  Text(country.nameCN)
+                    .fontSize(16)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor($r('app.color.text_primary'))
+                }
+                .width('100%')
+                  .height(52)
+                  .justifyContent(FlexAlign.Center)
+                  .backgroundColor($r('app.color.bg_card'))
+                  .borderRadius(12)
+                  .margin({ bottom: 12 })
+              })
+            }
+            .width('100%')
+              .padding({ left: 20, right: 20 })
+          }
+          .width('100%')
+        } else {
+          // 看名猜旗
+          Column() {
+            // 显示国家名称
+            Column() {
+              Text(this.questions[this.currentIndex].correctCountry.nameCN)
+                .fontSize(32)
+                .fontWeight(FontWeight.Bold)
+                .fontColor($r('app.color.text_primary'))
+
+              Text(this.questions[this.currentIndex].correctCountry.name)
+                .fontSize(16)
+                .fontColor($r('app.color.text_secondary'))
+                .margin({ top: 8 })
+            }
+            .width('100%')
+              .padding(32)
+              .margin({ bottom: 24 })
+
+            Text(this.context.resourceManager.getStringSync($r('app.string.select_correct_flag').id))
+              .fontSize(18)
+              .fontWeight(FontWeight.Medium)
+              .fontColor($r('app.color.text_primary'))
+              .margin({ bottom: 20 })
+
+            // 国旗选项 - 2x2 网格
+            Grid() {
+              ForEach(this.questions[this.currentIndex].choices, (country: Country, index: number) => {
+                GridItem() {
+                  Column() {
+                    Image($rawfile(`flags/${country.code}.svg`))
+                      .width('100%')
+                      .height('100%')
+                      .objectFit(ImageFit.Contain)
+                      .padding(12)
+                  }
+                  .width('100%')
+                    .height('100%')
+                    .backgroundColor($r('app.color.bg_card'))
+                    .borderRadius(12)
+                }
+              })
+            }
+            .columnsTemplate('1fr 1fr')
+              .rowsTemplate('1fr 1fr')
+              .columnsGap(12)
+              .rowsGap(12)
+              .width('100%')
+              .height(280)
+              .padding({ left: 20, right: 20 })
+          }
+          .width('100%')
+        }
+
+        Text(this.context.resourceManager.getStringSync($r('app.string.from_app').id))
+          .fontSize(12)
+          .fontColor($r('app.color.text_tertiary'))
+          .margin({ top: 16, bottom: 20 })
+      }
+      .width('100%')
+        .padding({ top: 20, bottom: 20 })
+        .backgroundColor($r('app.color.bg_page'))
+    }
+  }
+
+  private async onShareClick(): Promise<void> {
+    if (this.isSharing || this.questions.length === 0) return;
+
+    this.isSharing = true;
+    promptAction.showToast({
+      message: this.context.resourceManager.getStringSync($r('app.string.preparing_share').id),
+      duration: 1500
+    });
+
+    let tempFilePath: string | null = null;
+
+    try {
+      // 先释放之前的 PixelMap
+      this.releaseSharePixelMap();
+
+      // 截取分享容器内容
+      const pixmap = await screenshotManager.captureSnapshot(this.SHARE_CONTAINER_ID);
+      if (!pixmap) {
+        promptAction.showToast({
+          message: this.context.resourceManager.getStringSync($r('app.string.screenshot_failed').id),
+          duration: 2000
+        });
+        this.isSharing = false;
+        return;
+      }
+
+      this.sharePixelMap = pixmap;
+
+      // 创建图像打包器并打包为 ArrayBuffer
+      const imagePacker = image.createImagePacker();
+      const packOpts: image.PackingOption = {
+        format: 'image/jpeg',
+        quality: 90
+      };
+      
+      const imageData: ArrayBuffer = await imagePacker.packing(pixmap, packOpts);
+      console.info(`[QuizPlayPage] Image packed, data size: ${imageData.byteLength} bytes`);
+
+      // 保存到临时文件
+      const timestamp = Date.now();
+      tempFilePath = this.context.cacheDir + '/share_quiz_' + timestamp + '.jpg';
+      
+      // 使用同步文件操作
+      const fileHandle = fs.openSync(tempFilePath, fs.OpenMode.CREATE | fs.OpenMode.WRITE_ONLY);
+      fs.writeSync(fileHandle.fd, imageData);
+      fs.closeSync(fileHandle);
+      
+      // 验证文件是否存在且不为空
+      const stat = fs.statSync(tempFilePath);
+      if (stat.size === 0) {
+        throw new Error('Image file is empty');
+      }
+      
+      console.info(`[QuizPlayPage] Image file created: ${tempFilePath}, size: ${stat.size} bytes`);
+
+      // 获取文件URI
+      const imageUri = fileUri.getUriFromPath(tempFilePath);
+      console.info(`[QuizPlayPage] Image URI: ${imageUri}`);
+      
+      // 获取图片类型描述符
+      const utdTypeId = uniformTypeDescriptor.getUniformDataTypeByFilenameExtension('.jpg', uniformTypeDescriptor.UniformDataType.IMAGE);
+      console.info(`[QuizPlayPage] UTD Type ID: ${utdTypeId}`);
+
+      // 使用图片URI分享
+      const levelText = this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString());
+      const quizTypeName = this.context.resourceManager.getStringSync($r('app.string.quiz_flag_to_name').id);
+      const fromAppText = this.context.resourceManager.getStringSync($r('app.string.from_app').id);
+      const shareData = new systemShare.SharedData({
+        utd: utdTypeId,
+        uri: imageUri,
+        title: `${levelText} - ${quizTypeName}`,
+        description: fromAppText
+      });
+      
+      console.info(`[QuizPlayPage] ShareData created: utd=${utdTypeId}, uri=${imageUri}`);
+
+      const controller = new systemShare.ShareController(shareData);
+      
+      // 显示分享面板
+      await controller.show(this.context, {
+        selectionMode: systemShare.SelectionMode.SINGLE,
+        previewMode: systemShare.SharePreviewMode.DETAIL
+      });
+
+      console.info('[QuizPlayPage] Share panel opened successfully');
+      
+      // 分享成功后释放 PixelMap
+      this.releaseSharePixelMap();
+      
+      // 延迟删除文件，确保分享完成
+      setTimeout(() => {
+        if (tempFilePath) {
+          try {
+            fs.unlinkSync(tempFilePath);
+            console.info(`[QuizPlayPage] Temp file deleted: ${tempFilePath}`);
+          } catch (unlinkError) {
+            console.warn('[QuizPlayPage] Failed to delete temp file:', unlinkError);
+          }
+        }
+      }, 5000); // 5秒后删除
+
+    } catch (err) {
+      const error = err as BusinessError;
+      console.error(`[QuizPlayPage] Failed to share: code: ${error?.code}, message: ${error?.message}`);
+      promptAction.showToast({
+        message: this.context.resourceManager.getStringSync($r('app.string.share_failed').id),
+        duration: 2000
+      });
+      
+      // 清理资源
+      this.releaseSharePixelMap();
+      if (tempFilePath) {
+        try {
+          fs.unlinkSync(tempFilePath);
+        } catch (unlinkError) {
+          console.warn('[QuizPlayPage] Failed to delete temp file on error:', unlinkError);
+        }
+      }
+    } finally {
+      this.isSharing = false;
+    }
   }
 
   @Builder
@@ -402,7 +720,7 @@ interface QuizQuestion {
         .backgroundColor($r('app.color.bg_secondary'))
         .margin({ bottom: 24 })
 
-      Text('这是哪个国家的国旗？')
+      Text(this.context.resourceManager.getStringSync($r('app.string.which_country_flag').id))
         .fontSize(18)
         .fontWeight(FontWeight.Medium)
         .fontColor($r('app.color.text_primary'))
@@ -439,7 +757,7 @@ interface QuizQuestion {
         .padding(32)
         .margin({ bottom: 24 })
 
-      Text('请选择正确的国旗')
+      Text(this.context.resourceManager.getStringSync($r('app.string.select_correct_flag').id))
         .fontSize(18)
         .fontWeight(FontWeight.Medium)
         .fontColor($r('app.color.text_primary'))
@@ -630,13 +948,13 @@ interface QuizQuestion {
           .fontSize(64)
           .margin({ top: 40 })
 
-        Text('恭喜过关！')
+        Text($r('app.string.congratulations'))
           .fontSize(28)
           .fontWeight(FontWeight.Bold)
           .fontColor($r('app.color.text_primary'))
           .margin({ top: 24 })
 
-        Text(`第 ${this.level?.id} 关 · ${this.level?.name}`)
+        Text(`${this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString())} · ${this.level?.name}`)
           .fontSize(16)
           .fontColor($r('app.color.text_secondary'))
           .margin({ top: 8 })
@@ -644,7 +962,7 @@ interface QuizQuestion {
         // 统计信息
         Column() {
           Row() {
-            Text('正确答题')
+            Text(this.context.resourceManager.getStringSync($r('app.string.correct_answers').id))
               .fontSize(16)
               .fontColor($r('app.color.text_secondary'))
             Blank()
@@ -654,12 +972,12 @@ interface QuizQuestion {
               .fontColor($r('app.color.text_primary'))
           }
           .width('100%')
-            .padding({ top: 16, bottom: 16 })
+          .padding({ top: 16, bottom: 16 })
 
           Divider().color($r('app.color.gray_very_light'))
 
           Row() {
-            Text('最高连击')
+            Text(this.context.resourceManager.getStringSync($r('app.string.max_combo').id, this.maxCombo.toString()))
               .fontSize(16)
               .fontColor($r('app.color.text_secondary'))
             Blank()
@@ -669,12 +987,12 @@ interface QuizQuestion {
               .fontColor($r('app.color.text_primary'))
           }
           .width('100%')
-            .padding({ top: 16, bottom: 16 })
+          .padding({ top: 16, bottom: 16 })
 
           Divider().color($r('app.color.gray_very_light'))
 
           Row() {
-            Text('剩余生命')
+            Text(this.context.resourceManager.getStringSync($r('app.string.remaining_lives').id))
               .fontSize(16)
               .fontColor($r('app.color.text_secondary'))
             Blank()
@@ -692,7 +1010,7 @@ interface QuizQuestion {
           .backgroundColor($r('app.color.bg_card'))
           .borderRadius(16)
 
-        Text('国旗小百科')
+        Text(this.context.resourceManager.getStringSync($r('app.string.from_app').id))
           .fontSize(12)
           .fontColor($r('app.color.text_tertiary'))
           .margin({ top: 16 })
@@ -705,7 +1023,7 @@ interface QuizQuestion {
 
       // 按钮
       Row({ space: 12 }) {
-        Button('分享成绩')
+        Button(this.context.resourceManager.getStringSync($r('app.string.share_score').id))
           .layoutWeight(1)
           .height(48)
           .fontSize(17)
@@ -717,7 +1035,7 @@ interface QuizQuestion {
             this.onShareResult();
           })
 
-        Button(this.level && this.level.id < getAllQuizLevels().length ? '下一关' : '完美收官')
+        Button(this.level && this.level.id < getAllQuizLevels().length ? $r('app.string.next_level') : $r('app.string.perfect_finish'))
           .layoutWeight(1)
           .height(48)
           .fontSize(17)
@@ -749,21 +1067,29 @@ interface QuizQuestion {
 
     this.isSharing = true;
     promptAction.showToast({
-      message: '正在准备分享...',
+      message: this.context.resourceManager.getStringSync($r('app.string.preparing_share').id),
       duration: 1500
     });
 
     try {
       // 构建分享文本
-      const quizTypeName = this.quizType === 'flagToName' ? '看旗猜国名' : '看名猜国旗';
-      const shareText = this.buildShareText(quizTypeName);
+      const quizTypeNameRes = this.quizType === 'flagToName' 
+        ? $r('app.string.quiz_flag_to_name') 
+        : $r('app.string.quiz_name_to_flag');
+      const quizTypeName = this.context.resourceManager.getStringSync(quizTypeNameRes.id);
+      const shareText = await this.buildShareText(quizTypeName);
 
       // 使用文本分享
+      const gameQuizName = this.context.resourceManager.getStringSync($r('app.string.game_quiz').id);
+      const levelChallengeSuccess = this.context.resourceManager.getStringSync(
+        $r('app.string.level_challenge_success').id, 
+        this.level?.id?.toString() || '1'
+      );
       const shareData = new systemShare.SharedData({
         utd: uniformTypeDescriptor.UniformDataType.TEXT,
         content: shareText,
-        title: `国旗猜猜 - ${quizTypeName}`,
-        description: `第${this.level?.id}关挑战成功`
+        title: `${gameQuizName} - ${quizTypeName}`,
+        description: levelChallengeSuccess
       });
 
       const controller = new systemShare.ShareController(shareData);
@@ -776,7 +1102,7 @@ interface QuizQuestion {
       const error = err as BusinessError;
       console.error(`Failed to share: code: ${error?.code}, message: ${error?.message}`);
       promptAction.showToast({
-        message: '分享失败',
+        message: this.context.resourceManager.getStringSync($r('app.string.share_failed').id),
         duration: 2000
       });
     } finally {
@@ -784,18 +1110,21 @@ interface QuizQuestion {
     }
   }
 
-  private buildShareText(quizTypeName: string): string {
+  private async buildShareText(quizTypeName: string): Promise<string> {
     const lines: string[] = [];
-    lines.push('🎉 恭喜过关！');
+    const congratsText = await this.context.resourceManager.getStringValue($r('app.string.congratulations').id);
+    lines.push(`🎉 ${congratsText}`);
     lines.push('');
     lines.push(`🎮 ${quizTypeName}`);
-    lines.push(`🏆 第 ${this.level?.id} 关 · ${this.level?.name}`);
+    const levelText = this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString());
+    lines.push(`🏆 ${levelText} · ${this.level?.name}`);
     lines.push('');
-    lines.push(`✅ 正确答题：${this.correctAnswers} / ${this.questions.length}`);
-    lines.push(`🔥 最高连击：${this.maxCombo}`);
-    lines.push(`❤️ 剩余生命：${this.lives}`);
+    lines.push(`✅ ${this.context.resourceManager.getStringSync($r('app.string.correct_answers_share').id, this.correctAnswers.toString(), this.questions.length.toString())}`);
+    lines.push(`🔥 ${this.context.resourceManager.getStringSync($r('app.string.max_combo_share').id, this.maxCombo.toString())}`);
+    lines.push(`❤️ ${this.context.resourceManager.getStringSync($r('app.string.remaining_lives_share').id, this.lives.toString())}`);
     lines.push('');
-    lines.push('—— 来自「国旗小百科」');
+    const fromAppText = this.context.resourceManager.getStringSync($r('app.string.from_app').id);
+    lines.push(`—— ${fromAppText}`);
 
     return lines.join('\n');
   }

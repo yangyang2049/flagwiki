@@ -37,7 +37,7 @@ export interface FlagDesign {
 // 按洲分类
 export type Continent = 'World' | 'Asia' | 'Europe' | 'Africa' | 'Americas' | 'Oceania';
 
-// 洲名称映射
+// 洲名称映射（中文）
 export const ContinentNames: Record<Continent, string> = {
     'World': '全部',
     'Asia': '亚洲',
@@ -45,6 +45,16 @@ export const ContinentNames: Record<Continent, string> = {
     'Africa': '非洲',
     'Americas': '美洲',
     'Oceania': '大洋洲'
+};
+
+// 洲名称映射（英文）
+export const ContinentNamesEN: Record<Continent, string> = {
+    'World': 'All',
+    'Asia': 'Asia',
+    'Europe': 'Europe',
+    'Africa': 'Africa',
+    'Americas': 'Americas',
+    'Oceania': 'Oceania'
 };
 
 // 完整的国家数据列表
@@ -280,6 +290,58 @@ function initCountryMapCache(): void {
 export function getCountryByCode(code: string): Country | undefined {
     initCountryMapCache();
     return countryMapCache?.get(code.toLowerCase());
+}
+
+// 本地化工具函数：根据语言获取国家名称
+export function getLocalizedCountryName(country: Country, language: string): string {
+    if (language === 'en' || language.startsWith('en-')) {
+        return country.name;
+    }
+    return country.nameCN;
+}
+
+// 本地化工具函数：根据语言获取首都名称
+export function getLocalizedCapital(country: Country, language: string): string {
+    if (language === 'en' || language.startsWith('en-')) {
+        return country.capital;
+    }
+    return country.capitalCN;
+}
+
+// 本地化工具函数：根据语言获取地区名称
+export function getLocalizedRegionName(region: string, language: string): string {
+    const continent = region as Continent;
+    if (language === 'en' || language.startsWith('en-')) {
+        return ContinentNamesEN[continent] || region;
+    }
+    return ContinentNames[continent] || region;
+}
+
+// 本地化工具函数：根据语言获取标志设计描述
+export function getLocalizedFlagDesign(flagDesign: FlagDesign | undefined, language: string): string {
+    if (!flagDesign) {
+        return '';
+    }
+    if (language === 'en' || language.startsWith('en-')) {
+        return flagDesign.design;
+    }
+    return flagDesign.designCN;
+}
+
+// 本地化工具函数：根据语言获取国际组织名称
+export function getLocalizedOrgName(org: InternationalOrg, language: string): string {
+    if (language === 'en' || language.startsWith('en-')) {
+        return org.name;
+    }
+    return org.nameCN;
+}
+
+// 本地化工具函数：根据语言获取国际组织总部名称
+export function getLocalizedOrgHeadquarters(org: InternationalOrg, language: string): string {
+    if (language === 'en' || language.startsWith('en-')) {
+        return org.headquarters;
+    }
+    return org.headquartersCN;
 }
 
 // 获取所有洲

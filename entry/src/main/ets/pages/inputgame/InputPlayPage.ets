@@ -168,12 +168,17 @@ interface RouterParams {
   }
 
   private showGameOver(): void {
+    const challengeFailed = this.context.resourceManager.getStringSync($r('app.string.challenge_failed').id);
+    const correctAnswersText = this.context.resourceManager.getStringSync($r('app.string.correct_answers_count_trivia').id, this.correctAnswers.toString());
+    const backText = this.context.resourceManager.getStringSync($r('app.string.back').id);
+    const restartText = this.context.resourceManager.getStringSync($r('app.string.restart').id);
+    
     promptAction.showDialog({
-      title: '挑战失败',
-      message: `正确回答了 ${this.correctAnswers} 题`,
+      title: challengeFailed,
+      message: correctAnswersText,
       buttons: [
-        { text: '返回', color: '#666666' },
-        { text: '重新开始', color: '#1677FF' }
+        { text: backText, color: '#666666' },
+        { text: restartText, color: '#1677FF' }
       ]
     }).then((result) => {
       if (result.index === 0) {
@@ -205,7 +210,7 @@ interface RouterParams {
         Column() {
           // 顶部状态栏
           Row() {
-            Text(`第 ${this.level?.id} 关`)
+            Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString()))
               .fontSize(15)
               .fontWeight(FontWeight.Medium)
               .fontColor($r('app.color.text_secondary'))
@@ -251,7 +256,7 @@ interface RouterParams {
           if (this.isCorrect) {
             // 正确答案显示
             Column() {
-              Text('✓ 正确!')
+              Text(this.context.resourceManager.getStringSync($r('app.string.correct_answer').id))
                 .fontSize(20)
                 .fontWeight(FontWeight.Bold)
                 .fontColor($r('app.color.color_green'))
@@ -262,7 +267,9 @@ interface RouterParams {
                 .fontWeight(FontWeight.Bold)
                 .fontColor($r('app.color.text_primary'))
 
-              Button(this.currentIndex < (this.level?.countries.length || 0) - 1 ? '下一题' : '查看结果')
+              Button(this.currentIndex < (this.level?.countries.length || 0) - 1 
+                ? this.context.resourceManager.getStringSync($r('app.string.next_question').id)
+                : this.context.resourceManager.getStringSync($r('app.string.view_results').id))
                 .width('80%')
                 .height(48)
                 .fontSize(17)
@@ -278,7 +285,7 @@ interface RouterParams {
           } else {
             // 输入框和确认按钮
             Row() {
-              TextInput({ text: this.inputText, placeholder: '请输入国家名称' })
+              TextInput({ text: this.inputText, placeholder: this.context.resourceManager.getStringSync($r('app.string.enter_country_name').id) })
                 .layoutWeight(1)
                 .height(50)
                 .fontSize(18)
@@ -296,10 +303,10 @@ interface RouterParams {
                   await this.checkAnswer();
                 })
 
-              Button('确认')
+              Button('✓')
                 .width(72)
                 .height(50)
-                .fontSize(16)
+                .fontSize(24)
                 .fontWeight(FontWeight.Bold)
                 .backgroundColor($r('app.color.button_primary'))
                 .borderRadius(12)
@@ -319,7 +326,7 @@ interface RouterParams {
           .backgroundColor($r('app.color.bg_page'))
       } else {
         Column() {
-          Text('加载中...')
+          Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
             .fontSize(16)
             .fontColor($r('app.color.text_tertiary'))
         }
@@ -340,20 +347,20 @@ interface RouterParams {
         .fontSize(64)
         .margin({ top: 60 })
 
-      Text('恭喜过关！')
+      Text($r('app.string.congratulations'))
         .fontSize(28)
         .fontWeight(FontWeight.Bold)
         .fontColor($r('app.color.text_primary'))
         .margin({ top: 24 })
 
-      Text(`第 ${this.level?.id} 关`)
+      Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString()))
         .fontSize(16)
         .fontColor($r('app.color.text_secondary'))
         .margin({ top: 8 })
 
       Column() {
         Row() {
-          Text('正确回答')
+          Text(this.context.resourceManager.getStringSync($r('app.string.correct_answers_label').id))
             .fontSize(16)
             .fontColor($r('app.color.text_secondary'))
           Blank()
@@ -363,12 +370,12 @@ interface RouterParams {
             .fontColor($r('app.color.text_primary'))
         }
         .width('100%')
-          .padding({ top: 16, bottom: 16 })
+        .padding({ top: 16, bottom: 16 })
 
         Divider().color($r('app.color.gray_very_light'))
 
         Row() {
-          Text('剩余生命')
+          Text(this.context.resourceManager.getStringSync($r('app.string.remaining_lives').id))
             .fontSize(16)
             .fontColor($r('app.color.text_secondary'))
           Blank()
@@ -378,17 +385,17 @@ interface RouterParams {
             .fontColor($r('app.color.text_primary'))
         }
         .width('100%')
-          .padding({ top: 16, bottom: 16 })
+        .padding({ top: 16, bottom: 16 })
       }
       .width('100%')
-        .padding({ left: 24, right: 24 })
-        .margin({ top: 40 })
-        .backgroundColor($r('app.color.bg_card'))
-        .borderRadius(16)
+      .padding({ left: 24, right: 24 })
+      .margin({ top: 40 })
+      .backgroundColor($r('app.color.bg_card'))
+      .borderRadius(16)
 
       Blank()
 
-      Button('返回关卡列表')
+      Button(this.context.resourceManager.getStringSync($r('app.string.back_to_levels').id))
         .width('80%')
         .height(48)
         .fontSize(17)
@@ -399,7 +406,9 @@ interface RouterParams {
           router.back();
         })
 
-      Button(this.level && this.level.id < getTotalInputLevels() ? '下一关' : '完美收官')
+      Button(this.level && this.level.id < getTotalInputLevels() 
+        ? this.context.resourceManager.getStringSync($r('app.string.next_level').id)
+        : this.context.resourceManager.getStringSync($r('app.string.perfect_finish').id))
         .width('80%')
         .height(48)
         .fontSize(17)

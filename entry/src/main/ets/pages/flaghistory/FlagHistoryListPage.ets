@@ -4,6 +4,7 @@
  */
 
 import router from '@ohos.router';
+import common from '@ohos.app.ability.common';
 import { getAllFlagHistory, CountryFlagHistory } from '../../utils/FlagHistoryData';
 import { getCountryByCode } from '../../utils/countryData';
 import { getFlagImageSource } from '../../utils/countryData';
@@ -12,6 +13,7 @@ import { getFlagImageSource } from '../../utils/countryData';
 @Component
     struct FlagHistoryListPage {
     @State historyList: CountryFlagHistory[] = [];
+    private context = getContext(this) as common.UIAbilityContext;
 
     aboutToAppear() {
         this.historyList = getAllFlagHistory();
@@ -29,7 +31,7 @@ import { getFlagImageSource } from '../../utils/countryData';
                     if (this.historyList.length === 0) {
                         // 无历史数据
                         Column() {
-                            Text('暂无历史数据')
+                            Text(this.context.resourceManager.getStringSync($r('app.string.no_data').id))
                                 .fontSize(16)
                                 .fontColor($r('app.color.text_secondary'))
                                 .margin({ top: 100 })
@@ -95,7 +97,7 @@ import { getFlagImageSource } from '../../utils/countryData';
                 .scrollBar(BarState.Off)
                 .edgeEffect(EdgeEffect.Spring)
         }
-    .title('历史国旗')
+    .title(this.context.resourceManager.getStringSync($r('app.string.historical_flags').id))
             .titleMode(NavigationTitleMode.Mini)
             .hideBackButton(false)
     }

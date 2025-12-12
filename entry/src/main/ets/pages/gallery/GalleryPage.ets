@@ -1,12 +1,17 @@
 import router from '@ohos.router';
+import { common } from '@kit.AbilityKit';
 import {
   Country,
   Continent,
   ContinentNames,
+  ContinentNamesEN,
   getCountriesByContinent,
   getAllContinents,
-  getFlagImageSource
+  getFlagImageSource,
+  getLocalizedCountryName,
+  getLocalizedRegionName
 } from '../../utils/countryData';
+import { LocalizationUtil } from '../../utils/LocalizationUtil';
 
 @Component
 export struct GalleryPage {
@@ -15,8 +20,15 @@ export struct GalleryPage {
   @State selectedContinent: Continent = 'World';
   @State searchText: string = '';
   @Prop @Watch('onSearchExpandedChanged') isSearchExpanded: boolean = false;
+  @StorageLink('currentLanguage') @Watch('onLanguageChanged') systemLanguage: string = 'zh';
+  @Prop context?: common.UIAbilityContext;
+  private appContext = getContext(this) as common.UIAbilityContext;
 
   aboutToAppear() {
+    this.loadCountries();
+  }
+
+  private onLanguageChanged(): void {
     this.loadCountries();
   }
 
@@ -29,8 +41,13 @@ export struct GalleryPage {
 
   private loadCountries(): void {
     this.countries = getCountriesByContinent(this.selectedContinent);
-    // 按中文名称排序
-    this.countries.sort((a, b) => a.nameCN.localeCompare(b.nameCN, 'zh-CN'));
+    // 按本地化名称排序
+    const isEnglish = LocalizationUtil.isEnglish(this.systemLanguage);
+    this.countries.sort((a, b) => {
+      const nameA = getLocalizedCountryName(a, this.systemLanguage);
+      const nameB = getLocalizedCountryName(b, this.systemLanguage);
+      return isEnglish ? nameA.localeCompare(nameB, 'en') : nameA.localeCompare(nameB, 'zh-CN');
+    });
     this.filterCountries();
   }
 
@@ -40,7 +57,9 @@ export struct GalleryPage {
     } else {
       const keyword = this.searchText.trim().toLowerCase();
       this.filteredCountries = this.countries.filter((country) => {
-        return country.nameCN.toLowerCase().includes(keyword) ||
+        const localizedName = getLocalizedCountryName(country, this.systemLanguage).toLowerCase();
+        return localizedName.includes(keyword) ||
+          country.nameCN.toLowerCase().includes(keyword) ||
           country.name.toLowerCase().includes(keyword) ||
           country.code.toLowerCase().includes(keyword) ||
           country.capitalCN.toLowerCase().includes(keyword);
@@ -74,7 +93,10 @@ export struct GalleryPage {
       // 搜索区域
       if (this.isSearchExpanded) {
         Row() {
-          Search({ value: this.searchText, placeholder: '搜索国家或地区' })
+          Search({ 
+            value: this.searchText, 
+            placeholder: this.appContext.resourceManager.getStringSync($r('app.string.search_country_or_region').id) 
+          })
             .layoutWeight(1)
             .height(40)
             .onChange((value: string) => {
@@ -107,17 +129,17 @@ export struct GalleryPage {
       if (this.filteredCountries.length === 0) {
         Column() {
           if (this.searchText.trim() !== '') {
-            Text('未找到匹配的国家')
+            Text(this.appContext.resourceManager.getStringSync($r('app.string.no_matching_countries').id))
               .fontSize(16)
               .fontColor($r('app.color.text_tertiary'))
 
-            Text('修改关键词或选择"全部"或其他大洲')
+            Text(this.appContext.resourceManager.getStringSync($r('app.string.modify_keywords_or_select').id))
               .fontSize(12)
               .fontColor($r('app.color.text_tertiary'))
               .margin({ top: 8 })
               .opacity(0.7)
           } else {
-            Text('加载中...')
+            Text(this.appContext.resourceManager.getStringSync($r('app.string.loading').id))
               .fontSize(16)
               .fontColor($r('app.color.text_tertiary'))
           }
@@ -150,7 +172,7 @@ export struct GalleryPage {
 
   @Builder
   ContinentChip(continent: Continent) {
-    Text(ContinentNames[continent])
+    Text(LocalizationUtil.isEnglish(this.systemLanguage) ? ContinentNamesEN[continent] : ContinentNames[continent])
       .fontSize(14)
       .fontWeight(this.selectedContinent === continent ? FontWeight.Medium : FontWeight.Normal)
       .fontColor(this.selectedContinent === continent ? $r('app.color.white') : $r('app.color.text_secondary'))
@@ -173,7 +195,7 @@ export struct GalleryPage {
         .objectFit(ImageFit.Contain)
 
       // 国家名称
-      Text(country.nameCN)
+      Text(getLocalizedCountryName(country, this.systemLanguage))
         .fontSize(13)
         .fontWeight(FontWeight.Medium)
         .fontColor($r('app.color.text_primary'))

@@ -3,6 +3,749 @@
 ## [未发布]
 
 ### 修复 (Fixed)
+- **全面本地化审查和修复**：逐页、逐组件、逐 toast 审查并修复所有硬编码的中文字符串
+  - **FakeFlagPlayPage 本地化修复**：
+    - 修复 "加载中..." → 使用 `app.string.loading`
+    - 修复 "正确找出" → 使用 `app.string.correct_found`
+    - 修复 "剩余生命" → 使用 `app.string.remaining_lives`
+    - 修复 "返回关卡列表" → 使用 `app.string.back_to_levels`
+  - **QuizPlayPage 本地化修复**：
+    - 修复 "加载中..." → 使用 `app.string.loading`
+    - 修复 "这是哪个国家的国旗？" → 使用 `app.string.which_country_flag`
+    - 修复 "请选择正确的国旗" → 使用 `app.string.select_correct_flag`
+  - **StateFlagGalleryPage 本地化修复**：
+    - 添加 context 支持
+    - 修复 "加载中..." → 使用 `app.string.loading`
+    - 修复 "暂无数据" → 使用 `app.string.no_data`
+    - 修复标题硬编码 → 使用本地化资源
+  - **StateFlagCountryListPage 本地化修复**：
+    - 添加 context 支持
+    - 修复标题 "各国州旗" → 使用 `app.string.state_flags`
+  - **FlagHistoryListPage 本地化修复**：
+    - 添加 context 支持
+    - 修复 "暂无历史数据" → 使用 `app.string.no_data`
+    - 修复标题 "历史国旗" → 使用 `app.string.historical_flags`
+  - **InputPlayPage 本地化修复**：
+    - 修复 "加载中..." → 使用 `app.string.loading`
+  - **TopicDetailPage 本地化修复**：
+    - 修复 "专题详情" 硬编码 → 使用 `app.string.details`
+  - **效果**：所有页面、组件和 toast 消息现在都完全支持中英文切换，没有硬编码的中文字符串
+
+- **Connections 游戏主题本地化修复**：修复了 Connections 游戏中主题名称的英文本地化问题
+  - **问题**：`getLocalizedTheme` 函数只返回中文翻译，在英文环境下无法正确显示英文主题名
+  - **修复内容**：
+    - 修改 `ConnectionsLevels.ets` 中的 `getLocalizedTheme` 函数，添加对英文环境的支持
+    - 创建主题名到本地化资源键的映射（`ThemeResourceKeys`）
+    - 函数现在接受 `context` 参数，根据系统语言自动返回对应的本地化字符串
+    - 更新 `ConnectionsPlayPage.ets` 中调用 `getLocalizedTheme` 的地方，传入 `context` 参数
+  - **效果**：Connections 游戏中的主题名称现在能够根据系统语言正确显示中英文，所有主题名称的单复数形式都已检查并确认为正确（如 "Flags with Weapons"、"Flags with Stars" 等）
+- **Input 输入游戏 UI 优化**：改进了确认按钮的显示
+  - 将确认按钮的文本从 "确认" / "Confirm" 改为勾号符号 "✓"
+  - 增大字体大小（16 → 24）以适配符号显示
+  - 效果：界面更简洁直观，符号化的设计更加国际通用
+
+- **Trivia 知识问答游戏完整本地化**：实现了知识问答游戏的中英文双语支持
+  - **问题内容本地化**：
+    - 将 10 个关卡共 100 个问题全部本地化
+    - 中文版本保持原有问题内容
+    - 英文版本提供准确的英文翻译
+  - **代码重构**：
+    - 修改 `TriviaLevels.ets` 创建独立的中英文问题数据集（`triviaQuestionsCN` 和 `triviaQuestionsEN`）
+    - `getTriviaLevel()` 函数现在接受 `context` 参数，根据系统语言自动返回对应语言的问题
+    - 所有问题的答案选项也完全本地化
+  - **UI文本本地化**：
+    - "加载中..." 改为使用 `app.string.loading` 资源
+    - 关卡名称统一显示为 "Level X"
+  - **效果**：知识问答游戏现在完全支持中英文，包括所有问题、选项和答案，为国际用户提供完整的游戏体验
+
+- **Gallery 标签页本地化**：完成了 GalleryPage 和 FlagDetailPage 的完整本地化
+  - **添加的字符串资源**：
+    - `save_failed_with_error`: "保存失败: %s" / "Save failed: %s"
+    - `details`: "详情" / "Details"
+    - `flag`: "旗帜" / "Flag"
+    - `national_flag`: "国旗" / "National Flag"
+    - `flag_default_description`: 默认国旗描述（中英文）
+    - 朗读内容相关的字符串资源（also_known_as, headquarters_located, region_is, org_type_is, coverage_population_approx, website_colon, capital_is, region_belongs, population_colon, area_colon, flag_proportion_is, adopted_date_is 及其英文版本）
+  - **本地化的内容**：
+    - FlagDetailPage Toast 消息：截取图片失败、国旗图片已保存到相册、保存失败、下载失败、已停止朗读、开始朗读、朗读功能暂不可用、正在准备分享...、分享失败
+    - FlagDetailPage UI 文本：基本信息、覆盖人口、网站、详情、未知
+    - FlagDetailPage 朗读内容：所有朗读文本都已本地化
+    - FlagDetailPage 分享文本：分享标题、描述、内容都已本地化
+    - GalleryPage：已完全本地化（之前已完成）
+  - **效果**：Gallery 标签页下的所有页面、组件和 Toast 消息现在都完全支持中英文切换
+
+- **HomePage 本地化修复**：修复了 HomePage 及其子页面的本地化问题
+  - **趣味知识本地化**：将 HomePage 中硬编码的 10 条趣味知识移到本地化资源文件
+    - 添加了 `fun_fact_1` 到 `fun_fact_10` 的中英文本地化字符串
+    - 现在会根据系统语言自动显示对应语言的趣味知识
+  - **日期格式化本地化**：修复了日期显示中的硬编码月份名称
+    - 添加了月份名称的本地化资源（`month_jan` 到 `month_dec` 和 `month_1` 到 `month_12`）
+    - 添加了日期后缀的本地化资源（`day_suffix`）
+    - 英文环境显示 "Jan 1" 格式，中文环境显示 "1月1日" 格式
+  - **FavoritesPage 本地化修复**：修复了收藏页面的硬编码字符串
+    - 将 "删除" 按钮文本改为使用 `app.string.delete` 本地化资源
+    - 将硬编码的 "导航失败" 改为使用 `app.string.navigation_failed` 本地化资源
+  - **效果**：现在 HomePage 及其子页面完全支持中英文切换，所有文本都从本地化资源读取
+
+- **Paint 游戏页面本地化修复**：修复了涂鸦游戏（第三个 tab）及其子页面的本地化问题
+  - **Toast 消息检查**：所有 Toast 消息都已正确本地化
+    - `paint_reset_failed`: "重置失败，请重试" / "Reset failed, please try again"
+    - `level_not_found`: "关卡不存在" / "Level not found"
+    - `level_data_load_failed`: "关卡数据加载失败" / "Failed to load level data"
+  - **硬编码文本修复**：修复了 PaintPlayPage 中硬编码的关卡显示文本
+    - 将 `第 ${levelId} 关` 改为使用 `app.string.level_number` 本地化资源
+    - 现在会根据系统语言显示 "第 X 关" 或 "Level X"
+  - **效果**：现在 Paint 游戏页面完全支持中英文切换，所有文本和 Toast 消息都从本地化资源读取
+
+### 变更 (Changed)
+- **游戏名称更新**：将"拼写挑战"（Spelling Challenge）重命名为"输入游戏"（Input）
+  - 更新了所有相关的字符串资源
+  - 中文：拼写挑战 → 输入游戏
+  - 英文：Spelling Challenge → Input
+  - 涉及位置：关卡列表、探索页面、ProfilePage、游戏页面标题等
+
+- **假旗找茬游戏名称统一**：修复了探索页面和游戏页面显示不同名称的问题
+  - 探索页面英文名称：Find the Fake → **Fake Flag**
+  - 现在所有位置统一显示 "Fake Flag"（英文）/ "假旗找茬"（中文）
+
+### 修复 (Fixed)
+- **Connections 游戏界面优化**：改进了国旗选择的视觉设计
+  - **正常状态**：移除边框，界面更简洁清爽
+  - **选中状态**：显示绿色边框和浅绿色背景，清晰标识选中项
+  - **提示状态**：保持橙色边框和阴影效果
+  - 提升了视觉层次感和交互体验
+
+- **涂鸦游戏美国州旗本地化**：修复了 PaintPlayPage 中美国州旗的语言切换问题，确保正确显示英文或中文州名
+  - **修改前**：语言切换时州名可能显示错误的语言
+  - **修改后**：
+    - 英文环境：Alabama, California, Texas...
+    - 中文环境：阿拉巴马州、加利福尼亚州、德克萨斯州...
+  - **代码优化**：
+    - 重构了 `getFlagDisplayName()` 方法，使逻辑更清晰
+    - 直接使用 `LocalizationUtil.isEnglish(this.currentLanguage)` 确保获取最新的语言状态
+    - 先检查是否为美国州旗，再根据语言返回相应的州名
+  - **效果**：在切换应用语言时，美国州旗名称能正确显示对应语言的州名
+
+- **国旗详情页人口和面积本地化**：修复了 FlagDetailPage 中人口和面积数据的本地化显示问题
+  - **问题描述**：之前人口和面积始终使用中文单位（万、亿），在英文环境下显示不正确
+  - **修复方案**：修改 `formatPopulation()` 和 `formatArea()` 方法，根据语言环境使用不同的单位
+  - **英文格式**：
+    - 人口（Population）：
+      - ≥ 10亿：X.XX billion（如 1.41 billion）
+      - ≥ 100万：X.XX million（如 331.90 million）
+      - ≥ 1千：X thousand（如 500 thousand）
+      - < 1千：直接显示数字
+    - 面积（Area）：
+      - ≥ 100万：X.XX million km²（如 9.60 million km²）
+      - ≥ 1千：X thousand km²（如 357 thousand km²）
+      - < 1千：X km²（如 622 km²）
+  - **中文格式**（保持不变）：
+    - 人口：X.XX 亿人、X 万人、X 人
+    - 面积：X.XX 万平方公里、X 平方公里
+  - **效果**：现在英文用户可以看到符合英语习惯的人口和面积数据
+
+- **五星红旗历史专题显示优化**：在英文环境下隐藏"五星红旗历史"专题
+  - **修改位置**：
+    - TopicData.ets：修改 `getAllTopics()` 函数，接收可选的 `language` 参数
+    - HomePage.ets：传递语言参数到 `getAllTopics()`
+    - TopicListPage.ets：传递语言参数到 `getAllTopics()`，并添加语言变化监听
+  - **过滤逻辑**：
+    - 在英文环境下（`language === 'en'` 或 `language.startsWith('en-')`），自动过滤掉 `flag-history` 专题
+    - 在中文环境下，正常显示所有专题
+  - **效果**：
+    - 英文用户在首页和专题列表页不会看到"五星红旗历史"专题
+    - 中文用户仍然可以正常访问该专题
+  - **动态响应**：添加了 `@Watch` 装饰器，语言切换时自动更新专题列表
+
+- **国旗详情页语言切换问题**：修复了 FlagDetailPage（国旗详情页）在切换语言后，国家信息仍显示原语言的问题
+  - **问题原因**：`currentLanguage` 变量使用 `private` 声明，未使用 `@StorageLink` 连接到 AppStorage，导致无法响应语言切换
+  - **受影响的信息**：
+    - 首都名称（Capital/首都）
+    - 大洲名称（Continent/大洲）
+    - 组织总部（Headquarters/总部）
+    - 国家/组织名称
+    - 国旗设计描述
+  - **修复方案**：将 `currentLanguage` 改为使用 `@StorageLink('currentLanguage')` 装饰器
+  - **效果**：现在切换语言后，详情页的所有信息都会立即更新为对应的语言版本
+
+- **专题详情页国家数量显示问题**：修复了相似旗专题页面显示"零个国家"的问题
+  - **问题原因**：`getCountText()` 方法使用 `displayItems.length` 计算数量，但相似旗专题的 `loadSimilarFlags()` 方法没有填充 `displayItems`，只填充了 `similarFlagPairs`
+  - **修复方案**：在 `getCountText()` 方法中添加对相似旗专题的特殊处理，使用 `similarFlagPairs.length * 2` 计算国家数量（每个 pair 包含 2 个国家）
+  - **效果**：现在相似旗专题正确显示国家数量，例如"16 个国家"而不是"0 个国家"
+
+- **Connections、Input 和 FakeFlag 游戏本地化**：完成了 ConnectionsPlayPage、InputPlayPage 和 FakeFlagPlayPage 的完整本地化
+  - **添加的字符串资源**：
+    - `try_again`: "再试一次！" / "Try again!"
+    - `shuffle`: "打乱" / "Shuffle"
+    - `unselect_all`: "取消全选" / "Unselect All"
+    - `submit`: "提交" / "Submit"
+    - `correct_answer`: "✓ 正确!" / "✓ Correct!"
+    - `enter_country_name`: "请输入国家名称" / "Enter country name"
+    - `find_fake_flag`: "找出假旗" / "Find the fake flag"
+    - `correct_found`: "正确找出" / "Correctly Found"
+    - `correct_found_count`: "正确找出了 %s 个假旗" / "Correctly found %s fake flags"
+  - **本地化的内容**：
+    - ConnectionsPlayPage: 错误提示、按钮文本（打乱、取消全选、提交、下一关）
+    - InputPlayPage: 游戏结束对话框、正确提示、输入框占位符、按钮文本、统计信息
+    - FakeFlagPlayPage: 游戏结束对话框、提示文本、按钮文本、统计信息
+    - 所有硬编码的中文文本都已替换为本地化字符串资源
+
+- **五星红旗历史专题本地化**：修改了专题本地化逻辑，使"五星红旗历史"专题在英文环境下也始终显示中文
+  - **修改内容**：
+    - 更新了 `getLocalizedTopicName()` 函数，对于 `flag-history` 专题，始终返回中文名称
+    - 更新了 `getLocalizedTopicDescription()` 函数，对于 `flag-history` 专题，始终返回中文描述
+    - 更新了 HomePage 中的专题显示，使用本地化函数替代直接访问 `nameEN` 属性
+  - **效果**：在专题推荐和专题列表中，"五星红旗历史"专题无论系统语言设置为何，都显示中文名称和描述
+
+- **Quiz 和 Trivia 游戏本地化**：完成了 QuizPlayPage 和 TriviaPlayPage 的完整本地化
+  - **添加的字符串资源**：
+    - `which_country_flag`: "这是哪个国家的国旗？" / "Which country's flag is this?"
+    - `select_correct_flag`: "请选择正确的国旗" / "Select the correct flag"
+    - `challenge_failed`: "挑战失败" / "Challenge Failed"
+    - `correct_answers_count`: "正确回答了 %s 道题" / "Correctly answered %s questions"
+    - `correct_answers_count_trivia`: "正确回答了 %s 题" / "Correctly answered %s questions"
+    - `max_combo`: "最高连击 %s" / "Max Combo %s"
+    - `restart`: "重新开始" / "Restart"
+    - `next_question`: "下一题" / "Next Question"
+    - `view_results`: "查看结果" / "View Results"
+    - `correct_answers`: "正确答题" / "Correct Answers"
+    - `correct_answers_label`: "正确回答" / "Correct Answers"
+    - `remaining_lives`: "剩余生命" / "Remaining Lives"
+    - `share_score`: "分享成绩" / "Share Score"
+    - `combo_streak`: "%s 连击！" / "%s Combo!"
+    - `correct_answers_share`: "正确答题：%s / %s" / "Correct Answers: %s / %s"
+    - `max_combo_share`: "最高连击：%s" / "Max Combo: %s"
+    - `remaining_lives_share`: "剩余生命：%s" / "Remaining Lives: %s"
+    - `back_to_levels`: "返回关卡列表" / "Back to Levels"
+  - **本地化的内容**：
+    - QuizPlayPage: 问题提示文本、游戏结束对话框、按钮文本、统计信息、分享文本等
+    - TriviaPlayPage: 游戏结束对话框、按钮文本、统计信息、关卡显示等
+    - 所有硬编码的中文文本都已替换为本地化字符串资源
+
+- **历史国旗页面标题格式**：修复了 FlagHistoryPage（历史国旗页面）标题中国家名称和后续文本之间缺少空格的问题
+  - **修复位置**：
+    - ShareContentBuilder：分享截图标题
+    - HistoryContentBuilder：页面显示标题
+  - **修复效果**：
+    - 修改前：`${this.countryName}${flagHistory}`（如 "中国国旗变迁史"）
+    - 修改后：`${this.countryName} ${flagHistory}`（如 "中国 国旗变迁史" 或 "China Flag History"）
+  - 标题现在在国家名称和后续文本之间有正确的空格，提高了可读性
+
+- **记忆翻牌游戏本地化**：修复了 MemoryPlayPage（记忆翻牌游戏页面）中所有硬编码的中文字符串
+  - **添加的字符串资源**：
+    - `time`: "时间" / "Time"
+    - `moves`: "步数" / "Moves"
+    - `pairs`: "配对" / "Pairs"
+    - `total_moves`: "总步数" / "Total Moves"
+    - `pairs_completed`: "配对完成" / "Pairs Completed"
+    - `time_up`: "时间到！" / "Time's Up!"
+  - **本地化的UI文本**：
+    - 顶部状态栏：步数、时间、配对
+    - 结果对话框：恭喜过关、时间到、总步数、配对完成
+  - **其他修复**：
+    - 移除了结果对话框中的 `level.name` 显示，现在只显示 "第 N 关" 或 "Level N"
+    - 所有文本现在根据系统语言自动显示中英文版本
+
+- **首页本地化问题**：修复了首页多个区域的本地化显示问题
+  - **专题推荐部分**：
+    - 专题名称现在根据应用语言显示中文或英文
+    - 添加了文本溢出处理（ellipsis）
+  - **每周国旗部分**：
+    - 国家名称现在使用 `getLocalizedCountryName()` 根据语言显示
+    - 日期格式根据语言环境正确显示：
+      - 中文：X月X日（如 "12月25日"）
+      - 英文：Month Day（如 "Dec 25"）
+    - 修复了日期格式硬编码为中文的问题
+  - **实现细节**：
+    - 添加了 `formatDate()` 方法处理日期本地化
+    - 添加了 `getLocalizedCountryNameByCode()` 方法获取本地化国家名称
+    - 导入了 `getLocalizedCountryName` 工具函数
+
+- **游戏关卡页面显示优化**：修复了所有游戏关卡页面中关卡条目显示额外文本的问题
+  - **受影响页面**：
+    - MemoryLevelsPage：记忆翻牌关卡页面
+    - QuizLevelsPage：国旗猜猜关卡页面
+    - FakeFlagLevelsPage：假旗找茬关卡页面
+    - ConnectionsLevelsPage：分组连线关卡页面
+  - **修复内容**：
+    - 移除了关卡条目中的 `level.name` 显示（如 "第 N 关 · 关卡名称"）
+    - 现在所有关卡条目只显示 "第 N 关" 或 "Level N"
+    - 统一了所有页面使用 `context.resourceManager.getStringSync()` 获取本地化字符串资源
+    - 确保所有关卡页面显示格式一致
+
+- **QuizSelectPage 本地化问题**：修复了 QuizSelectPage（国旗猜猜选择页）中硬编码中文文本未本地化的问题
+  - 添加了缺失的字符串资源：`quiz_flag_to_name_desc`、`quiz_name_to_flag_desc`、`complete_levels_to_unlock`
+  - 将所有硬编码文本替换为本地化字符串资源
+  - 标题使用 `game_quiz` 资源进行本地化
+
+- **详情页 Snackbar 宽度问题**：修复了 FlagDetailPage 和 StateFlagDetailPage 中复制提示 snackbar 宽度为 100% 的布局问题
+  - **受影响页面**：
+    - FlagDetailPage：国旗详情页
+    - StateFlagDetailPage：州旗详情页
+  - **修复内容**：
+    - 移除了不必要的外层 Column 容器
+    - 去掉了 `width('100%')` 设置，让宽度根据 margin 自动计算
+    - 简化了布局结构，直接使用 Row 作为顶层容器
+    - 现在 snackbar 宽度正确为：父容器宽度 - 左右 margin (32px)
+
+- **应用语言切换同步问题**：修复了在 ProfilePage 切换语言后，其他页面不能立即更新语言的问题
+  - **问题原因**：多个页面使用 `LocalizationUtil.getSystemLanguage()` 获取语言，这只在页面初始化时获取一次，不能响应应用语言切换
+  - **修复方案**：将所有页面的语言变量改为使用 `@StorageLink('currentLanguage')` 连接到 `AppStorage`
+  - **受影响页面**：
+    - GalleryPage：添加 `@Watch('onLanguageChanged')` 监听语言变化并重新加载国家列表
+    - HomePage：趣味知识根据语言动态切换
+    - HeadsUpPlayPage：国家名称显示根据语言切换
+    - PaintPlayPage：美国州名和国家名根据语言显示
+    - TopicDetailPage：专题内容根据语言显示
+    - TopicListPage：专题列表根据语言显示
+    - FlagDetailPage：国旗详情页根据语言显示
+    - ProfilePage：配置页使用 @StorageLink 同步语言状态
+  - **效果**：现在切换语言后，所有页面都能立即显示正确的语言内容，无需重启应用
+
+- **全面修复英文本地化问题**：逐页、逐组件、逐toast审查并修复所有硬编码的中文字符串
+  - **Toast消息本地化**：修复所有toast消息的硬编码中文字符串
+    - QuizPlayPage: "正在准备分享..."、"截取图片失败"、"分享失败"
+    - TriviaPlayPage: "正在准备分享..."、"截取图片失败"、"分享失败"
+    - ConnectionsPlayPage: "分成四组，每组四个。点选，找齐即可过关。"
+    - PaintPlayPage: "关卡不存在"、"关卡数据加载失败"
+    - FlagDetailPage: "保存失败: ${error.message}"
+  - **连接字符串本地化**：修复所有"第 N 关"格式的硬编码字符串
+    - ConnectionsPlayPage: 关卡标题显示
+    - QuizPlayPage: 关卡标题、分享标题、结果页面
+    - InputPlayPage: 关卡标题、结果页面
+    - FakeFlagPlayPage: 关卡标题、结果页面
+    - TriviaPlayPage: 关卡标题、分享标题、结果页面
+    - PaintPlayPage: 关卡标题、结果页面
+    - MemoryPlayPage: 结果页面
+    - InputLevelsPage: 关卡列表显示
+    - TriviaLevelsPage: 关卡列表显示
+  - **UI文本本地化**：修复所有硬编码的UI文本
+    - GalleryPage: "搜索国家或地区"、"未找到匹配的国家"、"修改关键词或选择\"全部\"或其他大洲"、"加载中..."
+    - PaintPlayPage: "下一个"、"完成"、"下一关"、"完美收官"、"返回"
+    - TopicDetailPage: "加载中..."、"已停止朗读"、"开始朗读"、"朗读功能暂不可用"、"共 N 个国家/组织"
+    - HeadsUpPlayPage: "加载中..."
+    - StateFlagDetailPage: "加载中..."、"暂无数据"、"基本信息"、"所属国家"、"首府"、"地区"、"已收藏"、"收藏"、"下载"、"点击各项内容可复制"、"知道了"、"已复制"、"复制失败"、"已取消收藏"、"已添加到收藏"、"正在准备图片..."、"截取图片失败"、"下载失败"、"州旗图片已保存到相册"、"保存失败"、"已停止朗读"、"开始朗读"、"朗读功能暂不可用"、"正在准备分享..."、"分享失败"、"州旗详情"
+  - **字符串资源更新**：添加缺失的字符串资源
+    - `level_not_found`: "关卡不存在" / "Level not found"
+    - `level_data_load_failed`: "关卡数据加载失败" / "Failed to load level data"
+    - `next`: "下一个" / "Next"
+    - `complete`: "完成" / "Complete"
+    - `search_country_or_region`: "搜索国家或地区" / "Search country or region"
+    - `no_matching_countries`: "未找到匹配的国家" / "No matching countries found"
+    - `modify_keywords_or_select`: "修改关键词或选择\"全部\"或其他大洲" / "Modify keywords or select \"All\" or other continents"
+    - `loading`: "加载中..." / "Loading..."
+    - `level_challenge_success`: "第%s关挑战成功" / "Level %s challenge completed"
+    - `total_countries`: "共 %s 个国家" / "%s countries"
+    - `total_organizations`: "共 %s 个组织" / "%s organizations"
+    - `favorite_added`: "已添加到收藏" / "Added to favorites"
+    - `download_failed`: "下载失败" / "Download failed"
+    - `state_flag_saved`: "州旗图片已保存到相册" / "State flag image saved to gallery"
+    - `no_data`: "暂无数据" / "No data"
+    - `belongs_to_country`: "所属国家" / "Country"
+    - `state_flag_detail`: "州旗详情" / "State Flag Details"
+    - `state_flag`: "州旗" / "State Flag"
+  - **代码改进**：
+    - 所有toast消息现在使用 `context.resourceManager.getStringSync()` 获取本地化字符串
+    - 所有"第 N 关"格式的字符串现在使用 `level_number` 资源字符串
+    - 所有UI文本现在使用资源字符串而不是硬编码中文
+    - 确保所有连接字符串（如"第 N 关"）都正确支持本地化
+    - StateFlagDetailPage: 朗读内容根据系统语言生成中英文版本
+
+### 新增 (Added)
+- **图库页面本地化**：图库页面现在支持中英文切换
+  - **国家名称本地化显示**：根据系统语言显示英文或中文国家名称
+  - **大洲筛选器本地化**：大洲名称根据系统语言显示相应语言
+  - **智能排序**：英文环境按英文字母排序，中文环境按拼音排序
+  - **搜索功能增强**：搜索同时支持中英文国家名称
+  - **显示优化**：国家名称最多显示1行，超长文本自动省略
+  - 使用 `LocalizationUtil` 工具类获取系统语言
+  - 使用 `getLocalizedCountryName` 和 `getLocalizedRegionName` 函数进行本地化
+
+- **游戏关卡页面本地化**：所有游戏关卡页面的标题现在支持中英文切换
+  - 知识问答 (Trivia Quiz)
+  - 拼写挑战 (Spelling Challenge)
+  - 假旗找茬 (Flag Detection)
+  - 记忆翻牌 (Memory Match)
+  - 分组连线 (Connections)
+
+- **HeadsUp游戏本地化支持**：为HeadsUp游戏添加完整的国际化支持
+  - **Info对话框本地化**：首次进入游戏时的使用说明对话框现在支持中英文
+    - 添加 `headsup_tutorial_title` 资源（中文："使用说明" / 英文："How to Play"）
+    - 添加 `headsup_tutorial_message` 资源（中文："• 点击屏幕查看答案\n• 再点下一个\n• 每十个一轮" / 英文："• Tap screen to see answer\n• Tap again for next\n• 10 flags per round"）
+  - **游戏结束界面本地化**：完成一轮游戏后的界面文本本地化
+    - 添加 `headsup_session_over` 资源（中文："本轮完成！" / 英文："Round Complete!"）
+    - 添加 `headsup_session_count` 资源（中文："已完成 %s 轮" / 英文："Completed %s round(s)"）
+    - 添加 `headsup_exit` 资源（中文："退出" / 英文："Exit"）
+    - 添加 `headsup_continue` 资源（中文："继续" / 英文："Continue"）
+  - **国家名称显示优化**：
+    - 英文模式下只显示英文国家名称
+    - 中文模式下显示中文国家名称（主要）和英文名称（辅助）
+  - **代码改进**：
+    - 引入 `LocalizationUtil` 工具类检测系统语言
+    - 添加 `isEnglish` 状态变量动态控制国家名称显示
+    - 使用资源管理器动态获取本地化字符串
+
+- **Paint标签页完整本地化**：为涂鸦游戏添加全面的国际化支持
+  - **分类名称和描述本地化**：
+    - 添加 `paint_category_world` 资源（中文："世界" / 英文："World"）
+    - 添加 `paint_category_world_desc` 资源（中文："世界各国国旗涂鸦" / 英文："Paint world flags"）
+    - 添加 `paint_category_us` 资源（中文："美国" / 英文："United States"）
+    - 添加 `paint_category_us_desc` 资源（中文："美国各州州旗涂鸦" / 英文："Paint US state flags"）
+  - **界面元素本地化**：
+    - 添加 `paint_instructions_banner` 资源（中文："涂鸦说明" / 英文："How to Play"）
+    - 添加 `paint_reset_failed` 资源（中文："重置失败，请重试" / 英文："Reset failed, please try again"）
+  - **美国州名本地化支持**：
+    - 添加 `US_STATE_NAMES_EN` 常量，包含所有50个州和华盛顿特区的英文名称
+    - 重命名 `US_STATE_NAMES` 为 `US_STATE_NAMES_CN` 以明确区分语言
+    - 在PaintPlayPage中添加 `isEnglish` 状态变量
+    - 修改 `getFlagDisplayName()` 方法根据系统语言返回对应的州名或国家名
+  - **数据结构改进**：
+    - 为 `PaintCategory` 接口添加 `nameResId` 和 `descResId` 字段
+    - 所有分类配置使用资源ID而非硬编码字符串
+  - **页面更新**：
+    - PaintHomePage：使用资源ID显示分类名称和描述
+    - PaintPlayPage：根据语言环境显示正确的国家名或州名
+    - AllLevelsCompletedDialog：完成对话框使用本地化的分类名称
+
+### 修复 (Fixed)
+- **ArkTS @Builder 语法错误修复**：修复了 GalleryPage 中 @Builder 函数的编译错误
+  - 在 `@Builder` 函数中不能使用 `const`/`let`/`var` 声明变量
+  - 将变量声明改为直接在 UI 组件中使用表达式
+  - 修复了 `ContinentChip` 和 `FlagItem` 两个 Builder 函数
+
+- **AllLevelsCompletedDialog 类型错误修复**：修复了 PaintHomePage 中对话框的编译错误
+  - 将 `categoryName` 属性改为 `completionMessage` 属性
+  - 在创建对话框前生成完整的本地化消息
+  - 避免在 CustomDialog 中访问不存在的 `context` 属性
+
+- **资源目录命名错误修复**：修复了资源目录命名不符合HarmonyOS规范的问题
+  - 删除了使用连字符的 `en-US` 目录（错误命名）
+  - 保留使用下划线的 `en_US` 目录（正确命名）
+  - HarmonyOS 要求使用下划线格式（如 `en_US`, `zh_CN`）而不是连字符格式
+
+- **ArkTS 编译错误修复**：修复了多个 ArkTS 编译错误
+  - **对象字面量类型声明**：为 map 函数的返回值添加明确的类型声明
+    - FlagEtiquetteData.ets: `(section): EtiquetteSection => ({...})`
+    - FlagManufacturingData.ets: `(section): ManufacturingSection => ({...})`
+    - FlagVexillologyData.ets: `(section): VexillologySection => ({...})`
+    - FlagHistoryData.ets: `(section): HistorySection => ({...})`
+  - **Promise 类型错误**：修复 QuizPlayPage.ets 中的 Promise 类型问题
+    - 在调用 `buildShareText()` 时添加 `await`
+    - 确保异步方法正确返回 string 而不是 Promise<string>
+
+- **资源重复定义修复**：修复了 string.json 中重复的资源定义
+  - 删除了重复的 `next_level` 资源定义
+  - 删除了重复的 `perfect_finish` 资源定义
+  - 删除了重复的 `congratulations` 资源定义
+  - 中英文资源文件现在每个资源只定义一次
+
+### 新增 (Added)
+- **专题内容本地化支持**：为所有知识性专题内容添加英文支持
+  - **数据结构更新**：
+    - 为 `EtiquetteSection`、`ManufacturingSection`、`VexillologySection`、`HistorySection` 接口添加 `titleEN` 和 `contentEN` 字段
+    - 所有知识性专题的章节标题和内容现在都支持中英文两种语言
+  - **英文内容添加**：
+    - **FlagEtiquetteData**：为6个章节（升旗流程、悬挂顺序、悬挂方式、使用场合、礼仪规范、常见错误）添加完整英文内容
+    - **FlagManufacturingData**：为6个章节（制作流程、制作材料、制作工艺、制作工厂、质量标准、制作成本）添加完整英文内容
+    - **FlagVexillologyData**：为7个章节（旗帜学概述、旗帜分类、设计原则、历史演变、研究方法、著名学者、旗帜象征）添加完整英文内容
+    - **FlagHistoryData**：为8个章节（设计背景、设计过程、设计细节、首次升起、法律地位、使用规范、文化意义、历史演变）添加完整英文内容
+  - **本地化函数**：
+    - 创建 `getLocalizedEtiquetteContent()` 函数
+    - 创建 `getLocalizedManufacturingContent()` 函数
+    - 创建 `getLocalizedVexillologyContent()` 函数
+    - 创建 `getLocalizedFlagHistoryContent()` 函数
+    - 所有函数根据系统语言自动返回对应的本地化内容
+  - **页面更新**：
+    - **TopicDetailPage**：
+      - 更新 `loadKnowledgeContent()` 方法使用本地化函数
+      - 更新 `getReadContent()` 方法使用本地化的专题名称和描述
+      - 更新朗读功能的提示信息为本地化文本
+      - 更新相似旗专题的国家名称使用本地化
+      - 更新国旗列表中的国家/组织名称使用本地化
+      - 所有知识性专题内容（标题和正文）现在都根据系统语言自动显示
+    - **TopicListPage**：
+      - 更新页面标题使用字符串资源（`$r('app.string.topic_recommendations')`）
+      - 专题名称和描述已通过 `getLocalizedTopicName()` 和 `getLocalizedTopicDescription()` 实现本地化
+  - 知识性专题现在完全支持中英文切换，所有内容（包括章节标题和正文）都会根据系统语言自动显示相应的语言版本
+
+- **完善国际化支持**：为更多界面元素添加国际化支持
+  - **底部标签栏**：首页、画廊、涂鸦、探索、我的
+  - **ProfilePage**：
+    - 游戏名称：国旗猜猜、假旗找茬、拼写挑战、知识问答
+  - **HomePage**：
+    - 大洲名称：亚洲、欧洲、非洲、美洲、大洋洲
+  - **FavoritesPage**：
+    - 我的收藏、暂无收藏、已取消收藏、导航失败
+  - **游戏关卡页面**：
+    - 看旗猜国名、看名猜国旗
+    - 第 N 关 → Level N
+  - **游戏页面**：
+    - 恭喜过关 → Congratulations
+    - 下一关 → Next Level
+    - 完美收官 → Perfect Finish
+  - 添加所有相关的中英文字符串资源（30+个新字符串）
+  - 确保所有 UI 文本都能正确适配中英文语言
+
+- **语言切换功能**：在"我的"页面添加语言切换功能
+  - 在深色模式设置下方添加语言选择设置项
+  - 支持中文和英文两种语言
+  - 点击语言设置项打开语言选择对话框
+  - 使用 `i18n.System.setAppPreferredLanguage()` API 设置应用偏好语言
+  - 语言设置持久化保存到 Preferences 和 AppStorage
+  - 在 EntryAbility 中自动初始化语言设置
+  - 参考 morse 项目实现，支持实时语言切换
+  - 添加语言相关的字符串资源（中英文）
+  - 语言切换后重启应用即可生效
+
+### 修复 (Fixed)
+- **ArkTS 编译错误修复**：修复了 ProfilePage 和 LocalizationUtil 中的类型错误
+  - **ProfilePage.ets**：
+    - 使用 `ResourceWithId` 接口替代 `as unknown as Record<string, number>`
+    - 为 `showAboutApp()` 和 `showFeedback()` 方法定义 `DialogButton` 和 `ShowDialogOptions` 接口
+    - 移除所有 `as unknown as` 类型断言，改用明确的接口定义
+  - **LocalizationUtil.ets**：
+    - 定义 `LocaleInfo` 接口替代不存在的 `resourceManager.Locale`
+    - 使用 `locale.language !== undefined` 检查替代不支持的 `'language' in locale` 操作符
+    - 定义 `ErrorObject` 接口替代对象字面量作为类型声明
+    - 移除所有 `as unknown as` 类型断言
+
+### 新增 (Added)
+- **元数据英文支持**：为所有元数据（CountryInfo、FlagDesign、InternationalOrg 等）添加英文条目支持
+  - 添加 `ContinentNamesEN` 英文洲名称映射
+  - 创建本地化工具函数：
+    - `getLocalizedCountryName()` - 根据语言获取国家名称
+    - `getLocalizedCapital()` - 根据语言获取首都名称
+    - `getLocalizedRegionName()` - 根据语言获取地区名称
+    - `getLocalizedFlagDesign()` - 根据语言获取标志设计描述
+    - `getLocalizedOrgName()` - 根据语言获取国际组织名称
+    - `getLocalizedOrgHeadquarters()` - 根据语言获取国际组织总部名称
+  - 创建 `LocalizationUtil` 工具类，用于获取系统语言
+  - 更新 `FlagDetailPage` 以根据系统语言自动加载相应的元数据显示
+  - 所有国家信息、标志设计描述、国际组织信息现在都支持英文和中文两种语言
+  - 当应用语言设置为英文时，自动显示英文元数据；设置为中文时，显示中文元数据
+  - `StateFlagData` 已包含英文字段，无需额外添加
+  - 为 `TopicData` 添加英文支持：
+    - 在 `TopicItem` 接口中添加 `nameEN` 和 `descriptionEN` 字段
+    - 为所有专题（旗帜学、国旗礼仪、国旗制作、五星红旗历史、相似旗、国际组织等15个专题）添加英文名称和描述
+    - 创建 `getLocalizedTopicName()` 和 `getLocalizedTopicDescription()` 本地化函数
+    - 更新 `TopicListPage` 和 `TopicDetailPage` 以根据系统语言显示相应的专题名称和描述
+
+- **英文国际化支持**：为应用添加英文语言支持，使用 HarmonyOS 系统国际化方案
+  - 创建英文版本的 string.json 资源文件（en-US/element/string.json）
+  - 更新中文版本的 string.json，添加所有需要国际化的字符串资源
+  - 在 entry 和 AppScope 目录下分别创建英文资源文件
+  - 替换代码中的硬编码中文字符串为资源引用（$r('app.string.xxx')）
+  - 更新的页面包括：
+    - HomePage：欢迎标题、快捷入口、专题推荐、趣味小知识等
+    - ExplorePage：所有游戏卡片的标题和描述
+    - FlagDetailPage：基本信息、关于国旗、收藏、下载、分享等所有UI文本
+    - ProfilePage：设置项、主题对话框、关于应用、意见反馈等
+    - PaintHomePage：涂鸦说明对话框、完成对话框等
+  - 应用现在可以根据系统语言设置自动切换中英文界面
+  - 支持的语言：中文（简体）、英文（美式）
+
+### 优化 (Optimized)
+- **ConnectionsPlayPage 提示按钮样式优化**：将提示按钮背景色改为半透明
+  - 💡 提示按钮和 ✓ 解答按钮的背景色从纯色改为 `rgba(22, 119, 255, 0.5)`（50%透明度）
+  - 半透明效果让按钮看起来更轻盈，与游戏界面更协调
+  - 保持按钮的圆形设计和尺寸不变
+- **ConnectionsPlayPage 游戏提示优化**：游戏提示 toast 只在会话中显示一次
+  - 添加 `hasShownToast` 私有变量跟踪 toast 显示状态
+  - 只在第一次加载关卡时显示"分成四组，每组四个。点选，找齐即可过关。"提示
+  - 后续关卡不再重复显示提示，减少干扰，提升用户体验
+- **ConnectionsPlayPage 移除提交振动反馈**：移除提交按钮点击时的振动反馈
+  - 移除 `submitSelection` 方法中的 `VibratorUtil.vibrateTap()` 调用
+  - 保留正确答案、错误答案和完成游戏的振动反馈
+  - 减少不必要的振动，提升用户体验
+- **ExplorePage 列表底部间距优化**：为探索页面列表添加底部内边距，避免最后一张卡片被底部标签栏遮挡
+  - 在 Column 组件上添加 `padding: { bottom: 60 }`
+  - 将所有游戏卡片的内边距从 20 增加到 24，使卡片内容更宽敞舒适
+  - 用户现在可以完整看到最后一张卡片，无需担心被标签栏遮挡
+
+### 修复 (Fixed)
+- **ConnectionsPlayPage 硬编码关卡数修复**：修复了最大关卡数硬编码的问题
+  - 导入 `getTotalConnectionsLevels()` 函数
+  - 使用 `getTotalConnectionsLevels()` 动态获取总关卡数，替代硬编码的 `15`
+  - 确保添加新关卡时不需要修改多处代码
+- **GameProgressManager 内存泄漏修复**：修复了 initPromise 可能导致的内存泄漏
+  - 在成功初始化后将 `initPromise` 设置为 null
+  - 避免重复初始化时等待已完成的 Promise
+  - 提升内存管理和性能
+- **涂鸦游戏数据清理**：移除德国、意大利、巴西涂鸦游戏分类
+  - 从 `paintCategories` 数组中移除这三个分类（暂无数据）
+  - 从 `GameType` 枚举中移除 `PAINT_DE`、`PAINT_IT`、`PAINT_BR`
+  - 从 `PaintHomePage.getGameType()` 方法中移除对应映射
+  - 只保留世界和美国两个有完整数据的分类
+- **ConnectionsPlayPage 移除胜利界面**：移除胜利对话框，"下一关"按钮直接在当前页面加载下一关
+  - 移除 `showWinScreen` 状态变量和相关逻辑
+  - 移除 `WinScreen` @Builder 组件（包含遮罩层、胜利内容、已解分组展示等）
+  - 移除 `displayWinScreen()` 方法
+  - 移除 `handlePlayAgain()` 方法（不再需要"再玩一次"功能）
+  - "下一关"按钮点击后直接调用 `handleNextLevel()`，在当前页面加载下一关数据
+  - 简化了游戏流程，用户完成关卡后可以直接进入下一关，无需额外的对话框交互
+  - 移除 build 方法中的 Stack 和条件判断，直接使用 Navigation 作为根组件
+- **ConnectionsPlayPage 下一关按钮宽度问题**：修复了"下一关"按钮宽度超出屏幕的布局问题
+  - 问题原因：按钮同时设置了 `width: 100%` 和左右 margin，导致实际宽度超出父容器
+  - 修复方式：用 Column 包裹按钮，将 margin 改为 padding 设置在 Column 上
+  - 按钮现在正确显示在屏幕内，左右各有16像素的间距
+- **ConnectionsPlayPage 已解分组不显示问题**：修复了提交正确分组后，已解分组区域不显示的数据绑定问题
+  - 问题原因：在 ArkTS 中，直接修改 `@State` 数组内部对象的属性不会触发 UI 更新
+  - 修复方式：在修改分组状态后，使用 `this.groups = [...this.groups]` 重新赋值整个数组来触发 UI 更新
+  - 在 `submitSelection` 方法中添加数组重新赋值
+  - 在 `useSolve` 方法中添加数组重新赋值和 `this.showGroups = true`
+  - 修复后已解分组能够正确显示在页面顶部
+- **涂鸦游戏完成对话框崩溃问题**：修复了点击已完成的涂鸦游戏入口时应用崩溃的问题
+  - 问题原因：`showAllLevelsCompletedDialog` 方法中尝试使用 `new` 创建 `@CustomDialog` 结构体实例
+  - 修复方式：改用 CustomDialogController 的 builder 模式，直接传递参数
+  - 将 `onRestart` 回调改为可选参数（`onRestart?: () => void`）
+  - 添加 `@State dialogCategoryName: string` 用于传递分类名称到对话框
+  - 修复后点击已完成的游戏入口不再崩溃，正确显示完成对话框
+- **ConnectionsPlayPage 提交分组后逻辑和UI修复**：修复了提交分组后已解分组不立即显示的问题
+  - 在提交分组成功后，如果有已解分组，立即设置 `showGroups = true`，不再等待2秒延迟
+  - 移除已解分组区域的固定高度限制（200px），改为根据内容动态调整高度
+  - 移除已解分组区域的Scroll组件，改为直接使用Column，与Flutter实现保持一致
+  - 参考Flutter实现，确保提交分组后已解分组立即显示在顶部区域
+- **ConnectionsPlayPage 提示和解答按钮样式优化**：优化提示和解答按钮的文本大小和居中显示
+  - 将按钮文本大小从20减小到16，使按钮更精致
+  - 添加文本居中对齐，确保emoji图标在按钮中居中显示
+- **ConnectionsPlayPage 下一步按钮优化**：将"下一步"改为"下一关"，并参考QuizPlayPage调整按钮样式
+  - 将按钮文本从"下一步"改为"下一关"，与其他游戏页面保持一致
+  - 参考QuizPlayPage的实现，调整按钮样式：
+    - 字体大小从18调整为17
+    - 移除ButtonType.Normal和borderRadius，使用默认样式
+    - 保持宽度100%和高度48，与其他游戏页面保持一致
+- **ConnectionsPlayPage 游戏完成时隐藏操作按钮**：确保游戏完成时所有操作按钮（包括提示和解答按钮）都被隐藏
+  - 所有操作按钮（打乱、取消全选、提交、提示、解答）都在 `if (!this.isGameCompleted())` 条件内
+  - 当所有分组都完成时，这些按钮会自动隐藏，只显示"下一关"按钮
+  - 与Flutter实现保持一致，提供更好的用户体验
+- **ConnectionsPlayPage 提示改为Toast**：将"创建四个四组"提示从页面内横幅改为顶部Toast提示
+  - 移除页面内的提示横幅元素（showHintBanner）
+  - 在加载关卡时使用 `promptAction.showToast` 在顶部显示提示，持续3秒
+  - 设置 `bottom: '80%'` 让 Toast 显示在屏幕顶部
+  - 简化页面布局，减少页面内元素，提供更简洁的用户体验
+  - 移除相关的状态变量和定时器逻辑
+  - 更新提示文本为"分成四组，每组四个。点选，找齐即可过关。"，提供更详细的游戏说明
+- **ConnectionsLevelsPage 参考 QuizLevelsPage 样式**：完全参考 QuizLevelsPage 的样式和布局
+  - 添加关卡序号图标（圆形背景，显示数字）
+  - 保留"第 N 关"文本（不显示名称）
+  - 添加箭头图标（仅已解锁关卡显示）
+  - 将 onClick 从 ListItem 移到 Row 上
+  - 添加 startLevel 方法处理关卡点击，与 QuizLevelsPage 的 startQuiz 方法保持一致
+  - 使用相同的颜色、尺寸和间距，确保视觉一致性
+- **ConnectionsPlayPage 修复导航栏显示问题**：修复导航栏不显示的问题
+  - 将 `.title('')` 改为 `.title('分组连线')`，确保导航栏正常显示
+  - 空字符串标题可能导致导航栏不显示，设置非空标题可以解决这个问题
+- **ConnectionsPlayPage 移除内部返回按钮**：移除内部UI中的返回按钮，使用导航栏的返回按钮
+  - 移除内部顶部栏中的返回按钮图标和点击事件
+  - 移除 `.hideBackButton(true)`，恢复导航栏的返回按钮显示
+  - 简化内部UI，只保留关卡标题，使用导航栏的标准返回按钮
+- **ConnectionsPlayPage UI 优化**：优化分组连线游戏页面的标题和布局显示
+  - 移除导航栏标题文本（`.title('')`），只保留返回按钮
+  - 在页面内容区域顶部添加关卡标题（"第 N 关"），居中显示
+  - 已解分组区域在顶部显示（错误提示下方），方便用户查看已完成的分组
+  - 与 Flutter 项目保持一致的布局结构
+- **StateFlagDetailPage 对话框崩溃问题**：修复了点击美国州旗下载按钮时应用崩溃的问题
+  - 在创建新对话框前先关闭旧的对话框，避免重复创建导致崩溃
+  - 在 `aboutToDisappear()` 中添加对话框关闭逻辑，确保页面销毁时正确清理资源
+  - 在 `onSaveSuccess` 回调中添加 `releaseFlagPixelMap()` 调用，确保保存成功后释放 PixelMap
+  - 参考 FlagDetailPage 的实现方式，保持一致的对话框管理逻辑
+- **ConnectionsPlayPage 移除左侧返回按钮**：移除分组连线游戏页面 Navigation 组件的默认左侧返回按钮（chevron）
+  - 添加 `.hideBackButton(true)` 隐藏默认返回按钮
+  - 页面已有自定义返回按钮，移除默认按钮避免重复
+- **编译错误修复**：修复了多个 ArkTS 编译错误
+  - **ConnectionsPlayPage.ets**：
+    - 修复方法名错误：将 `playButtonTap()` 替换为 `playButton()`，`vibrateSelection()` 替换为 `vibrateTap()`
+    - 修复解构赋值问题：将数组解构赋值改为传统循环方式
+    - 修复展开运算符问题：将展开运算符改为显式循环复制数组
+    - 修复对象字面量类型问题：将展开对象改为显式属性赋值
+    - 修复结构类型问题：使用显式类型声明替代结构类型
+    - 修复 @Builder 中逻辑代码问题：将逻辑代码移到私有方法 `isFlagSelected()` 和 `isFlagHintHighlighted()` 中，在 @Builder 中直接使用方法调用
+    - 修复 FontWeight.SemiBold 不存在问题：改为使用 `FontWeight.Medium`
+    - 修复 curves API 问题：将 `curves.easeOut`、`curves.easeOutCubic`、`curves.easeInOut` 改为 `Curve.EaseOut`、`Curve.EaseOut`、`Curve.EaseInOut`
+    - 修复 Padding 格式问题：将 `{ vertical: x, horizontal: y }` 改为 `{ top: x, bottom: x, left: y, right: y }`
+    - 修复 maxHeight 问题：将 `maxHeight` 改为 `height`
+    - 修复重复方法名问题：将 `showWinScreen()` 方法重命名为 `displayWinScreen()`，避免与 `@State showWinScreen` 冲突
+    - 修复 icon_error 资源不存在问题：使用文本符号 '✗' 替代图标
+    - 修复 includes 方法问题：将 `includes()` 方法改为显式循环查找
+    - 修复 FlagTile 接口导入问题：从 ConnectionsLevels 导入 FlagTile 接口，移除本地重复定义
+  - **QuizPlayPage.ets**：
+    - 修复 build 方法结构问题：将条件分支包装在单一 Column 根节点中，符合 Navigation 的 build 方法要求
+    - 修复 Navigation 链式调用位置：将 `.title()`, `.titleMode()` 等链式调用移到 Navigation 块外
+  - **TriviaPlayPage.ets**：
+    - 修复 build 方法结构问题：将条件分支包装在单一 Column 根节点中，符合 Navigation 的 build 方法要求
+    - 修复 Navigation 链式调用位置：将 `.title()`, `.titleMode()` 等链式调用移到 Navigation 块外
+    - 修复 @Builder 中逻辑代码问题：将 `const question = this.getCurrentQuestion()` 改为直接在条件判断中使用方法调用
+
+### 新增 (Added)
+- **Quiz 和 Trivia 游戏分享功能**：为看旗猜国名和知识问答游戏添加分享功能
+  - 在导航栏添加分享按钮，点击可分享当前问题 UI
+  - 创建隐藏的分享容器，包含问题内容、选项和关卡信息
+  - 使用截图功能将问题 UI 转换为图片并分享
+  - 参考 FlagDetailPage 的实现方式，使用相同的图片分享技术
+  - 分享图片包含完整的问题信息，方便用户分享到社交媒体
+
+### 修复 (Fixed)
+- **ConnectionsPlayPage 路由注册**：为分组连线游戏页面注册路由
+  - 在 main_pages.json 中添加 ConnectionsLevelsPage 和 ConnectionsPlayPage 的路由注册
+  - 修复了分组连线游戏无法正常跳转的问题
+- **ConnectionsPlayPage 返回按钮反馈**：为分组连线游戏页面的返回按钮添加音效和振动反馈
+  - 返回按钮点击时播放按钮点击音效和振动反馈
+  - 与其他游戏页面保持一致的用户体验
+- **Snackbar 边距和样式优化**：修复详情页 Snackbar 的边距和样式问题
+  - 为 Snackbar 添加左右边距（16px）和底部边距（16px），避免紧贴屏幕边缘
+  - 将圆角从仅顶部圆角改为全圆角（12px），提升视觉效果
+  - 修复了 StateFlagDetailPage 和 FlagDetailPage 中的 Snackbar 样式
+  - 现在 Snackbar 有适当的边距，符合设计规范
+- **涂色游戏关卡恢复**：恢复世界国旗涂色游戏到20关
+- **涂色游戏关卡溢出防护**：加强关卡溢出检查，防止解锁或进入超过总关卡数的关卡
+  - 在 `onLevelComplete` 中检查关卡数，防止解锁超过总关卡数
+  - 在 `onNextLevel` 中检查关卡数，防止进入超过总关卡数的关卡
+  - 在 `GameProgressManager.unlockNextLevel` 中添加可选的 `maxLevel` 参数用于防止溢出
+  - 在 `aboutToAppear` 中检查关卡有效性，防止进入无效关卡
+- **涂色游戏进度显示修复**：修复进度显示超过总关卡数的问题（如18/17）
+  - 在加载进度时自动修复超过总关卡数的进度
+  - 在进度显示时限制显示值不超过总关卡数
+  - 确保进度条和文本显示正确
+- **涂色游戏全部完成处理**：当所有关卡完成时，点击游戏入口显示"全部完成"对话框
+  - 对话框包含"取消"和"重新开始"按钮
+  - 点击"重新开始"会重置进度到第1关并进入游戏
+  - 在 GameProgressManager 中添加 `setUnlockedLevel` 方法用于重置进度
+- **涂色游戏进度环显示修复**：修复进度环在全部完成时未填满的问题
+  - 修复了进度条 value 计算逻辑，当显示 17/17 时进度环会正确填满
+  - 将进度条 value 从 `unlockedLevel - 1` 改为 `unlockedLevel`，确保进度显示准确
+- **涂色游戏全部完成对话框优化**：使用自定义对话框替代系统对话框，支持深色/浅色模式
+  - 创建了 `AllLevelsCompletedDialog` 自定义对话框组件，使用应用颜色资源适配深色/浅色模式
+  - 修复了判断逻辑，当进度达到总关卡数（如17/17）时也会显示全部完成对话框
+  - 移除了系统对话框 `promptAction.showDialog`，改用应用样式的自定义对话框
+  - 在 PaintPlayPage 中添加关卡有效性检查，防止进入超出范围的关卡
+
+### 新增 (Added)
+- **分组连线游戏**：从 Flutter 项目移植分组连线（Connections）游戏
+  - `ConnectionsLevels.ets` - 关卡数据配置（15关，每关4组，每组4个国旗）
+  - `ConnectionsLevelsPage.ets` - 关卡选择页面，支持关卡解锁进度管理
+  - `ConnectionsPlayPage.ets` - 游戏主页面，包含完整的游戏逻辑、布局、样式、动画和反馈
+  - 游戏功能：
+    - 4x4 国旗网格布局，支持选择最多4个国旗
+    - 提交验证：检查选择的4个国旗是否属于同一主题分组
+    - 已解分组展示：显示已完成的主题分组，包含主题名称和国旗
+    - 操作按钮：打乱、取消全选、提交、提示、解答
+    - 错误提示：提交错误时显示红色错误提示，3秒后自动消失
+    - 游戏提示横幅：显示"创建四个四组！"提示，5秒后自动淡出
+    - 提示功能：随机高亮一个未解分组的4个国旗，3秒后取消高亮
+    - 解答功能：自动解答所有未解分组
+    - 胜利界面：显示所有已解分组和"下一关"、"再玩一次"按钮
+    - 关卡进度管理：集成 GameProgressManager，支持关卡解锁和进度保存
+  - 动画和反馈：
+    - 国旗选择动画：选中时边框变绿、背景变浅绿、轻微放大
+    - 提示高亮动画：高亮时边框变橙色、添加阴影效果、轻微放大
+    - 错误提示动画：从下方滑入，红色背景
+    - 提示横幅淡出动画：5秒后淡出
+    - 音效反馈：按钮点击、正确、错误、成功、祝贺音效
+    - 震动反馈：选择、正确、错误、成功、胜利震动
+  - 主题分组：包含亚洲、欧洲、美洲、非洲、颜色分组、文化分组、地区分组、特殊特征等15个主题
+  - 在探索页面添加"分组连线"游戏入口卡片
+
+### 修复 (Fixed)
 - **历史国旗页面崩溃问题**：修复了点击历史旗帜时应用崩溃的问题
   - 将排序逻辑从 `build()` 方法移到 `aboutToAppear()` 生命周期方法中
   - 使用 `slice()` 创建数组副本进行排序，避免直接修改原数组
@@ -30,6 +773,14 @@
   - 更新 ShareContentBuilder 以同时支持国家和国际组织
   - 使用图片分享代替文本分享，提供更丰富的视觉体验
   - 分享图片包含完整的组织信息，方便用户分享到社交媒体
+- **详情页信息复制功能**：为所有详情页添加点击复制功能
+  - 国旗详情页：所有信息项（名称、基本信息、关于这面国旗）可点击复制值
+  - 州旗详情页：所有信息项（名称、基本信息）可点击复制值
+  - 国际组织详情页：所有信息项（名称、基本信息、简介）可点击复制值
+  - 复制后显示"已复制"提示
+  - 首次进入任一详情页时显示底部 Snackbar 提示"点击各项内容可复制"，带"知道了"按钮
+  - 使用统一的 Preferences key 存储提示显示状态，确保整个应用只显示一次，直到应用卸载
+  - 使用 HarmonyOS pasteboard API 实现复制到剪贴板功能
 - **涂鸦游戏答案正确时旗帜被遮罩问题**：修复了当所有区域都正确填充后，旗帜看起来被遮罩覆盖的问题
   - 移除了 `#flag-svg.disabled` CSS 样式中的 `opacity: 0.7` 设置
   - 答案正确时旗帜保持清晰可见（opacity: 1），只禁用交互（pointer-events: none）

@@ -33,8 +33,8 @@ struct QuizLevelsPage {
     this.unlockedLevel = await GameProgressManager.getUnlockedLevel(GameType.QUIZ);
   }
 
-  private getTitle(): string {
-    return this.quizType === 'flagToName' ? '看旗猜国名' : '看名猜国旗';
+  private getTitle(): Resource {
+    return this.quizType === 'flagToName' ? $r('app.string.quiz_flag_to_name') : $r('app.string.quiz_name_to_flag');
   }
 
   private isLevelUnlocked(levelId: number): boolean {
@@ -76,7 +76,7 @@ struct QuizLevelsPage {
 
               // 关卡信息
               Column() {
-                Text(`第 ${level.id} 关 · ${level.name}`)
+                Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, level.id.toString()))
                   .fontSize(16)
                   .fontWeight(FontWeight.Medium)
                   .fontColor(this.isLevelUnlocked(level.id) ? $r('app.color.text_primary') : $r('app.color.text_tertiary'))

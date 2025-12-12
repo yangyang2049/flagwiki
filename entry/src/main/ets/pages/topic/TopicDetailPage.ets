@@ -1,13 +1,14 @@
 import router from '@ohos.router';
-import { TopicItem, getTopicById } from './TopicData';
-import { getCountryByCode, Country, getFlagImageSource, getInternationalOrgByCode, InternationalOrg, isInternationalOrg } from '../../utils/countryData';
-import { EtiquetteSection, getEtiquetteContent } from './FlagEtiquetteData';
-import { ManufacturingSection, getManufacturingContent } from './FlagManufacturingData';
-import { VexillologySection, getVexillologyContent } from './FlagVexillologyData';
-import { HistorySection, getFlagHistoryContent } from './FlagHistoryData';
+import { TopicItem, getTopicById, getLocalizedTopicName, getLocalizedTopicDescription } from './TopicData';
+import { getCountryByCode, Country, getFlagImageSource, getInternationalOrgByCode, InternationalOrg, isInternationalOrg, getLocalizedCountryName, getLocalizedOrgName } from '../../utils/countryData';
+import { EtiquetteSection, getEtiquetteContent, getLocalizedEtiquetteContent } from './FlagEtiquetteData';
+import { ManufacturingSection, getManufacturingContent, getLocalizedManufacturingContent } from './FlagManufacturingData';
+import { VexillologySection, getVexillologyContent, getLocalizedVexillologyContent } from './FlagVexillologyData';
+import { HistorySection, getFlagHistoryContent, getLocalizedFlagHistoryContent } from './FlagHistoryData';
 import { TextReaderUtil } from '../../utils/TextReaderUtil';
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
+import { LocalizationUtil } from '../../utils/LocalizationUtil';
 
 interface RouterParams {
   topicId: string;
@@ -17,6 +18,7 @@ interface DisplayItem {
   code: string;
   nameCN: string;
   name: string;
+  localizedName: string; // 本地化名称
 }
 
 interface SimilarFlagPair {
@@ -41,8 +43,10 @@ interface SimilarFlagPair {
   @State isReading: boolean = false;
   @State similarFlagPairs: SimilarFlagPair[] = [];
   private context = getContext(this) as common.UIAbilityContext;
+  @StorageLink('currentLanguage') currentLanguage: string = 'zh';
 
   async aboutToAppear() {
+    // 获取当前系统语言（已通过 @StorageLink 自动同步）
     const params = router.getParams() as RouterParams;
     if (params && params.topicId) {
       this.topic = getTopicById(params.topicId);
@@ -76,6 +80,25 @@ interface SimilarFlagPair {
     }
   }
 
+  private getCountText(): string {
+    if (!this.topic) {
+      return '';
+    }
+    let count: number;
+    if (this.topic.id === 'similar-flags') {
+      // 相似旗专题：每个 pair 包含 2 个国家
+      count = this.similarFlagPairs.length * 2;
+    } else {
+      count = this.displayItems.length;
+    }
+    const countStr = count.toString();
+    if (this.topic.id === 'international') {
+      return this.context.resourceManager.getStringSync($r('app.string.total_organizations').id, countStr);
+    } else {
+      return this.context.resourceManager.getStringSync($r('app.string.total_countries').id, countStr);
+    }
+  }
+
   private loadCountries(): void {
     if (!this.topic) return;
 
@@ -93,7 +116,8 @@ interface SimilarFlagPair {
           displayList.push({
             code: org.code,
             nameCN: org.nameCN,
-            name: org.name
+            name: org.name,
+            localizedName: getLocalizedOrgName(org, this.currentLanguage)
           });
         }
       } else {
@@ -103,7 +127,8 @@ interface SimilarFlagPair {
           displayList.push({
             code: country.code,
             nameCN: country.nameCN,
-            name: country.name
+            name: country.name,
+            localizedName: getLocalizedCountryName(country, this.currentLanguage)
           });
         }
       }
@@ -118,15 +143,15 @@ interface SimilarFlagPair {
 
     this.isLoading = true;
 
-    // 根据专题ID加载对应的知识内容
+    // 根据专题ID加载对应的知识内容（使用本地化内容）
     if (this.topic.id === 'etiquette') {
-      this.etiquetteSections = getEtiquetteContent();
+      this.etiquetteSections = getLocalizedEtiquetteContent(this.currentLanguage);
     } else if (this.topic.id === 'manufacturing') {
-      this.manufacturingSections = getManufacturingContent();
+      this.manufacturingSections = getLocalizedManufacturingContent(this.currentLanguage);
     } else if (this.topic.id === 'vexillology') {
-      this.vexillologySections = getVexillologyContent();
+      this.vexillologySections = getLocalizedVexillologyContent(this.currentLanguage);
     } else if (this.topic.id === 'flag-history') {
-      this.flagHistorySections = getFlagHistoryContent();
+      this.flagHistorySections = getLocalizedFlagHistoryContent(this.currentLanguage);
     }
 
     this.isLoading = false;
@@ -137,16 +162,57 @@ interface SimilarFlagPair {
 
     this.isLoading = true;
 
-    // 相似旗组合定义
+    // 相似旗组合定义（使用本地化名称）
+    const isEnglish = LocalizationUtil.isEnglish(this.currentLanguage);
     const pairs: SimilarFlagPair[] = [
-      { code1: 'mc', nameCN1: '摩纳哥', code2: 'id', nameCN2: '印尼' },
-      { code1: 'nl', nameCN1: '荷兰', code2: 'lu', nameCN2: '卢森堡' },
-      { code1: 'ro', nameCN1: '罗马尼亚', code2: 'td', nameCN2: '乍得' },
-      { code1: 'cn', nameCN1: '中国', code2: 'vn', nameCN2: '越南' },
-      { code1: 'ke', nameCN1: '肯尼亚', code2: 'ss', nameCN2: '南苏丹' },
-      { code1: 'ad', nameCN1: '安道尔', code2: 'md', nameCN2: '摩尔多瓦' },
-      { code1: 'ir', nameCN1: '伊朗', code2: 'tj', nameCN2: '塔吉克斯坦' },
-      { code1: 'ie', nameCN1: '爱尔兰', code2: 'ci', nameCN2: '科特迪瓦' }
+      { 
+        code1: 'mc', 
+        nameCN1: isEnglish ? 'Monaco' : '摩纳哥', 
+        code2: 'id', 
+        nameCN2: isEnglish ? 'Indonesia' : '印尼' 
+      },
+      { 
+        code1: 'nl', 
+        nameCN1: isEnglish ? 'Netherlands' : '荷兰', 
+        code2: 'lu', 
+        nameCN2: isEnglish ? 'Luxembourg' : '卢森堡' 
+      },
+      { 
+        code1: 'ro', 
+        nameCN1: isEnglish ? 'Romania' : '罗马尼亚', 
+        code2: 'td', 
+        nameCN2: isEnglish ? 'Chad' : '乍得' 
+      },
+      { 
+        code1: 'cn', 
+        nameCN1: isEnglish ? 'China' : '中国', 
+        code2: 'vn', 
+        nameCN2: isEnglish ? 'Vietnam' : '越南' 
+      },
+      { 
+        code1: 'ke', 
+        nameCN1: isEnglish ? 'Kenya' : '肯尼亚', 
+        code2: 'ss', 
+        nameCN2: isEnglish ? 'South Sudan' : '南苏丹' 
+      },
+      { 
+        code1: 'ad', 
+        nameCN1: isEnglish ? 'Andorra' : '安道尔', 
+        code2: 'md', 
+        nameCN2: isEnglish ? 'Moldova' : '摩尔多瓦' 
+      },
+      { 
+        code1: 'ir', 
+        nameCN1: isEnglish ? 'Iran' : '伊朗', 
+        code2: 'tj', 
+        nameCN2: isEnglish ? 'Tajikistan' : '塔吉克斯坦' 
+      },
+      { 
+        code1: 'ie', 
+        nameCN1: isEnglish ? 'Ireland' : '爱尔兰', 
+        code2: 'ci', 
+        nameCN2: isEnglish ? 'Ivory Coast' : '科特迪瓦' 
+      }
     ];
 
     this.similarFlagPairs = pairs;
@@ -163,19 +229,19 @@ interface SimilarFlagPair {
               .fontSize(48)
               .margin({ bottom: 12 })
 
-            Text(this.topic.name)
+            Text(getLocalizedTopicName(this.topic, this.currentLanguage))
               .fontSize(24)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
 
-            Text(this.topic.description)
+            Text(getLocalizedTopicDescription(this.topic, this.currentLanguage))
               .fontSize(14)
               .fontColor($r('app.color.text_secondary'))
               .margin({ top: 8 })
               .textAlign(TextAlign.Center)
 
             if (!this.isKnowledgeTopic) {
-              Text(`共 ${this.displayItems.length} 个${this.topic.id === 'international' ? '组织' : '国家'}`)
+              Text(this.getCountText())
                 .fontSize(13)
                 .fontColor($r('app.color.text_tertiary'))
                 .margin({ top: 8 })
@@ -202,7 +268,7 @@ interface SimilarFlagPair {
             .width(40)
             .height(40)
             .color($r('app.color.button_primary'))
-          Text('加载中...')
+          Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
             .fontSize(14)
             .fontColor($r('app.color.text_tertiary'))
             .margin({ top: 12 })
@@ -238,9 +304,13 @@ interface SimilarFlagPair {
     if (!this.topic) return '';
 
     const lines: string[] = [];
-    lines.push(this.topic.description);
+    const topicName = getLocalizedTopicName(this.topic, this.currentLanguage);
+    const topicDesc = getLocalizedTopicDescription(this.topic, this.currentLanguage);
+    lines.push(topicName);
+    lines.push(topicDesc);
     lines.push('');
 
+    // 使用本地化的内容（section.title 和 section.content 已经是本地化的）
     if (this.topic.id === 'etiquette') {
       for (const section of this.etiquetteSections) {
         lines.push(section.title);
@@ -274,24 +344,24 @@ interface SimilarFlagPair {
     if (this.isReading) {
       TextReaderUtil.stopRead();
       this.isReading = false;
-      promptAction.showToast({
-        message: '已停止朗读',
-        duration: 2000
-      });
+        promptAction.showToast({
+          message: this.context.resourceManager.getStringSync($r('app.string.stop_reading').id),
+          duration: 2000
+        });
     } else {
       try {
-        const title = this.topic?.name || '专题详情';
+        const title = this.topic ? getLocalizedTopicName(this.topic, this.currentLanguage) : this.context.resourceManager.getStringSync($r('app.string.details').id);
         const content = this.getReadContent();
         await TextReaderUtil.startRead(this.context, title, content);
         this.isReading = true;
         promptAction.showToast({
-          message: '开始朗读',
+          message: this.context.resourceManager.getStringSync($r('app.string.start_reading').id),
           duration: 2000
         });
       } catch (err) {
         console.error(`Failed to start read: ${JSON.stringify(err)}`);
         promptAction.showToast({
-          message: '朗读功能暂不可用',
+          message: this.context.resourceManager.getStringSync($r('app.string.reading_unavailable').id),
           duration: 2000
         });
       }
@@ -306,7 +376,7 @@ interface SimilarFlagPair {
           .width(40)
           .height(40)
           .color($r('app.color.button_primary'))
-        Text('加载中...')
+        Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
           .fontSize(14)
           .fontColor($r('app.color.text_tertiary'))
           .margin({ top: 12 })
@@ -319,8 +389,8 @@ interface SimilarFlagPair {
         Column() {
           ForEach(this.similarFlagPairs, (pair: SimilarFlagPair, index: number) => {
             Column() {
-              // 标题：xxx和xxx
-              Text(`${pair.nameCN1}和${pair.nameCN2}`)
+              // 标题：xxx和xxx（使用本地化文本）
+              Text(LocalizationUtil.isEnglish(this.currentLanguage) ? `${pair.nameCN1} and ${pair.nameCN2}` : `${pair.nameCN1}和${pair.nameCN2}`)
                 .fontSize(18)
                 .fontWeight(FontWeight.Bold)
                 .fontColor($r('app.color.text_primary'))
@@ -411,7 +481,7 @@ interface SimilarFlagPair {
           .width(40)
           .height(40)
           .color($r('app.color.button_primary'))
-        Text('加载中...')
+        Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
           .fontSize(14)
           .fontColor($r('app.color.text_tertiary'))
           .margin({ top: 12 })
@@ -450,7 +520,7 @@ interface SimilarFlagPair {
           .width(40)
           .height(40)
           .color($r('app.color.button_primary'))
-        Text('加载中...')
+        Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
           .fontSize(14)
           .fontColor($r('app.color.text_tertiary'))
           .margin({ top: 12 })
@@ -521,7 +591,7 @@ interface SimilarFlagPair {
         .objectFit(ImageFit.Contain)
         .borderRadius(4)
 
-      Text(item.nameCN)
+      Text(item.localizedName)
         .fontSize(13)
         .fontColor($r('app.color.text_primary'))
         .margin({ top: 8 })

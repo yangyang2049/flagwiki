@@ -1,4 +1,5 @@
 import router from '@ohos.router';
+import common from '@ohos.app.ability.common';
 import { CountryStateData, StateInfo, getCountryStateData, getStateFlagPath } from '../../utils/StateFlagData';
 
 interface RouterParams {
@@ -11,6 +12,7 @@ interface RouterParams {
   @State countryData: CountryStateData | undefined = undefined;
   @State isLoading: boolean = true;
   @State clickedItemKey: string = '';
+  private context = getContext(this) as common.UIAbilityContext;
 
   aboutToAppear() {
     const params = router.getParams() as RouterParams;
@@ -31,7 +33,7 @@ interface RouterParams {
             .width(40)
             .height(40)
             .color($r('app.color.button_primary'))
-          Text('加载中...')
+          Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
             .fontSize(14)
             .fontColor($r('app.color.text_tertiary'))
             .margin({ top: 12 })
@@ -115,7 +117,7 @@ interface RouterParams {
           .backgroundColor($r('app.color.bg_page'))
       } else {
         Column() {
-          Text('暂无数据')
+          Text(this.context.resourceManager.getStringSync($r('app.string.no_data').id))
             .fontSize(14)
             .fontColor($r('app.color.text_tertiary'))
         }
@@ -125,7 +127,7 @@ interface RouterParams {
           .backgroundColor($r('app.color.bg_page'))
       }
     }
-    .title(this.countryData ? `${this.countryData.countryNameCN}${this.countryData.stateLabel}旗` : '州旗画廊')
+    .title(this.countryData ? `${this.countryData.countryNameCN}${this.countryData.stateLabel}${this.context.resourceManager.getStringSync($r('app.string.flag').id)}` : this.context.resourceManager.getStringSync($r('app.string.state_flags').id))
       .titleMode(NavigationTitleMode.Mini)
       .backgroundColor($r('app.color.bg_page'))
   }

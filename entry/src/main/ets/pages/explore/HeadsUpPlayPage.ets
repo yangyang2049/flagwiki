@@ -5,6 +5,7 @@ import { Country, Countries, getFlagImageSource } from '../../utils/countryData'
 import { PreferencesManager } from '../../utils/PreferencesManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
+import { LocalizationUtil } from '../../utils/LocalizationUtil';
 
 const QUESTIONS_PER_SESSION = 10;
 const PREFS_NAME = 'heads_up_settings';
@@ -19,12 +20,17 @@ export struct HeadsUpPlayPage {
   @State sessionCountries: Country[] = [];
   @State showSessionOver: boolean = false;
   @State sessionNumber: number = 1;
+  @StorageLink('currentLanguage') currentLanguage: string = 'zh';
+  @State isEnglish: boolean = false;
   private context = getContext(this) as common.UIAbilityContext;
 
   async aboutToAppear() {
     // 初始化音效播放器和振动工具
     await SoundEffectUtil.init(this.context);
     await VibratorUtil.init(this.context);
+    
+    // 获取当前语言
+    this.isEnglish = LocalizationUtil.isEnglish(this.currentLanguage);
     
     await this.checkAndShowTutorial();
     this.startNewSession();
@@ -43,10 +49,10 @@ export struct HeadsUpPlayPage {
       if (!hasShown) {
         // 首次进入，显示提示弹窗
         promptAction.showDialog({
-          title: '使用说明',
-          message: '• 点击屏幕查看答案\n• 再点下一个\n• 每十个一轮',
+          title: this.context.resourceManager.getStringSync($r('app.string.headsup_tutorial_title').id),
+          message: this.context.resourceManager.getStringSync($r('app.string.headsup_tutorial_message').id),
           buttons: [
-            { text: '知道了', color: '#1677FF' }
+            { text: this.context.resourceManager.getStringSync($r('app.string.got_it').id), color: '#1677FF' }
           ]
         }).then(() => {
           // 保存已显示状态
@@ -145,7 +151,7 @@ export struct HeadsUpPlayPage {
           this.GameView()
         } else {
           Column() {
-            Text('加载中...')
+            Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
               .fontSize(16)
               .fontColor($r('app.color.text_tertiary'))
           }
@@ -195,17 +201,26 @@ export struct HeadsUpPlayPage {
       // 底部 box（固定高度，与顶部一样）
       Column() {
         if (this.currentCountry) {
-          Text(this.currentCountry.nameCN)
-            .fontSize(36)
-            .fontWeight(FontWeight.Bold)
-            .fontColor($r('app.color.text_primary'))
-            .margin({ bottom: 12 })
-            .visibility(this.showAnswer ? Visibility.Visible : Visibility.Hidden)
+          // 在英文模式下只显示英文名称，中文模式下显示中文和英文
+          if (this.isEnglish) {
+            Text(this.currentCountry.name)
+              .fontSize(36)
+              .fontWeight(FontWeight.Bold)
+              .fontColor($r('app.color.text_primary'))
+              .visibility(this.showAnswer ? Visibility.Visible : Visibility.Hidden)
+          } else {
+            Text(this.currentCountry.nameCN)
+              .fontSize(36)
+              .fontWeight(FontWeight.Bold)
+              .fontColor($r('app.color.text_primary'))
+              .margin({ bottom: 12 })
+              .visibility(this.showAnswer ? Visibility.Visible : Visibility.Hidden)
 
-          Text(this.currentCountry.name)
-            .fontSize(20)
-            .fontColor($r('app.color.text_secondary'))
-            .visibility(this.showAnswer ? Visibility.Visible : Visibility.Hidden)
+            Text(this.currentCountry.name)
+              .fontSize(20)
+              .fontColor($r('app.color.text_secondary'))
+              .visibility(this.showAnswer ? Visibility.Visible : Visibility.Hidden)
+          }
         }
       }
       .width('100%')
@@ -227,19 +242,19 @@ export struct HeadsUpPlayPage {
         .fontSize(80)
         .margin({ bottom: 20 })
 
-      Text('本轮完成！')
+      Text($r('app.string.headsup_session_over'))
         .fontSize(28)
         .fontWeight(FontWeight.Bold)
         .fontColor($r('app.color.text_primary'))
         .margin({ bottom: 12 })
 
-      Text(`已完成 ${this.sessionNumber} 轮`)
+      Text(this.context.resourceManager.getStringSync($r('app.string.headsup_session_count').id, this.sessionNumber))
         .fontSize(16)
         .fontColor($r('app.color.text_secondary'))
         .margin({ bottom: 60 })
 
       Row() {
-        Button('退出')
+        Button($r('app.string.headsup_exit'))
           .width(120)
           .height(48)
           .fontSize(17)
@@ -250,7 +265,7 @@ export struct HeadsUpPlayPage {
             await this.exitGame();
           })
 
-        Button('继续')
+        Button($r('app.string.headsup_continue'))
           .width(120)
           .height(48)
           .fontSize(17)

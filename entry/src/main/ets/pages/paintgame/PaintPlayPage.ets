@@ -5,14 +5,16 @@
 import router from '@ohos.router';
 import web_webview from '@ohos.web.webview';
 import common from '@ohos.app.ability.common';
+import promptAction from '@ohos.promptAction';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
 import curves from '@ohos.curves';
-import { getCountryByCode, Country } from '../../utils/countryData';
+import { getCountryByCode, Country, getLocalizedCountryName } from '../../utils/countryData';
 import { getPaintLevel, getFlagPaintInfo, getTotalLevels, PaintLevel } from './PaintGameData';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil, SoundType } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
+import { LocalizationUtil } from '../../utils/LocalizationUtil';
 
 interface RouterParams {
   categoryId: string;
@@ -20,7 +22,7 @@ interface RouterParams {
 }
 
 // 美国州名中文映射
-const US_STATE_NAMES: Record<string, string> = {
+const US_STATE_NAMES_CN: Record<string, string> = {
   'alabama': '阿拉巴马州',
   'alaska': '阿拉斯加州',
   'arizona': '亚利桑那州',
@@ -74,6 +76,61 @@ const US_STATE_NAMES: Record<string, string> = {
   'wyoming': '怀俄明州'
 };
 
+// 美国州名英文映射
+const US_STATE_NAMES_EN: Record<string, string> = {
+  'alabama': 'Alabama',
+  'alaska': 'Alaska',
+  'arizona': 'Arizona',
+  'arkansas': 'Arkansas',
+  'california': 'California',
+  'colorado': 'Colorado',
+  'connecticut': 'Connecticut',
+  'delaware': 'Delaware',
+  'district_of_columbia': 'District of Columbia',
+  'florida': 'Florida',
+  'georgia': 'Georgia',
+  'hawaii': 'Hawaii',
+  'idaho': 'Idaho',
+  'illinois': 'Illinois',
+  'indiana': 'Indiana',
+  'iowa': 'Iowa',
+  'kansas': 'Kansas',
+  'kentucky': 'Kentucky',
+  'louisiana': 'Louisiana',
+  'maine': 'Maine',
+  'maryland': 'Maryland',
+  'massachusetts': 'Massachusetts',
+  'michigan': 'Michigan',
+  'minnesota': 'Minnesota',
+  'mississippi': 'Mississippi',
+  'missouri': 'Missouri',
+  'montana': 'Montana',
+  'nebraska': 'Nebraska',
+  'nevada': 'Nevada',
+  'new_hampshire': 'New Hampshire',
+  'new_jersey': 'New Jersey',
+  'new_mexico': 'New Mexico',
+  'new_york': 'New York',
+  'north_carolina': 'North Carolina',
+  'north_dakota': 'North Dakota',
+  'ohio': 'Ohio',
+  'oklahoma': 'Oklahoma',
+  'oregon': 'Oregon',
+  'pennsylvania': 'Pennsylvania',
+  'rhode_island': 'Rhode Island',
+  'south_carolina': 'South Carolina',
+  'south_dakota': 'South Dakota',
+  'tennessee': 'Tennessee',
+  'texas': 'Texas',
+  'utah': 'Utah',
+  'vermont': 'Vermont',
+  'virginia': 'Virginia',
+  'washington': 'Washington',
+  'west_virginia': 'West Virginia',
+  'wisconsin': 'Wisconsin',
+  'wyoming': 'Wyoming'
+};
+
 @Entry
 @Component
   struct PaintPlayPage {
@@ -90,6 +147,11 @@ const US_STATE_NAMES: Record<string, string> = {
   @State webOpacity: number = 0; // Web 组件透明度，用于渐显动画
   @State contentTranslateY: number = 0; // 内容向上移动的距离
   @State showButtons: boolean = false; // 按钮是否显示
+  @StorageLink('currentLanguage') currentLanguage: string = 'zh';
+
+  private get isEnglish(): boolean {
+    return LocalizationUtil.isEnglish(this.currentLanguage);
+  }
 
   private webController: web_webview.WebviewController = new web_webview.WebviewController();
   private context = getContext(this) as common.UIAbilityContext;
@@ -105,7 +167,33 @@ const US_STATE_NAMES: Record<string, string> = {
       this.categoryId = params.categoryId || 'world';
       this.levelId = params.levelId || 1;
     }
+    
+    // 检查关卡是否有效
+    const totalLevels = getTotalLevels(this.categoryId);
+    if (this.levelId > totalLevels) {
+      // 关卡超出范围，返回首页
+      promptAction.showToast({
+        message: this.context.resourceManager.getStringSync($r('app.string.level_not_found').id),
+        duration: 2000
+      });
+      setTimeout(() => {
+        router.back();
+      }, 500);
+      return;
+    }
+    
     this.currentLevel = getPaintLevel(this.categoryId, this.levelId);
+    if (!this.currentLevel) {
+      // 关卡数据不存在，返回首页
+      promptAction.showToast({
+        message: this.context.resourceManager.getStringSync($r('app.string.level_data_load_failed').id),
+        duration: 2000
+      });
+      setTimeout(() => {
+        router.back();
+      }, 500);
+      return;
+    }
     this.updateCurrentFlagPath();
   }
 
@@ -158,13 +246,21 @@ const US_STATE_NAMES: Record<string, string> = {
   }
 
   private getFlagDisplayName(code: string): string {
+    const isEnglish = LocalizationUtil.isEnglish(this.currentLanguage);
+    
     // 先尝试获取美国州名
-    if (US_STATE_NAMES[code]) {
-      return US_STATE_NAMES[code];
+    if (US_STATE_NAMES_EN[code] || US_STATE_NAMES_CN[code]) {
+      // 这是美国州旗，直接返回州名
+      if (isEnglish) {
+        return US_STATE_NAMES_EN[code];
+      } else {
+        return US_STATE_NAMES_CN[code];
+      }
     }
-    // 否则尝试获取国家名称
+    
+    // 否则尝试获取国家本地化名称
     const country = getCountryByCode(code);
-    return country ? country.nameCN : code;
+    return country ? getLocalizedCountryName(country, this.currentLanguage) : code;
   }
 
 
@@ -224,10 +320,7 @@ const US_STATE_NAMES: Record<string, string> = {
   private getGameType(): GameType {
     const gameTypeMap: Record<string, GameType> = {
       'world': GameType.PAINT_WORLD,
-      'us': GameType.PAINT_US,
-      'de': GameType.PAINT_DE,
-      'it': GameType.PAINT_IT,
-      'br': GameType.PAINT_BR
+      'us': GameType.PAINT_US
     };
     return gameTypeMap[this.categoryId] || GameType.PAINT_WORLD;
   }
@@ -237,10 +330,18 @@ const US_STATE_NAMES: Record<string, string> = {
     await SoundEffectUtil.playCongrats();
     VibratorUtil.vibrateWin();
     
-    // 保存进度
+    // 保存进度（防止溢出）
     await GameProgressManager.init(this.context);
     const gameType = this.getGameType();
-    await GameProgressManager.unlockNextLevel(gameType, this.levelId);
+    const totalLevels = getTotalLevels(this.categoryId);
+    
+    // 只有在未完成所有关卡时才解锁下一关（防止溢出）
+    if (this.levelId < totalLevels) {
+      await GameProgressManager.unlockNextLevel(gameType, this.levelId, totalLevels);
+    } else {
+      // 已完成所有关卡，确保进度不超过总关卡数
+      await GameProgressManager.setUnlockedLevel(gameType, totalLevels);
+    }
 
     // 设置完成状态，内容从底部开始（初始位置在屏幕下方）
     this.levelCompleted = true;
@@ -284,9 +385,28 @@ const US_STATE_NAMES: Record<string, string> = {
     this.showButtons = false;
     
     const totalLevels = getTotalLevels(this.categoryId);
-    if (this.levelId < totalLevels) {
-      this.levelId++;
+    
+    // 防止关卡溢出
+    if (this.levelId >= totalLevels) {
+      // 所有关卡完成，返回首页
+      router.back();
+      return;
+    }
+    
+    // 进入下一关（确保不超过总关卡数）
+    const nextLevel = this.levelId + 1;
+    if (nextLevel <= totalLevels) {
+      this.levelId = nextLevel;
       this.currentLevel = getPaintLevel(this.categoryId, this.levelId);
+      if (!this.currentLevel) {
+        // 关卡数据不存在，返回首页
+        promptAction.showToast({
+          message: this.context.resourceManager.getStringSync($r('app.string.level_data_load_failed').id),
+          duration: 2000
+        });
+        router.back();
+        return;
+      }
       this.currentFlagIndex = 0;
       this.levelCompleted = false;
       this.showNextButton = false;
@@ -307,7 +427,7 @@ const US_STATE_NAMES: Record<string, string> = {
 
   private getFlagImagePath(code: string): string {
     // 美国州旗使用 state_flags/us/ 目录
-    if (US_STATE_NAMES[code]) {
+    if (US_STATE_NAMES_CN[code]) {
       return `state_flags/us/${code}.svg`;
     }
     // 其他国旗使用 flags/ 目录
@@ -413,7 +533,9 @@ const US_STATE_NAMES: Record<string, string> = {
 
             // 底部按钮区域（延迟显示）
             if (this.showNextButton) {
-              Button(this.currentFlagIndex < (this.currentLevel?.flags.length || 0) - 1 ? '下一个' : '完成')
+              Button(this.currentFlagIndex < (this.currentLevel?.flags.length || 0) - 1 
+                ? this.context.resourceManager.getStringSync($r('app.string.next').id)
+                : this.context.resourceManager.getStringSync($r('app.string.complete').id))
                 .width('80%')
                 .height(48)
                 .fontSize(17)
@@ -450,7 +572,7 @@ const US_STATE_NAMES: Record<string, string> = {
 
             // 关卡信息
             Column() {
-              Text(`第 ${this.levelId} 关`)
+              Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, this.levelId.toString()))
                 .fontSize(16)
                 .fontWeight(FontWeight.Bold)
                 .fontColor($r('app.color.button_primary'))
@@ -522,13 +644,13 @@ const US_STATE_NAMES: Record<string, string> = {
           .fontSize(72)
           .margin({ top: 80 })
 
-        Text('恭喜过关！')
+        Text($r('app.string.congratulations'))
           .fontSize(28)
           .fontWeight(FontWeight.Bold)
           .fontColor($r('app.color.text_primary'))
           .margin({ top: 24 })
 
-        Text(`第 ${this.levelId} 关`)
+        Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, this.levelId.toString()))
           .fontSize(16)
           .fontColor($r('app.color.text_secondary'))
           .margin({ top: 8 })
@@ -563,7 +685,9 @@ const US_STATE_NAMES: Record<string, string> = {
       if (this.showButtons) {
         Column() {
           // 下一关按钮
-          Button(this.levelId < getTotalLevels(this.categoryId) ? '下一关' : '完美收官')
+          Button(this.levelId < getTotalLevels(this.categoryId) 
+            ? this.context.resourceManager.getStringSync($r('app.string.next_level').id)
+            : this.context.resourceManager.getStringSync($r('app.string.perfect_finish').id))
             .width('80%')
             .height(48)
             .fontSize(17)
@@ -588,7 +712,7 @@ const US_STATE_NAMES: Record<string, string> = {
             })
 
           // 返回按钮
-          Button('返回')
+          Button(this.context.resourceManager.getStringSync($r('app.string.back').id))
             .width('80%')
             .height(48)
             .fontSize(17)

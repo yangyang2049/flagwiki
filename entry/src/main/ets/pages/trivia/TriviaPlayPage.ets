@@ -1,11 +1,18 @@
 import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
+import { systemShare } from '@kit.ShareKit';
+import { uniformTypeDescriptor } from '@kit.ArkData';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { image } from '@kit.ImageKit';
+import fs from '@ohos.file.fs';
+import { fileUri } from '@kit.CoreFileKit';
 import { getCountryByCode } from '../../utils/countryData';
 import { TriviaLevel, TriviaQuestion, getTriviaLevel, getTotalTriviaLevels } from './TriviaLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
+import { screenshotManager } from '../../utils/ScreenshotManager';
 
 interface RouterParams {
   levelId: number;
@@ -26,13 +33,19 @@ interface RouterParams {
   @State optionVisible: boolean[] = [];  // 选项可见性
   @State animatingIndex: number = -1;  // 正在动画的选项索引
   @State scaleValue: number = 1;  // 缩放值
+  @State isSharing: boolean = false;
+  @State sharePixelMap: image.PixelMap | null = null;
   private context = getContext(this) as common.UIAbilityContext;
+  private readonly SHARE_CONTAINER_ID = 'triviaShareContainer';
   private timeoutIds: number[] = []; // 存储所有setTimeout的ID，用于清理
 
   async aboutToAppear() {
     // 初始化音效播放器
     await SoundEffectUtil.init(this.context);
     await VibratorUtil.init(this.context);
+
+    // 初始化截图管理器
+    screenshotManager.init(this.getUIContext());
 
     const params = router.getParams() as RouterParams;
     if (params) {
@@ -46,6 +59,19 @@ interface RouterParams {
     this.clearAllTimeouts();
     // 释放音效资源
     SoundEffectUtil.release();
+    // 释放分享 PixelMap
+    this.releaseSharePixelMap();
+  }
+
+  private releaseSharePixelMap(): void {
+    if (this.sharePixelMap) {
+      try {
+        this.sharePixelMap.release();
+      } catch (e) {
+        console.warn('[TriviaPlayPage] Failed to release share pixelmap:', e);
+      }
+      this.sharePixelMap = null;
+    }
   }
 
   private clearAllTimeouts(): void {
@@ -58,7 +84,7 @@ interface RouterParams {
   private loadLevel(levelId: number): void {
     // 清理之前的定时器
     this.clearAllTimeouts();
-    this.level = getTriviaLevel(levelId);
+    this.level = getTriviaLevel(levelId, this.context);
     if (this.level) {
       this.lives = this.level.lives;
       this.currentIndex = 0;
@@ -208,12 +234,17 @@ interface RouterParams {
   }
 
   private showGameOver(): void {
+    const challengeFailed = this.context.resourceManager.getStringSync($r('app.string.challenge_failed').id);
+    const correctAnswersText = this.context.resourceManager.getStringSync($r('app.string.correct_answers_count_trivia').id, this.correctAnswers.toString());
+    const backText = this.context.resourceManager.getStringSync($r('app.string.back').id);
+    const restartText = this.context.resourceManager.getStringSync($r('app.string.restart').id);
+    
     promptAction.showDialog({
-      title: '挑战失败',
-      message: `正确回答了 ${this.correctAnswers} 题`,
+      title: challengeFailed,
+      message: correctAnswersText,
       buttons: [
-        { text: '返回', color: '#666666' },
-        { text: '重新开始', color: '#1677FF' }
+        { text: backText, color: '#666666' },
+        { text: restartText, color: '#1677FF' }
       ]
     }).then((result) => {
       if (result.index === 0) {
@@ -373,92 +404,316 @@ interface RouterParams {
 
   build() {
     Navigation() {
-      if (this.showResult) {
-        this.ResultView()
-      } else if (this.level && this.getCurrentQuestion()) {
-        Column() {
-          // 顶部状态栏
-          Row() {
-            Text(`第 ${this.level?.id} 关`)
-              .fontSize(15)
-              .fontWeight(FontWeight.Medium)
-              .fontColor($r('app.color.text_secondary'))
-              .layoutWeight(1)
-
-            Row() {
-              ForEach(Array.from({ length: this.level?.lives || 3 }), (_: undefined, index: number) => {
-                Text(index < this.lives ? '❤️' : '🖤')
-                  .fontSize(14)
-                  .margin({ left: 1, right: 1 })
-              })
+      Column() {
+        if (this.showResult) {
+          this.ResultView()
+        } else if (this.level && this.getCurrentQuestion()) {
+          Column() {
+            // 隐藏的分享容器（包含问题 UI）
+            Column() {
+              if (this.level && this.getCurrentQuestion()) {
+                this.ShareContentBuilder()
+              }
             }
-            .layoutWeight(1)
-              .justifyContent(FlexAlign.Center)
+            .id(this.SHARE_CONTAINER_ID)
+            .position({ x: -1000, y: -1000 })
+            .width(400)
+            .backgroundColor($r('app.color.bg_page'))
 
-            Text(`${this.currentIndex + 1} / ${this.level?.questions.length}`)
-              .fontSize(15)
-              .fontWeight(FontWeight.Medium)
-              .fontColor($r('app.color.text_secondary'))
-              .layoutWeight(1)
-              .textAlign(TextAlign.End)
+            Column() {
+              // 顶部状态栏
+              Row() {
+                Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString()))
+                  .fontSize(15)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor($r('app.color.text_secondary'))
+                  .layoutWeight(1)
+
+                Row() {
+                  ForEach(Array.from({ length: this.level?.lives || 3 }), (_: undefined, index: number) => {
+                    Text(index < this.lives ? '❤️' : '🖤')
+                      .fontSize(14)
+                      .margin({ left: 1, right: 1 })
+                  })
+                }
+                .layoutWeight(1)
+                  .justifyContent(FlexAlign.Center)
+
+                Text(`${this.currentIndex + 1} / ${this.level?.questions.length}`)
+                  .fontSize(15)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor($r('app.color.text_secondary'))
+                  .layoutWeight(1)
+                  .textAlign(TextAlign.End)
+              }
+              .width('100%')
+                .padding({ left: 20, right: 20, top: 12, bottom: 12 })
+
+              // 问题
+              Column() {
+                Text(this.getCurrentQuestion()?.question || '')
+                  .fontSize(20)
+                  .fontWeight(FontWeight.Bold)
+                  .fontColor($r('app.color.text_primary'))
+                  .textAlign(TextAlign.Center)
+                  .padding({ left: 20, right: 20 })
+              }
+              .width('100%')
+                .margin({ top: 60, bottom: 60 })
+
+              // 选项（使用打乱后的选项）
+              Column() {
+                ForEach(this.shuffledOptions, (option: string, index: number) => {
+                  this.OptionButton(option, index)
+                })
+              }
+              .width('100%')
+                .padding({ left: 20, right: 20 })
+
+              Blank()
+
+              // 下一题按钮
+              if (this.isAnswered) {
+                Button(this.currentIndex < (this.level?.questions.length || 0) - 1 
+                  ? this.context.resourceManager.getStringSync($r('app.string.next_question').id)
+                  : this.context.resourceManager.getStringSync($r('app.string.view_results').id))
+                  .width('80%')
+                  .height(48)
+                  .fontSize(17)
+                  .fontWeight(FontWeight.Bold)
+                  .backgroundColor($r('app.color.button_primary'))
+                  .margin({ bottom: 32 })
+                  .onClick(async () => {
+                    await this.nextQuestion();
+                  })
+              }
+            }
+            .width('100%')
+              .height('100%')
+              .backgroundColor($r('app.color.bg_page'))
           }
-          .width('100%')
-            .padding({ left: 20, right: 20, top: 12, bottom: 12 })
-
-          // 问题
+        } else {
           Column() {
-            Text(this.getCurrentQuestion()?.question || '')
-              .fontSize(20)
-              .fontWeight(FontWeight.Bold)
-              .fontColor($r('app.color.text_primary'))
-              .textAlign(TextAlign.Center)
-              .padding({ left: 20, right: 20 })
+            Text($r('app.string.loading'))
+              .fontSize(16)
+              .fontColor($r('app.color.text_tertiary'))
           }
           .width('100%')
-            .margin({ top: 60, bottom: 60 })
-
-          // 选项（使用打乱后的选项）
-          Column() {
-            ForEach(this.shuffledOptions, (option: string, index: number) => {
-              this.OptionButton(option, index)
-            })
-          }
-          .width('100%')
-            .padding({ left: 20, right: 20 })
-
-          Blank()
-
-          // 下一题按钮
-          if (this.isAnswered) {
-            Button(this.currentIndex < (this.level?.questions.length || 0) - 1 ? '下一题' : '查看结果')
-              .width('80%')
-              .height(48)
-              .fontSize(17)
-              .fontWeight(FontWeight.Bold)
-              .backgroundColor($r('app.color.button_primary'))
-              .margin({ bottom: 32 })
-              .onClick(async () => {
-                await this.nextQuestion();
-              })
-          }
+            .height('100%')
+            .justifyContent(FlexAlign.Center)
         }
-        .width('100%')
-          .height('100%')
-          .backgroundColor($r('app.color.bg_page'))
-      } else {
-        Column() {
-          Text('加载中...')
-            .fontSize(16)
-            .fontColor($r('app.color.text_tertiary'))
-        }
-        .width('100%')
-          .height('100%')
-          .justifyContent(FlexAlign.Center)
       }
+      .width('100%')
+        .height('100%')
     }
     .title('')
-      .titleMode(NavigationTitleMode.Mini)
-      .backgroundColor($r('app.color.bg_page'))
+    .titleMode(NavigationTitleMode.Mini)
+    .backgroundColor($r('app.color.bg_page'))
+    .menus(this.MenuBuilder)
+  }
+
+  @Builder
+  MenuBuilder() {
+    Row({ space: 20 }) {
+      Image($r('app.media.icon_share'))
+        .width(22)
+        .height(22)
+        .onClick(() => {
+          this.onShareClick();
+        })
+    }
+    .height('100%')
+      .justifyContent(FlexAlign.End)
+      .alignItems(VerticalAlign.Center)
+      .padding({ right: 16 })
+  }
+
+  @Builder
+  ShareContentBuilder() {
+    if (this.getCurrentQuestion()) {
+      Column({ space: 16 }) {
+      // 关卡信息
+      Row() {
+        Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString()))
+          .fontSize(16)
+          .fontWeight(FontWeight.Medium)
+          .fontColor($r('app.color.text_secondary'))
+          .layoutWeight(1)
+
+        Text(`${this.currentIndex + 1} / ${this.level?.questions.length}`)
+          .fontSize(16)
+          .fontWeight(FontWeight.Medium)
+          .fontColor($r('app.color.text_secondary'))
+          .textAlign(TextAlign.End)
+      }
+      .width('100%')
+        .padding({ left: 16, right: 16, top: 20, bottom: 12 })
+
+      // 问题
+      Column() {
+        Text(this.getCurrentQuestion()?.question || '')
+          .fontSize(20)
+          .fontWeight(FontWeight.Bold)
+          .fontColor($r('app.color.text_primary'))
+          .textAlign(TextAlign.Center)
+          .padding({ left: 20, right: 20 })
+      }
+      .width('100%')
+        .margin({ top: 40, bottom: 40 })
+
+      // 选项
+      Column() {
+        ForEach(this.shuffledOptions, (option: string, index: number) => {
+          Row() {
+            Text(this.getOptionText(option))
+              .fontSize(16)
+              .fontWeight(FontWeight.Medium)
+              .fontColor($r('app.color.text_primary'))
+              .textAlign(TextAlign.Center)
+          }
+          .width('100%')
+            .height(56)
+            .justifyContent(FlexAlign.Center)
+            .backgroundColor($r('app.color.bg_card'))
+            .borderRadius(12)
+            .margin({ bottom: 12 })
+        })
+      }
+      .width('100%')
+        .padding({ left: 20, right: 20 })
+
+        Text(this.context.resourceManager.getStringSync($r('app.string.from_app').id))
+          .fontSize(12)
+          .fontColor($r('app.color.text_tertiary'))
+          .margin({ top: 16, bottom: 20 })
+      }
+      .width('100%')
+        .padding({ top: 20, bottom: 20 })
+        .backgroundColor($r('app.color.bg_page'))
+    }
+  }
+
+  private async onShareClick(): Promise<void> {
+    if (this.isSharing || !this.level || !this.getCurrentQuestion()) return;
+
+    this.isSharing = true;
+    promptAction.showToast({
+      message: this.context.resourceManager.getStringSync($r('app.string.preparing_share').id),
+      duration: 1500
+    });
+
+    let tempFilePath: string | null = null;
+
+    try {
+      // 先释放之前的 PixelMap
+      this.releaseSharePixelMap();
+
+      // 截取分享容器内容
+      const pixmap = await screenshotManager.captureSnapshot(this.SHARE_CONTAINER_ID);
+      if (!pixmap) {
+        promptAction.showToast({
+          message: this.context.resourceManager.getStringSync($r('app.string.screenshot_failed').id),
+          duration: 2000
+        });
+        this.isSharing = false;
+        return;
+      }
+
+      this.sharePixelMap = pixmap;
+
+      // 创建图像打包器并打包为 ArrayBuffer
+      const imagePacker = image.createImagePacker();
+      const packOpts: image.PackingOption = {
+        format: 'image/jpeg',
+        quality: 90
+      };
+      
+      const imageData: ArrayBuffer = await imagePacker.packing(pixmap, packOpts);
+      console.info(`[TriviaPlayPage] Image packed, data size: ${imageData.byteLength} bytes`);
+
+      // 保存到临时文件
+      const timestamp = Date.now();
+      tempFilePath = this.context.cacheDir + '/share_trivia_' + timestamp + '.jpg';
+      
+      // 使用同步文件操作
+      const fileHandle = fs.openSync(tempFilePath, fs.OpenMode.CREATE | fs.OpenMode.WRITE_ONLY);
+      fs.writeSync(fileHandle.fd, imageData);
+      fs.closeSync(fileHandle);
+      
+      // 验证文件是否存在且不为空
+      const stat = fs.statSync(tempFilePath);
+      if (stat.size === 0) {
+        throw new Error('Image file is empty');
+      }
+      
+      console.info(`[TriviaPlayPage] Image file created: ${tempFilePath}, size: ${stat.size} bytes`);
+
+      // 获取文件URI
+      const imageUri = fileUri.getUriFromPath(tempFilePath);
+      console.info(`[TriviaPlayPage] Image URI: ${imageUri}`);
+      
+      // 获取图片类型描述符
+      const utdTypeId = uniformTypeDescriptor.getUniformDataTypeByFilenameExtension('.jpg', uniformTypeDescriptor.UniformDataType.IMAGE);
+      console.info(`[TriviaPlayPage] UTD Type ID: ${utdTypeId}`);
+
+      // 使用图片URI分享
+      const levelText = this.context.resourceManager.getStringSync($r('app.string.level_number').id, this.level.id.toString());
+      const triviaName = this.context.resourceManager.getStringSync($r('app.string.game_trivia').id);
+      const fromAppText = this.context.resourceManager.getStringSync($r('app.string.from_app').id);
+      const shareData = new systemShare.SharedData({
+        utd: utdTypeId,
+        uri: imageUri,
+        title: `${levelText} - ${triviaName}`,
+        description: fromAppText
+      });
+      
+      console.info(`[TriviaPlayPage] ShareData created: utd=${utdTypeId}, uri=${imageUri}`);
+
+      const controller = new systemShare.ShareController(shareData);
+      
+      // 显示分享面板
+      await controller.show(this.context, {
+        selectionMode: systemShare.SelectionMode.SINGLE,
+        previewMode: systemShare.SharePreviewMode.DETAIL
+      });
+
+      console.info('[TriviaPlayPage] Share panel opened successfully');
+      
+      // 分享成功后释放 PixelMap
+      this.releaseSharePixelMap();
+      
+      // 延迟删除文件，确保分享完成
+      setTimeout(() => {
+        if (tempFilePath) {
+          try {
+            fs.unlinkSync(tempFilePath);
+            console.info(`[TriviaPlayPage] Temp file deleted: ${tempFilePath}`);
+          } catch (unlinkError) {
+            console.warn('[TriviaPlayPage] Failed to delete temp file:', unlinkError);
+          }
+        }
+      }, 5000); // 5秒后删除
+
+    } catch (err) {
+      const error = err as BusinessError;
+      console.error(`[TriviaPlayPage] Failed to share: code: ${error?.code}, message: ${error?.message}`);
+      promptAction.showToast({
+        message: this.context.resourceManager.getStringSync($r('app.string.share_failed').id),
+        duration: 2000
+      });
+      
+      // 清理资源
+      this.releaseSharePixelMap();
+      if (tempFilePath) {
+        try {
+          fs.unlinkSync(tempFilePath);
+        } catch (unlinkError) {
+          console.warn('[TriviaPlayPage] Failed to delete temp file on error:', unlinkError);
+        }
+      }
+    } finally {
+      this.isSharing = false;
+    }
   }
 
   @Builder
@@ -468,20 +723,20 @@ interface RouterParams {
         .fontSize(64)
         .margin({ top: 60 })
 
-      Text('恭喜过关！')
+      Text($r('app.string.congratulations'))
         .fontSize(28)
         .fontWeight(FontWeight.Bold)
         .fontColor($r('app.color.text_primary'))
         .margin({ top: 24 })
 
-      Text(`第 ${this.level?.id} 关`)
+      Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString()))
         .fontSize(16)
         .fontColor($r('app.color.text_secondary'))
         .margin({ top: 8 })
 
       Column() {
         Row() {
-          Text('正确回答')
+          Text(this.context.resourceManager.getStringSync($r('app.string.correct_answers_label').id))
             .fontSize(16)
             .fontColor($r('app.color.text_secondary'))
           Blank()
@@ -491,12 +746,12 @@ interface RouterParams {
             .fontColor($r('app.color.text_primary'))
         }
         .width('100%')
-          .padding({ top: 16, bottom: 16 })
+        .padding({ top: 16, bottom: 16 })
 
         Divider().color($r('app.color.gray_very_light'))
 
         Row() {
-          Text('剩余生命')
+          Text(this.context.resourceManager.getStringSync($r('app.string.remaining_lives').id))
             .fontSize(16)
             .fontColor($r('app.color.text_secondary'))
           Blank()
@@ -516,7 +771,7 @@ interface RouterParams {
 
       Blank()
 
-      Button('返回关卡列表')
+      Button(this.context.resourceManager.getStringSync($r('app.string.back_to_levels').id))
         .width('80%')
         .height(48)
         .fontSize(17)
@@ -527,7 +782,9 @@ interface RouterParams {
           router.back();
         })
 
-      Button(this.level && this.level.id < getTotalTriviaLevels() ? '下一关' : '完美收官')
+      Button(this.level && this.level.id < getTotalTriviaLevels() 
+        ? this.context.resourceManager.getStringSync($r('app.string.next_level').id)
+        : this.context.resourceManager.getStringSync($r('app.string.perfect_finish').id))
         .width('80%')
         .height(48)
         .fontSize(17)

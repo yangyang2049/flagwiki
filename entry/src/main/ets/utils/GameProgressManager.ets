@@ -13,11 +13,9 @@ export enum GameType {
   QUIZ = 'quiz',               // 国旗猜猜
   INPUT = 'input',             // 输入游戏
   TRIVIA = 'trivia',           // 知识问答
+  CONNECTIONS = 'connections', // 分组连线
   PAINT_WORLD = 'paint_world', // 涂鸦-世界
-  PAINT_US = 'paint_us',       // 涂鸦-美国
-  PAINT_DE = 'paint_de',       // 涂鸦-德国
-  PAINT_IT = 'paint_it',       // 涂鸦-意大利
-  PAINT_BR = 'paint_br'        // 涂鸦-巴西
+  PAINT_US = 'paint_us'        // 涂鸦-美国
 }
 
 // 进度存储的 key 前缀
@@ -48,6 +46,7 @@ class GameProgressManagerClass {
     try {
       this.prefs = await preferences.getPreferences(context, PREFS_NAME);
       this.isInitialized = true;
+      this.initPromise = null; // 成功后清空 initPromise
       console.info('[GameProgressManager] Initialized successfully');
     } catch (err) {
       console.error('[GameProgressManager] Failed to initialize:', err);
@@ -84,12 +83,40 @@ class GameProgressManagerClass {
   }
 
   /**
+   * 设置解锁关卡数（用于重置进度）
+   * @param gameType 游戏类型
+   * @param level 要设置的关卡号
+   */
+  async setUnlockedLevel(gameType: GameType, level: number): Promise<void> {
+    if (!this.prefs) {
+      console.warn('[GameProgressManager] Prefs not initialized');
+      return;
+    }
+
+    try {
+      const key = PROGRESS_KEY_PREFIX + gameType;
+      await this.prefs.put(key, level);
+      await this.prefs.flush();
+      console.info(`[GameProgressManager] Set unlocked level for ${gameType} to ${level}`);
+    } catch (err) {
+      console.error('[GameProgressManager] Failed to set unlocked level:', err);
+      // ArkTS 要求 throw 必须是 Error 类型
+      if (err instanceof Error) {
+        throw err;
+      } else {
+        throw new Error(`Failed to set unlocked level: ${String(err)}`);
+      }
+    }
+  }
+
+  /**
    * 解锁下一关
    * @param gameType 游戏类型
    * @param completedLevel 刚完成的关卡号
+   * @param maxLevel 最大关卡数（可选，用于防止溢出）
    * @returns 新的解锁关卡号
    */
-  async unlockNextLevel(gameType: GameType, completedLevel: number): Promise<number> {
+  async unlockNextLevel(gameType: GameType, completedLevel: number, maxLevel?: number): Promise<number> {
     if (!this.prefs) {
       console.warn('[GameProgressManager] Prefs not initialized');
       return completedLevel + 1;
@@ -98,7 +125,12 @@ class GameProgressManagerClass {
     try {
       const key = PROGRESS_KEY_PREFIX + gameType;
       const currentUnlocked = await this.getUnlockedLevel(gameType);
-      const newLevel = Math.max(currentUnlocked, completedLevel + 1);
+      let newLevel = Math.max(currentUnlocked, completedLevel + 1);
+      
+      // 如果提供了最大关卡数，防止溢出
+      if (maxLevel !== undefined && newLevel > maxLevel) {
+        newLevel = maxLevel;
+      }
       
       await this.prefs.put(key, newLevel);
       await this.prefs.flush();

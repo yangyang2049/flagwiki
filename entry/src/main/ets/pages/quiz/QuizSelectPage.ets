@@ -1,8 +1,11 @@
 import router from '@ohos.router';
+import common from '@ohos.app.ability.common';
 
 @Entry
 @Component
 struct QuizSelectPage {
+  private context = getContext(this) as common.UIAbilityContext;
+
   build() {
     Navigation() {
       Column() {
@@ -19,12 +22,12 @@ struct QuizSelectPage {
           .justifyContent(FlexAlign.Center)
 
           Column() {
-            Text('看旗猜国名')
+            Text(this.context.resourceManager.getStringSync($r('app.string.quiz_flag_to_name').id))
               .fontSize(20)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
 
-            Text('根据国旗图案，选择正确的国家名称')
+            Text(this.context.resourceManager.getStringSync($r('app.string.quiz_flag_to_name_desc').id))
               .fontSize(14)
               .fontColor($r('app.color.text_secondary'))
               .margin({ top: 6 })
@@ -62,12 +65,12 @@ struct QuizSelectPage {
           .justifyContent(FlexAlign.Center)
 
           Column() {
-            Text('看名猜国旗')
+            Text(this.context.resourceManager.getStringSync($r('app.string.quiz_name_to_flag').id))
               .fontSize(20)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
 
-            Text('根据国家名称，选择正确的国旗图案')
+            Text(this.context.resourceManager.getStringSync($r('app.string.quiz_name_to_flag_desc').id))
               .fontSize(14)
               .fontColor($r('app.color.text_secondary'))
               .margin({ top: 6 })
@@ -94,7 +97,7 @@ struct QuizSelectPage {
 
         // 说明
         Column() {
-          Text('完成每关挑战，解锁更多关卡')
+          Text(this.context.resourceManager.getStringSync($r('app.string.complete_levels_to_unlock').id))
             .fontSize(13)
             .fontColor($r('app.color.text_tertiary'))
             .textAlign(TextAlign.Center)
@@ -105,7 +108,7 @@ struct QuizSelectPage {
       .width('100%')
       .height('100%')
     }
-    .title('国旗猜猜')
+    .title(this.context.resourceManager.getStringSync($r('app.string.game_quiz').id))
     .titleMode(NavigationTitleMode.Mini)
     .backgroundColor($r('app.color.bg_page'))
   }

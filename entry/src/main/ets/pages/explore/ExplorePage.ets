@@ -19,12 +19,12 @@ export struct ExplorePage {
             .justifyContent(FlexAlign.Center)
 
           Column() {
-            Text('国旗猜猜')
+            Text($r('app.string.explore_flag_quiz'))
               .fontSize(20)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
 
-            Text('看旗猜国名、看名猜国旗')
+            Text($r('app.string.explore_flag_quiz_desc'))
               .fontSize(14)
               .fontColor($r('app.color.text_secondary'))
               .margin({ top: 6 })
@@ -37,7 +37,7 @@ export struct ExplorePage {
             .width(20)
             .height(20)
         }
-      .padding(20)
+      .padding(24)
           .margin({ left: 16, right: 16, top: 16 })
           .backgroundColor($r('app.color.bg_card'))
           .borderRadius(20)
@@ -59,12 +59,12 @@ export struct ExplorePage {
             .justifyContent(FlexAlign.Center)
 
           Column() {
-            Text('假旗找茬')
+            Text($r('app.string.explore_fake_flag'))
               .fontSize(20)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
 
-            Text('在四面国旗中找出假旗')
+            Text($r('app.string.explore_fake_flag_desc'))
               .fontSize(14)
               .fontColor($r('app.color.text_secondary'))
               .margin({ top: 6 })
@@ -77,7 +77,7 @@ export struct ExplorePage {
             .width(20)
             .height(20)
         }
-      .padding(20)
+      .padding(24)
           .margin({ left: 16, right: 16, top: 16 })
           .backgroundColor($r('app.color.bg_card'))
           .borderRadius(20)
@@ -99,12 +99,12 @@ export struct ExplorePage {
             .justifyContent(FlexAlign.Center)
 
           Column() {
-            Text('拼写挑战')
+            Text($r('app.string.explore_spelling'))
               .fontSize(20)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
 
-            Text('看国旗，输入国家名称')
+            Text($r('app.string.explore_spelling_desc'))
               .fontSize(14)
               .fontColor($r('app.color.text_secondary'))
               .margin({ top: 6 })
@@ -117,7 +117,7 @@ export struct ExplorePage {
             .width(20)
             .height(20)
         }
-      .padding(20)
+      .padding(24)
           .margin({ left: 16, right: 16, top: 16 })
           .backgroundColor($r('app.color.bg_card'))
           .borderRadius(20)
@@ -139,12 +139,12 @@ export struct ExplorePage {
             .justifyContent(FlexAlign.Center)
 
           Column() {
-            Text('知识问答')
+            Text($r('app.string.explore_trivia'))
               .fontSize(20)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
 
-            Text('趣味国旗百科问答')
+            Text($r('app.string.explore_trivia_desc'))
               .fontSize(14)
               .fontColor($r('app.color.text_secondary'))
               .margin({ top: 6 })
@@ -157,7 +157,7 @@ export struct ExplorePage {
             .width(20)
             .height(20)
         }
-      .padding(20)
+      .padding(24)
           .margin({ left: 16, right: 16, top: 16 })
           .backgroundColor($r('app.color.bg_card'))
           .borderRadius(20)
@@ -179,12 +179,12 @@ export struct ExplorePage {
             .justifyContent(FlexAlign.Center)
 
           Column() {
-            Text('记忆翻牌')
+            Text($r('app.string.explore_memory'))
               .fontSize(20)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
 
-            Text('翻牌配对，锻炼记忆力')
+            Text($r('app.string.explore_memory_desc'))
               .fontSize(14)
               .fontColor($r('app.color.text_secondary'))
               .margin({ top: 6 })
@@ -197,13 +197,53 @@ export struct ExplorePage {
             .width(20)
             .height(20)
         }
-      .padding(20)
+      .padding(24)
           .margin({ left: 16, right: 16, top: 16 })
           .backgroundColor($r('app.color.bg_card'))
           .borderRadius(20)
           .alignItems(VerticalAlign.Center)
           .onClick(() => {
             router.pushUrl({ url: 'pages/memory/MemoryLevelsPage' });
+          })
+
+        // 分组连线卡片
+        Row() {
+          Column() {
+            Text('🔗')
+              .fontSize(40)
+          }
+        .width(72)
+            .height(72)
+            .backgroundColor($r('app.color.bg_blue_light'))
+            .borderRadius(16)
+            .justifyContent(FlexAlign.Center)
+
+          Column() {
+            Text($r('app.string.explore_connections'))
+              .fontSize(20)
+              .fontWeight(FontWeight.Bold)
+              .fontColor($r('app.color.text_primary'))
+
+            Text($r('app.string.explore_connections_desc'))
+              .fontSize(14)
+              .fontColor($r('app.color.text_secondary'))
+              .margin({ top: 6 })
+          }
+        .alignItems(HorizontalAlign.Start)
+            .margin({ left: 16 })
+            .layoutWeight(1)
+
+          Image($r('app.media.icon_arrow_right'))
+            .width(20)
+            .height(20)
+        }
+      .padding(24)
+          .margin({ left: 16, right: 16, top: 16 })
+          .backgroundColor($r('app.color.bg_card'))
+          .borderRadius(20)
+          .alignItems(VerticalAlign.Center)
+          .onClick(() => {
+            router.pushUrl({ url: 'pages/connections/ConnectionsLevelsPage' });
           })
 
         // HeadsUp 卡片
@@ -219,12 +259,12 @@ export struct ExplorePage {
             .justifyContent(FlexAlign.Center)
 
           Column() {
-            Text('国旗猜猜乐')
+            Text($r('app.string.explore_headsup'))
               .fontSize(20)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
 
-            Text('快速识别国旗，挑战你的反应')
+            Text($r('app.string.explore_headsup_desc'))
               .fontSize(14)
               .fontColor($r('app.color.text_secondary'))
               .margin({ top: 6 })
@@ -237,7 +277,7 @@ export struct ExplorePage {
             .width(20)
             .height(20)
         }
-      .padding(20)
+      .padding(24)
           .margin({ left: 16, right: 16, top: 16 })
           .backgroundColor($r('app.color.bg_card'))
           .borderRadius(20)
@@ -247,6 +287,7 @@ export struct ExplorePage {
           })
       }
       .width('100%')
+      .padding({ bottom: 60 })
     }
     .width('100%')
       .height('100%')

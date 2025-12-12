@@ -5,19 +5,21 @@
 import router from '@ohos.router';
 import common from '@ohos.app.ability.common';
 import display from '@ohos.display';
+import promptAction from '@ohos.promptAction';
 import { paintCategories, PaintCategory, getTotalLevels } from './PaintGameData';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 
 @CustomDialog
 struct HowToPlayDialog {
   controller: CustomDialogController;
+  private context = getContext(this) as common.UIAbilityContext;
 
   build() {
     Column() {
       Row() {
         Text('🎨')
           .fontSize(28)
-        Text(' 涂鸦说明')
+        Text(` ${this.context.resourceManager.getStringSync($r('app.string.paint_instructions_title').id)}`)
           .fontSize(20)
           .fontWeight(FontWeight.Bold)
           .fontColor($r('app.color.text_primary'))
@@ -25,29 +27,29 @@ struct HowToPlayDialog {
       .margin({ bottom: 20 })
 
       Column() {
-        Text('1. 从调色板选择颜色')
+        Text(this.context.resourceManager.getStringSync($r('app.string.paint_instruction_1').id))
           .fontSize(15)
           .fontColor($r('app.color.text_secondary'))
           .margin({ bottom: 10 })
 
-        Text('2. 用手指点击或拖动国旗区域进行填色')
+        Text(this.context.resourceManager.getStringSync($r('app.string.paint_instruction_2').id))
           .fontSize(15)
           .fontColor($r('app.color.text_secondary'))
           .margin({ bottom: 10 })
 
-        Text('3. 按照正确的颜色顺序完成涂鸦')
+        Text(this.context.resourceManager.getStringSync($r('app.string.paint_instruction_3').id))
           .fontSize(15)
           .fontColor($r('app.color.text_secondary'))
           .margin({ bottom: 10 })
 
-        Text('4. 每关包含多个国旗或州旗，全部正确即可过关')
+        Text(this.context.resourceManager.getStringSync($r('app.string.paint_instruction_4').id))
           .fontSize(15)
           .fontColor($r('app.color.text_secondary'))
       }
       .alignItems(HorizontalAlign.Start)
       .width('100%')
 
-      Button('知道了')
+      Button(this.context.resourceManager.getStringSync($r('app.string.got_it').id))
         .width('100%')
         .height(44)
         .fontSize(16)
@@ -65,17 +67,88 @@ struct HowToPlayDialog {
   }
 }
 
+@CustomDialog
+struct AllLevelsCompletedDialog {
+  controller: CustomDialogController;
+  completionMessage: string = '';
+  onRestart?: () => void;
+  private context = getContext(this) as common.UIAbilityContext;
+
+  build() {
+    Column() {
+      Row() {
+        Text('🎉')
+          .fontSize(28)
+        Text(` ${this.context.resourceManager.getStringSync($r('app.string.congratulations').id)}`)
+          .fontSize(20)
+          .fontWeight(FontWeight.Bold)
+          .fontColor($r('app.color.text_primary'))
+      }
+      .margin({ bottom: 20 })
+
+      Text(this.completionMessage)
+        .fontSize(15)
+        .fontColor($r('app.color.text_secondary'))
+        .textAlign(TextAlign.Center)
+        .margin({ bottom: 8 })
+
+      Text(this.context.resourceManager.getStringSync($r('app.string.restart_question').id))
+        .fontSize(15)
+        .fontColor($r('app.color.text_secondary'))
+        .textAlign(TextAlign.Center)
+        .margin({ bottom: 24 })
+
+      Row() {
+        Button(this.context.resourceManager.getStringSync($r('app.string.cancel').id))
+          .layoutWeight(1)
+          .height(44)
+          .fontSize(16)
+          .fontWeight(FontWeight.Medium)
+          .backgroundColor($r('app.color.bg_secondary'))
+          .fontColor($r('app.color.text_primary'))
+          .margin({ right: 8 })
+          .onClick(() => {
+            this.controller.close();
+          })
+
+        Button(this.context.resourceManager.getStringSync($r('app.string.restart').id))
+          .layoutWeight(1)
+          .height(44)
+          .fontSize(16)
+          .fontWeight(FontWeight.Medium)
+          .backgroundColor($r('app.color.button_primary'))
+          .fontColor($r('app.color.text_white'))
+          .margin({ left: 8 })
+          .onClick(() => {
+            this.controller.close();
+            if (this.onRestart) {
+              this.onRestart();
+            }
+          })
+      }
+      .width('100%')
+    }
+    .width(320)
+    .padding(24)
+    .backgroundColor($r('app.color.bg_card'))
+    .borderRadius(20)
+  }
+}
+
 @Component
 export struct PaintHomePage {
   @State unlockedLevels: Map<string, number> = new Map();
   @State screenWidth: number = 360;
   @State screenHeight: number = 780;
+  @State dialogCategoryName: string = '';
   private context = getContext(this) as common.UIAbilityContext;
   private howToPlayDialogController: CustomDialogController = new CustomDialogController({
     builder: HowToPlayDialog(),
     alignment: DialogAlignment.Center,
     customStyle: true
   });
+  private allLevelsCompletedDialogController: CustomDialogController | null = null;
+  private currentCategoryForRestart: PaintCategory | null = null;
 
   async aboutToAppear() {
     // 获取屏幕尺寸
@@ -91,7 +164,16 @@ export struct PaintHomePage {
     // 为每个分类加载进度
     for (const category of paintCategories) {
       const key = this.getGameType(category.id);
-      const level = await GameProgressManager.getUnlockedLevel(key);
+      let level = await GameProgressManager.getUnlockedLevel(key);
+      const totalLevels = getTotalLevels(category.id);
+      
+      // 如果进度超过总关卡数，限制为总关卡数（处理之前有更多关卡的情况）
+      if (level > totalLevels) {
+        level = totalLevels;
+        // 自动修复进度
+        await GameProgressManager.setUnlockedLevel(key, totalLevels);
+      }
+      
       this.unlockedLevels.set(category.id, level);
     }
     // 触发UI更新
@@ -101,10 +183,7 @@ export struct PaintHomePage {
   private getGameType(categoryId: string): GameType {
     const gameTypeMap: Record<string, GameType> = {
       'world': GameType.PAINT_WORLD,
-      'us': GameType.PAINT_US,
-      'de': GameType.PAINT_DE,
-      'it': GameType.PAINT_IT,
-      'br': GameType.PAINT_BR
+      'us': GameType.PAINT_US
     };
     return gameTypeMap[categoryId] || GameType.PAINT_WORLD;
   }
@@ -115,6 +194,15 @@ export struct PaintHomePage {
 
   private navigateToGame(category: PaintCategory): void {
     const currentLevel = this.getUnlockedLevel(category.id);
+    const totalLevels = getTotalLevels(category.id);
+    
+    // 检查是否所有关卡都已完成（包括等于的情况，即17/17）
+    if (currentLevel >= totalLevels) {
+      // 显示全部完成对话框
+      this.showAllLevelsCompletedDialog(category);
+      return;
+    }
+    
     // 直接进入当前关卡
     router.pushUrl({
       url: 'pages/paintgame/PaintPlayPage',
@@ -123,6 +211,53 @@ export struct PaintHomePage {
         levelId: currentLevel
       }
     });
+  }
+
+  private showAllLevelsCompletedDialog(category: PaintCategory): void {
+    this.currentCategoryForRestart = category;
+    this.dialogCategoryName = this.context.resourceManager.getStringSync(category.nameResId.id);
+    const completionMessage = this.context.resourceManager.getStringSync($r('app.string.all_levels_completed').id, this.dialogCategoryName);
+    
+    // 创建控制器
+    this.allLevelsCompletedDialogController = new CustomDialogController({
+      builder: AllLevelsCompletedDialog({
+        completionMessage: completionMessage,
+        onRestart: () => {
+          if (this.currentCategoryForRestart) {
+            this.restartGame(this.currentCategoryForRestart);
+          }
+        }
+      }),
+      alignment: DialogAlignment.Center,
+      customStyle: true
+    });
+    this.allLevelsCompletedDialogController.open();
+  }
+
+  private async restartGame(category: PaintCategory): Promise<void> {
+    try {
+      const gameType = this.getGameType(category.id);
+      // 重置进度到第1关
+      await GameProgressManager.setUnlockedLevel(gameType, 1);
+      // 更新本地状态
+      this.unlockedLevels.set(category.id, 1);
+      this.unlockedLevels = new Map(this.unlockedLevels);
+      
+      // 进入第1关
+      router.pushUrl({
+        url: 'pages/paintgame/PaintPlayPage',
+        params: {
+          categoryId: category.id,
+          levelId: 1
+        }
+      });
+    } catch (err) {
+      console.error('Failed to restart game:', err);
+      promptAction.showToast({
+        message: this.context.resourceManager.getStringSync($r('app.string.paint_reset_failed').id),
+        duration: 2000
+      });
+    }
   }
 
   private showHowToPlayDialog(): void {
@@ -140,12 +275,12 @@ export struct PaintHomePage {
               .fontSize(56)
               .margin({ bottom: 12 })
 
-            Text('世界')
+            Text($r('app.string.paint_category_world'))
               .fontSize(20)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
 
-            Text('世界各国国旗涂鸦')
+            Text($r('app.string.paint_category_world_desc'))
               .fontSize(13)
               .fontColor($r('app.color.text_secondary'))
               .margin({ top: 6 })
@@ -157,7 +292,7 @@ export struct PaintHomePage {
           // 右上角浮动圆环进度
           Stack() {
             Progress({
-              value: this.getUnlockedLevel('world') - 1,
+              value: Math.min(this.getUnlockedLevel('world'), getTotalLevels('world')),
               total: getTotalLevels('world'),
               type: ProgressType.Ring
             })
@@ -167,7 +302,7 @@ export struct PaintHomePage {
               .color('#69B4FF')
               .backgroundColor('rgba(0, 0, 0, 0.06)')
 
-            Text(`${this.getUnlockedLevel('world')}/${getTotalLevels('world')}`)
+            Text(`${Math.min(this.getUnlockedLevel('world'), getTotalLevels('world'))}/${getTotalLevels('world')}`)
               .fontSize(11)
               .fontColor($r('app.color.text_secondary'))
           }
@@ -201,12 +336,12 @@ export struct PaintHomePage {
                 .fontSize(48)
                 .margin({ bottom: 10 })
 
-              Text(category.name)
+              Text(this.context.resourceManager.getStringSync(category.nameResId.id))
                 .fontSize(18)
                 .fontWeight(FontWeight.Bold)
                 .fontColor($r('app.color.text_primary'))
 
-              Text(category.description)
+              Text(this.context.resourceManager.getStringSync(category.descResId.id))
                 .fontSize(13)
                 .fontColor($r('app.color.text_secondary'))
                 .margin({ top: 6 })
@@ -218,7 +353,7 @@ export struct PaintHomePage {
             // 右上角浮动圆环进度
             Stack() {
               Progress({
-                value: this.getUnlockedLevel(category.id) - 1,
+                value: Math.min(this.getUnlockedLevel(category.id), getTotalLevels(category.id)),
                 total: getTotalLevels(category.id),
                 type: ProgressType.Ring
               })
@@ -228,7 +363,7 @@ export struct PaintHomePage {
                 .color('#69B4FF')
                 .backgroundColor('rgba(0, 0, 0, 0.06)')
 
-              Text(`${this.getUnlockedLevel(category.id)}/${getTotalLevels(category.id)}`)
+              Text(`${Math.min(this.getUnlockedLevel(category.id), getTotalLevels(category.id))}/${getTotalLevels(category.id)}`)
                 .fontSize(10)
                 .fontColor($r('app.color.text_secondary'))
             }
@@ -256,7 +391,7 @@ export struct PaintHomePage {
         Row() {
           Text('🎨')
             .fontSize(20)
-          Text(' 涂鸦说明')
+          Text(` ${this.context.resourceManager.getStringSync($r('app.string.paint_instructions_banner').id)}`)
             .fontSize(15)
             .fontWeight(FontWeight.Medium)
             .fontColor($r('app.color.text_primary'))

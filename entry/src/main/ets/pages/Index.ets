@@ -8,7 +8,7 @@ import common from '@ohos.app.ability.common';
 import { PreferencesManager } from '../utils/PreferencesManager';
 
 interface TabItem {
-  title: string;
+  title: Resource;
   iconNormal: Resource;
   iconSelected: Resource;
 }
@@ -25,19 +25,25 @@ struct Index {
   private context = getContext(this) as common.UIAbilityContext;
 
   private tabItems: TabItem[] = [
-    { title: '首页', iconNormal: $r('app.media.icon_tab_home'), iconSelected: $r('app.media.icon_tab_home_selected') },
-    { title: '画廊', iconNormal: $r('app.media.icon_tab_gallery'), iconSelected: $r('app.media.icon_tab_gallery_selected') },
-    { title: '涂鸦', iconNormal: $r('app.media.icon_tab_paint'), iconSelected: $r('app.media.icon_tab_paint_selected') },
-    { title: '探索', iconNormal: $r('app.media.icon_tab_explore'), iconSelected: $r('app.media.icon_tab_explore_selected') },
-    { title: '我的', iconNormal: $r('app.media.icon_tab_profile'), iconSelected: $r('app.media.icon_tab_profile_selected') }
+    { title: $r('app.string.tab_home'), iconNormal: $r('app.media.icon_tab_home'), iconSelected: $r('app.media.icon_tab_home_selected') },
+    { title: $r('app.string.tab_gallery'), iconNormal: $r('app.media.icon_tab_gallery'), iconSelected: $r('app.media.icon_tab_gallery_selected') },
+    { title: $r('app.string.tab_paint'), iconNormal: $r('app.media.icon_tab_paint'), iconSelected: $r('app.media.icon_tab_paint_selected') },
+    { title: $r('app.string.tab_explore'), iconNormal: $r('app.media.icon_tab_explore'), iconSelected: $r('app.media.icon_tab_explore_selected') },
+    { title: $r('app.string.tab_profile'), iconNormal: $r('app.media.icon_tab_profile'), iconSelected: $r('app.media.icon_tab_profile_selected') }
   ];
 
-  private getTitleText(): string {
-    const titles: string[] = ['国旗小百科', '画廊', '涂鸦', '探索', '我的'];
+  private getTitleText(): Resource {
+    const titles: Resource[] = [
+      $r('app.string.app_welcome_title'),
+      $r('app.string.tab_gallery'),
+      $r('app.string.tab_paint'),
+      $r('app.string.tab_explore'),
+      $r('app.string.tab_profile')
+    ];
     if (this.currentTabIndex >= 0 && this.currentTabIndex < titles.length) {
       return titles[this.currentTabIndex];
     }
-    return '国旗小百科';
+    return $r('app.string.app_welcome_title');
   }
 
   async aboutToAppear() {
@@ -142,7 +148,7 @@ struct Index {
           .tabBar(this.TabItemBuilder(0))
 
           TabContent() {
-            GalleryPage({ isSearchExpanded: this.isGallerySearchExpanded })
+            GalleryPage({ isSearchExpanded: this.isGallerySearchExpanded, context: this.context })
           }
           .tabBar(this.TabItemBuilder(1))
 

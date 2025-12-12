@@ -51,7 +51,7 @@ struct MemoryLevelsPage {
 
               // 关卡信息
               Column() {
-                Text(`第 ${level.id} 关 · ${level.name}`)
+                Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, level.id.toString()))
                   .fontSize(16)
                   .fontWeight(FontWeight.Medium)
                   .fontColor(this.isLevelUnlocked(level.id) ? $r('app.color.text_primary') : $r('app.color.text_tertiary'))
@@ -89,7 +89,7 @@ struct MemoryLevelsPage {
       .scrollBar(BarState.Off)
       .backgroundColor($r('app.color.bg_page'))
     }
-    .title('记忆翻牌')
+    .title($r('app.string.game_memory'))
     .titleMode(NavigationTitleMode.Mini)
     .backgroundColor($r('app.color.bg_page'))
   }

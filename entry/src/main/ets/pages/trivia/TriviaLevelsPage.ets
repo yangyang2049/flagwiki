@@ -66,7 +66,7 @@ struct TriviaLevelsPage {
 
               // 关卡信息
               Column() {
-                Text(`${level.name}`)
+                Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, level.id.toString()))
                   .fontSize(16)
                   .fontWeight(FontWeight.Medium)
                   .fontColor(this.isLevelUnlocked(level.id) ? $r('app.color.text_primary') : $r('app.color.text_tertiary'))
@@ -100,7 +100,7 @@ struct TriviaLevelsPage {
       .padding({ top: 8, bottom: 16 })
       .scrollBar(BarState.Off)
     }
-    .title('知识问答')
+    .title($r('app.string.game_trivia'))
     .titleMode(NavigationTitleMode.Mini)
     .backgroundColor($r('app.color.bg_page'))
   }

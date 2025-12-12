@@ -1,10 +1,12 @@
 import router from '@ohos.router';
+import common from '@ohos.app.ability.common';
 import { CountryStateData, getAllCountryStateData } from '../../utils/StateFlagData';
 
 @Entry
 @Component
 struct StateFlagCountryListPage {
   @State countryList: CountryStateData[] = [];
+  private context = getContext(this) as common.UIAbilityContext;
 
   aboutToAppear() {
     this.countryList = getAllCountryStateData();
@@ -64,7 +66,7 @@ struct StateFlagCountryListPage {
       .height('100%')
       .backgroundColor($r('app.color.bg_page'))
     }
-    .title('各国州旗')
+    .title(this.context.resourceManager.getStringSync($r('app.string.state_flags').id))
     .titleMode(NavigationTitleMode.Mini)
     .backgroundColor($r('app.color.bg_page'))
   }

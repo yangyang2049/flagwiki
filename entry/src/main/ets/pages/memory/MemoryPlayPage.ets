@@ -362,7 +362,7 @@ interface Card {
           Row() {
             // 步数
             Column() {
-              Text('步数')
+              Text($r('app.string.moves'))
                 .fontSize(12)
                 .fontColor($r('app.color.text_secondary'))
               Text(`${this.moves}`)
@@ -375,7 +375,7 @@ interface Card {
             // 时间（放在中间）
             if (this.level && this.level.timeLimit > 0) {
               Column() {
-                Text('时间')
+                Text($r('app.string.time'))
                   .fontSize(11)
                   .fontColor($r('app.color.text_secondary'))
                 Text(this.formatTime(this.timeRemaining))
@@ -388,7 +388,7 @@ interface Card {
 
             // 配对进度
             Column() {
-              Text('配对')
+              Text($r('app.string.pairs'))
                 .fontSize(12)
                 .fontColor($r('app.color.text_secondary'))
               Text(`${this.matchedPairs}/${this.level?.pairs || 0}`)
@@ -539,13 +539,13 @@ interface Card {
           .fontSize(56)
           .margin({ top: 24 })
 
-        Text(this.isWin ? '恭喜过关！' : '时间到！')
+        Text(this.isWin ? $r('app.string.congratulations') : $r('app.string.time_up'))
           .fontSize(24)
           .fontWeight(FontWeight.Bold)
           .fontColor($r('app.color.text_primary'))
           .margin({ top: 16 })
 
-        Text(`第 ${this.level?.id} 关 · ${this.level?.name}`)
+        Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString()))
           .fontSize(14)
           .fontColor($r('app.color.text_secondary'))
           .margin({ top: 8 })
@@ -553,7 +553,7 @@ interface Card {
         // 统计信息
         Column() {
           Row() {
-            Text('总步数')
+            Text($r('app.string.total_moves'))
               .fontSize(15)
               .fontColor($r('app.color.text_secondary'))
             Blank()
@@ -568,7 +568,7 @@ interface Card {
           Divider().color($r('app.color.gray_very_light'))
 
           Row() {
-            Text('配对完成')
+            Text($r('app.string.pairs_completed'))
               .fontSize(15)
               .fontColor($r('app.color.text_secondary'))
             Blank()
@@ -588,7 +588,7 @@ interface Card {
 
         // 按钮
         Row({ space: 12 }) {
-          Button('返回')
+          Button(this.context.resourceManager.getStringSync($r('app.string.back').id))
             .layoutWeight(1)
             .height(44)
             .fontSize(16)
@@ -600,7 +600,11 @@ interface Card {
               router.back();
             })
 
-          Button(this.isWin ? (this.level && this.level.id < getAllMemoryLevels().length ? '下一关' : '完美收官') : '重新开始')
+          Button(this.isWin 
+            ? (this.level && this.level.id < getAllMemoryLevels().length 
+              ? this.context.resourceManager.getStringSync($r('app.string.next_level').id)
+              : this.context.resourceManager.getStringSync($r('app.string.perfect_finish').id))
+            : this.context.resourceManager.getStringSync($r('app.string.restart').id))
             .layoutWeight(1)
             .height(44)
             .fontSize(16)

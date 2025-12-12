@@ -2,12 +2,15 @@
 
 export interface VexillologySection {
    title: string;
+   titleEN: string;
    content: string;
+   contentEN: string;
 }
 
 export const flagVexillologyContent: VexillologySection[] = [
    {
       title: '旗帜学概述',
+      titleEN: 'Vexillology Overview',
       content: `旗帜学（Vexillology）是研究旗帜的学科，专门研究旗帜的设计、历史、象征意义和使用。
 
 1. 学科定义
@@ -32,10 +35,36 @@ export const flagVexillologyContent: VexillologySection[] = [
    - 保护旗帜文化遗产
    - 促进旗帜设计的科学性
    - 传承旗帜文化传统
-   - 增进国际理解与交流`
+   - 增进国际理解与交流`,
+      contentEN: `Vexillology is the study of flags, specifically researching flag design, history, symbolism, and usage.
+
+1. Discipline Definition
+   - Vexillology is a specialized discipline studying flags
+   - The English term "Vexillology" comes from Latin "vexillum" (flag) and Greek "logos" (study)
+   - Established in the 1960s by American vexillologist Whitney Smith
+
+2. Research Scope
+   - National flags, state flags, city flags, and various flag types
+   - Flag design principles and aesthetics
+   - Historical evolution of flags
+   - Symbolic meanings of flags
+   - Flag usage standards
+
+3. Discipline Characteristics
+   - Interdisciplinary research: involving history, design, politics, culture, etc.
+   - Combining theory and practice
+   - International discipline studied by scholars worldwide
+   - Both academic research and practical applications
+
+4. Discipline Significance
+   - Preserving flag cultural heritage
+   - Promoting scientific flag design
+   - Inheriting flag cultural traditions
+   - Enhancing international understanding and exchange`
    },
    {
       title: '旗帜分类',
+      titleEN: 'Flag Classification',
       content: `旗帜学将旗帜按照不同标准进行分类：
 
 1. 按用途分类
@@ -62,10 +91,38 @@ export const flagVexillologyContent: VexillologySection[] = [
    - 传统旗帜：历史悠久、设计稳定
    - 现代旗帜：20世纪后设计的旗帜
    - 历史旗帜：已不再使用的旗帜
-   - 临时旗帜：特殊场合使用的旗帜`
+   - 临时旗帜：特殊场合使用的旗帜`,
+      contentEN: `Vexillology classifies flags according to different standards:
+
+1. By Purpose
+   - National flags: Representing countries
+   - State/Provincial flags: Representing administrative regions
+   - City flags: Representing cities
+   - Military flags: Used by armed forces
+   - Organizational flags: International organizations, corporations, etc.
+
+2. By Design
+   - Solid color flags: Single color flags
+   - Striped flags: Flags composed of stripes (such as tricolor flags)
+   - Cross flags: Flags with cross patterns
+   - Star and stripe flags: Flags with stars and stripes
+   - Emblem flags: Flags with emblems or patterns
+
+3. By Pattern
+   - Geometric patterns: Circles, triangles, squares, etc.
+   - Natural patterns: Sun, moon, stars, animals, etc.
+   - Text patterns: Flags with text
+   - Abstract patterns: Symbolic patterns
+
+4. By History
+   - Traditional flags: Long history, stable design
+   - Modern flags: Designed after the 20th century
+   - Historical flags: No longer in use
+   - Temporary flags: Used for special occasions`
    },
    {
       title: '设计原则',
+      titleEN: 'Design Principles',
       content: `旗帜设计遵循一定的原则和规范：
 
 1. 简洁性原则
@@ -96,10 +153,42 @@ export const flagVexillologyContent: VexillologySection[] = [
    - 与其他旗帜有明显区别
    - 避免与已有旗帜过于相似
    - 体现独特性
-   - 避免混淆`
+   - 避免混淆`,
+      contentEN: `Flag design follows certain principles and standards:
+
+1. Simplicity Principle
+   - Design should be simple and clear, easy to recognize
+   - Avoid overly complex patterns
+   - Clearly recognizable from a distance
+   - Can be drawn by children
+
+2. Symbolism Principle
+   - Colors have symbolic meanings
+   - Patterns represent specific meanings
+   - Overall design reflects national/regional characteristics
+   - Conveys cultural values
+
+3. Color Principle
+   - Use standard colors (such as Pantone color chart)
+   - Colors should be distinct and easily distinguishable
+   - Avoid using too many colors (typically 3-5)
+   - Consider effects under different lighting conditions
+
+4. Proportion Principle
+   - Follow standard aspect ratios (such as 2:3, 1:2)
+   - Pattern position and size should be coordinated
+   - Maintain visual balance
+   - Consider display effects at different sizes
+
+5. Uniqueness Principle
+   - Clearly distinct from other flags
+   - Avoid being too similar to existing flags
+   - Reflect uniqueness
+   - Avoid confusion`
    },
    {
       title: '历史演变',
+      titleEN: 'Historical Evolution',
       content: `旗帜的历史演变反映了人类文明的发展：
 
 1. 古代旗帜
@@ -130,10 +219,42 @@ export const flagVexillologyContent: VexillologySection[] = [
    - 数字化设计工具的应用
    - 环保材料的使用
    - 旗帜文化的全球化
-   - 在线旗帜数据库的建立`
+   - 在线旗帜数据库的建立`,
+      contentEN: `The historical evolution of flags reflects the development of human civilization:
+
+1. Ancient Flags
+   - Earliest flags date back to ancient China and Egypt
+   - Mainly used for military and identification purposes
+   - Simple designs, mostly solid colors or simple patterns
+   - Materials primarily silk and fabric
+
+2. Medieval Flags
+   - European knights used heraldic flags
+   - Crusades promoted flag development
+   - Flags became symbols of identity and status
+   - Designs became more complex and exquisite
+
+3. Modern Flags
+   - Rise of nation-states in the 18th-19th centuries
+   - National flags became national symbols
+   - Classic designs like tricolor flags emerged
+   - Flag design became standardized
+
+4. Contemporary Flags
+   - Many new nations emerged after the 20th century
+   - Flag designs became more diverse
+   - Emphasis on symbolic meaning and cultural connotation
+   - Use of modern materials and techniques
+
+5. Current Development
+   - Application of digital design tools
+   - Use of eco-friendly materials
+   - Globalization of flag culture
+   - Establishment of online flag databases`
    },
    {
       title: '研究方法',
+      titleEN: 'Research Methods',
       content: `旗帜学研究采用多种方法：
 
 1. 历史研究法
@@ -164,10 +285,42 @@ export const flagVexillologyContent: VexillologySection[] = [
    - 建立旗帜数据库
    - 使用图像处理技术
    - 进行数据统计分析
-   - 利用网络资源研究`
+   - 利用网络资源研究`,
+      contentEN: `Vexillology research employs various methods:
+
+1. Historical Research Method
+   - Review historical documents and archives
+   - Study flag evolution processes
+   - Analyze historical backgrounds and reasons
+   - Verify flag origins
+
+2. Comparative Research Method
+   - Compare different flag designs
+   - Analyze similarities and differences in design elements
+   - Study design influences and inheritance
+   - Discover design patterns
+
+3. Field Survey Method
+   - Observe flag usage in person
+   - Photograph and document flags
+   - Investigate flag manufacturing techniques
+   - Understand flag usage standards
+
+4. Literature Research Method
+   - Collect flag-related literature
+   - Study vexillology theory
+   - Analyze design cases
+   - Summarize design experience
+
+5. Digital Methods
+   - Establish flag databases
+   - Use image processing technology
+   - Conduct statistical data analysis
+   - Utilize online resources for research`
    },
    {
       title: '著名学者',
+      titleEN: 'Famous Scholars',
       content: `旗帜学领域有许多著名学者：
 
 1. Whitney Smith（1934-2016）
@@ -198,10 +351,42 @@ export const flagVexillologyContent: VexillologySection[] = [
    - 年轻学者不断加入
    - 研究方法不断创新
    - 数字化研究工具应用
-   - 跨学科研究增多`
+   - 跨学科研究增多`,
+      contentEN: `There are many famous scholars in the field of vexillology:
+
+1. Whitney Smith (1934-2016)
+   - American vexillologist, founder of the discipline
+   - Coined the term "Vexillology" in 1961
+   - Founded "The Flag Bulletin" magazine in 1962
+   - Established systematic vexillology theory
+
+2. Other Famous Scholars
+   - Europe: Multiple scholars studying European flag traditions
+   - Asia: Researching Asian flag cultural characteristics
+   - Africa: Studying African flag design features
+   - Latin America: Researching Latin American flag historical evolution
+
+3. International Organizations
+   - International Federation of Vexillological Associations (FIAV)
+   - National vexillological societies
+   - Flag museums and research institutions
+   - Online vexillology communities
+
+4. Academic Contributions
+   - Established flag classification systems
+   - Developed flag design standards
+   - Protected flag cultural heritage
+   - Promoted international exchange and cooperation
+
+5. Contemporary Development
+   - Young scholars continuously joining
+   - Research methods constantly innovating
+   - Application of digital research tools
+   - Increase in interdisciplinary research`
    },
    {
       title: '旗帜象征',
+      titleEN: 'Flag Symbolism',
       content: `旗帜的象征意义是旗帜学的重要研究内容：
 
 1. 颜色象征
@@ -236,12 +421,58 @@ export const flagVexillologyContent: VexillologySection[] = [
    - 代表国家主权
    - 象征民族独立
    - 体现政治制度
-   - 表达政治理念`
+   - 表达政治理念`,
+      contentEN: `The symbolic meaning of flags is an important research area in vexillology:
+
+1. Color Symbolism
+   - Red: Revolution, courage, sacrifice, passion
+   - Blue: Peace, freedom, loyalty, ocean
+   - White: Purity, peace, justice, light
+   - Green: Nature, hope, agriculture, life
+   - Yellow/Gold: Wealth, wisdom, sun, glory
+   - Black: Strength, determination, mourning, land
+
+2. Pattern Symbolism
+   - Stars: Unity, hope, guidance
+   - Moon: Islamic culture, new life
+   - Sun: Light, power, life
+   - Cross: Christianity, direction, protection
+   - Animals: National characteristics, strength, wisdom
+   - Plants: Nature, life, prosperity
+
+3. Design Symbolism
+   - Stripes: Unity, equality, solidarity
+   - Circles: Completeness, harmony, eternity
+   - Triangles: Stability, strength, direction
+   - Symmetry: Balance, order, stability
+
+4. Cultural Symbolism
+   - Reflects national cultural characteristics
+   - Inherits historical traditions
+   - Expresses values
+   - Shows national image
+
+5. Political Symbolism
+   - Represents national sovereignty
+   - Symbolizes national independence
+   - Reflects political systems
+   - Expresses political ideals`
    }
 ];
 
 export function getVexillologyContent(): VexillologySection[] {
    return flagVexillologyContent;
+}
+
+// 获取本地化的旗帜学内容
+export function getLocalizedVexillologyContent(language: string): VexillologySection[] {
+   const isEnglish = language === 'en' || (language.length > 3 && language.substring(0, 3) === 'en-');
+   return flagVexillologyContent.map((section): VexillologySection => ({
+      title: isEnglish ? section.titleEN : section.title,
+      titleEN: section.titleEN,
+      content: isEnglish ? section.contentEN : section.content,
+      contentEN: section.contentEN
+   }));
 }
 
 

@@ -2,459 +2,459 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "国旗小百科 - 探索世界各国国旗"
+      "value": "Flag Wiki - Explore World Flags"
     },
     {
       "name": "EntryAbility_desc",
-      "value": "探索世界各国国旗的奥秘"
+      "value": "Explore the mysteries of world flags"
     },
     {
       "name": "EntryAbility_label",
-      "value": "国旗小百科"
+      "value": "Flag Wiki"
     },
     {
       "name": "vibrate_permission_reason",
-      "value": "用于操作时提供触觉反馈"
+      "value": "For providing haptic feedback during operations"
     },
     {
       "name": "internet_permission_reason",
-      "value": "用于下载语音模型和在线语音服务"
+      "value": "For downloading voice models and online voice services"
     },
     {
       "name": "app_welcome_title",
-      "value": "国旗小百科"
+      "value": "Flag Wiki"
     },
     {
       "name": "app_welcome_subtitle",
-      "value": "探索世界各国国旗的奥秘"
+      "value": "Explore the mysteries of world flags"
     },
     {
       "name": "tab_home",
-      "value": "首页"
+      "value": "Home"
     },
     {
       "name": "tab_gallery",
-      "value": "画廊"
+      "value": "Gallery"
     },
     {
       "name": "tab_paint",
-      "value": "涂鸦"
+      "value": "Paint"
     },
     {
       "name": "tab_explore",
-      "value": "探索"
+      "value": "Explore"
     },
     {
       "name": "tab_profile",
-      "value": "我的"
+      "value": "Me"
     },
     {
       "name": "game_quiz",
-      "value": "国旗猜猜"
+      "value": "Flag Quiz"
     },
     {
       "name": "game_fake_flag",
-      "value": "假旗找茬"
+      "value": "Fake Flag"
     },
     {
       "name": "game_input",
-      "value": "输入游戏"
+      "value": "Input"
     },
     {
       "name": "game_trivia",
-      "value": "知识问答"
+      "value": "Trivia Quiz"
     },
     {
       "name": "game_memory",
-      "value": "记忆翻牌"
+      "value": "Memory Match"
     },
     {
       "name": "game_connections",
-      "value": "分组连线"
+      "value": "Connections"
     },
     {
       "name": "quiz_flag_to_name",
-      "value": "看旗猜国名"
+      "value": "Flag to Name"
     },
     {
       "name": "quiz_name_to_flag",
-      "value": "看名猜国旗"
+      "value": "Name to Flag"
     },
     {
       "name": "level_number",
-      "value": "第 %s 关"
+      "value": "Level %s"
     },
     {
       "name": "congratulations",
-      "value": "恭喜过关！"
+      "value": "Congratulations!"
     },
     {
       "name": "next_level",
-      "value": "下一关"
+      "value": "Next Level"
     },
     {
       "name": "perfect_finish",
-      "value": "完美收官"
+      "value": "Perfect Finish"
     },
     {
       "name": "continent_asia",
-      "value": "亚洲"
+      "value": "Asia"
     },
     {
       "name": "continent_europe",
-      "value": "欧洲"
+      "value": "Europe"
     },
     {
       "name": "continent_africa",
-      "value": "非洲"
+      "value": "Africa"
     },
     {
       "name": "continent_americas",
-      "value": "美洲"
+      "value": "Americas"
     },
     {
       "name": "continent_oceania",
-      "value": "大洋洲"
+      "value": "Oceania"
     },
     {
       "name": "weekly_flag",
-      "value": "本周国旗"
+      "value": "Flag of the Week"
     },
     {
       "name": "national_day",
-      "value": "国庆日"
+      "value": "National Day"
     },
     {
       "name": "quick_entrance",
-      "value": "快捷入口"
+      "value": "Quick Access"
     },
     {
       "name": "flag_gallery",
-      "value": "国旗画廊"
+      "value": "Flag Gallery"
     },
     {
       "name": "state_flags",
-      "value": "各国州旗"
+      "value": "State Flags"
     },
     {
       "name": "flag_quiz",
-      "value": "国旗猜猜"
+      "value": "Flag Quiz"
     },
     {
       "name": "favorites",
-      "value": "收藏夹"
+      "value": "Favorites"
     },
     {
       "name": "topic_recommendations",
-      "value": "专题推荐"
+      "value": "Featured Topics"
     },
     {
       "name": "fun_facts",
-      "value": "💡 趣味小知识"
+      "value": "💡 Fun Facts"
     },
     {
       "name": "explore_flag_quiz",
-      "value": "国旗猜猜"
+      "value": "Flag Quiz"
     },
     {
       "name": "explore_flag_quiz_desc",
-      "value": "看旗猜国名、看名猜国旗"
+      "value": "Guess country by flag, guess flag by country"
     },
     {
       "name": "explore_fake_flag",
-      "value": "假旗找茬"
+      "value": "Fake Flag"
     },
     {
       "name": "explore_fake_flag_desc",
-      "value": "在四面国旗中找出假旗"
+      "value": "Find the fake flag among four flags"
     },
     {
       "name": "explore_spelling",
-      "value": "输入游戏"
+      "value": "Input"
     },
     {
       "name": "explore_spelling_desc",
-      "value": "看国旗，输入国家名称"
+      "value": "Look at the flag, type the country name"
     },
     {
       "name": "explore_trivia",
-      "value": "知识问答"
+      "value": "Trivia"
     },
     {
       "name": "explore_trivia_desc",
-      "value": "趣味国旗百科问答"
+      "value": "Fun flag knowledge quiz"
     },
     {
       "name": "explore_memory",
-      "value": "记忆翻牌"
+      "value": "Memory Match"
     },
     {
       "name": "explore_memory_desc",
-      "value": "翻牌配对，锻炼记忆力"
+      "value": "Flip cards and match pairs to train memory"
     },
     {
       "name": "explore_connections",
-      "value": "分组连线"
+      "value": "Connections"
     },
     {
       "name": "explore_connections_desc",
-      "value": "将国旗按主题分成四组"
+      "value": "Group flags into four themed groups"
     },
     {
       "name": "explore_headsup",
-      "value": "国旗猜猜乐"
+      "value": "Heads Up"
     },
     {
       "name": "explore_headsup_desc",
-      "value": "快速识别国旗，挑战你的反应"
+      "value": "Quickly identify flags, challenge your reaction"
     },
     {
       "name": "headsup_tutorial_title",
-      "value": "使用说明"
+      "value": "How to Play"
     },
     {
       "name": "headsup_tutorial_message",
-      "value": "• 点击屏幕查看答案\n• 再点下一个\n• 每十个一轮"
+      "value": "• Tap screen to see answer\n• Tap again for next\n• 10 flags per round"
     },
     {
       "name": "headsup_session_over",
-      "value": "本轮完成！"
+      "value": "Round Complete!"
     },
     {
       "name": "headsup_session_count",
-      "value": "已完成 %s 轮"
+      "value": "Completed %s round(s)"
     },
     {
       "name": "headsup_exit",
-      "value": "退出"
+      "value": "Exit"
     },
     {
       "name": "headsup_continue",
-      "value": "继续"
+      "value": "Continue"
     },
     {
       "name": "basic_info",
-      "value": "基本信息"
+      "value": "Basic Information"
     },
     {
       "name": "capital",
-      "value": "首都"
+      "value": "Capital"
     },
     {
       "name": "region",
-      "value": "所属地区"
+      "value": "Region"
     },
     {
       "name": "population",
-      "value": "人口"
+      "value": "Population"
     },
     {
       "name": "area",
-      "value": "面积"
+      "value": "Area"
     },
     {
       "name": "country_code",
-      "value": "国家代码"
+      "value": "Country Code"
     },
     {
       "name": "about_flag",
-      "value": "关于这面国旗"
+      "value": "About This Flag"
     },
     {
       "name": "flag_proportion",
-      "value": "国旗比例"
+      "value": "Flag Proportion"
     },
     {
       "name": "adopted_date",
-      "value": "采用日期"
+      "value": "Adopted Date"
     },
     {
       "name": "coat_of_arms",
-      "value": "国徽"
+      "value": "Coat of Arms"
     },
     {
       "name": "favorite",
-      "value": "收藏"
+      "value": "Favorite"
     },
     {
       "name": "favorited",
-      "value": "已收藏"
+      "value": "Favorited"
     },
     {
       "name": "download",
-      "value": "下载"
+      "value": "Download"
     },
     {
       "name": "share",
-      "value": "分享"
+      "value": "Share"
     },
     {
       "name": "copy_hint",
-      "value": "点击各项内容可复制"
+      "value": "Tap any item to copy"
     },
     {
       "name": "got_it",
-      "value": "知道了"
+      "value": "Got it"
     },
     {
       "name": "copied",
-      "value": "已复制"
+      "value": "Copied"
     },
     {
       "name": "copy_failed",
-      "value": "复制失败"
+      "value": "Copy failed"
     },
     {
       "name": "preparing_image",
-      "value": "正在准备图片..."
+      "value": "Preparing image..."
     },
     {
       "name": "screenshot_failed",
-      "value": "截取图片失败"
+      "value": "Screenshot failed"
     },
     {
       "name": "flag_saved",
-      "value": "国旗图片已保存到相册"
+      "value": "Flag image saved to gallery"
     },
     {
       "name": "save_failed",
-      "value": "保存失败"
+      "value": "Save failed"
     },
     {
       "name": "preparing_share",
-      "value": "正在准备分享..."
+      "value": "Preparing to share..."
     },
     {
       "name": "share_failed",
-      "value": "分享失败"
+      "value": "Share failed"
     },
     {
       "name": "from_app",
-      "value": "来自国旗小百科"
+      "value": "From Flag Wiki"
     },
     {
       "name": "unknown",
-      "value": "未知"
+      "value": "Unknown"
     },
     {
       "name": "asia",
-      "value": "亚洲"
+      "value": "Asia"
     },
     {
       "name": "europe",
-      "value": "欧洲"
+      "value": "Europe"
     },
     {
       "name": "africa",
-      "value": "非洲"
+      "value": "Africa"
     },
     {
       "name": "americas",
-      "value": "美洲"
+      "value": "Americas"
     },
     {
       "name": "oceania",
-      "value": "大洋洲"
+      "value": "Oceania"
     },
     {
       "name": "billion_people",
-      "value": "亿人"
+      "value": " billion"
     },
     {
       "name": "ten_thousand_people",
-      "value": "万人"
+      "value": "K"
     },
     {
       "name": "people",
-      "value": "人"
+      "value": ""
     },
     {
       "name": "ten_thousand_sq_km",
-      "value": "万平方公里"
+      "value": "K km²"
     },
     {
       "name": "sq_km",
-      "value": "平方公里"
+      "value": " km²"
     },
     {
       "name": "headquarters",
-      "value": "总部"
+      "value": "Headquarters"
     },
     {
       "name": "org_type",
-      "value": "组织类型"
+      "value": "Organization Type"
     },
     {
       "name": "coverage_population",
-      "value": "覆盖人口"
+      "value": "Coverage Population"
     },
     {
       "name": "website",
-      "value": "网站"
+      "value": "Website"
     },
     {
       "name": "description",
-      "value": "简介"
+      "value": "Description"
     },
     {
       "name": "start_reading",
-      "value": "开始朗读"
+      "value": "Start reading"
     },
     {
       "name": "stop_reading",
-      "value": "已停止朗读"
+      "value": "Reading stopped"
     },
     {
       "name": "reading_unavailable",
-      "value": "朗读功能暂不可用"
+      "value": "Reading feature unavailable"
     },
     {
       "name": "exploration_progress",
-      "value": "探索进度"
+      "value": "Exploration Progress"
     },
     {
       "name": "completed",
-      "value": "已完成"
+      "value": "Completed"
     },
     {
       "name": "level",
-      "value": "关"
+      "value": " level"
     },
     {
       "name": "my_favorites",
-      "value": "我的收藏"
+      "value": "My Favorites"
     },
     {
       "name": "no_favorites",
-      "value": "暂无收藏"
+      "value": "No favorites yet"
     },
     {
       "name": "favorite_removed",
-      "value": "已取消收藏"
+      "value": "Removed from favorites"
     },
     {
       "name": "navigation_failed",
-      "value": "导航失败"
+      "value": "Navigation failed"
     },
     {
       "name": "dark_mode",
-      "value": "深色模式"
+      "value": "Dark Mode"
     },
     {
       "name": "follow_system",
-      "value": "跟随系统"
+      "value": "Follow System"
     },
     {
       "name": "light",
-      "value": "浅色"
+      "value": "Light"
     },
     {
       "name": "dark",
-      "value": "深色"
+      "value": "Dark"
     },
     {
       "name": "language",
-      "value": "语言"
+      "value": "Language"
     },
     {
       "name": "chinese",
@@ -466,459 +466,459 @@
     },
     {
       "name": "sound",
-      "value": "音效"
+      "value": "Sound"
     },
     {
       "name": "vibration",
-      "value": "振动"
+      "value": "Vibration"
     },
     {
       "name": "rate_app",
-      "value": "应用评分"
+      "value": "Rate App"
     },
     {
       "name": "feedback",
-      "value": "意见反馈"
+      "value": "Feedback"
     },
     {
       "name": "about_app",
-      "value": "关于应用"
+      "value": "About App"
     },
     {
       "name": "share_app",
-      "value": "分享应用"
+      "value": "Share App"
     },
     {
       "name": "confirm",
-      "value": "确定"
+      "value": "Confirm"
     },
     {
       "name": "cancel",
-      "value": "取消"
+      "value": "Cancel"
     },
     {
       "name": "ok",
-      "value": "好的"
+      "value": "OK"
     },
     {
       "name": "save_failed_toast",
-      "value": "保存失败"
+      "value": "Save failed"
     },
     {
       "name": "app_tagline",
-      "value": "探索世界，从国旗开始 🚩"
+      "value": "Explore the world, starting with flags 🚩"
     },
     {
       "name": "level_n",
-      "value": "第 {level} 关"
+      "value": "Level {level}"
     },
     {
       "name": "play_again",
-      "value": "再玩一次"
+      "value": "Play Again"
     },
     {
       "name": "back",
-      "value": "返回"
+      "value": "Back"
     },
     {
       "name": "paint_instructions_title",
-      "value": "涂鸦说明"
+      "value": "How to Play"
     },
     {
       "name": "paint_instruction_1",
-      "value": "1. 从调色板选择颜色"
+      "value": "1. Select a color from the palette"
     },
     {
       "name": "paint_instruction_2",
-      "value": "2. 用手指点击或拖动国旗区域进行填色"
+      "value": "2. Tap or drag on flag areas to fill colors"
     },
     {
       "name": "paint_instruction_3",
-      "value": "3. 按照正确的颜色顺序完成涂鸦"
+      "value": "3. Complete the painting in the correct color order"
     },
     {
       "name": "paint_instruction_4",
-      "value": "4. 每关包含多个国旗或州旗，全部正确即可过关"
+      "value": "4. Each level contains multiple flags or state flags, complete all correctly to pass"
     },
     {
       "name": "paint_category_world",
-      "value": "世界"
+      "value": "World"
     },
     {
       "name": "paint_category_world_desc",
-      "value": "世界各国国旗涂鸦"
+      "value": "Paint world flags"
     },
     {
       "name": "paint_category_us",
-      "value": "美国"
+      "value": "United States"
     },
     {
       "name": "paint_category_us_desc",
-      "value": "美国各州州旗涂鸦"
+      "value": "Paint US state flags"
     },
     {
       "name": "paint_instructions_banner",
-      "value": "涂鸦说明"
+      "value": "How to Play"
     },
     {
       "name": "paint_reset_failed",
-      "value": "重置失败，请重试"
+      "value": "Reset failed, please try again"
     },
     {
       "name": "all_levels_completed",
-      "value": "涂鸦关卡！"
+      "value": "You have completed all {category} painting levels!"
     },
     {
       "name": "restart_question",
-      "value": "是否重新开始，从第1关开始？"
+      "value": "Restart from level 1?"
     },
     {
       "name": "connections_hint",
-      "value": "分成四组，每组四个。点选，找齐即可过关。"
+      "value": "Group into four groups of four. Select and find all to pass."
     },
     {
       "name": "cannot_open_app_market",
-      "value": "无法打开应用市场，请手动前往应用市场评分"
+      "value": "Cannot open app market, please go to app market to rate manually"
     },
     {
       "name": "cannot_open_app_market_simple",
-      "value": "无法打开应用市场"
+      "value": "Cannot open app market"
     },
     {
       "name": "about_app_message",
-      "value": "国旗小百科 v1.0.0\n\n一款有趣的国旗知识应用，带你探索世界各国国旗的故事与历史。"
+      "value": "Flag Wiki v1.0.0\n\nAn interesting flag knowledge app that takes you to explore the stories and history of world flags."
     },
     {
       "name": "feedback_message",
-      "value": "如有建议或问题，可通过应用商店评论，或者发邮件到 ssz2048@163.com 反馈。感谢您的支持。"
+      "value": "If you have suggestions or questions, please leave a comment in the app store, or send an email to ssz2048@163.com. Thank you for your support."
     },
     {
       "name": "share_app_text",
-      "value": "国旗小百科 - 一款有趣的国旗知识应用，带你探索世界各国国旗的故事与历史。\n\n下载链接：{url}"
+      "value": "Flag Wiki - An interesting flag knowledge app that takes you to explore the stories and history of world flags.\n\nDownload link: {url}"
     },
     {
       "name": "share_app_description",
-      "value": "探索世界国旗的奥秘"
+      "value": "Explore the mysteries of world flags"
     },
     {
       "name": "level_not_found",
-      "value": "关卡不存在"
+      "value": "Level not found"
     },
     {
       "name": "level_data_load_failed",
-      "value": "关卡数据加载失败"
+      "value": "Failed to load level data"
     },
     {
       "name": "next",
-      "value": "下一个"
+      "value": "Next"
     },
     {
       "name": "complete",
-      "value": "完成"
+      "value": "Complete"
     },
     {
       "name": "search_country_or_region",
-      "value": "搜索国家或地区"
+      "value": "Search country or region"
     },
     {
       "name": "no_matching_countries",
-      "value": "未找到匹配的国家"
+      "value": "No matching countries found"
     },
     {
       "name": "modify_keywords_or_select",
-      "value": "修改关键词或选择\"全部\"或其他大洲"
+      "value": "Modify keywords or select \"All\" or other continents"
     },
     {
       "name": "loading",
-      "value": "加载中..."
+      "value": "Loading..."
     },
     {
       "name": "level_challenge_success",
-      "value": "第%s关挑战成功"
+      "value": "Level %s challenge completed"
     },
     {
       "name": "total_countries",
-      "value": "共 %s 个国家"
+      "value": "%s countries"
     },
     {
       "name": "total_organizations",
-      "value": "共 %s 个组织"
+      "value": "%s organizations"
     },
     {
       "name": "favorite_added",
-      "value": "已添加到收藏"
+      "value": "Added to favorites"
     },
     {
       "name": "download_failed",
-      "value": "下载失败"
+      "value": "Download failed"
     },
     {
       "name": "state_flag_saved",
-      "value": "州旗图片已保存到相册"
+      "value": "State flag image saved to gallery"
     },
     {
       "name": "no_data",
-      "value": "暂无数据"
+      "value": "No data"
     },
     {
       "name": "belongs_to_country",
-      "value": "所属国家"
+      "value": "Country"
     },
     {
       "name": "state_flag_detail",
-      "value": "州旗详情"
+      "value": "State Flag Details"
     },
     {
       "name": "state_flag",
-      "value": "州旗"
+      "value": "State Flag"
     },
     {
       "name": "historical_flags",
-      "value": "历史国旗"
+      "value": "Historical Flags"
     },
     {
       "name": "flag_history",
-      "value": "国旗变迁史"
+      "value": "Flag History"
     },
     {
       "name": "current",
-      "value": "（当前）"
+      "value": " (Current)"
     },
     {
       "name": "quiz_flag_to_name_desc",
-      "value": "根据国旗图案，选择正确的国家名称"
+      "value": "Select the correct country name based on the flag pattern"
     },
     {
       "name": "quiz_name_to_flag_desc",
-      "value": "根据国家名称，选择正确的国旗图案"
+      "value": "Select the correct flag pattern based on the country name"
     },
     {
       "name": "complete_levels_to_unlock",
-      "value": "完成每关挑战，解锁更多关卡"
+      "value": "Complete each level to unlock more levels"
     },
     {
       "name": "time",
-      "value": "时间"
+      "value": "Time"
     },
     {
       "name": "moves",
-      "value": "步数"
+      "value": "Moves"
     },
     {
       "name": "pairs",
-      "value": "配对"
+      "value": "Pairs"
     },
     {
       "name": "total_moves",
-      "value": "总步数"
+      "value": "Total Moves"
     },
     {
       "name": "pairs_completed",
-      "value": "配对完成"
+      "value": "Pairs Completed"
     },
     {
       "name": "time_up",
-      "value": "时间到！"
+      "value": "Time's Up!"
     },
     {
       "name": "which_country_flag",
-      "value": "这是哪个国家的国旗？"
+      "value": "Which country's flag is this?"
     },
     {
       "name": "select_correct_flag",
-      "value": "请选择正确的国旗"
+      "value": "Select the correct flag"
     },
     {
       "name": "challenge_failed",
-      "value": "挑战失败"
+      "value": "Challenge Failed"
     },
     {
       "name": "correct_answers_count",
-      "value": "正确回答了 %s 道题"
+      "value": "Correctly answered %s questions"
     },
     {
       "name": "correct_answers_count_trivia",
-      "value": "正确回答了 %s 题"
+      "value": "Correctly answered %s questions"
     },
     {
       "name": "max_combo",
-      "value": "最高连击 %s"
+      "value": "Max Combo %s"
     },
     {
       "name": "next_question",
-      "value": "下一题"
+      "value": "Next Question"
     },
     {
       "name": "view_results",
-      "value": "查看结果"
+      "value": "View Results"
     },
     {
       "name": "correct_answers",
-      "value": "正确答题"
+      "value": "Correct Answers"
     },
     {
       "name": "correct_answers_label",
-      "value": "正确回答"
+      "value": "Correct Answers"
     },
     {
       "name": "remaining_lives",
-      "value": "剩余生命"
+      "value": "Remaining Lives"
     },
     {
       "name": "share_score",
-      "value": "分享成绩"
+      "value": "Share Score"
     },
     {
       "name": "combo_streak",
-      "value": "%s 连击！"
+      "value": "%s Combo!"
     },
     {
       "name": "correct_answers_share",
-      "value": "正确答题：%s / %s"
+      "value": "Correct Answers: %s / %s"
     },
     {
       "name": "max_combo_share",
-      "value": "最高连击：%s"
+      "value": "Max Combo: %s"
     },
     {
       "name": "remaining_lives_share",
-      "value": "剩余生命：%s"
+      "value": "Remaining Lives: %s"
     },
     {
       "name": "back_to_levels",
-      "value": "返回关卡列表"
+      "value": "Back to Levels"
     },
     {
       "name": "restart",
-      "value": "重新开始"
+      "value": "Restart"
     },
     {
       "name": "try_again",
-      "value": "再试一次！"
+      "value": "Try again!"
     },
     {
       "name": "shuffle",
-      "value": "打乱"
+      "value": "Shuffle"
     },
     {
       "name": "unselect_all",
-      "value": "取消全选"
+      "value": "Unselect All"
     },
     {
       "name": "submit",
-      "value": "提交"
+      "value": "Submit"
     },
     {
       "name": "correct_answer",
-      "value": "✓ 正确!"
+      "value": "✓ Correct!"
     },
     {
       "name": "enter_country_name",
-      "value": "请输入国家名称"
+      "value": "Enter country name"
     },
     {
       "name": "find_fake_flag",
-      "value": "找出假旗"
+      "value": "Find the fake flag"
     },
     {
       "name": "correct_found",
-      "value": "正确找出"
+      "value": "Correctly Found"
     },
     {
       "name": "correct_found_count",
-      "value": "正确找出了 %s 个假旗"
+      "value": "Correctly found %s fake flags"
     },
     {
       "name": "delete",
-      "value": "删除"
+      "value": "Delete"
     },
     {
       "name": "fun_fact_1",
-      "value": "🇳🇵 尼泊尔是世界上唯一非矩形的国旗，由两个三角形组成！"
+      "value": "🇳🇵 Nepal has the world's only non-rectangular flag, made of two triangles!"
     },
     {
       "name": "fun_fact_2",
-      "value": "🇨🇭 瑞士和梵蒂冈是世界上仅有的两个正方形国旗！"
+      "value": "🇨🇭 Switzerland and Vatican City are the only two countries with square flags!"
     },
     {
       "name": "fun_fact_3",
-      "value": "🇯🇵 日本国旗上的红色圆形代表太阳，日本被称为\"日出之国\"！"
+      "value": "🇯🇵 The red circle on Japan's flag represents the sun, Japan is called the \"Land of the Rising Sun\"!"
     },
     {
       "name": "fun_fact_4",
-      "value": "🇱🇾 利比亚在1977-2011年使用过世界上唯一的纯色国旗（绿色）！"
+      "value": "🇱🇾 Libya used the world's only solid-color flag (green) from 1977-2011!"
     },
     {
       "name": "fun_fact_5",
-      "value": "🇲🇨 摩纳哥和印度尼西亚的国旗几乎相同，只是尺寸比例不同！"
+      "value": "🇲🇨 Monaco and Indonesia have almost identical flags, differing only in size ratio!"
     },
     {
       "name": "fun_fact_6",
-      "value": "🇩🇰 丹麦国旗是世界上使用时间最长的国旗，自1219年开始使用！"
+      "value": "🇩🇰 Denmark's flag is the world's oldest flag, in use since 1219!"
     },
     {
       "name": "fun_fact_7",
-      "value": "🇧🇷 巴西国旗上的27颗星星代表26个州和1个联邦区！"
+      "value": "🇧🇷 Brazil's flag has 27 stars representing 26 states and 1 federal district!"
     },
     {
       "name": "fun_fact_8",
-      "value": "🇺🇸 美国国旗的50颗星代表50个州，13道条纹代表最初的13个殖民地！"
+      "value": "🇺🇸 The US flag has 50 stars for 50 states and 13 stripes for the original 13 colonies!"
     },
     {
       "name": "fun_fact_9",
-      "value": "🇨🇦 加拿大国旗上的枫叶有11个尖角，这是经过风洞测试最清晰的设计！"
+      "value": "🇨🇦 The maple leaf on Canada's flag has 11 points, the clearest design after wind tunnel testing!"
     },
     {
       "name": "fun_fact_10",
-      "value": "🇬🇧 英国国旗\"米字旗\"由英格兰、苏格兰和爱尔兰的旗帜组合而成！"
+      "value": "🇬🇧 The UK \"Union Jack\" combines the flags of England, Scotland, and Ireland!"
     },
     {
       "name": "month_1",
-      "value": "1月"
+      "value": "January"
     },
     {
       "name": "month_2",
-      "value": "2月"
+      "value": "February"
     },
     {
       "name": "month_3",
-      "value": "3月"
+      "value": "March"
     },
     {
       "name": "month_4",
-      "value": "4月"
+      "value": "April"
     },
     {
       "name": "month_5",
-      "value": "5月"
+      "value": "May"
     },
     {
       "name": "month_6",
-      "value": "6月"
+      "value": "June"
     },
     {
       "name": "month_7",
-      "value": "7月"
+      "value": "July"
     },
     {
       "name": "month_8",
-      "value": "8月"
+      "value": "August"
     },
     {
       "name": "month_9",
-      "value": "9月"
+      "value": "September"
     },
     {
       "name": "month_10",
-      "value": "10月"
+      "value": "October"
     },
     {
       "name": "month_11",
-      "value": "11月"
+      "value": "November"
     },
     {
       "name": "month_12",
-      "value": "12月"
+      "value": "December"
     },
     {
       "name": "month_jan",
@@ -970,63 +970,63 @@
     },
     {
       "name": "day_suffix",
-      "value": "日"
+      "value": ""
     },
     {
       "name": "save_failed_with_error",
-      "value": "保存失败: %s"
+      "value": "Save failed: %s"
     },
     {
       "name": "details",
-      "value": "详情"
+      "value": "Details"
     },
     {
       "name": "also_known_as",
-      "value": "，英文名%s"
+      "value": ", also known as %s"
     },
     {
       "name": "headquarters_located",
-      "value": "总部位于%s"
+      "value": "Headquarters is located in %s"
     },
     {
       "name": "region_is",
-      "value": "地区是%s"
+      "value": "Region: %s"
     },
     {
       "name": "org_type_is",
-      "value": "组织类型是%s"
+      "value": "Organization type: %s"
     },
     {
       "name": "coverage_population_approx",
-      "value": "覆盖人口约%s"
+      "value": "Coverage population: approximately %s"
     },
     {
       "name": "website_colon",
-      "value": "网站：%s"
+      "value": "Website: %s"
     },
     {
       "name": "capital_is",
-      "value": "首都是%s"
+      "value": "Capital: %s"
     },
     {
       "name": "region_belongs",
-      "value": "所属地区是%s"
+      "value": "Region: %s"
     },
     {
       "name": "population_colon",
-      "value": "人口%s"
+      "value": "Population: %s"
     },
     {
       "name": "area_colon",
-      "value": "面积%s"
+      "value": "Area: %s"
     },
     {
       "name": "flag_proportion_is",
-      "value": "国旗比例为%s"
+      "value": "Flag proportion: %s"
     },
     {
       "name": "adopted_date_is",
-      "value": "采用日期是%s"
+      "value": "Adopted date: %s"
     },
     {
       "name": "also_known_as_en",
@@ -1074,15 +1074,15 @@
     },
     {
       "name": "flag",
-      "value": "旗帜"
+      "value": "Flag"
     },
     {
       "name": "national_flag",
-      "value": "国旗"
+      "value": "National Flag"
     },
     {
       "name": "flag_default_description",
-      "value": "%s的国旗是这个国家的重要象征，代表着国家的历史、文化和价值观。"
+      "value": "The flag of %s is an important symbol of the country, representing its history, culture, and values."
     }
   ]
 }

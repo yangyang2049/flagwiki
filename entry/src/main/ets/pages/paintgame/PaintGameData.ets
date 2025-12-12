@@ -20,12 +20,14 @@ export interface PaintLevel {
 export interface PaintCategory {
   id: string;
   name: string;
+  nameResId: Resource; // 名称资源ID
   emoji: string;
   description: string;
+  descResId: Resource; // 描述资源ID
   levels: PaintLevel[];
 }
 
-// 世界国旗涂鸦关卡配置
+// 世界国旗涂鸦关卡配置（20关）
 export const worldPaintLevels: PaintLevel[] = [
   { level: 1, flags: ['fr', 'de', 'it'] },
   { level: 2, flags: ['cn', 'jp', 'kr'] },
@@ -75,17 +77,22 @@ export const paintCategories: PaintCategory[] = [
   {
     id: 'world',
     name: '世界',
+    nameResId: $r('app.string.paint_category_world'),
     emoji: '🌍',
     description: '世界各国国旗涂鸦',
+    descResId: $r('app.string.paint_category_world_desc'),
     levels: worldPaintLevels
   },
   {
     id: 'us',
     name: '美国',
+    nameResId: $r('app.string.paint_category_us'),
     emoji: '🇺🇸',
     description: '美国各州州旗涂鸦',
+    descResId: $r('app.string.paint_category_us_desc'),
     levels: usPaintLevels
   }
+  // 德国、意大利、巴西暂无涂鸦数据
 ];
 
 // 国旗颜色配置（十六进制，不带#）

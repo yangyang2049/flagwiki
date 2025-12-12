@@ -2,12 +2,15 @@
 
 export interface ManufacturingSection {
    title: string;
+   titleEN: string;
    content: string;
+   contentEN: string;
 }
 
 export const flagManufacturingContent: ManufacturingSection[] = [
    {
       title: '制作流程',
+      titleEN: 'Manufacturing Process',
       content: `国旗制作是一个严谨的过程，需要经过多个步骤：
 
 1. 设计阶段
@@ -34,10 +37,38 @@ export const flagManufacturingContent: ManufacturingSection[] = [
    - 检查尺寸是否符合标准
    - 验证颜色是否准确
    - 测试耐候性和色牢度
-   - 确保无瑕疵后包装出厂`
+   - 确保无瑕疵后包装出厂`,
+      contentEN: `Flag manufacturing is a rigorous process that requires multiple steps:
+
+1. Design Phase
+   - Determine flag dimensions according to flag law (typically 3:2 or 2:1 ratio)
+   - Precisely draw flag patterns, ensuring all element positions are accurate
+   - Determine color standards using internationally recognized color codes (such as Pantone)
+
+2. Material Preparation
+   - Select standard-compliant fabrics (typically nylon, polyester, or cotton)
+   - Prepare dyes or printing inks in required colors
+   - Prepare sewing threads and reinforcement materials
+
+3. Cutting and Sewing
+   - Precisely cut fabric according to design drawings
+   - Use professional sewing equipment for joining
+   - Ensure seams are strong and won't unravel
+
+4. Pattern Production
+   - Use screen printing or digital printing for complex patterns
+   - Ensure patterns are clear and colors accurate
+   - Use professional embroidery machines for embroidered patterns
+
+5. Quality Inspection
+   - Check dimensions meet standards
+   - Verify color accuracy
+   - Test weather resistance and colorfastness
+   - Ensure no defects before packaging`
    },
    {
       title: '制作材料',
+      titleEN: 'Manufacturing Materials',
       content: `国旗制作使用的材料直接影响其质量和寿命：
 
 1. 布料材料
@@ -60,10 +91,34 @@ export const flagManufacturingContent: ManufacturingSection[] = [
 4. 特殊材料
    - 反光材料：用于夜间可见的国旗
    - 防水涂层：提高耐候性
-   - 防火材料：用于特殊安全要求`
+   - 防火材料：用于特殊安全要求`,
+      contentEN: `Materials used in flag manufacturing directly affect quality and lifespan:
+
+1. Fabric Materials
+   - Nylon: Lightweight, durable, quick-drying, suitable for outdoor use
+   - Polyester: UV-resistant, fade-resistant, suitable for long-term display
+   - Cotton: Traditional material, good feel but prone to fading
+   - Silk: Premium material for special occasions
+
+2. Dyes and Inks
+   - Use eco-friendly dyes meeting environmental standards
+   - Colors must comply with flag law standard colors
+   - Use high colorfastness dyes to ensure long-term color retention
+   - Use specialized printing inks for special patterns
+
+3. Sewing Materials
+   - High-strength sewing threads for strong seams
+   - Reinforcement strips for pole connection points
+   - Metal or plastic grommets for hanging
+
+4. Special Materials
+   - Reflective materials for night-visible flags
+   - Waterproof coatings to improve weather resistance
+   - Fire-resistant materials for special safety requirements`
    },
    {
       title: '制作工艺',
+      titleEN: 'Manufacturing Techniques',
       content: `国旗制作需要精湛的工艺技术：
 
 1. 印刷工艺
@@ -87,10 +142,35 @@ export const flagManufacturingContent: ManufacturingSection[] = [
 4. 特殊工艺
    - 防水处理：提高户外使用耐久性
    - 防紫外线处理：延缓褪色
-   - 阻燃处理：用于特殊安全要求`
+   - 阻燃处理：用于特殊安全要求`,
+      contentEN: `Flag manufacturing requires skilled techniques:
+
+1. Printing Techniques
+   - Screen printing: Suitable for mass production, rich colors
+   - Digital printing: Suitable for small batch customization, fine patterns
+   - Heat transfer: Suitable for complex patterns, rich colors
+   - Embroidery: For premium flags, strong three-dimensional effect
+
+2. Sewing Techniques
+   - Flat seam: For fabric joining
+   - Edge locking: Prevents fabric edge unraveling
+   - Reinforcement seam: Strengthens key areas
+   - Edge binding: Beautifies edges, improves durability
+
+3. Quality Control
+   - Dimensional accuracy within ±2mm
+   - Color deviation within standard range
+   - Seam strength testing to ensure tear resistance
+   - Weather resistance testing simulating various conditions
+
+4. Special Techniques
+   - Waterproof treatment: Improves outdoor durability
+   - UV protection treatment: Delays fading
+   - Flame retardant treatment: For special safety requirements`
    },
    {
       title: '制作工厂',
+      titleEN: 'Manufacturing Facilities',
       content: `专业的国旗制作工厂需要具备以下条件：
 
 1. 资质要求
@@ -121,10 +201,42 @@ export const flagManufacturingContent: ManufacturingSection[] = [
    - 原材料检验，确保材料符合标准
    - 生产过程监控，及时发现问题
    - 成品检验，确保每面国旗合格
-   - 质量追溯系统，可追溯生产全过程`
+   - 质量追溯系统，可追溯生产全过程`,
+      contentEN: `Professional flag manufacturing facilities require the following:
+
+1. Qualification Requirements
+   - Obtain flag manufacturing license
+   - Pass quality management system certification
+   - Comply with environmental production standards
+   - Have safety production qualifications
+
+2. Equipment Configuration
+   - Large cutting equipment for precise cutting
+   - Professional sewing equipment to improve efficiency
+   - Printing equipment supporting multiple printing techniques
+   - Quality inspection equipment to ensure product quality
+
+3. Production Environment
+   - Dust-free production workshops for clean products
+   - Constant temperature and humidity for material stability
+   - Adequate lighting for color inspection
+   - Good ventilation for production safety
+
+4. Well-Known Facilities
+   - China: Multiple professional flag manufacturing enterprises
+   - United States: Large flag manufacturers with advanced technology
+   - Europe: Combining traditional craftsmanship with modern technology
+   - Japan: Attention to detail and quality control
+
+5. Quality Control System
+   - Raw material inspection to ensure standards compliance
+   - Production process monitoring to detect issues promptly
+   - Finished product inspection to ensure each flag is qualified
+   - Quality traceability system tracking entire production process`
    },
    {
       title: '质量标准',
+      titleEN: 'Quality Standards',
       content: `国旗制作必须符合严格的质量标准：
 
 1. 尺寸标准
@@ -155,10 +267,42 @@ export const flagManufacturingContent: ManufacturingSection[] = [
    - 外观检验：无瑕疵、无污渍
    - 尺寸检验：符合标准要求
    - 颜色检验：与标准色卡对比
-   - 强度检验：接缝和材料强度测试`
+   - 强度检验：接缝和材料强度测试`,
+      contentEN: `Flag manufacturing must meet strict quality standards:
+
+1. Dimensional Standards
+   - Strictly follow flag law proportions
+   - Standard dimensions: 3:2 or 2:1 length-to-width ratio
+   - Allowable error: ±2mm
+   - Special sizes must be proportionally scaled
+
+2. Color Standards
+   - Use standard color charts (such as Pantone) to determine colors
+   - Color deviation within allowable range
+   - Ensure color consistency under different lighting
+   - Long-term use without fading or fading within acceptable range
+
+3. Material Standards
+   - Fabric strength meets usage requirements
+   - Weather resistance tests pass standards
+   - Colorfastness reaches specified grade
+   - Eco-friendly materials meeting safety standards
+
+4. Process Standards
+   - Strong seams that won't unravel
+   - Clear patterns with accurate positioning
+   - Neat edges without fraying
+   - Overall flatness without wrinkles
+
+5. Inspection Standards
+   - Appearance inspection: No defects or stains
+   - Dimensional inspection: Meets standard requirements
+   - Color inspection: Comparison with standard color chart
+   - Strength inspection: Seam and material strength testing`
    },
    {
       title: '制作成本',
+      titleEN: 'Manufacturing Costs',
       content: `国旗制作成本受多种因素影响：
 
 1. 材料成本
@@ -189,12 +333,54 @@ export const flagManufacturingContent: ManufacturingSection[] = [
    - 普通国旗：几十到几百元不等
    - 专业级国旗：数百到数千元
    - 定制国旗：根据需求定价
-   - 特殊规格：价格相应调整`
+   - 特殊规格：价格相应调整`,
+      contentEN: `Flag manufacturing costs are influenced by various factors:
+
+1. Material Costs
+   - Fabric prices: Determined by material type and quantity
+   - Dye costs: Number of colors and process complexity
+   - Auxiliary material costs: Sewing threads, grommets, etc.
+   - Special materials: Reflective, waterproof, and other special treatments
+
+2. Process Costs
+   - Printing costs: Based on pattern complexity
+   - Sewing costs: Based on production quantity
+   - Special processes: Embroidery, heat transfer, etc.
+   - Quality control: Inspection and testing costs
+
+3. Scale Effects
+   - Mass production: Lower unit costs
+   - Small batch customization: Higher unit costs
+   - Standardized production: Controllable costs
+   - Personalized customization: Increased costs
+
+4. Quality Grades
+   - Standard grade: Meets basic usage requirements
+   - Premium grade: Uses high-quality materials and processes
+   - Professional grade: For special occasions
+   - Collector grade: Limited edition or commemorative
+
+5. Market Prices
+   - Regular flags: Vary from tens to hundreds of yuan
+   - Professional grade flags: Hundreds to thousands of yuan
+   - Custom flags: Priced according to requirements
+   - Special specifications: Prices adjusted accordingly`
    }
 ];
 
 export function getManufacturingContent(): ManufacturingSection[] {
    return flagManufacturingContent;
+}
+
+// 获取本地化的制作内容
+export function getLocalizedManufacturingContent(language: string): ManufacturingSection[] {
+   const isEnglish = language === 'en' || (language.length > 3 && language.substring(0, 3) === 'en-');
+   return flagManufacturingContent.map((section): ManufacturingSection => ({
+      title: isEnglish ? section.titleEN : section.title,
+      titleEN: section.titleEN,
+      content: isEnglish ? section.contentEN : section.content,
+      contentEN: section.contentEN
+   }));
 }
 
 

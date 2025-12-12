@@ -13,8 +13,9 @@ import { image } from '@kit.ImageKit';
 import fs from '@ohos.file.fs';
 import { fileUri } from '@kit.CoreFileKit';
 import { getFlagHistory, FlagHistoryItem } from '../../utils/FlagHistoryData';
-import { getCountryByCode } from '../../utils/countryData';
+import { getCountryByCode, getLocalizedCountryName } from '../../utils/countryData';
 import { screenshotManager } from '../../utils/ScreenshotManager';
+import { LocalizationUtil } from '../../utils/LocalizationUtil';
 
 @Entry
 @Component
@@ -24,6 +25,7 @@ import { screenshotManager } from '../../utils/ScreenshotManager';
   @State countryName: string = '';
   @State isSharing: boolean = false;
   @State sharePixelMap: image.PixelMap | null = null;
+  @StorageLink('currentLanguage') @Watch('onLanguageChanged') currentLanguage: string = 'zh';
   private context = getContext(this) as common.UIAbilityContext;
   private readonly SHARE_CONTAINER_ID = 'flagHistoryShareContainer';
 
@@ -34,14 +36,28 @@ import { screenshotManager } from '../../utils/ScreenshotManager';
     const params = router.getParams() as Record<string, string>;
     if (params && params['countryCode']) {
       this.countryCode = params['countryCode'];
-      const items = getFlagHistory(this.countryCode);
-      // 按年份倒序排序
-      this.historyItems = items.slice().sort((a, b) => b.year - a.year);
+      this.loadHistoryData();
+    }
+  }
 
-      const country = getCountryByCode(this.countryCode);
-      if (country) {
-        this.countryName = country.nameCN;
-      }
+  private onLanguageChanged(): void {
+    // 语言变化时更新国家名称
+    if (this.countryCode) {
+      this.updateCountryName();
+    }
+  }
+
+  private loadHistoryData(): void {
+    const items = getFlagHistory(this.countryCode);
+    // 按年份倒序排序
+    this.historyItems = items.slice().sort((a, b) => b.year - a.year);
+    this.updateCountryName();
+  }
+
+  private updateCountryName(): void {
+    const country = getCountryByCode(this.countryCode);
+    if (country) {
+      this.countryName = getLocalizedCountryName(country, this.currentLanguage);
     }
   }
 
@@ -66,7 +82,7 @@ import { screenshotManager } from '../../utils/ScreenshotManager';
 
     this.isSharing = true;
     promptAction.showToast({
-      message: '正在准备分享...',
+      message: this.context.resourceManager.getStringSync($r('app.string.preparing_share').id),
       duration: 1500
     });
 
@@ -80,7 +96,7 @@ import { screenshotManager } from '../../utils/ScreenshotManager';
       const pixmap = await screenshotManager.captureSnapshot(this.SHARE_CONTAINER_ID);
       if (!pixmap) {
         promptAction.showToast({
-          message: '截取图片失败',
+          message: this.context.resourceManager.getStringSync($r('app.string.screenshot_failed').id),
           duration: 2000
         });
         this.isSharing = false;
@@ -127,11 +143,13 @@ import { screenshotManager } from '../../utils/ScreenshotManager';
       console.info(`[FlagHistoryPage] UTD Type ID: ${utdTypeId}`);
 
       // 使用图片URI分享 - 参考 jifen 项目：使用 DETAIL 预览模式
+      const historicalFlagsText = this.context.resourceManager.getStringSync($r('app.string.historical_flags').id);
+      const fromAppText = this.context.resourceManager.getStringSync($r('app.string.from_app').id);
       const shareData = new systemShare.SharedData({
         utd: utdTypeId,
         uri: imageUri,
-        title: `${this.countryName}历史国旗`,
-        description: '来自国旗小百科'
+        title: `${this.countryName} ${historicalFlagsText}`,
+        description: fromAppText
       });
       
       console.info(`[FlagHistoryPage] ShareData created: utd=${utdTypeId}, uri=${imageUri}`);
@@ -167,7 +185,7 @@ import { screenshotManager } from '../../utils/ScreenshotManager';
       const error = err as BusinessError;
       console.error(`[FlagHistoryPage] Failed to share: code: ${error?.code}, message: ${error?.message}`);
       promptAction.showToast({
-        message: '分享失败',
+        message: this.context.resourceManager.getStringSync($r('app.string.share_failed').id),
         duration: 2000
       });
       
@@ -203,7 +221,7 @@ import { screenshotManager } from '../../utils/ScreenshotManager';
           if (this.historyItems.length === 0) {
             // 无历史数据
             Column() {
-              Text('暂无历史数据')
+              Text(this.context.resourceManager.getStringSync($r('app.string.no_data').id))
                 .fontSize(16)
                 .fontColor($r('app.color.text_secondary'))
                 .margin({ top: 100 })
@@ -257,7 +275,7 @@ import { screenshotManager } from '../../utils/ScreenshotManager';
   ShareContentBuilder() {
     Column() {
       // 标题
-      Text(`${this.countryName}国旗变迁史`)
+      Text(`${this.countryName} ${this.context.resourceManager.getStringSync($r('app.string.flag_history').id)}`)
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
         .fontColor($r('app.color.text_primary'))
@@ -297,7 +315,7 @@ import { screenshotManager } from '../../utils/ScreenshotManager';
                 .fontColor($r('app.color.text_primary'))
 
               if (index === 0) {
-                Text('（当前）')
+                Text(this.context.resourceManager.getStringSync($r('app.string.current').id))
                   .fontSize(14)
                   .fontColor($r('app.color.text_secondary'))
                   .margin({ left: 2 })
@@ -332,7 +350,7 @@ import { screenshotManager } from '../../utils/ScreenshotManager';
   HistoryContentBuilder() {
     Column() {
       // 标题
-      Text(`${this.countryName}国旗变迁史`)
+      Text(`${this.countryName} ${this.context.resourceManager.getStringSync($r('app.string.flag_history').id)}`)
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
         .fontColor($r('app.color.text_primary'))
@@ -372,7 +390,7 @@ import { screenshotManager } from '../../utils/ScreenshotManager';
                 .fontColor($r('app.color.text_primary'))
 
               if (index === 0) {
-                Text('（当前）')
+                Text(this.context.resourceManager.getStringSync($r('app.string.current').id))
                   .fontSize(14)
                   .fontColor($r('app.color.text_secondary'))
                   .margin({ left: 2 })

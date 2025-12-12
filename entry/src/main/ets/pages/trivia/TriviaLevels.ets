@@ -1,4 +1,6 @@
 // 知识答题关卡配置
+import { LocalizationUtil } from '../../utils/LocalizationUtil';
+import common from '@ohos.app.ability.common';
 
 export interface TriviaQuestion {
   question: string;
@@ -13,8 +15,8 @@ export interface TriviaLevel {
   lives: number;
 }
 
-// 10个关卡，每关10个问题
-export const triviaQuestions: TriviaQuestion[][] = [
+// 中文问题
+const triviaQuestionsCN: TriviaQuestion[][] = [
   // Level 1
   [
     { question: '哪面国旗不是长方形的？', answer: 'np', options: ['np', 'cn', 'in', 'pk'] },
@@ -147,24 +149,167 @@ export const triviaQuestions: TriviaQuestion[][] = [
   ],
 ];
 
-export function getTriviaLevel(levelId: number): TriviaLevel | undefined {
-  if (levelId < 1 || levelId > triviaQuestions.length) {
+// English questions
+const triviaQuestionsEN: TriviaQuestion[][] = [
+  // Level 1
+  [
+    { question: 'Which flag is not rectangular?', answer: 'np', options: ['np', 'cn', 'in', 'pk'] },
+    { question: 'Which flag has the most red?', answer: 'cn', options: ['cn', 'vn', 'ch', 'bg'] },
+    { question: 'Which flag has the most white?', answer: 'jp', options: ['jp', 'fr', 'it', 'ie'] },
+    { question: 'Which flag has a moon?', answer: 'tr', options: ['tr', 'de', 'fr', 'it'] },
+    { question: 'Which flag has a sun?', answer: 'jp', options: ['jp', 'cn', 'kr', 'vn'] },
+    { question: 'Which is a tricolor flag?', answer: 'fr', options: ['fr', 'jp', 'cn', 'gb'] },
+    { question: 'Which flag has stars?', answer: 'us', options: ['us', 'de', 'fr', 'it'] },
+    { question: 'Which flag has stripes?', answer: 'us', options: ['us', 'jp', 'cn', 'kr'] },
+    { question: 'Which flag has a cross?', answer: 'ch', options: ['ch', 'cn', 'jp', 'kr'] },
+    { question: 'Which country\'s flag is red and white?', answer: 'jp', options: ['jp', 'cn', 'us', 'gb'] },
+  ],
+  // Level 2
+  [
+    { question: 'Which flag has a dragon?', answer: 'bt', options: ['bt', 'cn', 'jp', 'kr'] },
+    { question: 'Which flag has a maple leaf?', answer: 'ca', options: ['ca', 'us', 'gb', 'au'] },
+    { question: 'Which flag has the Union Jack?', answer: 'gb', options: ['gb', 'us', 'fr', 'de'] },
+    { question: 'Which flag has the Southern Cross?', answer: 'au', options: ['au', 'nz', 'br', 'ar'] },
+    { question: 'Which flag has a crescent and star?', answer: 'pk', options: ['pk', 'tr', 'my', 'sg'] },
+    { question: 'Which flag has a red circle?', answer: 'bd', options: ['bd', 'jp', 'kr', 'cn'] },
+    { question: 'Which flag has an eagle?', answer: 'al', options: ['al', 'de', 'us', 'mx'] },
+    { question: 'Which flag has a lion?', answer: 'lk', options: ['lk', 'sg', 'gb', 'nl'] },
+    { question: 'Which flag has a snake?', answer: 'mx', options: ['mx', 'br', 'ar', 'co'] },
+    { question: 'Which flag has the Star of David?', answer: 'il', options: ['il', 'eg', 'sa', 'ae'] },
+  ],
+  // Level 3
+  [
+    { question: 'Which is the only square flag in the world?', answer: 'ch', options: ['ch', 'va', 'np', 'mc'] },
+    { question: 'Which country\'s flag has five-pointed stars?', answer: 'cn', options: ['cn', 'jp', 'kr', 'vn'] },
+    { question: 'Which country\'s flag has green?', answer: 'br', options: ['br', 'jp', 'cn', 'fr'] },
+    { question: 'Which flag has triangles?', answer: 'np', options: ['np', 'jp', 'cn', 'kr'] },
+    { question: 'Which flag has a yin-yang symbol?', answer: 'kr', options: ['kr', 'cn', 'jp', 'vn'] },
+    { question: 'Which flag has a double-headed eagle?', answer: 'rs', options: ['rs', 'al', 'de', 'ru'] },
+    { question: 'Which flag has blue stripes?', answer: 'gr', options: ['gr', 'fr', 'de', 'it'] },
+    { question: 'Which flag is solid red?', answer: 'cn', options: ['cn', 'jp', 'kr', 'vn'] },
+    { question: 'Which flag has a yellow circle?', answer: 'bd', options: ['bd', 'jp', 'in', 'pk'] },
+    { question: 'Which flag has a wheel?', answer: 'in', options: ['in', 'pk', 'bd', 'lk'] },
+  ],
+  // Level 4
+  [
+    { question: 'Which flag has hammer and sickle?', answer: 'kp', options: ['kp', 'cn', 'ru', 'cu'] },
+    { question: 'What is the color order of France\'s flag?', answer: 'Blue, White, Red', options: ['Blue, White, Red', 'Red, White, Blue', 'White, Blue, Red', 'Red, Blue, White'] },
+    { question: 'What are Italy\'s flag colors?', answer: 'Green, White, Red', options: ['Green, White, Red', 'Red, White, Green', 'White, Green, Red', 'Green, Red, White'] },
+    { question: 'What are Germany\'s flag colors?', answer: 'Black, Red, Gold', options: ['Black, Red, Gold', 'Red, Black, Gold', 'Gold, Red, Black', 'Black, Gold, Red'] },
+    { question: 'What are Belgium\'s flag colors?', answer: 'Black, Yellow, Red', options: ['Black, Yellow, Red', 'Red, Yellow, Black', 'Yellow, Black, Red', 'Black, Red, Yellow'] },
+    { question: 'What are Netherlands\' flag colors?', answer: 'Red, White, Blue', options: ['Red, White, Blue', 'Blue, White, Red', 'White, Red, Blue', 'Blue, Red, White'] },
+    { question: 'What are Russia\'s flag colors?', answer: 'White, Blue, Red', options: ['White, Blue, Red', 'Red, Blue, White', 'Blue, White, Red', 'Red, White, Blue'] },
+    { question: 'What are Ireland\'s flag colors?', answer: 'Green, White, Orange', options: ['Green, White, Orange', 'Orange, White, Green', 'White, Green, Orange', 'Green, Orange, White'] },
+    { question: 'What are Hungary\'s flag colors?', answer: 'Red, White, Green', options: ['Red, White, Green', 'Green, White, Red', 'White, Red, Green', 'Red, Green, White'] },
+    { question: 'What are Bulgaria\'s flag colors?', answer: 'White, Green, Red', options: ['White, Green, Red', 'Red, Green, White', 'Green, White, Red', 'White, Red, Green'] },
+  ],
+  // Level 5
+  [
+    { question: 'Which country\'s flag has three horizontal stripes?', answer: 'de', options: ['de', 'fr', 'it', 'jp'] },
+    { question: 'Which country\'s flag has three vertical stripes?', answer: 'fr', options: ['fr', 'de', 'ru', 'nl'] },
+    { question: 'How many stars are on the US flag?', answer: '50', options: ['50', '48', '51', '52'] },
+    { question: 'How many stripes are on the US flag?', answer: '13', options: ['13', '50', '15', '12'] },
+    { question: 'How many stars are on China\'s flag?', answer: '5', options: ['5', '4', '6', '1'] },
+    { question: 'Which country\'s flag is on Australia\'s flag?', answer: 'UK', options: ['UK', 'USA', 'France', 'Netherlands'] },
+    { question: 'How many stars are on New Zealand\'s flag?', answer: '4', options: ['4', '5', '6', '3'] },
+    { question: 'How many stars are on Brazil\'s flag?', answer: '27', options: ['27', '26', '25', '28'] },
+    { question: 'How many stars are on the EU flag?', answer: '12', options: ['12', '27', '28', '15'] },
+    { question: 'What\'s on Turkey\'s flag?', answer: 'Crescent and star', options: ['Crescent and star', 'Cross', 'Sun', 'Moon'] },
+  ],
+  // Level 6
+  [
+    { question: 'Which country has the most complex flag?', answer: 'bt', options: ['bt', 'np', 'us', 'gb'] },
+    { question: 'Which country\'s flag has a weapon?', answer: 'mz', options: ['mz', 'us', 'cn', 'ru'] },
+    { question: 'Which country\'s flag has an AK-47?', answer: 'mz', options: ['mz', 'af', 'iq', 'sy'] },
+    { question: 'Which country\'s flag has a map?', answer: 'cy', options: ['cy', 'tr', 'gr', 'mt'] },
+    { question: 'Which country\'s flag has a shield?', answer: 'hr', options: ['hr', 'rs', 'si', 'ba'] },
+    { question: 'Which country\'s flag has a crown?', answer: 'li', options: ['li', 'mc', 'lu', 'be'] },
+    { question: 'Which country\'s flag has a ship?', answer: 'lr', options: ['lr', 'us', 'gb', 'fr'] },
+    { question: 'Which country\'s flag has a bird?', answer: 'pg', options: ['pg', 'id', 'my', 'ph'] },
+    { question: 'Which country\'s flag has a tree?', answer: 'lb', options: ['lb', 'sy', 'jo', 'iq'] },
+    { question: 'Which country\'s flag has a mountain?', answer: 'si', options: ['si', 'ch', 'at', 'np'] },
+  ],
+  // Level 7
+  [
+    { question: 'Which is the world\'s oldest flag?', answer: 'dk', options: ['dk', 'gb', 'fr', 'nl'] },
+    { question: 'Which country\'s flag has never changed?', answer: 'dk', options: ['dk', 'gb', 'fr', 'us'] },
+    { question: 'Which two countries have almost identical flags?', answer: 'Monaco and Indonesia', options: ['Monaco and Indonesia', 'France and Netherlands', 'Italy and Mexico', 'Japan and Bangladesh'] },
+    { question: 'Which country has a two-sided flag?', answer: 'py', options: ['py', 'br', 'ar', 'uy'] },
+    { question: 'Which country\'s flag has purple?', answer: 'ni', options: ['ni', 'es', 'pt', 'mx'] },
+    { question: 'Which country\'s flag has brown?', answer: 'qa', options: ['qa', 'ae', 'sa', 'kw'] },
+    { question: 'Which country has a pentagonal flag?', answer: 'np', options: ['np', 'ch', 'va', 'bt'] },
+    { question: 'Which country\'s flag has a building?', answer: 'kh', options: ['kh', 'th', 'mm', 'la'] },
+    { question: 'Which country\'s flag has text?', answer: 'sa', options: ['sa', 'ir', 'af', 'iq'] },
+    { question: 'Which country\'s flag has a sword?', answer: 'sa', options: ['sa', 'om', 'kw', 'qa'] },
+  ],
+  // Level 8
+  [
+    { question: 'Where did the Nordic cross first appear?', answer: 'dk', options: ['dk', 'se', 'no', 'fi'] },
+    { question: 'What are the Pan-African colors?', answer: 'Red, Green, Yellow', options: ['Red, Green, Yellow', 'Red, White, Blue', 'Black, Red, Gold', 'Green, White, Red'] },
+    { question: 'What are the Pan-Slavic colors?', answer: 'Red, White, Blue', options: ['Red, White, Blue', 'Red, Green, Yellow', 'Black, Red, Gold', 'Green, White, Red'] },
+    { question: 'What are the Pan-Arab colors?', answer: 'Red, White, Black, Green', options: ['Red, White, Black, Green', 'Red, Green, Yellow', 'Red, White, Blue', 'Black, Red, Gold'] },
+    { question: 'Which country\'s flag has a crocodile?', answer: 'tl', options: ['tl', 'id', 'my', 'ph'] },
+    { question: 'Which country\'s flag has keys?', answer: 'va', options: ['va', 'mt', 'sm', 'mc'] },
+    { question: 'Which country\'s flag has an anchor?', answer: 'fj', options: ['fj', 'nz', 'au', 'pg'] },
+    { question: 'Which country\'s flag has a tower?', answer: 'kh', options: ['kh', 'th', 'mm', 'la'] },
+    { question: 'Which country has the simplest flag?', answer: 'jp', options: ['jp', 'bd', 'ly', 'ua'] },
+    { question: 'Which country had a solid green flag?', answer: 'ly', options: ['ly', 'sa', 'pk', 'bd'] },
+  ],
+  // Level 9
+  [
+    { question: 'Which country\'s flag has a unicorn?', answer: 'gb', options: ['gb', 'fr', 'de', 'it'] },
+    { question: 'Which country\'s flag has a rooster?', answer: 'fr', options: ['fr', 'pt', 'it', 'es'] },
+    { question: 'Which country\'s flag has a bear?', answer: 'ru', options: ['ru', 'fi', 'ca', 'us'] },
+    { question: 'Which country\'s flag has an elephant?', answer: 'la', options: ['la', 'th', 'in', 'lk'] },
+    { question: 'Which country\'s flag has a koala?', answer: 'None', options: ['None', 'Australia', 'New Zealand', 'Papua New Guinea'] },
+    { question: 'Which country\'s flag has a kangaroo?', answer: 'None', options: ['None', 'Australia', 'New Zealand', 'Papua New Guinea'] },
+    { question: 'Which country\'s flag has a hippo?', answer: 'None', options: ['None', 'Kenya', 'Tanzania', 'Uganda'] },
+    { question: 'Which country\'s flag has a camel?', answer: 'None', options: ['None', 'Egypt', 'Saudi Arabia', 'UAE'] },
+    { question: 'Which country\'s flag has a peacock?', answer: 'mm', options: ['mm', 'in', 'lk', 'np'] },
+    { question: 'Which country\'s flag has a bird of paradise?', answer: 'pg', options: ['pg', 'id', 'my', 'ph'] },
+  ],
+  // Level 10
+  [
+    { question: 'Which country has the most unique flag ratio?', answer: 'np', options: ['np', 'ch', 'va', 'qa'] },
+    { question: 'What is Qatar\'s flag ratio?', answer: '11:28', options: ['11:28', '1:2', '2:3', '3:5'] },
+    { question: 'What is Switzerland\'s flag ratio?', answer: '1:1', options: ['1:1', '2:3', '3:5', '1:2'] },
+    { question: 'Which country has the narrowest flag?', answer: 'qa', options: ['qa', 'np', 'ch', 'va'] },
+    { question: 'Which country has the most colors on its flag?', answer: 'za', options: ['za', 'us', 'gb', 'br'] },
+    { question: 'How many colors are on South Africa\'s flag?', answer: '6', options: ['6', '5', '4', '7'] },
+    { question: 'Which country has the newest flag design?', answer: 'ss', options: ['ss', 'kv', 'me', 'tl'] },
+    { question: 'When did South Sudan become independent?', answer: '2011', options: ['2011', '2010', '2012', '2008'] },
+    { question: 'Which country changed its flag the most?', answer: 'af', options: ['af', 'ir', 'iq', 'ly'] },
+    { question: 'What color is the UN flag?', answer: 'Blue and white', options: ['Blue and white', 'White and blue', 'Blue and gold', 'White and gold'] },
+  ],
+];
+
+export function getTriviaLevel(levelId: number, context?: common.UIAbilityContext): TriviaLevel | undefined {
+  if (levelId < 1 || levelId > triviaQuestionsCN.length) {
     return undefined;
   }
+
+  // 获取语言
+  let language = 'zh';
+  if (context) {
+    try {
+      const config = context.resourceManager.getConfigurationSync();
+      language = config.locale ?? 'zh';
+    } catch (e) {
+      console.error('Failed to get language:', e);
+    }
+  }
+
+  const isEnglish = LocalizationUtil.isEnglish(language);
+  const questions = isEnglish ? triviaQuestionsEN[levelId - 1] : triviaQuestionsCN[levelId - 1];
+
   return {
     id: levelId,
-    name: `第 ${levelId} 关`,
-    questions: triviaQuestions[levelId - 1],
+    name: `Level ${levelId}`,
+    questions: questions,
     lives: 3
   };
 }
 
 export function getTotalTriviaLevels(): number {
-  return triviaQuestions.length;
+  return triviaQuestionsCN.length;
 }
-
-
-
-
-
-

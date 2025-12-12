@@ -1,13 +1,22 @@
 import router from '@ohos.router';
-import { TopicItem, getAllTopics } from './TopicData';
+import common from '@ohos.app.ability.common';
+import { TopicItem, getAllTopics, getLocalizedTopicName, getLocalizedTopicDescription } from './TopicData';
+import { LocalizationUtil } from '../../utils/LocalizationUtil';
 
 @Entry
 @Component
   struct TopicListPage {
   @State topics: TopicItem[] = [];
+  private context = getContext(this) as common.UIAbilityContext;
+  @StorageLink('currentLanguage') @Watch('onLanguageChanged') currentLanguage: string = 'zh';
 
   aboutToAppear() {
-    this.topics = getAllTopics();
+    this.topics = getAllTopics(this.currentLanguage);
+  }
+
+  private onLanguageChanged(): void {
+    // 语言变化时重新加载专题列表
+    this.topics = getAllTopics(this.currentLanguage);
   }
 
   build() {
@@ -29,12 +38,12 @@ import { TopicItem, getAllTopics } from './TopicData';
 
               // 中间文字
               Column() {
-                Text(topic.name)
+                Text(getLocalizedTopicName(topic, this.currentLanguage))
                   .fontSize(18)
                   .fontWeight(FontWeight.Bold)
                   .fontColor($r('app.color.text_primary'))
 
-                Text(topic.description)
+                Text(getLocalizedTopicDescription(topic, this.currentLanguage))
                   .fontSize(13)
                   .fontColor($r('app.color.text_secondary'))
                   .margin({ top: 4 })
@@ -69,7 +78,7 @@ import { TopicItem, getAllTopics } from './TopicData';
         .padding({ top: 8, bottom: 16 })
         .edgeEffect(EdgeEffect.Spring)
     }
-    .title('专题')
+    .title($r('app.string.topic_recommendations'))
       .titleMode(NavigationTitleMode.Mini)
       .backgroundColor($r('app.color.bg_page'))
   }
