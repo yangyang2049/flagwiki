@@ -630,7 +630,7 @@
     },
     {
       "name": "data_info_note_content",
-      "value": "本应用中的国旗数据来源于公开的维基百科资源，采用 Creative Commons 许可协议。数据仅供参考，如有疑问请以官方资料为准。"
+      "value": "数据仅供参考，如有疑问请以官方资料为准。"
     },
     {
       "name": "data_info_state_flags",

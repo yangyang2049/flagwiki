@@ -309,3 +309,4 @@ export function getLocalizedFlagHistoryContent(language: string): HistorySection
       contentEN: section.contentEN
    }));
 }
+

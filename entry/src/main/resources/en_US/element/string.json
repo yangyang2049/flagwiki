@@ -630,7 +630,7 @@
     },
     {
       "name": "data_info_note_content",
-      "value": "The flag data in this app is sourced from publicly available Wikipedia resources under Creative Commons license. The data is for reference only. Please refer to official sources for authoritative information."
+      "value": "The data is for reference only. Please refer to official sources for authoritative information."
     },
     {
       "name": "data_info_state_flags",

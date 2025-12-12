@@ -29,7 +29,7 @@ export struct DataInfoPage {
           .borderRadius(12)
           .margin({ top: 16 })
 
-          // 数据来源卡片
+          // 数据来源与说明卡片（合并）
           Column() {
             Text($r('app.string.data_info_source'))
               .fontSize(18)
@@ -43,27 +43,13 @@ export struct DataInfoPage {
               .fontColor($r('app.color.text_secondary'))
               .lineHeight(22)
               .width('100%')
-          }
-          .width('100%')
-          .padding(20)
-          .backgroundColor($r('app.color.bg_card'))
-          .borderRadius(12)
-          .margin({ top: 12 })
-
-          // 说明卡片
-          Column() {
-            Text($r('app.string.data_info_note'))
-              .fontSize(18)
-              .fontWeight(FontWeight.Bold)
-              .fontColor($r('app.color.text_primary'))
-              .margin({ bottom: 12 })
-              .width('100%')
             
             Text($r('app.string.data_info_note_content'))
               .fontSize(14)
-              .fontColor($r('app.color.text_secondary'))
+              .fontColor($r('app.color.text_tertiary'))
               .lineHeight(22)
               .width('100%')
+              .margin({ top: 12 })
           }
           .width('100%')
           .padding(20)
@@ -133,3 +119,4 @@ export struct DataInfoPage {
     return true;
   }
 }
+
