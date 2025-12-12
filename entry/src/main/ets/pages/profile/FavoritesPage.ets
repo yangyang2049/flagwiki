@@ -2,14 +2,16 @@ import router from '@ohos.router';
 import common from '@ohos.app.ability.common';
 import promptAction from '@ohos.promptAction';
 import { FavoritesManager, FavoriteItem } from '../../utils/favoritesManager';
-import { getFlagImageSource } from '../../utils/countryData';
-import { getStateFlagPath } from '../../utils/StateFlagData';
+import { getFlagImageSource, getInternationalOrgByCode, isInternationalOrg, getLocalizedOrgName } from '../../utils/countryData';
+import { getStateFlagPath, getCountryStateData, CountryStateData, StateInfo } from '../../utils/StateFlagData';
+import { LocalizationUtil } from '../../utils/LocalizationUtil';
 
 @Entry
 @Component
 export struct FavoritesPage {
   @State favorites: FavoriteItem[] = [];
   @State isEditMode: boolean = false;
+  @StorageLink('currentLanguage') currentLanguage: string = 'zh';
   private context = getContext(this) as common.UIAbilityContext;
 
   async aboutToAppear() {
@@ -50,6 +52,38 @@ export struct FavoritesPage {
   private isValidStateFlagUrl(pageUrl: string): boolean {
     const parts = pageUrl.substring(10).split(':');
     return parts.length >= 2;
+  }
+  
+  private getLocalizedName(item: FavoriteItem): string {
+    // 如果是州旗类型，根据语言返回本地化名称
+    if (item.pageUrl.startsWith('stateflag:') && this.isValidStateFlagUrl(item.pageUrl)) {
+      const parts = item.pageUrl.substring(10).split(':');
+      if (parts.length >= 2) {
+        const countryCode = parts[0];
+        const stateCode = parts[1];
+        const countryData = getCountryStateData(countryCode);
+        if (countryData) {
+          const stateInfo = countryData.states.find((s: StateInfo) => s.code === stateCode);
+          if (stateInfo) {
+            // 根据语言返回州名称
+            return LocalizationUtil.isEnglish(this.currentLanguage) ? stateInfo.name : stateInfo.nameCN;
+          }
+        }
+      }
+    }
+    // 如果是国旗类型，检查是否为国际组织
+    if (item.pageUrl.startsWith('flag:')) {
+      const code = item.pageUrl.substring(5);
+      if (isInternationalOrg(code)) {
+        const org = getInternationalOrgByCode(code);
+        if (org) {
+          // 根据语言返回国际组织名称
+          return getLocalizedOrgName(org, this.currentLanguage);
+        }
+      }
+    }
+    // 其他类型直接返回保存的名称
+    return item.name;
   }
 
   private navigateToTool(pageUrl: string) {
@@ -181,7 +215,7 @@ export struct FavoritesPage {
                     .height(20)
                     .margin({ right: 12 })
                 }
-                Text(item.name)
+                Text(this.getLocalizedName(item))
                   .fontSize(16)
                   .fontColor($r('app.color.text_primary'))
                   .layoutWeight(1)

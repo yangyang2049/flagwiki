@@ -2,7 +2,95 @@
 
 ## [未发布]
 
+### 新增 (Added)
+- **数据说明页面**：在 ProfilePage 中添加了数据说明功能
+  - **新增页面**：创建了 `DataInfoPage.ets` 数据说明页面
+  - **功能内容**：
+    - 数据概览：说明应用包含 193 个联合国会员国和 2 个联合国观察员国的国旗数据
+    - 数据来源：标注数据来源于维基百科和 Creative Commons
+    - 说明：提供数据使用说明和免责声明
+  - **本地化**：完整支持中英文双语
+  - **入口**：在 ProfilePage 设置项中，位于"关于应用"和"分享应用"之间
+  - **新增字符串资源**：
+    - `data_info`: "数据说明" / "Data Info"
+    - `data_info_title`: "数据说明" / "Data Information"
+    - `data_info_overview`: "数据概览" / "Data Overview"
+    - `data_info_overview_content`: 数据概览内容（中英文）
+    - `data_info_source`: "数据来源" / "Data Source"
+    - `data_info_source_content`: 数据来源内容（中英文）
+    - `data_info_note`: "说明" / "Note"
+    - `data_info_note_content`: 说明内容（中英文）
+  - **路由配置**：在 `main_pages.json` 中注册了新页面路由
+  - **扩展数据说明内容**：在数据说明页面中添加了州旗/省旗数据信息和"更多数据即将到来"说明
+    - **新增内容**：
+      - 数据概览：现在包含完整的数据统计（国旗 + 州旗/省旗）
+      - 州旗/省旗数据：列出 11 个国家的 246 个州旗/省旗数据
+      - 更多数据即将到来：说明正在持续更新和扩展数据内容
+    - **优化数据来源说明**：
+      - 之前：列出"维基百科"和"Creative Commons"为两个独立来源 ❌
+      - 现在：明确表示"维基百科 - Creative Commons 许可" ✅
+      - 说明：CC 是维基百科使用的许可协议，而非独立数据源
+    - **新增字符串资源**：
+      - `data_info_state_flags`: "州旗/省旗数据" / "State/Provincial Flags Data"
+      - `data_info_state_flags_content`: 11 个国家的州旗/省旗数据详情（中英文）
+      - `data_info_more_coming`: "更多数据" / "More Data Coming"
+      - `data_info_more_coming_content`: 更多数据即将到来的说明（中英文）
+    - **更新字符串资源**：
+      - `data_info_overview_content`: 现在包含国旗和州旗/省旗的完整统计
+      - `data_info_source_content`: 明确表示 CC 是维基百科的许可协议
+
+- **完善每周国旗功能**：扩展配置覆盖全年52周
+  - **扩展范围**：从原来的10周配置扩展到全年52周完整配置
+  - **选择标准**：每周展示一个国家的国旗，基于该国的国庆日/独立日等重要纪念日选择
+  - **覆盖效果**：确保全年任何时候打开应用都能看到对应周的国旗
+  - **配置详情**（52个国家/地区）：
+    - **1-4周（1月）**：🇨🇺 古巴（1/1）、🇸🇩 苏丹（1/1）、🇷🇸 塞尔维亚（1/15）、🇦🇺 澳大利亚（1/26）
+    - **5-8周（2月）**：🇳🇿 新西兰（2/6）、🇱🇰 斯里兰卡（2/4）、🇱🇹 立陶宛（2/16）、🇪🇪 爱沙尼亚（2/24）
+    - **9-13周（3月）**：🇧🇬 保加利亚（3/3）、🇬🇭 加纳（3/6）、🇮🇪 爱尔兰（3/17）、🇬🇷 希腊（3/25）、🇧🇩 孟加拉国（3/26）
+    - **14-17周（4月）**：🇸🇳 塞内加尔（4/4）、🇹🇭 泰国（4/13）、🇿🇼 津巴布韦（4/18）、🇳🇱 荷兰（4/27）
+    - **18-22周（5月）**：🇮🇱 以色列（5/14）、🇳🇴 挪威（5/17）、🇦🇷 阿根廷（5/25）、🇯🇴 约旦（5/25）、🇳🇬 尼日利亚（5/29）
+    - **23-26周（6月）**：🇩🇰 丹麦（6/5）、🇸🇪 瑞典（6/6）、🇮🇸 冰岛（6/17）、🇱🇺 卢森堡（6/23）
+    - **27-30周（7月）**：🇨🇦 加拿大（7/1）、🇺🇸 美国（7/4）、🇫🇷 法国（7/14）、🇨🇴 哥伦比亚（7/20）
+    - **31-35周（8月）**：🇨🇭 瑞士（8/1）、🇯🇲 牙买加（8/6）、🇸🇬 新加坡（8/9）、🇮🇳 印度（8/15）、🇺🇦 乌克兰（8/24）
+    - **36-39周（9月）**：🇧🇷 巴西（9/7）、🇲🇽 墨西哥（9/16）、🇨🇱 智利（9/18）、🇸🇦 沙特阿拉伯（9/23）
+    - **40-44周（10月）**：🇨🇳 中国（10/1）、🇩🇪 德国（10/3）、🇪🇸 西班牙（10/12）、🇦🇹 奥地利（10/26）、🇹🇷 土耳其（10/29）
+    - **45-48周（11月）**：🇵🇦 巴拿马（11/3）、🇵🇱 波兰（11/11）、🇱🇻 拉脱维亚（11/18）、🇦🇱 阿尔巴尼亚（11/28）
+    - **49-52周（12月）**：🇦🇪 阿联酋（12/2）、🇫🇮 芬兰（12/6）、🇶🇦 卡塔尔（12/18）、🇯🇵 日本（12/23）
+  - **功能特点**：
+    - ✅ 根据系统日期自动计算当前周数（`getWeekNumber()`）
+    - ✅ 动态显示对应周的国旗和纪念日信息
+    - ✅ 全年无间断覆盖，任何时候都有国旗显示
+    - ✅ 每周自动更换，无需手动更新
+
 ### 优化 (Optimization)
+- **HeadsUp 游戏国旗渐显动画**：为 HeadsUpPlayPage 中的国旗添加逐渐显示的动画效果
+  - **实现方式**：
+    - 添加 `@State flagOpacity: number = 0` 状态变量控制透明度
+    - 添加 `@State enableFlagTransition: boolean = false` 状态变量控制是否启用过渡动画
+    - 在 `loadNextCountry()` 方法中：
+      - 如果有当前国旗，先禁用 transition，立即将透明度设为 0（立即隐藏）
+      - 更新国家数据后，启用 transition，然后使用 `animateTo()` 触发渐显动画
+    - 在 Image 组件上添加 `.opacity()` 和条件 `.transition()` 属性
+    - 使用 `.key()` 属性确保每次切换时组件正确更新
+  - **动画参数**：
+    - 渐显持续时间：400ms
+    - 缓动曲线：cubicBezier(0.42, 0, 0.58, 1)
+    - 立即隐藏：duration 0（无动画）
+  - **效果**：
+    - 切换国旗时，当前国旗立即隐藏（无渐隐动画）
+    - 新国旗从透明逐渐显示（渐显动画）
+    - 提供更流畅和清晰的视觉体验
+
+- **添加滚动弹跳效果**：为缺失的页面添加 Spring 弹跳效果，提升用户体验
+  - **修改页面**：
+    - `DataInfoPage`：数据说明页面的 Scroll 组件
+    - `StateFlagCountryListPage`：州旗国家列表页面的 List 组件
+    - `ConnectionsPlayPage`：Connections 游戏页面的 Scroll 组件
+  - **效果**：
+    - 滚动到边界时显示平滑的弹跳动画
+    - 增强界面交互的流畅感和现代感
+    - 与应用其他页面保持一致的滚动体验
+
 - **移除语言切换时的 Toast 提示**：在 ProfilePage 中切换语言时不再显示 toast 提示
   - **修改内容**：移除了 `saveLanguage()` 方法中的 `promptAction.showToast()` 调用
   - **效果**：切换语言时界面更加简洁，不会弹出提示消息
@@ -33,6 +121,226 @@
   - **详细报告**：见 `docs/DUPLICATE_FILES_REVIEW.md`
 
 ### 修复 (Fixed)
+- **国际组织名称显示行数优化**：将名称最大显示行数从 2 行增加到 3 行
+  - **问题**：FIAV（国际旗帜学协会联盟）的全称 "Fédération internationale des associations vexillologiques" 非常长，2 行无法完整显示
+  - **修改 FlagDetailPage.ets**（主视图和分享视图）：
+    - 主名称：`.maxLines(2)` → `.maxLines(3)`
+    - 次要名称：`.maxLines(2)` → `.maxLines(3)`
+  - **效果**：
+    - 短名称（如 "UN", "EU", "NATO"）：仍然 1-2 行显示 ✅
+    - 长名称（如 "FIAV"）：可以显示到 3 行，更完整 ✅
+    - 所有国际组织名称都能正确显示，不被截断
+
+- **国际组织详情页英文环境优化**：当语言为英文时，不显示中文次要名称
+  - **问题**：英文环境下，国际组织详情页同时显示英文主名称和中文次要名称，造成视觉冗余
+  - **修改 FlagDetailPage.ets**（主视图和分享视图）：
+    ```typescript
+    // 之前 ❌
+    Text(LocalizationUtil.isEnglish(this.currentLanguage) ? this.internationalOrg.nameCN : this.internationalOrg.name)
+      .fontSize(16)
+      .fontColor($r('app.color.text_secondary'))
+    
+    // 现在 ✅
+    // 只在中文环境显示次要名称（英文名称）
+    if (!LocalizationUtil.isEnglish(this.currentLanguage)) {
+      Text(this.internationalOrg.name)
+        .fontSize(16)
+        .fontColor($r('app.color.text_secondary'))
+    }
+    ```
+  - **效果**：
+    - **中文环境** 🇨🇳：
+      ```
+      联合国              ← 主名称（中文）
+      United Nations     ← 次要名称（英文）✅
+      ```
+    - **英文环境** 🇬🇧：
+      ```
+      United Nations     ← 主名称（英文）
+                         ← 不显示中文名称 ✅
+      ```
+    - 英文用户获得更简洁的显示效果
+
+- **国际组织 Region 和 Description 本地化**：修复国际组织详情页中地区和简介未本地化的问题
+  - **问题分析**：
+    - **Region 字段**：数据中使用中文值（如 "全球"、"欧洲"、"东南亚"），而 `getLocalizedRegionName()` 期望的是英文标准值（如 'World', 'Europe', 'Asia'）
+    - **Description 字段**：只有中文版本，没有英文版本
+  - **修改 InternationalOrg 接口**：
+    - `region` 字段注释更新为"地区（英文标准值，如 'Global', 'Europe'）"
+    - 添加 `descriptionEN?: string` 字段用于存储英文简介
+  - **更新所有 9 个国际组织数据**：
+    - **Region 标准化**：
+      - `'全球'` → `'World'`（UN, Olympic, Red Cross, FIAV）
+      - `'欧洲'` → `'Europe'`（EU, NATO）
+      - `'东南亚'` → `'Asia'`（ASEAN）
+      - `'非洲'` → `'Africa'`（AU, Arab League）
+    - **添加英文 Description**：
+      ```typescript
+      // 示例：联合国
+      description: '联合国是第二次世界大战后成立的国际组织...',
+      descriptionEN: 'The United Nations is an international organization established after World War II...'
+      ```
+  - **修改 FlagDetailPage.ets**（4 处）：
+    - **主视图和分享视图**：
+      ```typescript
+      // 之前 ❌
+      if (this.internationalOrg.description) {
+        this.DescriptionItem($r('app.string.description'), this.internationalOrg.description, true)
+      }
+      
+      // 现在 ✅
+      if (this.internationalOrg.description || this.internationalOrg.descriptionEN) {
+        this.DescriptionItem($r('app.string.description'), 
+          LocalizationUtil.isEnglish(this.currentLanguage) 
+            ? (this.internationalOrg.descriptionEN || this.internationalOrg.description || '') 
+            : (this.internationalOrg.description || this.internationalOrg.descriptionEN || ''), 
+          true)
+      }
+      ```
+    - **朗读内容**：
+      ```typescript
+      // 根据语言选择对应的 description
+      const description = isEnglish 
+        ? (this.internationalOrg.descriptionEN || this.internationalOrg.description) 
+        : (this.internationalOrg.description || this.internationalOrg.descriptionEN);
+      if (description) {
+        lines.push(`${description}`);
+      }
+      ```
+    - **分享/复制文本**：分别处理英文和中文环境下的 description 选择
+  - **效果**：
+    - **Region**：
+      - 中文：全部、亚洲、欧洲、非洲、美洲、大洋洲 ✅
+      - 英文：All, Asia, Europe, Africa, Americas, Oceania ✅
+    - **Description**：
+      - 中文：显示中文简介 ✅
+      - 英文：显示英文简介 ✅
+    - 国际组织详情页完整支持双语
+
+- **FavoritesPage 国际组织名称本地化**：修复收藏页面中国际组织名称未本地化的问题
+  - **问题分析**：
+    - `getLocalizedName()` 方法中，对于非州旗类型的收藏项，直接返回 `item.name`
+    - 收藏时保存的名称是当前语言的名称，切换语言后不会更新
+    - 国际组织收藏项显示的是收藏时的语言，而不是当前语言
+  - **修改 FavoritesPage.ets**：
+    - 导入 `getInternationalOrgByCode`, `isInternationalOrg`, `getLocalizedOrgName` 函数
+    - 在 `getLocalizedName()` 方法中添加国际组织判断逻辑：
+      ```typescript
+      // 如果是国旗类型，检查是否为国际组织
+      if (item.pageUrl.startsWith('flag:')) {
+        const code = item.pageUrl.substring(5);
+        if (isInternationalOrg(code)) {
+          const org = getInternationalOrgByCode(code);
+          if (org) {
+            // 根据语言返回国际组织名称
+            return getLocalizedOrgName(org, this.currentLanguage);
+          }
+        }
+      }
+      ```
+  - **效果**：
+    - 中文环境：显示中文名称（如"联合国"、"欧盟"）✅
+    - 英文环境：显示英文名称（如"United Nations"、"European Union"）✅
+    - 切换语言后，收藏列表中的国际组织名称会自动更新 ✅
+
+- **Trivia 游戏选项显示本地化**：修复 TriviaPlayPage 中国家名称选项未本地化的问题
+  - **问题分析**：
+    - `getOptionText()` 方法中始终返回 `country.nameCN`（中文名称）
+    - 虽然题目本身（`question` 字段）已根据语言加载正确数据
+    - 但当选项是国家代码时，显示的国家名称始终是中文
+  - **添加依赖**：导入 `getLocalizedCountryName` 从 countryData
+  - **添加语言监听**：使用 `@StorageLink('currentLanguage')` 监听语言变化
+  - **修改 `getOptionText()` 方法**：
+    ```typescript
+    // 之前 ❌
+    if (country) {
+      return country.nameCN;  // 硬编码中文
+    }
+    
+    // 现在 ✅
+    if (country) {
+      return getLocalizedCountryName(country, this.currentLanguage);  // 本地化
+    }
+    ```
+  - **效果**：
+    - 中文环境：题目和国家名称选项都是中文
+    - 英文环境：题目和国家名称选项都是英文
+    - 文本选项（如颜色名称）：继续使用题目数据中的预设文本
+    - 完整的国际化体验
+
+- **Input 游戏答案验证优化**：修复 InputPlayPage 中答案只检查中文的问题
+  - **问题分析**：
+    - `getCurrentCountryName()` 只返回中文名称（`country?.nameCN`）
+    - `checkAnswer()` 只检查中文名称匹配
+    - 英文用户无法输入英文答案通过验证
+  - **添加依赖**：导入 `getLocalizedCountryName` 从 countryData
+  - **添加语言监听**：使用 `@StorageLink('currentLanguage')` 监听语言变化
+  - **修改 `getCurrentCountryName()`**：返回本地化的国家名称
+  - **重写 `checkAnswer()` 验证逻辑**：
+    - 同时支持中文和英文答案验证（无论当前语言设置）
+    - 使用 `toLowerCase()` 实现大小写不敏感
+    - 支持完全匹配和部分匹配两种方式
+    - 验证条件：
+      ```typescript
+      userInput === chineseName || 
+      userInput === englishName ||
+      chineseName.includes(userInput) || 
+      englishName.includes(userInput) ||
+      userInput.includes(chineseName) ||
+      userInput.includes(englishName)
+      ```
+  - **效果**：
+    - 中文环境：显示中文国家名称，接受中英文输入
+    - 英文环境：显示英文国家名称，接受中英文输入
+    - 用户可以用任何语言输入答案
+    - 答案验证更加灵活和友好
+
+- **Fake Flag 游戏国家名称本地化**：修复 FakeFlagPlayPage 中国家名称未本地化的问题
+  - **问题**：游戏界面和对比弹窗中的国家名称始终显示中文（`country?.nameCN`）
+  - **添加依赖**：导入 `getLocalizedCountryName` 从 countryData
+  - **添加语言监听**：使用 `@StorageLink('currentLanguage')` 监听语言变化
+  - **修改方法**（2处）：
+    - `getCountryName()`：用于国旗卡片下方的国家名称
+    - `getFakeCountryName()`：用于对比弹窗中的国家名称
+  - **效果**：
+    - 中文环境：显示 "中国"、"美国"、"日本" 等中文名称
+    - 英文环境：显示 "China"、"United States"、"Japan" 等英文名称
+    - 切换语言时所有国家名称自动更新
+
+- **Quiz 游戏选项本地化**：修复 QuizPlayPage 中选项名称未本地化的问题
+  - **问题**：看旗猜名和看名猜旗游戏中，国家名称选项始终显示中文（`country.nameCN`）
+  - **添加依赖**：导入 `getLocalizedCountryName` 从 countryData
+  - **添加语言监听**：使用 `@StorageLink('currentLanguage')` 监听语言变化
+  - **新增方法 `getCountryName()`**：根据当前语言返回本地化的国家名称
+  - **修改位置**（5处）：
+    - `FlagToNameQuestion` Builder：选项按钮文本
+    - `NameToFlagQuestion` Builder：题目国家名称
+    - `ShareContentBuilder`：分享内容中的选项和题目
+  - **特别优化**：看名猜旗模式的国家名称显示
+    - 中文环境：显示中文名称（大字）+ 英文名称（小字副标题）
+    - 英文环境：只显示英文名称（大字），不显示副标题
+    - 避免在英文环境下出现重复的英文名称显示
+  - **效果**：
+    - 中文环境：显示 "中国"、"美国"、"日本" 等中文名称
+    - 英文环境：显示 "China"、"United States"、"Japan" 等英文名称
+    - 切换语言时选项自动更新
+
+- **收藏页面州旗名称本地化**：修复 FavoritesPage 中州旗名称未本地化的问题
+  - **添加依赖**：
+    - 导入 `getCountryStateData`、`CountryStateData`、`StateInfo` 从 StateFlagData
+    - 导入 `LocalizationUtil` 用于语言检测
+  - **添加语言监听**：使用 `@StorageLink('currentLanguage')` 监听语言变化
+  - **新增方法 `getLocalizedName()`**：
+    - 检测收藏项类型（国旗/州旗/其他）
+    - 对于州旗类型：解析 pageUrl 获取国家代码和州代码
+    - 从 StateFlagData 查找对应的州信息
+    - 根据当前语言返回本地化名称（name / nameCN）
+    - 其他类型直接返回保存的名称
+  - **效果**：
+    - 中文环境：显示 "加利福尼亚州"、"新南威尔士州" 等中文名称
+    - 英文环境：显示 "California"、"New South Wales" 等英文名称
+    - 切换语言时州旗名称自动更新
+
 - **州旗页面完整本地化及界面优化**：完成了所有州旗相关页面的本地化和界面优化
   - **StateFlagCountryListPage（州旗国家列表页）**：
     - 添加 `@StorageLink('currentLanguage')` 监听语言变化

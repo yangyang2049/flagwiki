@@ -100,6 +100,7 @@ struct StateFlagCountryListPage {
         .width('100%')
         .layoutWeight(1)
         .padding({ left: 16, right: 16, top: 16 })
+        .edgeEffect(EdgeEffect.Spring)
       }
       .width('100%')
       .height('100%')

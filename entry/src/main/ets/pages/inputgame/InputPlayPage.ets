@@ -1,7 +1,7 @@
 import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
-import { getCountryByCode } from '../../utils/countryData';
+import { getCountryByCode, getLocalizedCountryName } from '../../utils/countryData';
 import { InputGameLevel, getInputGameLevel, getTotalInputLevels } from './InputGameLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
@@ -22,6 +22,7 @@ interface RouterParams {
   @State showResult: boolean = false;
   @State correctAnswers: number = 0;
   @State flagVisible: boolean = false; // 国旗可见性
+  @StorageLink('currentLanguage') currentLanguage: string = 'zh';
   private context = getContext(this) as common.UIAbilityContext;
   private timeoutIds: number[] = []; // 存储所有setTimeout的ID，用于清理
 
@@ -93,7 +94,8 @@ interface RouterParams {
     const code = this.getCurrentCountryCode();
     if (!code) return '';
     const country = getCountryByCode(code);
-    return country?.nameCN || '';
+    if (!country) return '';
+    return getLocalizedCountryName(country, this.currentLanguage);
   }
 
   private async checkAnswer(): Promise<void> {
@@ -102,11 +104,24 @@ interface RouterParams {
     // 点击振动反馈
     VibratorUtil.vibrateTap();
 
-    const correctName = this.getCurrentCountryName();
-    const userInput = this.inputText.trim();
+    const code = this.getCurrentCountryCode();
+    const country = getCountryByCode(code);
+    if (!country) return;
 
-    // 检查答案是否正确（完全匹配或包含）
-    if (userInput === correctName || correctName.includes(userInput) || userInput.includes(correctName)) {
+    const userInput = this.inputText.trim().toLowerCase();
+    const chineseName = country.nameCN.toLowerCase();
+    const englishName = country.name.toLowerCase();
+
+    // 检查答案是否正确（支持中英文，完全匹配或包含）
+    const isCorrect = 
+      userInput === chineseName || 
+      userInput === englishName ||
+      chineseName.includes(userInput) || 
+      englishName.includes(userInput) ||
+      userInput.includes(chineseName) ||
+      userInput.includes(englishName);
+
+    if (isCorrect) {
       // 播放正确答案音效和振动
       await SoundEffectUtil.playCorrect();
       VibratorUtil.vibrateCorrect();

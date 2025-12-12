@@ -379,7 +379,7 @@ interface RouterParams {
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
               .textAlign(TextAlign.Center)
-              .maxLines(2)
+              .maxLines(3)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
               .margin({ bottom: 4 })
               .onClick(() => {
@@ -388,17 +388,20 @@ interface RouterParams {
                 }
               })
 
-            Text(LocalizationUtil.isEnglish(this.currentLanguage) ? this.internationalOrg.nameCN : this.internationalOrg.name)
-              .fontSize(16)
-              .fontColor($r('app.color.text_secondary'))
-              .textAlign(TextAlign.Center)
-              .maxLines(2)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-              .onClick(() => {
-                if (this.internationalOrg) {
-                  this.copyToClipboard(LocalizationUtil.isEnglish(this.currentLanguage) ? this.internationalOrg.nameCN : this.internationalOrg.name);
-                }
-              })
+            // 只在中文环境显示次要名称（英文名称）
+            if (!LocalizationUtil.isEnglish(this.currentLanguage)) {
+              Text(this.internationalOrg.name)
+                .fontSize(16)
+                .fontColor($r('app.color.text_secondary'))
+                .textAlign(TextAlign.Center)
+                .maxLines(3)
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
+                .onClick(() => {
+                  if (this.internationalOrg) {
+                    this.copyToClipboard(this.internationalOrg.name);
+                  }
+                })
+            }
           }
           .width('100%')
             .padding({ left: 16, right: 16, top: 20, bottom: 16 })
@@ -425,9 +428,9 @@ interface RouterParams {
                 Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
                 this.InfoItem(this.context.resourceManager.getStringSync($r('app.string.website').id), this.internationalOrg.website)
               }
-              if (this.internationalOrg.description) {
+              if (this.internationalOrg.description || this.internationalOrg.descriptionEN) {
                 Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.DescriptionItem($r('app.string.description'), this.internationalOrg.description, true)
+                this.DescriptionItem($r('app.string.description'), LocalizationUtil.isEnglish(this.currentLanguage) ? (this.internationalOrg.descriptionEN || this.internationalOrg.description || '') : (this.internationalOrg.description || this.internationalOrg.descriptionEN || ''), true)
               }
             }
           .padding(16)
@@ -842,16 +845,19 @@ interface RouterParams {
             .fontWeight(FontWeight.Bold)
             .fontColor($r('app.color.text_primary'))
             .textAlign(TextAlign.Center)
-            .maxLines(2)
+            .maxLines(3)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .margin({ bottom: 4 })
 
-          Text(LocalizationUtil.isEnglish(this.currentLanguage) ? this.internationalOrg.nameCN : this.internationalOrg.name)
-            .fontSize(16)
-            .fontColor($r('app.color.text_secondary'))
-            .textAlign(TextAlign.Center)
-            .maxLines(2)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
+          // 只在中文环境显示次要名称（英文名称）
+          if (!LocalizationUtil.isEnglish(this.currentLanguage)) {
+            Text(this.internationalOrg.name)
+              .fontSize(16)
+              .fontColor($r('app.color.text_secondary'))
+              .textAlign(TextAlign.Center)
+              .maxLines(3)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+          }
         }
         .width('100%')
           .padding({ left: 16, right: 16, top: 20, bottom: 16 })
@@ -878,9 +884,9 @@ interface RouterParams {
               Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
               this.InfoItem(this.context.resourceManager.getStringSync($r('app.string.website').id), this.internationalOrg.website)
             }
-            if (this.internationalOrg.description) {
+            if (this.internationalOrg.description || this.internationalOrg.descriptionEN) {
               Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-              this.DescriptionItem($r('app.string.description'), this.internationalOrg.description, true)
+              this.DescriptionItem($r('app.string.description'), LocalizationUtil.isEnglish(this.currentLanguage) ? (this.internationalOrg.descriptionEN || this.internationalOrg.description || '') : (this.internationalOrg.description || this.internationalOrg.descriptionEN || ''), true)
             }
           }
           .padding(16)
@@ -1120,8 +1126,9 @@ interface RouterParams {
           lines.push(this.context.resourceManager.getStringSync($r('app.string.website_colon').id, this.internationalOrg.website) + '。');
         }
       }
-      if (this.internationalOrg.description) {
-        lines.push(`${this.internationalOrg.description}`);
+      const description = isEnglish ? (this.internationalOrg.descriptionEN || this.internationalOrg.description) : (this.internationalOrg.description || this.internationalOrg.descriptionEN);
+      if (description) {
+        lines.push(`${description}`);
       }
     } else if (this.country) {
       const countryName = getLocalizedCountryName(this.country, this.currentLanguage);
@@ -1338,9 +1345,10 @@ interface RouterParams {
         if (this.internationalOrg.website) {
           lines.push(`🌐 ${this.context.resourceManager.getStringSync($r('app.string.website').id)}: ${this.internationalOrg.website}`);
         }
-        if (this.internationalOrg.description) {
+        const descriptionText = this.internationalOrg.descriptionEN || this.internationalOrg.description;
+        if (descriptionText) {
           lines.push('');
-          lines.push(`📝 ${this.context.resourceManager.getStringSync($r('app.string.description').id)}: ${this.internationalOrg.description}`);
+          lines.push(`📝 ${this.context.resourceManager.getStringSync($r('app.string.description').id)}: ${descriptionText}`);
         }
       } else {
         lines.push(`📍 ${this.context.resourceManager.getStringSync($r('app.string.headquarters').id)}：${headquarters}`);
@@ -1350,9 +1358,10 @@ interface RouterParams {
         if (this.internationalOrg.website) {
           lines.push(`🌐 ${this.context.resourceManager.getStringSync($r('app.string.website').id)}：${this.internationalOrg.website}`);
         }
-        if (this.internationalOrg.description) {
+        const descriptionTextCN = this.internationalOrg.description || this.internationalOrg.descriptionEN;
+        if (descriptionTextCN) {
           lines.push('');
-          lines.push(`📝 ${this.context.resourceManager.getStringSync($r('app.string.description').id)}：${this.internationalOrg.description}`);
+          lines.push(`📝 ${this.context.resourceManager.getStringSync($r('app.string.description').id)}：${descriptionTextCN}`);
         }
       }
     } else if (this.country) {

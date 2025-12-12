@@ -7,7 +7,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { image } from '@kit.ImageKit';
 import fs from '@ohos.file.fs';
 import { fileUri } from '@kit.CoreFileKit';
-import { Country, getCountryByCode, Countries } from '../../utils/countryData';
+import { Country, getCountryByCode, Countries, getLocalizedCountryName } from '../../utils/countryData';
 import { QuizLevel, getQuizLevel, getAllQuizLevels } from './QuizLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
@@ -44,6 +44,7 @@ interface QuizQuestion {
   @State isSharing: boolean = false;
   @State sharePixelMap: image.PixelMap | null = null;
   @State optionVisible: boolean[] = [false, false, false, false];  // 选项可见性
+  @StorageLink('currentLanguage') currentLanguage: string = 'zh';
   private context = getContext(this) as common.UIAbilityContext;
   private readonly SHARE_CONTAINER_ID = 'quizShareContainer';
   private timeoutIds: number[] = []; // 存储所有setTimeout的ID，用于清理
@@ -328,6 +329,10 @@ interface QuizQuestion {
       this.timeoutIds.push(id);
     }
   }
+  
+  private getCountryName(country: Country): string {
+    return getLocalizedCountryName(country, this.currentLanguage);
+  }
 
   build() {
     Navigation() {
@@ -500,7 +505,7 @@ interface QuizQuestion {
             Column() {
               ForEach(this.questions[this.currentIndex].choices, (country: Country, index: number) => {
                 Row() {
-                  Text(country.nameCN)
+                  Text(this.getCountryName(country))
                     .fontSize(16)
                     .fontWeight(FontWeight.Medium)
                     .fontColor($r('app.color.text_primary'))
@@ -522,15 +527,18 @@ interface QuizQuestion {
           Column() {
             // 显示国家名称
             Column() {
-              Text(this.questions[this.currentIndex].correctCountry.nameCN)
+              Text(this.getCountryName(this.questions[this.currentIndex].correctCountry))
                 .fontSize(32)
                 .fontWeight(FontWeight.Bold)
                 .fontColor($r('app.color.text_primary'))
 
-              Text(this.questions[this.currentIndex].correctCountry.name)
-                .fontSize(16)
-                .fontColor($r('app.color.text_secondary'))
-                .margin({ top: 8 })
+              // 中文环境下显示英文名称作为副标题
+              if (this.currentLanguage !== 'en' && !this.currentLanguage.startsWith('en-')) {
+                Text(this.questions[this.currentIndex].correctCountry.name)
+                  .fontSize(16)
+                  .fontColor($r('app.color.text_secondary'))
+                  .margin({ top: 8 })
+              }
             }
             .width('100%')
               .padding(32)
@@ -729,7 +737,7 @@ interface QuizQuestion {
       // 选项
       Column() {
         ForEach(this.questions[this.currentIndex].choices, (country: Country, index: number) => {
-          this.ChoiceButton(country.nameCN, index)
+          this.ChoiceButton(this.getCountryName(country), index)
         })
       }
       .width('100%')
@@ -743,15 +751,18 @@ interface QuizQuestion {
     Column() {
       // 显示国家名称
       Column() {
-        Text(this.questions[this.currentIndex].correctCountry.nameCN)
+        Text(this.getCountryName(this.questions[this.currentIndex].correctCountry))
           .fontSize(32)
           .fontWeight(FontWeight.Bold)
           .fontColor($r('app.color.text_primary'))
 
-        Text(this.questions[this.currentIndex].correctCountry.name)
-          .fontSize(16)
-          .fontColor($r('app.color.text_secondary'))
-          .margin({ top: 8 })
+        // 中文环境下显示英文名称作为副标题
+        if (this.currentLanguage !== 'en' && !this.currentLanguage.startsWith('en-')) {
+          Text(this.questions[this.currentIndex].correctCountry.name)
+            .fontSize(16)
+            .fontColor($r('app.color.text_secondary'))
+            .margin({ top: 8 })
+        }
       }
       .width('100%')
         .padding(32)

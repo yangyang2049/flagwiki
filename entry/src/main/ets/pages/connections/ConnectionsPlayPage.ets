@@ -441,6 +441,8 @@ struct ConnectionsPlayPage {
               }
               .layoutWeight(1)
               .width('100%')
+              .scrollBar(BarState.Auto)
+              .edgeEffect(EdgeEffect.Spring)
 
               // 操作按钮（游戏完成时隐藏）
               if (!this.isGameCompleted()) {

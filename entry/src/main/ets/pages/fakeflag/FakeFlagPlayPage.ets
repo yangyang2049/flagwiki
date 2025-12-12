@@ -1,7 +1,7 @@
 import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
-import { getCountryByCode } from '../../utils/countryData';
+import { getCountryByCode, getLocalizedCountryName } from '../../utils/countryData';
 import { FakeFlagLevel, FakeFlagQuestion, getFakeFlagLevel, getAllFakeFlagLevels } from './FakeFlagLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
@@ -26,6 +26,7 @@ interface RouterParams {
   @State scaleValue: number = 1;
   @State showCompareDialog: boolean = false;
   @State flagVisible: boolean[] = [false, false, false, false];  // 国旗选项可见性
+  @StorageLink('currentLanguage') currentLanguage: string = 'zh';
   private context = getContext(this) as common.UIAbilityContext;
   private timeoutIds: number[] = []; // 存储所有setTimeout的ID，用于清理
 
@@ -303,7 +304,8 @@ interface RouterParams {
 
   private getCountryName(code: string): string {
     const country = getCountryByCode(code);
-    return country?.nameCN || code.toUpperCase();
+    if (!country) return code.toUpperCase();
+    return getLocalizedCountryName(country, this.currentLanguage);
   }
 
   private getCardBorderColor(code: string): Resource {
@@ -599,7 +601,8 @@ interface RouterParams {
     const question = this.getCurrentQuestion();
     if (question) {
       const country = getCountryByCode(question.fakeCountryCode);
-      return country?.nameCN || question.fakeCountryCode.toUpperCase();
+      if (!country) return question.fakeCountryCode.toUpperCase();
+      return getLocalizedCountryName(country, this.currentLanguage);
     }
     return '';
   }

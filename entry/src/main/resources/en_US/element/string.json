@@ -130,7 +130,7 @@
     },
     {
       "name": "flag_gallery",
-      "value": "Flag Gallery"
+      "value": "Gallery"
     },
     {
       "name": "state_flags",
@@ -489,6 +489,10 @@
       "value": "Share App"
     },
     {
+      "name": "data_info",
+      "value": "Data Info"
+    },
+    {
       "name": "confirm",
       "value": "Confirm"
     },
@@ -599,6 +603,50 @@
     {
       "name": "share_app_description",
       "value": "Explore the mysteries of world flags"
+    },
+    {
+      "name": "data_info_title",
+      "value": "Data Information"
+    },
+    {
+      "name": "data_info_overview",
+      "value": "Data Overview"
+    },
+    {
+      "name": "data_info_overview_content",
+      "value": "This app contains the following flag data:\n\n• 193 UN member state flags\n• 2 UN observer state flags\n• 246 state/provincial flags from 11 countries"
+    },
+    {
+      "name": "data_info_source",
+      "value": "Data Source"
+    },
+    {
+      "name": "data_info_source_content",
+      "value": "Wikipedia - Creative Commons License"
+    },
+    {
+      "name": "data_info_note",
+      "value": "Note"
+    },
+    {
+      "name": "data_info_note_content",
+      "value": "The flag data in this app is sourced from publicly available Wikipedia resources under Creative Commons license. The data is for reference only. Please refer to official sources for authoritative information."
+    },
+    {
+      "name": "data_info_state_flags",
+      "value": "State/Provincial Flags Data"
+    },
+    {
+      "name": "data_info_state_flags_content",
+      "value": "This app also includes state/provincial flag data for the following 11 countries:\n\n🇯🇵 Japan (47 Prefectures)\n🇺🇸 United States (50 States)\n🇩🇪 Germany (16 States)\n🇦🇺 Australia (9 States)\n🇧🇷 Brazil (27 States)\n🇨🇦 Canada (13 Provinces)\n🇰🇷 South Korea (17 Administrative Divisions)\n🇨🇭 Switzerland (26 Cantons)\n🇬🇧 United Kingdom (4 Regions)\n🇮🇹 Italy (20 Regions)\n🇪🇸 Spain (17 Autonomous Communities)"
+    },
+    {
+      "name": "data_info_more_coming",
+      "value": "More Data Coming"
+    },
+    {
+      "name": "data_info_more_coming_content",
+      "value": "We are continuously updating and expanding our data content. More flag data for countries and regions is coming soon. Stay tuned!"
     },
     {
       "name": "level_not_found",
@@ -746,7 +794,7 @@
     },
     {
       "name": "next_question",
-      "value": "Next Question"
+      "value": "Next"
     },
     {
       "name": "view_results",

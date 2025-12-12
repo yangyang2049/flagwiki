@@ -17,12 +17,13 @@ export interface InternationalOrg {
     nameCN: string;      // 中文名称
     headquarters: string; // 总部
     headquartersCN: string; // 总部中文
-    region: string;      // 地区
+    region: string;      // 地区（英文标准值，如 'Global', 'Europe'）
     orgType: string;      // 组织类型
     orgTypeCN: string;   // 组织类型中文
     population: number;  // 覆盖人口
     website?: string;    // 网站（可选，不可点击的文本）
-    description?: string; // 简介（可选）
+    description?: string; // 简介中文（可选）
+    descriptionEN?: string; // 简介英文（可选）
 }
 
 // 国旗设计数据模型
@@ -582,12 +583,13 @@ export const InternationalOrgs: InternationalOrg[] = [
         nameCN: '联合国',
         headquarters: 'New York',
         headquartersCN: '纽约',
-        region: '全球',
+        region: 'World',
         orgType: 'Intergovernmental Organization',
         orgTypeCN: '政府间组织',
         population: 8000000000,  // 约80亿人
         website: 'https://www.un.org',
-        description: '联合国是第二次世界大战后成立的国际组织，致力于维护国际和平与安全、促进国际合作、发展国际法、保护人权。成立于1945年，现有193个会员国。'
+        description: '联合国是第二次世界大战后成立的国际组织，致力于维护国际和平与安全、促进国际合作、发展国际法、保护人权。成立于1945年，现有193个会员国。',
+        descriptionEN: 'The United Nations is an international organization established after World War II, dedicated to maintaining international peace and security, promoting international cooperation, developing international law, and protecting human rights. Founded in 1945, it currently has 193 member states.'
     },
     {
         code: 'eu',
@@ -595,12 +597,13 @@ export const InternationalOrgs: InternationalOrg[] = [
         nameCN: '欧盟',
         headquarters: 'Brussels',
         headquartersCN: '布鲁塞尔',
-        region: '欧洲',
+        region: 'Europe',
         orgType: 'Supranational Union',
         orgTypeCN: '超国家联盟',
         population: 447000000,  // 约4.47亿人
         website: 'https://european-union.europa.eu',
-        description: '欧盟是由27个欧洲国家组成的政治经济联盟，致力于促进成员国之间的和平、价值观和人民福祉。成立于1993年，拥有统一的货币欧元和共同市场。'
+        description: '欧盟是由27个欧洲国家组成的政治经济联盟，致力于促进成员国之间的和平、价值观和人民福祉。成立于1993年，拥有统一的货币欧元和共同市场。',
+        descriptionEN: 'The European Union is a political and economic union of 27 European countries, dedicated to promoting peace, values, and the well-being of its citizens among member states. Founded in 1993, it features a unified currency (the Euro) and a common market.'
     },
     {
         code: 'olympic',
@@ -608,12 +611,13 @@ export const InternationalOrgs: InternationalOrg[] = [
         nameCN: '奥林匹克',
         headquarters: 'Lausanne',
         headquartersCN: '洛桑',
-        region: '全球',
+        region: 'World',
         orgType: 'Sports Organization',
         orgTypeCN: '体育组织',
         population: 8000000000,  // 全球人口
         website: 'https://olympics.com',
-        description: '国际奥林匹克委员会是负责组织和管理奥林匹克运动会的国际组织。成立于1894年，每四年举办一次夏季和冬季奥运会，旨在通过体育促进世界和平与友谊。'
+        description: '国际奥林匹克委员会是负责组织和管理奥林匹克运动会的国际组织。成立于1894年，每四年举办一次夏季和冬季奥运会，旨在通过体育促进世界和平与友谊。',
+        descriptionEN: 'The International Olympic Committee is the international organization responsible for organizing and managing the Olympic Games. Founded in 1894, it hosts the Summer and Winter Olympics every four years, aiming to promote world peace and friendship through sports.'
     },
     {
         code: 'nato',
@@ -621,12 +625,13 @@ export const InternationalOrgs: InternationalOrg[] = [
         nameCN: '北约',
         headquarters: 'Brussels',
         headquartersCN: '布鲁塞尔',
-        region: '欧洲、北美',
+        region: 'Europe',
         orgType: 'Military Alliance',
         orgTypeCN: '军事联盟',
         population: 950000000,  // 约9.5亿人
         website: 'https://www.nato.int',
-        description: '北大西洋公约组织是北美和欧洲国家组成的军事联盟，成立于1949年。旨在通过政治和军事手段保障成员国的自由和安全，实行集体防御原则。'
+        description: '北大西洋公约组织是北美和欧洲国家组成的军事联盟，成立于1949年。旨在通过政治和军事手段保障成员国的自由和安全，实行集体防御原则。',
+        descriptionEN: 'The North Atlantic Treaty Organization is a military alliance of North American and European countries, founded in 1949. It aims to safeguard the freedom and security of its member states through political and military means, implementing the principle of collective defense.'
     },
     {
         code: 'asean',
@@ -634,12 +639,13 @@ export const InternationalOrgs: InternationalOrg[] = [
         nameCN: '东盟',
         headquarters: 'Jakarta',
         headquartersCN: '雅加达',
-        region: '东南亚',
+        region: 'Asia',
         orgType: 'Regional Organization',
         orgTypeCN: '区域组织',
         population: 680000000,  // 约6.8亿人
         website: 'https://asean.org',
-        description: '东南亚国家联盟是东南亚10个国家组成的区域组织，成立于1967年。致力于促进区域经济合作、政治安全合作和社会文化合作，维护地区和平与稳定。'
+        description: '东南亚国家联盟是东南亚10个国家组成的区域组织，成立于1967年。致力于促进区域经济合作、政治安全合作和社会文化合作，维护地区和平与稳定。',
+        descriptionEN: 'The Association of Southeast Asian Nations is a regional organization comprising 10 Southeast Asian countries, established in 1967. It is dedicated to promoting regional economic cooperation, political and security cooperation, and socio-cultural cooperation, maintaining regional peace and stability.'
     },
     {
         code: 'au_org',
@@ -647,12 +653,13 @@ export const InternationalOrgs: InternationalOrg[] = [
         nameCN: '非盟',
         headquarters: 'Addis Ababa',
         headquartersCN: '亚的斯亚贝巴',
-        region: '非洲',
+        region: 'Africa',
         orgType: 'Regional Organization',
         orgTypeCN: '区域组织',
         population: 1400000000,  // 约14亿人
         website: 'https://au.int',
-        description: '非洲联盟是非洲55个成员国组成的区域组织，成立于2002年，前身是非洲统一组织。致力于促进非洲的团结、和平、安全与发展，推动非洲一体化进程。'
+        description: '非洲联盟是非洲55个成员国组成的区域组织，成立于2002年，前身是非洲统一组织。致力于促进非洲的团结、和平、安全与发展，推动非洲一体化进程。',
+        descriptionEN: 'The African Union is a regional organization of 55 African member states, founded in 2002, succeeding the Organization of African Unity. It is dedicated to promoting African unity, peace, security, and development, advancing the African integration process.'
     },
     {
         code: 'arab_league',
@@ -660,12 +667,13 @@ export const InternationalOrgs: InternationalOrg[] = [
         nameCN: '阿盟',
         headquarters: 'Cairo',
         headquartersCN: '开罗',
-        region: '中东、北非',
+        region: 'Africa',
         orgType: 'Regional Organization',
         orgTypeCN: '区域组织',
         population: 450000000,  // 约4.5亿人
         website: 'https://www.lasportal.org',
-        description: '阿拉伯国家联盟是22个阿拉伯国家组成的区域组织，成立于1945年。旨在加强阿拉伯国家之间的合作，协调成员国的政策和活动，维护阿拉伯世界的共同利益。'
+        description: '阿拉伯国家联盟是22个阿拉伯国家组成的区域组织，成立于1945年。旨在加强阿拉伯国家之间的合作，协调成员国的政策和活动，维护阿拉伯世界的共同利益。',
+        descriptionEN: 'The Arab League is a regional organization of 22 Arab countries, founded in 1945. It aims to strengthen cooperation among Arab states, coordinate member state policies and activities, and safeguard the common interests of the Arab world.'
     },
     {
         code: 'red_cross',
@@ -673,12 +681,13 @@ export const InternationalOrgs: InternationalOrg[] = [
         nameCN: '红十字会',
         headquarters: 'Geneva',
         headquartersCN: '日内瓦',
-        region: '全球',
+        region: 'World',
         orgType: 'Humanitarian Organization',
         orgTypeCN: '人道主义组织',
         population: 8000000000,  // 全球人口
         website: 'https://www.icrc.org',
-        description: '国际红十字与红新月运动是全球最大的人道主义网络，由国际红十字委员会、红十字会与红新月会国际联合会以及各国红会组成。致力于在武装冲突和自然灾害中保护生命和尊严。'
+        description: '国际红十字与红新月运动是全球最大的人道主义网络，由国际红十字委员会、红十字会与红新月会国际联合会以及各国红会组成。致力于在武装冲突和自然灾害中保护生命和尊严。',
+        descriptionEN: 'The International Red Cross and Red Crescent Movement is the world\'s largest humanitarian network, consisting of the International Committee of the Red Cross, the International Federation of Red Cross and Red Crescent Societies, and national societies. It is dedicated to protecting life and dignity in armed conflicts and natural disasters.'
     },
     {
         code: 'fiav',
@@ -686,12 +695,13 @@ export const InternationalOrgs: InternationalOrg[] = [
         nameCN: '旗帜学协会国际联盟',
         headquarters: 'Houston / London',
         headquartersCN: '休斯顿 / 伦敦',
-        region: '全球',
+        region: 'World',
         orgType: 'International Association',
         orgTypeCN: '国际协会',
         population: 0,  // 成员协会及组织
         website: 'http://www.fiav.org',
-        description: '旗帜学协会国际联盟是致力于旗帜学研究与推广的国际组织，成立于1969年，由惠特尼·史密斯创立。拥有55个成员协会及组织，促进全球旗帜学知识的交流与发展。协会旗帜图案为一个接绳结。'
+        description: '旗帜学协会国际联盟是致力于旗帜学研究与推广的国际组织，成立于1969年，由惠特尼·史密斯创立。拥有55个成员协会及组织，促进全球旗帜学知识的交流与发展。协会旗帜图案为一个接绳结。',
+        descriptionEN: 'The International Federation of Vexillological Associations is an international organization dedicated to the study and promotion of vexillology, founded in 1969 by Whitney Smith. With 55 member associations and organizations, it promotes the exchange and development of vexillological knowledge worldwide. The association flag features a knot.'
     }
 ];
 

@@ -1,6 +1,7 @@
 import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
+import curves from '@ohos.curves';
 import { Country, Countries, getFlagImageSource } from '../../utils/countryData';
 import { PreferencesManager } from '../../utils/PreferencesManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
@@ -22,6 +23,8 @@ export struct HeadsUpPlayPage {
   @State sessionNumber: number = 1;
   @StorageLink('currentLanguage') currentLanguage: string = 'zh';
   @State isEnglish: boolean = false;
+  @State flagOpacity: number = 0;
+  @State enableFlagTransition: boolean = false;
   private context = getContext(this) as common.UIAbilityContext;
 
   async aboutToAppear() {
@@ -82,6 +85,8 @@ export struct HeadsUpPlayPage {
     this.currentIndex = 0;
     this.showAnswer = false;
     this.showSessionOver = false;
+    this.flagOpacity = 0;
+    this.enableFlagTransition = true;
     this.loadNextCountry();
   }
 
@@ -100,8 +105,31 @@ export struct HeadsUpPlayPage {
 
   private loadNextCountry(): void {
     if (this.currentIndex < this.sessionCountries.length) {
-      this.currentCountry = this.sessionCountries[this.currentIndex];
-      this.showAnswer = false;
+      // 如果有当前国旗，立即隐藏（不使用动画）
+      if (this.currentCountry) {
+        // 禁用 transition，立即将透明度设为 0
+        this.enableFlagTransition = false;
+        this.flagOpacity = 0;
+      }
+      
+      // 等待一小段时间确保隐藏完成，然后更新国家数据
+      setTimeout(() => {
+        this.currentCountry = this.sessionCountries[this.currentIndex];
+        this.showAnswer = false;
+        
+        // 启用 transition，准备渐显动画
+        this.enableFlagTransition = true;
+        
+        // 再等待一小段时间后触发渐显动画
+        setTimeout(() => {
+          animateTo({
+            duration: 400,
+            curve: curves.cubicBezier(0.42, 0, 0.58, 1)
+          }, () => {
+            this.flagOpacity = 1;
+          });
+        }, 50);
+      }, 50);
     } else {
       this.showSessionOver = true;
     }
@@ -192,6 +220,9 @@ export struct HeadsUpPlayPage {
             .width('90%')
             .height('100%')
             .objectFit(ImageFit.Contain)
+            .opacity(this.flagOpacity)
+            .key(`${this.currentCountry.code}_${this.currentIndex}`)
+            .transition(this.enableFlagTransition ? TransitionEffect.OPACITY.animation({ duration: 400, curve: curves.cubicBezier(0.42, 0, 0.58, 1) }) : TransitionEffect.OPACITY.animation({ duration: 0 }))
         }
       }
       .width('100%')

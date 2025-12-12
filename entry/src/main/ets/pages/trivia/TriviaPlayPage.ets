@@ -7,7 +7,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { image } from '@kit.ImageKit';
 import fs from '@ohos.file.fs';
 import { fileUri } from '@kit.CoreFileKit';
-import { getCountryByCode } from '../../utils/countryData';
+import { getCountryByCode, getLocalizedCountryName } from '../../utils/countryData';
 import { TriviaLevel, TriviaQuestion, getTriviaLevel, getTotalTriviaLevels } from './TriviaLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
@@ -35,6 +35,7 @@ interface RouterParams {
   @State scaleValue: number = 1;  // 缩放值
   @State isSharing: boolean = false;
   @State sharePixelMap: image.PixelMap | null = null;
+  @StorageLink('currentLanguage') currentLanguage: string = 'zh';
   private context = getContext(this) as common.UIAbilityContext;
   private readonly SHARE_CONTAINER_ID = 'triviaShareContainer';
   private timeoutIds: number[] = []; // 存储所有setTimeout的ID，用于清理
@@ -301,10 +302,10 @@ interface RouterParams {
     const question = this.getCurrentQuestion();
     if (!question) return option;
 
-    // 如果选项是国家代码，显示国家名称
+    // 如果选项是国家代码，显示本地化的国家名称
     const country = getCountryByCode(option);
     if (country) {
-      return country.nameCN;
+      return getLocalizedCountryName(country, this.currentLanguage);
     }
     return option;
   }

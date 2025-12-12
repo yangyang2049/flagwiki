@@ -657,6 +657,16 @@ export struct ProfilePage {
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
+              this.settingItem($r('app.media.icon_all_application'), $r('app.string.data_info'), '', () => {
+                router.pushUrl({ url: 'pages/profile/DataInfoPage' })
+                  .catch((err: Error) => {
+                    console.error(`Failed to navigate to DataInfoPage: ${err.message}`);
+                  });
+              })
+              Divider()
+                .strokeWidth(0.5)
+                .color($r('app.color.gray_border'))
+                .margin({ left: 16, right: 16 })
               this.settingItem($r('app.media.icon_share'), $r('app.string.share_app'), '', () => {
                 this.shareApp();
               })
