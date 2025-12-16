@@ -44,6 +44,7 @@ interface SimilarFlagPair {
   @State isKnowledgeTopic: boolean = false;
   @State isReading: boolean = false;
   @State similarFlagPairs: SimilarFlagPair[] = [];
+  @State showTtsFirstUseDialog: boolean = false;
   private context = getContext(this) as common.UIAbilityContext;
   @StorageLink('currentLanguage') currentLanguage: string = 'zh';
 
@@ -224,68 +225,77 @@ interface SimilarFlagPair {
   }
 
   build() {
-    Navigation() {
-      if (this.topic) {
-        Column() {
-          // 专题介绍卡片 - 无圆角
+    Stack() {
+      Navigation() {
+        if (this.topic) {
           Column() {
-            Text(this.topic.emoji)
-              .fontSize(48)
-              .margin({ bottom: 12 })
+            // 专题介绍卡片 - 无圆角
+            Column() {
+              Text(this.topic.emoji)
+                .fontSize(48)
+                .margin({ bottom: 12 })
 
-            Text(getLocalizedTopicName(this.topic, this.currentLanguage))
-              .fontSize(24)
-              .fontWeight(FontWeight.Bold)
-              .fontColor($r('app.color.text_primary'))
+              Text(getLocalizedTopicName(this.topic, this.currentLanguage))
+                .fontSize(24)
+                .fontWeight(FontWeight.Bold)
+                .fontColor($r('app.color.text_primary'))
 
-            Text(getLocalizedTopicDescription(this.topic, this.currentLanguage))
-              .fontSize(14)
-              .fontColor($r('app.color.text_secondary'))
-              .margin({ top: 8 })
-              .textAlign(TextAlign.Center)
-
-            if (!this.isKnowledgeTopic) {
-              Text(this.getCountText())
-                .fontSize(13)
-                .fontColor($r('app.color.text_tertiary'))
+              Text(getLocalizedTopicDescription(this.topic, this.currentLanguage))
+                .fontSize(14)
+                .fontColor($r('app.color.text_secondary'))
                 .margin({ top: 8 })
+                .textAlign(TextAlign.Center)
+
+              if (!this.isKnowledgeTopic) {
+                Text(this.getCountText())
+                  .fontSize(13)
+                  .fontColor($r('app.color.text_tertiary'))
+                  .margin({ top: 8 })
+              }
+            }
+            .width('100%')
+              .padding(24)
+              .backgroundColor($r('app.color.bg_card'))
+
+            // 内容区域：知识性专题显示知识内容，相似旗显示特殊UI，否则显示国旗列表
+            if (this.isKnowledgeTopic) {
+              this.KnowledgeContentView()
+            } else if (this.topic.id === 'similar-flags') {
+              this.SimilarFlagsView()
+            } else {
+              this.FlagListView()
             }
           }
           .width('100%')
-            .padding(24)
-            .backgroundColor($r('app.color.bg_card'))
-
-          // 内容区域：知识性专题显示知识内容，相似旗显示特殊UI，否则显示国旗列表
-          if (this.isKnowledgeTopic) {
-            this.KnowledgeContentView()
-          } else if (this.topic.id === 'similar-flags') {
-            this.SimilarFlagsView()
-          } else {
-            this.FlagListView()
+            .height('100%')
+        } else {
+          Column() {
+            LoadingProgress()
+              .width(40)
+              .height(40)
+              .color($r('app.color.button_primary'))
+            Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
+              .fontSize(14)
+              .fontColor($r('app.color.text_tertiary'))
+              .margin({ top: 12 })
           }
+          .width('100%')
+            .height('100%')
+            .justifyContent(FlexAlign.Center)
         }
-        .width('100%')
-          .height('100%')
-      } else {
-        Column() {
-          LoadingProgress()
-            .width(40)
-            .height(40)
-            .color($r('app.color.button_primary'))
-          Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
-            .fontSize(14)
-            .fontColor($r('app.color.text_tertiary'))
-            .margin({ top: 12 })
-        }
-        .width('100%')
-          .height('100%')
-          .justifyContent(FlexAlign.Center)
+      }
+      .title('')
+        .titleMode(NavigationTitleMode.Mini)
+        .backgroundColor($r('app.color.bg_page'))
+        .menus(this.isKnowledgeTopic ? this.MenuBuilder : undefined)
+
+      // TTS首次使用提示对话框
+      if (this.showTtsFirstUseDialog) {
+        this.TtsFirstUseDialog()
       }
     }
-    .title('')
-      .titleMode(NavigationTitleMode.Mini)
-      .backgroundColor($r('app.color.bg_page'))
-      .menus(this.isKnowledgeTopic ? this.MenuBuilder : undefined)
+    .width('100%')
+      .height('100%')
   }
 
   @Builder
@@ -362,23 +372,43 @@ interface SimilarFlagPair {
           duration: 2000
         });
     } else {
-      try {
-        const title = this.topic ? getLocalizedTopicName(this.topic, this.currentLanguage) : this.context.resourceManager.getStringSync($r('app.string.details').id);
-        const content = this.getReadContent();
-        await TextReaderUtil.startRead(this.context, title, content);
-        this.isReading = true;
-        promptAction.showToast({
-          message: this.context.resourceManager.getStringSync($r('app.string.start_reading').id),
-          duration: 2000
-        });
-      } catch (err) {
-        console.error(`Failed to start read: ${JSON.stringify(err)}`);
-        promptAction.showToast({
-          message: this.context.resourceManager.getStringSync($r('app.string.reading_unavailable').id),
-          duration: 2000
-        });
+      // 检查是否首次使用TTS功能
+      const isFirstUse = await TextReaderUtil.isFirstUse(this.context);
+      if (isFirstUse) {
+        // 显示首次使用提示对话框
+        this.showTtsFirstUseDialog = true;
+      } else {
+        // 直接开始朗读
+        await this.startReading();
       }
     }
+  }
+
+  private async startReading(): Promise<void> {
+    try {
+      const title = this.topic ? getLocalizedTopicName(this.topic, this.currentLanguage) : this.context.resourceManager.getStringSync($r('app.string.details').id);
+      const content = this.getReadContent();
+      await TextReaderUtil.startRead(this.context, title, content);
+      this.isReading = true;
+      promptAction.showToast({
+        message: this.context.resourceManager.getStringSync($r('app.string.start_reading').id),
+        duration: 2000
+      });
+    } catch (err) {
+      console.error(`Failed to start read: ${JSON.stringify(err)}`);
+      promptAction.showToast({
+        message: this.context.resourceManager.getStringSync($r('app.string.reading_unavailable').id),
+        duration: 2000
+      });
+    }
+  }
+
+  private async onTtsFirstUseDialogConfirm(): Promise<void> {
+    // 标记已显示
+    await TextReaderUtil.markFirstUseShown(this.context);
+    this.showTtsFirstUseDialog = false;
+    // 开始朗读
+    await this.startReading();
   }
 
   @Builder
@@ -627,5 +657,60 @@ interface SimilarFlagPair {
           console.error(`Navigation failed: ${err.message}`);
         });
       })
+  }
+
+  @Builder
+  TtsFirstUseDialog() {
+    Stack({ alignContent: Alignment.Center }) {
+      // 遮罩层
+      Column()
+        .width('100%')
+        .height('100%')
+        .backgroundColor('rgba(0, 0, 0, 0.5)')
+        .onClick(() => {
+          // 不允许点击遮罩层关闭，必须点击确认按钮
+        })
+
+      // 对话框
+      Column() {
+        Text($r('app.string.tts_first_use_title'))
+          .fontSize(18)
+          .fontWeight(FontWeight.Bold)
+          .fontColor($r('app.color.text_primary'))
+          .margin({ bottom: 16 })
+
+        Text($r('app.string.tts_first_use_message'))
+          .fontSize(14)
+          .fontColor($r('app.color.text_primary'))
+          .lineHeight(22)
+          .width('100%')
+          .margin({ bottom: 20 })
+
+        Button($r('app.string.tts_first_use_confirm'))
+          .type(ButtonType.Normal)
+          .backgroundColor($r('app.color.button_primary'))
+          .fontColor($r('app.color.white'))
+          .fontSize(16)
+          .width('100%')
+          .height(44)
+          .borderRadius(8)
+          .onClick(async () => {
+            await this.onTtsFirstUseDialogConfirm();
+          })
+      }
+      .width('85%')
+        .constraintSize({ maxWidth: 400 })
+        .padding({ left: 24, right: 24, top: 24, bottom: 24 })
+        .backgroundColor($r('app.color.bg_card'))
+        .borderRadius(16)
+        .shadow({
+          radius: 20,
+          color: $r('app.color.shadow'),
+          offsetX: 0,
+          offsetY: 4
+        })
+    }
+    .width('100%')
+      .height('100%')
   }
 }

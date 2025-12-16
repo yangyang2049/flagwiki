@@ -373,7 +373,7 @@ export struct HomePage {
                 .width(90)
                 .height(90)
                 .padding(12)
-                .backgroundColor($r('app.color.bg_secondary'))
+                .backgroundColor($r('app.color.bg_blue_light'))
                 .borderRadius(12)
                 .margin({ right: 12 })
                 .onClick(() => {

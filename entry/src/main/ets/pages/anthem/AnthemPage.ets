@@ -138,62 +138,70 @@ export struct AnthemPage {
     return this.appContext.resourceManager.getStringSync($r('app.string.national_anthem').id);
   }
 
+  /**
+   * 创建歌曲项（集中化函数）
+   * @param country 国家对象
+   * @param songIndex 歌曲索引（从1开始，因为MediaService使用parseInt(id) - 1）
+   * @returns 如果国家有国歌文件，返回SongItem；否则返回null
+   */
+  private createSongItem(country: Country, songIndex: number): SongItem | null {
+    // 跳过没有国歌文件的国家
+    if (!hasAnthemFile(country.code)) {
+      return null;
+    }
+    
+    const anthemPath = getAnthemFilePath(country.code);
+    const countryName = getLocalizedCountryName(country, this.systemLanguage);
+    const song: SongItem = new SongItem();
+    song.id = `${songIndex}`; // MediaService使用parseInt(id) - 1，所以从1开始
+    song.title = this.getAnthemName(country.code);
+    song.singer = countryName;
+    song.src = anthemPath;
+    song.isLocal = true;
+    song.label = getFlagImageSource(country.code);
+    return song;
+  }
+
   private playAnthem(country: Country): void {
     // 检查是否有国歌文件
     if (!hasAnthemFile(country.code)) {
       return;
     }
     
-    const anthemPath = getAnthemFilePath(country.code);
-    const countryName = getLocalizedCountryName(country, this.systemLanguage);
-    
-    // 创建歌曲列表（包含当前国家）
+    // 创建歌曲列表
     const songList: SongItem[] = [];
     
-    // 添加当前国家之后的所有国家到播放列表
+    // 找到当前国家在过滤列表中的索引
     const currentIndex = this.filteredCountries.findIndex(c => c.code === country.code);
-    let songIndex = 0;
     
-    if (currentIndex >= 0) {
-      // 首先添加当前国家（索引0）
-      const song: SongItem = new SongItem();
-      song.id = `${songIndex + 1}`; // MediaService使用parseInt(id) - 1，所以从1开始
-      song.title = this.getAnthemName(country.code);
-      song.singer = countryName;
-      song.src = anthemPath;
-      song.isLocal = true;
-      song.label = getFlagImageSource(country.code);
-      songList.push(song);
+    if (currentIndex < 0) {
+      return;
+    }
+    
+    let songIndex = 1; // MediaService使用parseInt(id) - 1，所以从1开始
+    
+    // 首先添加当前国家（索引0）
+    const currentSong = this.createSongItem(country, songIndex);
+    if (currentSong) {
+      songList.push(currentSong);
       songIndex++;
-      
-      // 添加当前国家之后的所有国家到播放列表
-      for (let i = currentIndex + 1; i < this.filteredCountries.length; i++) {
-        const c: Country = this.filteredCountries[i];
-        const anthemPathForList = getAnthemFilePath(c.code);
-        const cName = getLocalizedCountryName(c, this.systemLanguage);
-        const songItem: SongItem = new SongItem();
-        songItem.id = `${songIndex + 1}`;
-        songItem.title = this.getAnthemName(c.code);
-        songItem.singer = cName;
-        songItem.src = anthemPathForList;
-        songItem.isLocal = true;
-        songItem.label = getFlagImageSource(c.code);
+    }
+    
+    // 添加当前国家之后的所有国家到播放列表（只添加有国歌文件的）
+    for (let i = currentIndex + 1; i < this.filteredCountries.length; i++) {
+      const c: Country = this.filteredCountries[i];
+      const songItem = this.createSongItem(c, songIndex);
+      if (songItem) {
         songList.push(songItem);
         songIndex++;
       }
-      
-      // 添加当前国家之前的所有国家到播放列表
-      for (let i = 0; i < currentIndex; i++) {
-        const c: Country = this.filteredCountries[i];
-        const anthemPathForList = getAnthemFilePath(c.code);
-        const cName = getLocalizedCountryName(c, this.systemLanguage);
-        const songItem: SongItem = new SongItem();
-        songItem.id = `${songIndex + 1}`;
-        songItem.title = this.getAnthemName(c.code);
-        songItem.singer = cName;
-        songItem.src = anthemPathForList;
-        songItem.isLocal = true;
-        songItem.label = getFlagImageSource(c.code);
+    }
+    
+    // 添加当前国家之前的所有国家到播放列表（只添加有国歌文件的）
+    for (let i = 0; i < currentIndex; i++) {
+      const c: Country = this.filteredCountries[i];
+      const songItem = this.createSongItem(c, songIndex);
+      if (songItem) {
         songList.push(songItem);
         songIndex++;
       }

@@ -33,6 +33,7 @@ struct StateFlagDetailPage {
   @State isReading: boolean = false;
   @State isSharing: boolean = false;
   @State showCopyHint: boolean = false;
+  @State showTtsFirstUseDialog: boolean = false;
   private context = getContext(this) as common.UIAbilityContext;
   private readonly FLAG_CONTAINER_ID = 'stateFlagContainer';
   private readonly FLAG_DOWNLOAD_CONTAINER_ID = 'stateFlagDownloadContainer';
@@ -480,6 +481,11 @@ struct StateFlagDetailPage {
     if (this.showCopyHint) {
       this.CopyHintSnackbar()
     }
+
+    // TTS首次使用提示对话框
+    if (this.showTtsFirstUseDialog) {
+      this.TtsFirstUseDialog()
+    }
     }
     .width('100%')
     .height('100%')
@@ -658,23 +664,43 @@ struct StateFlagDetailPage {
         duration: 2000
       });
     } else {
-      try {
-        const title = this.stateInfo?.nameCN || this.context.resourceManager.getStringSync($r('app.string.state_flag_detail').id);
-        const content = this.getReadContent();
-        await TextReaderUtil.startRead(this.context, title, content);
-        this.isReading = true;
-        promptAction.showToast({
-          message: $r('app.string.start_reading'),
-          duration: 2000
-        });
-      } catch (err) {
-        console.error(`Failed to start read: ${JSON.stringify(err)}`);
-        promptAction.showToast({
-          message: $r('app.string.reading_unavailable'),
-          duration: 2000
-        });
+      // 检查是否首次使用TTS功能
+      const isFirstUse = await TextReaderUtil.isFirstUse(this.context);
+      if (isFirstUse) {
+        // 显示首次使用提示对话框
+        this.showTtsFirstUseDialog = true;
+      } else {
+        // 直接开始朗读
+        await this.startReading();
       }
     }
+  }
+
+  private async startReading(): Promise<void> {
+    try {
+      const title = this.stateInfo?.nameCN || this.context.resourceManager.getStringSync($r('app.string.state_flag_detail').id);
+      const content = this.getReadContent();
+      await TextReaderUtil.startRead(this.context, title, content);
+      this.isReading = true;
+      promptAction.showToast({
+        message: $r('app.string.start_reading'),
+        duration: 2000
+      });
+    } catch (err) {
+      console.error(`Failed to start read: ${JSON.stringify(err)}`);
+      promptAction.showToast({
+        message: $r('app.string.reading_unavailable'),
+        duration: 2000
+      });
+    }
+  }
+
+  private async onTtsFirstUseDialogConfirm(): Promise<void> {
+    // 标记已显示
+    await TextReaderUtil.markFirstUseShown(this.context);
+    this.showTtsFirstUseDialog = false;
+    // 开始朗读
+    await this.startReading();
   }
 
   private async onShareClick(): Promise<void> {
@@ -825,6 +851,61 @@ struct StateFlagDetailPage {
     lines.push('—— 来自「国旗小百科」');
 
     return lines.join('\n');
+  }
+
+  @Builder
+  TtsFirstUseDialog() {
+    Stack({ alignContent: Alignment.Center }) {
+      // 遮罩层
+      Column()
+        .width('100%')
+        .height('100%')
+        .backgroundColor('rgba(0, 0, 0, 0.5)')
+        .onClick(() => {
+          // 不允许点击遮罩层关闭，必须点击确认按钮
+        })
+
+      // 对话框
+      Column() {
+        Text($r('app.string.tts_first_use_title'))
+          .fontSize(18)
+          .fontWeight(FontWeight.Bold)
+          .fontColor($r('app.color.text_primary'))
+          .margin({ bottom: 16 })
+
+        Text($r('app.string.tts_first_use_message'))
+          .fontSize(14)
+          .fontColor($r('app.color.text_primary'))
+          .lineHeight(22)
+          .width('100%')
+          .margin({ bottom: 20 })
+
+        Button($r('app.string.tts_first_use_confirm'))
+          .type(ButtonType.Normal)
+          .backgroundColor($r('app.color.button_primary'))
+          .fontColor($r('app.color.white'))
+          .fontSize(16)
+          .width('100%')
+          .height(44)
+          .borderRadius(8)
+          .onClick(async () => {
+            await this.onTtsFirstUseDialogConfirm();
+          })
+      }
+      .width('85%')
+        .constraintSize({ maxWidth: 400 })
+        .padding({ left: 24, right: 24, top: 24, bottom: 24 })
+        .backgroundColor($r('app.color.bg_card'))
+        .borderRadius(16)
+        .shadow({
+          radius: 20,
+          color: $r('app.color.shadow'),
+          offsetX: 0,
+          offsetY: 4
+        })
+    }
+    .width('100%')
+      .height('100%')
   }
 }
 

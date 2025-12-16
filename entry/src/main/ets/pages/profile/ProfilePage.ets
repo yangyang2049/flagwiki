@@ -116,6 +116,10 @@ export struct ProfilePage {
       // 同步到全局状态
       AppStorage.setOrCreate('loopPlaybackEnabled', loop);
       
+      // 同步工具类的启用状态，确保重新进入页面时能立即生效
+      await VibratorUtil.setEnabled(vibration);
+      await SoundEffectUtil.setEnabled(sound);
+
       console.info(`[ProfilePage] ✅ Settings loaded - Vibration: ${vibration}, Sound: ${sound}, Loop: ${loop}`);
     } catch (err) {
       console.error(`[ProfilePage] ❌ Failed to load settings: ${JSON.stringify(err)}`);
@@ -124,6 +128,10 @@ export struct ProfilePage {
       this.soundEnabled = true;
       this.loopPlaybackEnabled = true;
       AppStorage.setOrCreate('loopPlaybackEnabled', true);
+
+      // 同步工具类的默认启用状态，确保反馈功能一致
+      await VibratorUtil.setEnabled(true);
+      await SoundEffectUtil.setEnabled(true);
     }
   }
 

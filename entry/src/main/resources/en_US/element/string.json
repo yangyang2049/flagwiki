@@ -417,6 +417,18 @@
       "value": "Reading feature unavailable"
     },
     {
+      "name": "tts_first_use_title",
+      "value": "About Text-to-Speech Feature"
+    },
+    {
+      "name": "tts_first_use_message",
+      "value": "The text-to-speech feature in this app relies on Huawei phone's TTS (Text-to-Speech) capability.\n\nIf your device has not downloaded the corresponding voice packs, this feature may not work properly. You can download the required voice packs in system settings."
+    },
+    {
+      "name": "tts_first_use_confirm",
+      "value": "I Understand"
+    },
+    {
       "name": "exploration_progress",
       "value": "Exploration Progress"
     },

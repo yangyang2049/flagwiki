@@ -1,6 +1,7 @@
 import { ReadStateCode, TextReader } from '@kit.SpeechKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import common from '@ohos.app.ability.common';
+import { PreferencesManager } from './PreferencesManager';
 
 /**
  * TextReader 工具类
@@ -10,6 +11,7 @@ export class TextReaderUtil {
   private static context: common.UIAbilityContext | null = null;
   private static isInitialized: boolean = false;
   private static currentReadInfo: TextReader.ReadInfo | null = null;
+  private static readonly TTS_FIRST_USE_KEY = 'tts_first_use_shown';
 
   /**
    * 初始化 TextReader
@@ -121,6 +123,38 @@ export class TextReaderUtil {
   static isPlaying(): boolean {
     // 这里需要根据实际状态来判断
     return false;
+  }
+
+  /**
+   * 检查是否首次使用TTS功能
+   * @param context UIAbility上下文
+   * @returns 如果是首次使用返回true，否则返回false
+   */
+  static async isFirstUse(context: common.UIAbilityContext): Promise<boolean> {
+    try {
+      const prefs = await PreferencesManager.getPreferences('app_settings');
+      const hasShown = await prefs.get(TextReaderUtil.TTS_FIRST_USE_KEY, false) as boolean;
+      return !hasShown;
+    } catch (err) {
+      console.error(`Failed to check TTS first use: ${JSON.stringify(err)}`);
+      // 出错时返回true，确保显示提示
+      return true;
+    }
+  }
+
+  /**
+   * 标记TTS首次使用提示已显示
+   * @param context UIAbility上下文
+   */
+  static async markFirstUseShown(context: common.UIAbilityContext): Promise<void> {
+    try {
+      const prefs = await PreferencesManager.getPreferences('app_settings');
+      await prefs.put(TextReaderUtil.TTS_FIRST_USE_KEY, true);
+      await prefs.flush();
+      console.info('[TextReaderUtil] TTS first use notice marked as shown');
+    } catch (err) {
+      console.error(`Failed to mark TTS first use: ${JSON.stringify(err)}`);
+    }
   }
 }
 
