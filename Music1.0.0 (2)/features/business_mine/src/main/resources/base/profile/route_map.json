@@ -1,0 +1,44 @@
+{
+  "routerMap": [
+    {
+      "name": "MinePage",
+      "pageSourceFile": "src/main/ets/pages/MinePage.ets",
+      "buildFunction": "MinePageBuilder"
+    },
+    {
+      "name": "MarkPage",
+      "pageSourceFile": "src/main/ets/pages/MarkPage.ets",
+      "buildFunction": "MarkPageBuilder"
+    },
+    {
+      "name": "ThemePage",
+      "pageSourceFile": "src/main/ets/pages/ThemePage.ets",
+      "buildFunction": "ThemePageBuilder"
+    },
+    {
+      "name": "MineMusicPage",
+      "pageSourceFile": "src/main/ets/pages/MineMusicPage.ets",
+      "buildFunction": "MineMusicPageBuilder"
+    },
+    {
+      "name": "MineOnePlayList",
+      "pageSourceFile": "src/main/ets/pages/MineOnePlayList.ets",
+      "buildFunction": "MineOnePlayListBuilder"
+    },
+    {
+      "name": "AddOnePlayList",
+      "pageSourceFile": "src/main/ets/pages/AddOnePlayList.ets",
+      "buildFunction": "AddOnePlayListBuilder"
+    },
+    {
+      "name": "LocalSongsPage",
+      "pageSourceFile": "src/main/ets/pages/LocalSongsPage.ets",
+      "buildFunction": "LocalSongsPageBuilder"
+    },
+    {
+      "name": "VipCenterPage",
+      "pageSourceFile": "src/main/ets/pages/VipCenterPage.ets",
+      "buildFunction": "VipCenterPageBuilder"
+    }
+  ]
+}

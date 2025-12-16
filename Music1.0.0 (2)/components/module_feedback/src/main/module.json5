@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "module_feedback",
+    "type": "har",
+    "routerMap": "$profile:route_map",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

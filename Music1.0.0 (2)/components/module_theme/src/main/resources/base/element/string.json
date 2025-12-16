@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "agcit_huawei_weather_module_theme",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_weather_module_theme",
+      "value": "serviceComponent"
+    },
+    {
+      "name": "page_show",
+      "value": "page from package"
+    }
+  ]
+}

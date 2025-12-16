@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "lib_music_api",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "string": [
+    {
+      "name": "volume",
+      "value": "音量",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "play_error",
+      "value": "再生エラーです。",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "brightness",
+      "value": "画面の明るさ",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "agcit_huawei_music_service",
+      "value": "1.0.0"
+    }
+  ]
+}

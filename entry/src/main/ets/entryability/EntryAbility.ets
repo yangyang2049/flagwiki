@@ -11,6 +11,9 @@ const DOMAIN = 0x0000;
 
 export default class EntryAbility extends UIAbility {
   async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
+    // 存储 context 到 AppStorage，供 MediaService 等使用
+    AppStorage.setOrCreate('context', this.context);
+
     // 初始化 PreferencesManager
     PreferencesManager.init(this.context);
 
@@ -44,6 +47,13 @@ export default class EntryAbility extends UIAbility {
       hilog.info(DOMAIN, 'testTag', 'GameProgressManager initialized');
     } catch (err) {
       hilog.error(DOMAIN, 'testTag', 'Failed to init GameProgressManager. Cause: %{public}s', JSON.stringify(err));
+    }
+
+    // 初始化循环播放设置
+    try {
+      await this.initializeLoopPlaybackPreference();
+    } catch (err) {
+      hilog.error(DOMAIN, 'testTag', 'Failed to init loop playback preference. Cause: %{public}s', JSON.stringify(err));
     }
 
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
@@ -96,6 +106,19 @@ export default class EntryAbility extends UIAbility {
     } catch (err) {
       hilog.error(DOMAIN, 'testTag', 'Failed to load color mode: %{public}s', JSON.stringify(err));
       throw new Error(`Failed to load color mode: ${JSON.stringify(err)}`);
+    }
+  }
+
+  private async initializeLoopPlaybackPreference(): Promise<void> {
+    try {
+      const prefs = await PreferencesManager.getPreferences('app_settings');
+      const loopPlaybackEnabled = await prefs.get('loop_playback_enabled', true) as boolean;
+      AppStorage.setOrCreate('loopPlaybackEnabled', loopPlaybackEnabled);
+      hilog.info(DOMAIN, 'testTag', 'Loop playback preference initialized: %{public}s', loopPlaybackEnabled.toString());
+    } catch (err) {
+      hilog.error(DOMAIN, 'testTag', 'Failed to initialize loop playback preference: %{public}s', JSON.stringify(err));
+      // 默认启用循环播放
+      AppStorage.setOrCreate('loopPlaybackEnabled', true);
     }
   }
 

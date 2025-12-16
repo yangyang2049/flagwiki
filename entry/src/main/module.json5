@@ -30,6 +30,16 @@
           ],
           "when": "inuse"
         }
+      },
+      {
+        "name": "ohos.permission.KEEP_BACKGROUND_RUNNING",
+        "reason": "$string:background_running_permission_reason",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "always"
+        }
       }
     ],
     "abilities": [
@@ -42,6 +52,9 @@
         "startWindowIcon": "$media:startIcon",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,
+        "backgroundModes": [
+          "audioPlayback"
+        ],
         "skills": [
           {
             "entities": [

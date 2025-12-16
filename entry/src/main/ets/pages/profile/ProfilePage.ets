@@ -36,6 +36,7 @@ export struct ProfilePage {
   @State selectedLanguage: string = 'zh'; // 'zh' 或 'en'
   @State vibrationEnabled: boolean = true; // 振动反馈开关，默认启用
   @State soundEnabled: boolean = true; // 音效开关，默认启用
+  @State loopPlaybackEnabled: boolean = true; // 循环播放开关，默认启用
   @StorageLink('currentLanguage') systemLanguage: string = 'zh';
   @Prop @Watch('onRefreshKeyChanged') refreshKey: number = 0;
   private prefs: preferences.Preferences | null = null;
@@ -83,6 +84,7 @@ export struct ProfilePage {
     await this.loadGameProgress();
     await this.loadVibrationPreference();
     await this.loadSoundPreference();
+    await this.loadLoopPlaybackPreference();
     await VibratorUtil.init(this.context);
     await SoundEffectUtil.init(this.context);
   }
@@ -93,6 +95,7 @@ export struct ProfilePage {
     this.loadGameProgress();
     this.loadVibrationPreference();
     this.loadSoundPreference();
+    this.loadLoopPlaybackPreference();
   }
 
   private async loadGameProgress(): Promise<void> {
@@ -288,6 +291,21 @@ export struct ProfilePage {
     }
   }
 
+  private async loadLoopPlaybackPreference(): Promise<void> {
+    try {
+      if (!this.prefs) {
+        this.prefs = await PreferencesManager.getPreferences('app_settings');
+      }
+      this.loopPlaybackEnabled = await this.prefs.get('loop_playback_enabled', true) as boolean;
+      // 同步到 AppStorage，供 MediaService 使用
+      AppStorage.setOrCreate('loopPlaybackEnabled', this.loopPlaybackEnabled);
+    } catch (err) {
+      console.error(`Failed to load loop playback preference: ${JSON.stringify(err)}`);
+      this.loopPlaybackEnabled = true; // 默认启用
+      AppStorage.setOrCreate('loopPlaybackEnabled', true);
+    }
+  }
+
   private async saveSoundPreference(enabled: boolean): Promise<void> {
     try {
       if (!this.prefs) {
@@ -299,6 +317,21 @@ export struct ProfilePage {
       await SoundEffectUtil.setEnabled(enabled);
     } catch (err) {
       console.error(`Failed to save sound preference: ${JSON.stringify(err)}`);
+    }
+  }
+
+  private async saveLoopPlaybackPreference(enabled: boolean): Promise<void> {
+    try {
+      if (!this.prefs) {
+        this.prefs = await PreferencesManager.getPreferences('app_settings');
+      }
+      await this.prefs.put('loop_playback_enabled', enabled);
+      await this.prefs.flush();
+      this.loopPlaybackEnabled = enabled;
+      // 同步到 AppStorage，供 MediaService 使用
+      AppStorage.setOrCreate('loopPlaybackEnabled', enabled);
+    } catch (err) {
+      console.error(`Failed to save loop playback preference: ${JSON.stringify(err)}`);
     }
   }
 
@@ -627,6 +660,13 @@ export struct ProfilePage {
                 .margin({ left: 16, right: 16 })
               this.settingItemWithToggle($r('app.media.icon_vibration'), $r('app.string.vibration'), this.vibrationEnabled, (enabled: boolean) => {
                 this.saveVibrationPreference(enabled);
+              })
+              Divider()
+                .strokeWidth(0.5)
+                .color($r('app.color.gray_border'))
+                .margin({ left: 16, right: 16 })
+              this.settingItemWithToggle($r('app.media.icon_setting_config'), $r('app.string.loop_playback'), this.loopPlaybackEnabled, (enabled: boolean) => {
+                this.saveLoopPlaybackPreference(enabled);
               })
               Divider()
                 .strokeWidth(0.5)

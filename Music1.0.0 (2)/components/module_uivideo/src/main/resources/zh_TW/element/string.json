@@ -1,0 +1,29 @@
+{
+  "string": [
+    {
+      "name": "volume",
+      "value": "音量",
+      "attr": {
+        "priority": "LT"
+      }
+    },
+    {
+      "name": "play_error",
+      "value": "播放失敗",
+      "attr": {
+        "priority": "LT"
+      }
+    },
+    {
+      "name": "brightness",
+      "value": "亮度",
+      "attr": {
+        "priority": "LT"
+      }
+    },
+    {
+      "name": "agcit_huawei_music_service",
+      "value": "1.0.0"
+    }
+  ]
+}

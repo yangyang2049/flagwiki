@@ -1,0 +1,29 @@
+{
+  "string": [
+    {
+      "name": "volume",
+      "value": "ئۈن",
+      "attr": {
+        "priority": "LT"
+      }
+    },
+    {
+      "name": "play_error",
+      "value": "قويۇلمىدى.",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "brightness",
+      "value": "يورۇقلۇق",
+      "attr": {
+        "priority": "LT"
+      }
+    },
+    {
+      "name": "agcit_huawei_music_service",
+      "value": "1.0.0"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "string": [
+    {
+      "name": "volume",
+      "value": "Volumen",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "play_error",
+      "value": "Error de reproducción.",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "brightness",
+      "value": "Brillo",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "agcit_huawei_music_service",
+      "value": "1.0.0"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "play_error",
+      "value": "play error"
+    },
+    {
+      "name": "volume",
+      "value": "volume"
+    },
+    {
+      "name": "brightness",
+      "value": "brightness"
+    },
+    {
+      "name": "agcit_huawei_music_service",
+      "value": "1.0.0"
+    }
+  ]
+}

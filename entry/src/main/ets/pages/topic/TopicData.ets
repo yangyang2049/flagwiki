@@ -1,4 +1,5 @@
 // 专题数据配置
+import { Countries } from '../../utils/countryData';
 
 export interface TopicItem {
   id: string;
@@ -47,6 +48,15 @@ export const topics: TopicItem[] = [
     descriptionEN: 'Design background, historical evolution, legal status, and cultural significance of the Five-Star Red Flag',
     emoji: '🇨🇳',
     countryCodes: [] // 空数组表示这是知识性专题
+  },
+  {
+    id: 'country-symbols',
+    name: '国名 国旗 国徽 国歌',
+    nameEN: 'Country Name, Flag, Coat of Arms, Anthem',
+    description: '探索世界各国的四大国家象征：国名、国旗、国徽和国歌',
+    descriptionEN: 'Explore the four national symbols of countries around the world: country name, flag, coat of arms, and anthem',
+    emoji: '🏛️',
+    countryCodes: Countries.map(country => country.code) // 包含所有国家
   },
   {
     id: 'similar-flags',

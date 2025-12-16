@@ -1,0 +1,29 @@
+{
+  "string": [
+    {
+      "name": "volume",
+      "value": "مستوى الصوت",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "play_error",
+      "value": "مشكلة في التشغيل.",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "brightness",
+      "value": "السطوع",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "agcit_huawei_music_service",
+      "value": "1.0.0"
+    }
+  ]
+}

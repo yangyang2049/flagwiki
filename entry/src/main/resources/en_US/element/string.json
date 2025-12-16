@@ -21,6 +21,10 @@
       "value": "For downloading voice models and online voice services"
     },
     {
+      "name": "background_running_permission_reason",
+      "value": "To continue playing national anthem music in the background"
+    },
+    {
       "name": "app_welcome_title",
       "value": "Flag Wiki"
     },
@@ -35,6 +39,10 @@
     {
       "name": "tab_gallery",
       "value": "Gallery"
+    },
+    {
+      "name": "tab_anthem",
+      "value": "Anthem"
     },
     {
       "name": "tab_paint",
@@ -473,6 +481,14 @@
       "value": "Vibration"
     },
     {
+      "name": "loop_playback",
+      "value": "Loop Playback"
+    },
+    {
+      "name": "no_sound_file",
+      "value": "No sound file available"
+    },
+    {
       "name": "rate_app",
       "value": "Rate App"
     },
@@ -614,7 +630,7 @@
     },
     {
       "name": "data_info_overview_content",
-      "value": "This app contains the following flag data:\n\n• 193 UN member state flags\n• 2 UN observer state flags\n• 246 state/provincial flags from 11 countries"
+      "value": "This app contains the following flag data:\n\n• 193 UN member state flags\n• 2 UN observer state flags\n• 246 state/provincial flags from 11 countries\n• Coat of arms data for 198 countries\n• National anthem data for 188 countries"
     },
     {
       "name": "data_info_source",
@@ -649,6 +665,34 @@
       "value": "We are continuously updating and expanding our data content. More flag data for countries and regions is coming soon. Stay tuned!"
     },
     {
+      "name": "data_info_coat_of_arms",
+      "value": "Coat of Arms Data"
+    },
+    {
+      "name": "data_info_coat_of_arms_content",
+      "value": "This app contains coat of arms data for %s countries."
+    },
+    {
+      "name": "data_info_anthem",
+      "value": "Anthem Data"
+    },
+    {
+      "name": "data_info_anthem_content",
+      "value": "This app contains anthem data for %s countries."
+    },
+    {
+      "name": "data_info_flags_count",
+      "value": "• Flag data for %s countries"
+    },
+    {
+      "name": "data_info_coat_of_arms_count",
+      "value": "• Coat of arms data for %s countries"
+    },
+    {
+      "name": "data_info_anthem_count",
+      "value": "• National anthem data for %s countries"
+    },
+    {
       "name": "level_not_found",
       "value": "Level not found"
     },
@@ -669,12 +713,32 @@
       "value": "Search country or region"
     },
     {
+      "name": "search_country",
+      "value": "Search country"
+    },
+    {
+      "name": "national_anthem",
+      "value": "National Anthem"
+    },
+    {
+      "name": "no_anthem_available",
+      "value": "No anthem available"
+    },
+    {
       "name": "no_matching_countries",
       "value": "No matching countries found"
     },
     {
       "name": "modify_keywords_or_select",
       "value": "Modify keywords or select \"All\" or other continents"
+    },
+    {
+      "name": "no_playing",
+      "value": "No playback"
+    },
+    {
+      "name": "select_song_to_play",
+      "value": "Please select a song to play"
     },
     {
       "name": "loading",

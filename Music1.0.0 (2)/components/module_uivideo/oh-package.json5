@@ -1,0 +1,17 @@
+{
+  "name": "module_uivideo",
+  "version": "1.0.0",
+  "description": "ui-video是基于open harmony基础组件开发的视频组件，支持横屏显示，以及音量、亮度和进度调节。",
+  "keywords": [
+    '视频播放组件',
+    '音量调节',
+    '进度调节',
+    '亮度调节',
+    '横竖屏切换'
+  ],
+  "main": "Index.ets",
+  "author": "hms",
+  "license": "ISC",
+  "dependencies": {
+  }
+}

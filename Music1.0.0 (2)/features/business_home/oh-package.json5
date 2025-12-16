@@ -1,0 +1,17 @@
+{
+  "name": "business_home",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "lib_common": "file:../../commons/lib_common",
+    "lib_widget": "file:../../commons/lib_widget",
+    "lib_account": "file:../../commons/lib_account",
+    "lib_music_api": "file:../../commons/lib_music_api",
+    "module_musicplay": "file:../../components/module_musicplay",
+    "module_theme": "file:../../components/module_theme",
+    "module_share": "file:../../components/module_share"
+  }
+}

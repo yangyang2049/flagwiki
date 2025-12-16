@@ -1,8 +1,11 @@
 import router from '@ohos.router';
+import { common } from '@kit.AbilityKit';
 
 @Entry
 @Component
 export struct DataInfoPage {
+  @StorageLink('currentLanguage') systemLanguage: string = 'zh';
+  private context = getContext(this) as common.UIAbilityContext;
 
   build() {
     Navigation() {
@@ -78,6 +81,7 @@ export struct DataInfoPage {
           .borderRadius(12)
           .margin({ top: 12 })
 
+
           // 更多数据即将到来卡片
           Column() {
             Text($r('app.string.data_info_more_coming'))
@@ -119,4 +123,8 @@ export struct DataInfoPage {
     return true;
   }
 }
+
+
+
+
 
