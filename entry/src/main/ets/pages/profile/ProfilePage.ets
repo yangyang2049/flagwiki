@@ -39,7 +39,6 @@ export struct ProfilePage {
   @State loopPlaybackEnabled: boolean = true; // 循环播放开关，默认启用
   @StorageLink('currentLanguage') systemLanguage: string = 'zh';
   @Prop @Watch('onRefreshKeyChanged') refreshKey: number = 0;
-  private prefs: preferences.Preferences | null = null;
   private context = getContext(this) as common.UIAbilityContext;
 
   // 辅助函数：从 Resource 获取字符串值
@@ -79,23 +78,53 @@ export struct ProfilePage {
 
   async aboutToAppear() {
     // systemLanguage 已通过 @StorageLink 自动同步
+    await VibratorUtil.init(this.context);
+    await SoundEffectUtil.init(this.context);
     await this.loadColorMode();
     await this.loadLanguage();
     await this.loadGameProgress();
-    await this.loadVibrationPreference();
-    await this.loadSoundPreference();
-    await this.loadLoopPlaybackPreference();
-    await VibratorUtil.init(this.context);
-    await SoundEffectUtil.init(this.context);
+    await this.loadAllSettings();
   }
 
   private onRefreshKeyChanged(): void {
-    this.loadColorMode();
-    this.loadLanguage();
-    this.loadGameProgress();
-    this.loadVibrationPreference();
-    this.loadSoundPreference();
-    this.loadLoopPlaybackPreference();
+    // 异步加载，不阻塞
+    Promise.all([
+      this.loadColorMode(),
+      this.loadLanguage(),
+      this.loadGameProgress(),
+      this.loadAllSettings()
+    ]).catch((err: Error) => {
+      console.error(`[ProfilePage] Failed to refresh: ${JSON.stringify(err)}`);
+    });
+  }
+
+  // 统一加载所有设置
+  private async loadAllSettings(): Promise<void> {
+    try {
+      const prefs = await PreferencesManager.getPreferences('app_settings');
+      
+      // 一次性读取所有设置
+      const vibration = await prefs.get('vibration_enabled', true) as boolean;
+      const sound = await prefs.get('sound_enabled', true) as boolean;
+      const loop = await prefs.get('loop_playback_enabled', true) as boolean;
+      
+      // 更新状态
+      this.vibrationEnabled = vibration;
+      this.soundEnabled = sound;
+      this.loopPlaybackEnabled = loop;
+      
+      // 同步到全局状态
+      AppStorage.setOrCreate('loopPlaybackEnabled', loop);
+      
+      console.info(`[ProfilePage] ✅ Settings loaded - Vibration: ${vibration}, Sound: ${sound}, Loop: ${loop}`);
+    } catch (err) {
+      console.error(`[ProfilePage] ❌ Failed to load settings: ${JSON.stringify(err)}`);
+      // 使用默认值
+      this.vibrationEnabled = true;
+      this.soundEnabled = true;
+      this.loopPlaybackEnabled = true;
+      AppStorage.setOrCreate('loopPlaybackEnabled', true);
+    }
   }
 
   private async loadGameProgress(): Promise<void> {
@@ -113,10 +142,8 @@ export struct ProfilePage {
 
   private async loadColorMode(): Promise<void> {
     try {
-      if (!this.prefs) {
-        this.prefs = await PreferencesManager.getPreferences('app_settings');
-      }
-      const saved: number = await this.prefs.get('colorMode', ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET) as number;
+      const prefs = await PreferencesManager.getPreferences('app_settings');
+      const saved: number = await prefs.get('colorMode', ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET) as number;
       this.colorMode = saved as ConfigurationConstant.ColorMode;
       this.applyColorMode();
     } catch (err) {
@@ -126,11 +153,9 @@ export struct ProfilePage {
 
   private async saveColorMode(): Promise<void> {
     try {
-      if (!this.prefs) {
-        this.prefs = await PreferencesManager.getPreferences('app_settings');
-      }
-      await this.prefs.put('colorMode', this.colorMode);
-      await this.prefs.flush();
+      const prefs = await PreferencesManager.getPreferences('app_settings');
+      await prefs.put('colorMode', this.colorMode);
+      await prefs.flush();
       this.applyColorMode();
     } catch (err) {
       console.error(`Failed to save color mode: ${JSON.stringify(err)}`);
@@ -155,16 +180,14 @@ export struct ProfilePage {
 
   private async loadLanguage(): Promise<void> {
     try {
-      if (!this.prefs) {
-        this.prefs = await PreferencesManager.getPreferences('app_settings');
-      }
+      const prefs = await PreferencesManager.getPreferences('app_settings');
       
       // 检查是否已经保存过语言偏好
-      const hasLanguageKey = await this.prefs.has('language');
+      const hasLanguageKey = await prefs.has('language');
       
       if (hasLanguageKey) {
         // 已保存过语言偏好，使用保存的值
-        const saved: string = await this.prefs.get('language', 'zh') as string;
+        const saved: string = await prefs.get('language', 'zh') as string;
         this.selectedLanguage = saved;
         console.info(`[ProfilePage] Using saved language preference: ${saved}`);
       } else {
@@ -174,8 +197,8 @@ export struct ProfilePage {
         console.info(`[ProfilePage] First installation, detected system language: ${systemLang}`);
         
         // 保存检测到的系统语言作为初始偏好
-        await this.prefs.put('language', systemLang);
-        await this.prefs.flush();
+        await prefs.put('language', systemLang);
+        await prefs.flush();
       }
       
       // 设置应用偏好语言
@@ -194,11 +217,9 @@ export struct ProfilePage {
 
   private async saveLanguage(): Promise<void> {
     try {
-      if (!this.prefs) {
-        this.prefs = await PreferencesManager.getPreferences('app_settings');
-      }
-      await this.prefs.put('language', this.selectedLanguage);
-      await this.prefs.flush();
+      const prefs = await PreferencesManager.getPreferences('app_settings');
+      await prefs.put('language', this.selectedLanguage);
+      await prefs.flush();
       
       // 设置应用偏好语言
       await this.setAppPreferredLanguage(this.selectedLanguage);
@@ -267,85 +288,48 @@ export struct ProfilePage {
     }
   }
 
-  private async loadVibrationPreference(): Promise<void> {
-    try {
-      if (!this.prefs) {
-        this.prefs = await PreferencesManager.getPreferences('app_settings');
-      }
-      this.vibrationEnabled = await this.prefs.get('vibration_enabled', true) as boolean;
-    } catch (err) {
-      console.error(`Failed to load vibration preference: ${JSON.stringify(err)}`);
-      this.vibrationEnabled = true; // 默认启用
-    }
-  }
-
-  private async loadSoundPreference(): Promise<void> {
-    try {
-      if (!this.prefs) {
-        this.prefs = await PreferencesManager.getPreferences('app_settings');
-      }
-      this.soundEnabled = await this.prefs.get('sound_enabled', true) as boolean;
-    } catch (err) {
-      console.error(`Failed to load sound preference: ${JSON.stringify(err)}`);
-      this.soundEnabled = true; // 默认启用
-    }
-  }
-
-  private async loadLoopPlaybackPreference(): Promise<void> {
-    try {
-      if (!this.prefs) {
-        this.prefs = await PreferencesManager.getPreferences('app_settings');
-      }
-      this.loopPlaybackEnabled = await this.prefs.get('loop_playback_enabled', true) as boolean;
-      // 同步到 AppStorage，供 MediaService 使用
-      AppStorage.setOrCreate('loopPlaybackEnabled', this.loopPlaybackEnabled);
-    } catch (err) {
-      console.error(`Failed to load loop playback preference: ${JSON.stringify(err)}`);
-      this.loopPlaybackEnabled = true; // 默认启用
-      AppStorage.setOrCreate('loopPlaybackEnabled', true);
-    }
-  }
-
-  private async saveSoundPreference(enabled: boolean): Promise<void> {
-    try {
-      if (!this.prefs) {
-        this.prefs = await PreferencesManager.getPreferences('app_settings');
-      }
-      await this.prefs.put('sound_enabled', enabled);
-      await this.prefs.flush();
-      this.soundEnabled = enabled;
-      await SoundEffectUtil.setEnabled(enabled);
-    } catch (err) {
-      console.error(`Failed to save sound preference: ${JSON.stringify(err)}`);
-    }
-  }
-
-  private async saveLoopPlaybackPreference(enabled: boolean): Promise<void> {
-    try {
-      if (!this.prefs) {
-        this.prefs = await PreferencesManager.getPreferences('app_settings');
-      }
-      await this.prefs.put('loop_playback_enabled', enabled);
-      await this.prefs.flush();
-      this.loopPlaybackEnabled = enabled;
-      // 同步到 AppStorage，供 MediaService 使用
-      AppStorage.setOrCreate('loopPlaybackEnabled', enabled);
-    } catch (err) {
-      console.error(`Failed to save loop playback preference: ${JSON.stringify(err)}`);
-    }
-  }
-
+  // 保存振动设置
   private async saveVibrationPreference(enabled: boolean): Promise<void> {
     try {
-      if (!this.prefs) {
-        this.prefs = await PreferencesManager.getPreferences('app_settings');
-      }
-      await this.prefs.put('vibration_enabled', enabled);
-      await this.prefs.flush();
+      console.info(`[ProfilePage] 💾 Saving vibration: ${enabled}`);
+      const prefs = await PreferencesManager.getPreferences('app_settings');
+      await prefs.put('vibration_enabled', enabled);
+      await prefs.flush();
       this.vibrationEnabled = enabled;
       await VibratorUtil.setEnabled(enabled);
+      console.info(`[ProfilePage] ✅ Vibration saved: ${enabled}`);
     } catch (err) {
-      console.error(`Failed to save vibration preference: ${JSON.stringify(err)}`);
+      console.error(`[ProfilePage] ❌ Failed to save vibration: ${JSON.stringify(err)}`);
+    }
+  }
+
+  // 保存音效设置
+  private async saveSoundPreference(enabled: boolean): Promise<void> {
+    try {
+      console.info(`[ProfilePage] 💾 Saving sound: ${enabled}`);
+      const prefs = await PreferencesManager.getPreferences('app_settings');
+      await prefs.put('sound_enabled', enabled);
+      await prefs.flush();
+      this.soundEnabled = enabled;
+      await SoundEffectUtil.setEnabled(enabled);
+      console.info(`[ProfilePage] ✅ Sound saved: ${enabled}`);
+    } catch (err) {
+      console.error(`[ProfilePage] ❌ Failed to save sound: ${JSON.stringify(err)}`);
+    }
+  }
+
+  // 保存循环播放设置
+  private async saveLoopPlaybackPreference(enabled: boolean): Promise<void> {
+    try {
+      console.info(`[ProfilePage] 💾 Saving loop playback: ${enabled}`);
+      const prefs = await PreferencesManager.getPreferences('app_settings');
+      await prefs.put('loop_playback_enabled', enabled);
+      await prefs.flush();
+      this.loopPlaybackEnabled = enabled;
+      AppStorage.setOrCreate('loopPlaybackEnabled', enabled);
+      console.info(`[ProfilePage] ✅ Loop playback saved: ${enabled}`);
+    } catch (err) {
+      console.error(`[ProfilePage] ❌ Failed to save loop playback: ${JSON.stringify(err)}`);
     }
   }
 
@@ -637,37 +621,31 @@ export struct ProfilePage {
 
             // 设置项
             Column() {
-              this.settingItemWithValue(this.getThemeIcon(), $r('app.string.dark_mode'), () => this.getThemeText(), () => {
+              this.settingItemWithValue($r('app.media.icon_theme'), $r('app.string.dark_mode'), () => this.getThemeText(), () => {
                 this.showThemeSettings();
               })
               Divider()
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.settingItemWithValue($r('app.media.icon_setting_config'), $r('app.string.language'), () => this.getLanguageText(), () => {
+              this.settingItemWithValue($r('app.media.icon_language'), $r('app.string.language'), () => this.getLanguageText(), () => {
                 this.showLanguageSettings();
               })
               Divider()
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.settingItemWithToggle($r('app.media.icon_sound'), $r('app.string.sound'), this.soundEnabled, (enabled: boolean) => {
-                this.saveSoundPreference(enabled);
-              })
+              this.SoundToggle()
               Divider()
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.settingItemWithToggle($r('app.media.icon_vibration'), $r('app.string.vibration'), this.vibrationEnabled, (enabled: boolean) => {
-                this.saveVibrationPreference(enabled);
-              })
+              this.VibrationToggle()
               Divider()
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.settingItemWithToggle($r('app.media.icon_setting_config'), $r('app.string.loop_playback'), this.loopPlaybackEnabled, (enabled: boolean) => {
-                this.saveLoopPlaybackPreference(enabled);
-              })
+              this.LoopPlaybackToggle()
               Divider()
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
@@ -679,7 +657,7 @@ export struct ProfilePage {
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.settingItem($r('app.media.icon_all_application'), $r('app.string.feedback'), '', () => {
+              this.settingItem($r('app.media.icon_feedback'), $r('app.string.feedback'), '', () => {
                 this.showFeedback();
               })
               Divider()
@@ -690,14 +668,14 @@ export struct ProfilePage {
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.settingItem($r('app.media.icon_all_application'), $r('app.string.about_app'), '', () => {
+              this.settingItem($r('app.media.icon_about'), $r('app.string.about_app'), '', () => {
                 this.showAboutApp();
               })
               Divider()
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.settingItem($r('app.media.icon_all_application'), $r('app.string.data_info'), '', () => {
+              this.settingItem($r('app.media.icon_data_info'), $r('app.string.data_info'), '', () => {
                 router.pushUrl({ url: 'pages/profile/DataInfoPage' })
                   .catch((err: Error) => {
                     console.error(`Failed to navigate to DataInfoPage: ${err.message}`);
@@ -828,43 +806,86 @@ export struct ProfilePage {
       })
   }
 
-  private getThemeIcon(): Resource {
-    // 根据当前颜色模式返回对应的图标
-    if (this.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK) {
-      return $r('app.media.icon_dark_mode');
-    } else if (this.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) {
-      return $r('app.media.icon_light_mode');
-    } else {
-      // 跟随系统模式，使用设置图标
-      return $r('app.media.icon_setting_config');
-    }
-  }
 
   @Builder
-  settingItemWithToggle(icon: Resource, title: Resource | string, enabled: boolean, onToggle: (enabled: boolean) => void) {
+  SoundToggle() {
     Row() {
       Row() {
-        Image(icon)
+        Image($r('app.media.icon_sound'))
           .width(16)
           .height(16)
           .margin({ right: 12 })
-        Text(title)
+        Text($r('app.string.sound'))
           .fontSize(14)
           .fontWeight(FontWeight.Medium)
           .fontColor($r('app.color.text_primary'))
       }
       .layoutWeight(1)
 
-      Toggle({ type: ToggleType.Switch, isOn: enabled })
+      Toggle({ type: ToggleType.Switch, isOn: this.soundEnabled })
         .selectedColor($r('app.color.button_primary'))
         .switchPointColor($r('app.color.white'))
         .onChange((isOn: boolean) => {
-          onToggle(isOn);
+          this.saveSoundPreference(isOn);
         })
     }
     .width('100%')
-      .height(56)
-      .padding({ left: 16, right: 16 })
+    .height(56)
+    .padding({ left: 16, right: 16 })
+  }
+
+  @Builder
+  VibrationToggle() {
+    Row() {
+      Row() {
+        Image($r('app.media.icon_vibration'))
+          .width(16)
+          .height(16)
+          .margin({ right: 12 })
+        Text($r('app.string.vibration'))
+          .fontSize(14)
+          .fontWeight(FontWeight.Medium)
+          .fontColor($r('app.color.text_primary'))
+      }
+      .layoutWeight(1)
+
+      Toggle({ type: ToggleType.Switch, isOn: this.vibrationEnabled })
+        .selectedColor($r('app.color.button_primary'))
+        .switchPointColor($r('app.color.white'))
+        .onChange((isOn: boolean) => {
+          this.saveVibrationPreference(isOn);
+        })
+    }
+    .width('100%')
+    .height(56)
+    .padding({ left: 16, right: 16 })
+  }
+
+  @Builder
+  LoopPlaybackToggle() {
+    Row() {
+      Row() {
+        Image($r('app.media.icon_loop'))
+          .width(16)
+          .height(16)
+          .margin({ right: 12 })
+        Text($r('app.string.loop_playback'))
+          .fontSize(14)
+          .fontWeight(FontWeight.Medium)
+          .fontColor($r('app.color.text_primary'))
+      }
+      .layoutWeight(1)
+
+      Toggle({ type: ToggleType.Switch, isOn: this.loopPlaybackEnabled })
+        .selectedColor($r('app.color.button_primary'))
+        .switchPointColor($r('app.color.white'))
+        .onChange((isOn: boolean) => {
+          this.saveLoopPlaybackPreference(isOn);
+        })
+    }
+    .width('100%')
+    .height(56)
+    .padding({ left: 16, right: 16 })
   }
 
   @Builder

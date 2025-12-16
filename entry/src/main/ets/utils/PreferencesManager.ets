@@ -15,6 +15,8 @@ export class PreferencesManager {
    * @param context UIAbilityContext
    */
   static init(context: common.UIAbilityContext): void {
+    // 清除之前的缓存，确保使用新的 context
+    PreferencesManager.prefsMap.clear();
     PreferencesManager.context = context;
   }
 
@@ -32,6 +34,13 @@ export class PreferencesManager {
     const existing = PreferencesManager.prefsMap.get(name);
     if (existing) {
       return existing;
+    }
+
+    // 先从系统缓存中移除，确保获取最新数据
+    try {
+      await preferences.removePreferencesFromCache(PreferencesManager.context, name);
+    } catch (e) {
+      // 忽略移除缓存的错误
     }
 
     // 创建新的 Preferences 实例

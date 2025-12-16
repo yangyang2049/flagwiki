@@ -306,7 +306,17 @@ export class MediaService {
       return;
     }
     // 检查循环播放设置（从 AppStorage 读取，默认启用）
-    const loopPlaybackEnabled = AppStorage.get('loopPlaybackEnabled') as boolean ?? true;
+    let loopPlaybackEnabled = true; // 默认值
+    try {
+      const value = AppStorage.get<boolean>('loopPlaybackEnabled');
+      if (value !== undefined && value !== null) {
+        loopPlaybackEnabled = value;
+      }
+    } catch (err) {
+      hilog.warn(DOMAIN, TAG, `Failed to get loopPlaybackEnabled from AppStorage: ${JSON.stringify(err)}, using default: true`);
+    }
+    
+    hilog.info(DOMAIN, TAG, `playCompleteAuto: loopPlaybackEnabled = ${loopPlaybackEnabled}`);
     
     if (loopPlaybackEnabled) {
       // 循环播放启用时，自动播放下一首

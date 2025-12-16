@@ -97,19 +97,19 @@ export struct AnthemPlayer {
         SymbolGlyph($r('sys.symbol.music_fill'))
           .fontSize(28)
           .symbolEffect(new ReplaceSymbolEffect(EffectScope.WHOLE), true)
-          .fontColor(['#33000000'])
+          .fontColor([$r('app.color.text_tertiary')])
       }
       .height(38)
       .width(38)
       .borderRadius(50)
-      .backgroundColor('#0D000000')
+      .backgroundColor($r('app.color.bg_secondary'))
       .alignItems(VerticalAlign.Center)
       .justifyContent(FlexAlign.Center)
 
       Text(this.context.resourceManager.getStringSync($r('app.string.no_playing').id))
         .fontSize(14)
         .fontWeight(500)
-        .fontColor('#88000000')
+        .fontColor($r('app.color.text_secondary'))
     }
     .layoutWeight(1)
     .alignItems(VerticalAlign.Center)
@@ -132,7 +132,7 @@ export struct AnthemPlayer {
         Text(this.musicModel.currentSong?.title ?? '')
           .fontSize(14)
           .fontWeight(500)
-          .fontColor('#88000000')
+          .fontColor($r('app.color.text_primary'))
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width(150)
@@ -140,7 +140,7 @@ export struct AnthemPlayer {
         // 第二行：国家名称
         Text(this.musicModel.currentSong?.singer ?? '')
           .fontSize(10)
-          .fontColor('#4D000000')
+          .fontColor($r('app.color.text_secondary'))
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width(150)
@@ -164,7 +164,6 @@ export struct AnthemPlayer {
       Image($r('app.media.icon_previous'))
         .width(24)
         .height(24)
-        .fillColor($r('app.color.button_primary'))
         .margin({ right: 16 })
         .onClick(this.singleClick(() => {
           this.mediaService.playPrevious();
@@ -174,7 +173,6 @@ export struct AnthemPlayer {
       Image(this.musicModel.isPlay ? $r('app.media.icon_pause') : $r('app.media.icon_play'))
         .width(28)
         .height(28)
-        .fillColor($r('app.color.button_primary'))
         .onClick(this.singleClick(() => {
           this.mediaService.playAndPause();
         }, 1000))
@@ -183,7 +181,6 @@ export struct AnthemPlayer {
       Image($r('app.media.icon_next'))
         .width(24)
         .height(24)
-        .fillColor($r('app.color.button_primary'))
         .margin({ left: 16 })
         .onClick(this.singleClick(() => {
           this.mediaService.playNext();

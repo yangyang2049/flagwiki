@@ -2,8 +2,8 @@ import { media } from '@kit.MediaKit';
 import { audio } from '@kit.AudioKit';
 import common from '@ohos.app.ability.common';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { preferences } from '@kit.ArkData';
 import { PreferencesManager } from './PreferencesManager';
+import { preferences } from '@kit.ArkData';
 
 /**
  * 音效类型枚举
@@ -46,10 +46,20 @@ export class SoundEffectUtil {
   static async init(context: common.UIAbilityContext): Promise<void> {
     // 增加引用计数
     SoundEffectUtil.refCount++;
+    console.info(`[SoundEffectUtil] ========== Initializing, refCount: ${SoundEffectUtil.refCount} ==========`);
     
-    // 如果已经初始化，直接返回
+    // 即使已初始化，也要刷新设置
     if (SoundEffectUtil.isInitialized) {
-      console.info(`SoundEffectUtil already initialized, refCount: ${SoundEffectUtil.refCount}`);
+      // 刷新音效设置
+      try {
+        console.info(`[SoundEffectUtil] Already initialized, refreshing settings`);
+        SoundEffectUtil.prefs = await PreferencesManager.getPreferences('app_settings');
+        const saved: boolean = await SoundEffectUtil.prefs.get('sound_enabled', true) as boolean;
+        SoundEffectUtil.isEnabled = saved;
+        console.info(`[SoundEffectUtil] ✅ Refreshed settings, sound enabled: ${SoundEffectUtil.isEnabled}, refCount: ${SoundEffectUtil.refCount}`);
+      } catch (e) {
+        console.warn(`[SoundEffectUtil] ❌ Failed to refresh settings: ${JSON.stringify(e)}`);
+      }
       return;
     }
 
@@ -57,8 +67,11 @@ export class SoundEffectUtil {
       SoundEffectUtil.context = context;
       
       // 读取音效设置
+      console.info(`[SoundEffectUtil] Getting prefs instance`);
       SoundEffectUtil.prefs = await PreferencesManager.getPreferences('app_settings');
-      SoundEffectUtil.isEnabled = await SoundEffectUtil.prefs.get('sound_enabled', true) as boolean;
+      const saved: boolean = await SoundEffectUtil.prefs.get('sound_enabled', true) as boolean;
+      SoundEffectUtil.isEnabled = saved;
+      console.info(`[SoundEffectUtil] ✅ Sound enabled: ${SoundEffectUtil.isEnabled}`);
 
       // 创建音频渲染器信息
       const audioStreamInfo: audio.AudioStreamInfo = {
@@ -161,16 +174,21 @@ export class SoundEffectUtil {
    * 设置是否启用音效
    */
   static async setEnabled(enabled: boolean): Promise<void> {
+    console.info(`[SoundEffectUtil] ========== setEnabled called: ${enabled} ==========`);
     SoundEffectUtil.isEnabled = enabled;
     try {
       if (SoundEffectUtil.prefs) {
+        console.info(`[SoundEffectUtil] Calling prefs.put('sound_enabled', ${enabled})`);
         await SoundEffectUtil.prefs.put('sound_enabled', enabled);
+        console.info(`[SoundEffectUtil] Calling prefs.flush()`);
         await SoundEffectUtil.prefs.flush();
-        console.info(`[SoundEffectUtil] Sound ${enabled ? 'enabled' : 'disabled'}`);
+        console.info(`[SoundEffectUtil] ✅ Saved and flushed: ${enabled}`);
+      } else {
+        console.warn(`[SoundEffectUtil] ⚠️ prefs is null, cannot save`);
       }
     } catch (err) {
       const error = err as BusinessError;
-      console.error(`[SoundEffectUtil] Failed to save sound setting: ${error.message}`);
+      console.error(`[SoundEffectUtil] ❌ Failed to save sound setting: ${error.message}`);
     }
   }
 

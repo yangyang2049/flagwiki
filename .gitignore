@@ -16,3 +16,7 @@
 **/IconPark*/
 **/icons pack*/
 **/icons-pack*/
+
+# macOS system files
+.DS_Store
+**/.DS_Store

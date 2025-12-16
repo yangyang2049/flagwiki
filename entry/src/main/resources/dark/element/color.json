@@ -81,6 +81,10 @@
       "value": "#E5E5EA"
     },
     {
+      "name": "icon_tab_normal",
+      "value": "#FFFFFF"
+    },
+    {
       "name": "bg_page",
       "value": "#1C1C1E"
     },
@@ -183,6 +187,10 @@
     {
       "name": "bg_flag_topic",
       "value": "#2C2C2E"
+    },
+    {
+      "name": "icon_color",
+      "value": "#FFFFFF"
     }
   ]
 }

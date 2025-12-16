@@ -5,6 +5,7 @@ import { EtiquetteSection, getEtiquetteContent, getLocalizedEtiquetteContent } f
 import { ManufacturingSection, getManufacturingContent, getLocalizedManufacturingContent } from './FlagManufacturingData';
 import { VexillologySection, getVexillologyContent, getLocalizedVexillologyContent } from './FlagVexillologyData';
 import { HistorySection, getFlagHistoryContent, getLocalizedFlagHistoryContent } from './FiveStarRedFlagHistoryData';
+import { CountrySymbolsSection, getLocalizedCountrySymbolsContent } from './CountrySymbolsData';
 import { TextReaderUtil } from '../../utils/TextReaderUtil';
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
@@ -39,6 +40,7 @@ interface SimilarFlagPair {
   @State manufacturingSections: ManufacturingSection[] = [];
   @State vexillologySections: VexillologySection[] = [];
   @State flagHistorySections: HistorySection[] = [];
+  @State countrySymbolsSections: CountrySymbolsSection[] = [];
   @State isKnowledgeTopic: boolean = false;
   @State isReading: boolean = false;
   @State similarFlagPairs: SimilarFlagPair[] = [];
@@ -152,6 +154,8 @@ interface SimilarFlagPair {
       this.vexillologySections = getLocalizedVexillologyContent(this.currentLanguage);
     } else if (this.topic.id === 'flag-history') {
       this.flagHistorySections = getLocalizedFlagHistoryContent(this.currentLanguage);
+    } else if (this.topic.id === 'country-symbols') {
+      this.countrySymbolsSections = getLocalizedCountrySymbolsContent(this.currentLanguage);
     }
 
     this.isLoading = false;
@@ -334,6 +338,12 @@ interface SimilarFlagPair {
       }
     } else if (this.topic.id === 'flag-history') {
       for (const section of this.flagHistorySections) {
+        lines.push(section.title);
+        lines.push(section.content);
+        lines.push('');
+      }
+    } else if (this.topic.id === 'country-symbols') {
+      for (const section of this.countrySymbolsSections) {
         lines.push(section.title);
         lines.push(section.content);
         lines.push('');
@@ -550,6 +560,10 @@ interface SimilarFlagPair {
             ForEach(this.flagHistorySections, (section: HistorySection, index: number) => {
               this.KnowledgeSection(section.title, section.content, index)
             }, (section: HistorySection, index: number) => `flag-history_${index}`)
+          } else if (this.topic?.id === 'country-symbols') {
+            ForEach(this.countrySymbolsSections, (section: CountrySymbolsSection, index: number) => {
+              this.KnowledgeSection(section.title, section.content, index)
+            }, (section: CountrySymbolsSection, index: number) => `country-symbols_${index}`)
           }
         }
         .width('100%')

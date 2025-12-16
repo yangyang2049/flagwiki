@@ -56,7 +56,7 @@ export const topics: TopicItem[] = [
     description: '探索世界各国的四大国家象征：国名、国旗、国徽和国歌',
     descriptionEN: 'Explore the four national symbols of countries around the world: country name, flag, coat of arms, and anthem',
     emoji: '🏛️',
-    countryCodes: Countries.map(country => country.code) // 包含所有国家
+    countryCodes: [] // 空数组表示这是知识性专题
   },
   {
     id: 'similar-flags',

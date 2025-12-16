@@ -1,8 +1,8 @@
 import vibrator from '@ohos.vibrator';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { preferences } from '@kit.ArkData';
 import common from '@ohos.app.ability.common';
 import { PreferencesManager } from './PreferencesManager';
+import { preferences } from '@kit.ArkData';
 
 /**
  * 振动工具类
@@ -17,18 +17,17 @@ export class VibratorUtil {
    * 初始化振动工具
    */
   static async init(context: common.Context): Promise<void> {
-    if (VibratorUtil.isInitialized) {
-      return;
-    }
     try {
+      console.info(`[VibratorUtil] ========== Initializing ==========`);
       VibratorUtil.prefs = await PreferencesManager.getPreferences('app_settings');
-      // 读取振动设置，默认启用
-      VibratorUtil.isEnabled = await VibratorUtil.prefs.get('vibration_enabled', true) as boolean;
+      console.info(`[VibratorUtil] Got prefs instance`);
+      const saved: boolean = await VibratorUtil.prefs.get('vibration_enabled', true) as boolean;
+      VibratorUtil.isEnabled = saved;
       VibratorUtil.isInitialized = true;
-      console.info(`[VibratorUtil] Initialized, vibration enabled: ${VibratorUtil.isEnabled}`);
+      console.info(`[VibratorUtil] ✅ Initialized, vibration enabled: ${VibratorUtil.isEnabled}`);
     } catch (err) {
       const error = err as BusinessError;
-      console.error(`[VibratorUtil] Failed to initialize: ${error.message}`);
+      console.error(`[VibratorUtil] ❌ Failed to initialize: ${error.message}`);
       VibratorUtil.isEnabled = true; // 默认启用
       VibratorUtil.isInitialized = true;
     }
@@ -38,16 +37,21 @@ export class VibratorUtil {
    * 设置是否启用振动
    */
   static async setEnabled(enabled: boolean): Promise<void> {
+    console.info(`[VibratorUtil] ========== setEnabled called: ${enabled} ==========`);
     VibratorUtil.isEnabled = enabled;
     try {
       if (VibratorUtil.prefs) {
+        console.info(`[VibratorUtil] Calling prefs.put('vibration_enabled', ${enabled})`);
         await VibratorUtil.prefs.put('vibration_enabled', enabled);
+        console.info(`[VibratorUtil] Calling prefs.flush()`);
         await VibratorUtil.prefs.flush();
-        console.info(`[VibratorUtil] Vibration ${enabled ? 'enabled' : 'disabled'}`);
+        console.info(`[VibratorUtil] ✅ Saved and flushed: ${enabled}`);
+      } else {
+        console.warn(`[VibratorUtil] ⚠️ prefs is null, cannot save`);
       }
     } catch (err) {
       const error = err as BusinessError;
-      console.error(`[VibratorUtil] Failed to save vibration setting: ${error.message}`);
+      console.error(`[VibratorUtil] ❌ Failed to save vibration setting: ${error.message}`);
     }
   }
 

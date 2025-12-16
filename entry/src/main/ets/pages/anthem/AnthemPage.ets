@@ -377,9 +377,9 @@ export struct AnthemPage {
 
       // 播放按钮（只在有国歌时显示）
       if (hasAnthemFile(country.code)) {
-        SymbolGlyph($r('sys.symbol.play_fill'))
-          .fontSize(28)
-          .fontColor([$r('app.color.button_primary')])
+        SymbolGlyph($r('sys.symbol.play'))
+          .fontSize(22)
+          .fontColor([$r('app.color.text_tertiary')])
           .margin({ left: 8 })
       }
     }

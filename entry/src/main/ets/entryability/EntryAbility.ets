@@ -1,7 +1,6 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
-import { preferences } from '@kit.ArkData';
 import { i18n } from '@kit.LocalizationKit';
 import { FavoritesManager } from '../utils/favoritesManager';
 import { GameProgressManager } from '../utils/GameProgressManager';
@@ -17,20 +16,30 @@ export default class EntryAbility extends UIAbility {
     // 初始化 PreferencesManager
     PreferencesManager.init(this.context);
 
+    // 初始化循环播放设置
+    try {
+      hilog.info(DOMAIN, 'testTag', '========== EntryAbility: Loading loop playback ==========');
+      const prefs = await PreferencesManager.getPreferences('app_settings');
+      hilog.info(DOMAIN, 'testTag', 'Got prefs instance');
+      const loopPlaybackEnabled: boolean = await prefs.get('loop_playback_enabled', true) as boolean;
+      AppStorage.setOrCreate('loopPlaybackEnabled', loopPlaybackEnabled);
+      hilog.info(DOMAIN, 'testTag', '✅ Loop playback loaded: %{public}s, synced to AppStorage', loopPlaybackEnabled.toString());
+    } catch (err) {
+      hilog.error(DOMAIN, 'testTag', '❌ Failed to load loop playback preference: %{public}s', JSON.stringify(err));
+      AppStorage.setOrCreate('loopPlaybackEnabled', true);
+    }
+
     // 初始化语言设置
     this.initializeLanguage();
 
+    // 加载并应用主题设置
     try {
-      // 加载保存的主题设置
-      await this.loadAndApplyColorMode();
+      const prefs = await PreferencesManager.getPreferences('app_settings');
+      const savedColorMode: number = await prefs.get('colorMode', ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET) as number;
+      this.context.getApplicationContext().setColorMode(savedColorMode as ConfigurationConstant.ColorMode);
+      hilog.info(DOMAIN, 'testTag', 'Color mode loaded: %{public}d', savedColorMode);
     } catch (err) {
-      hilog.error(DOMAIN, 'testTag', 'Failed to set colorMode. Cause: %{public}s', JSON.stringify(err));
-      // 如果加载失败，使用默认值（跟随系统）
-      try {
-        this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
-      } catch (setErr) {
-        hilog.error(DOMAIN, 'testTag', 'Failed to set default colorMode. Cause: %{public}s', JSON.stringify(setErr));
-      }
+      hilog.error(DOMAIN, 'testTag', 'Failed to load color mode: %{public}s', JSON.stringify(err));
     }
 
     // 初始化收藏管理器
@@ -47,13 +56,6 @@ export default class EntryAbility extends UIAbility {
       hilog.info(DOMAIN, 'testTag', 'GameProgressManager initialized');
     } catch (err) {
       hilog.error(DOMAIN, 'testTag', 'Failed to init GameProgressManager. Cause: %{public}s', JSON.stringify(err));
-    }
-
-    // 初始化循环播放设置
-    try {
-      await this.initializeLoopPlaybackPreference();
-    } catch (err) {
-      hilog.error(DOMAIN, 'testTag', 'Failed to init loop playback preference. Cause: %{public}s', JSON.stringify(err));
     }
 
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
@@ -93,32 +95,6 @@ export default class EntryAbility extends UIAbility {
     } catch (error) {
       hilog.error(DOMAIN, 'testTag', 'Failed to initialize language: %{public}s', JSON.stringify(error));
       AppStorage.setOrCreate('currentLanguage', 'zh'); // 回退到中文
-    }
-  }
-
-  private async loadAndApplyColorMode(): Promise<void> {
-    try {
-      const prefs = await PreferencesManager.getPreferences('app_settings');
-      const savedColorMode: number = await prefs.get('colorMode', ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET) as number;
-      const colorMode = savedColorMode as ConfigurationConstant.ColorMode;
-      this.context.getApplicationContext().setColorMode(colorMode);
-      hilog.info(DOMAIN, 'testTag', 'Color mode loaded: %{public}d', colorMode);
-    } catch (err) {
-      hilog.error(DOMAIN, 'testTag', 'Failed to load color mode: %{public}s', JSON.stringify(err));
-      throw new Error(`Failed to load color mode: ${JSON.stringify(err)}`);
-    }
-  }
-
-  private async initializeLoopPlaybackPreference(): Promise<void> {
-    try {
-      const prefs = await PreferencesManager.getPreferences('app_settings');
-      const loopPlaybackEnabled = await prefs.get('loop_playback_enabled', true) as boolean;
-      AppStorage.setOrCreate('loopPlaybackEnabled', loopPlaybackEnabled);
-      hilog.info(DOMAIN, 'testTag', 'Loop playback preference initialized: %{public}s', loopPlaybackEnabled.toString());
-    } catch (err) {
-      hilog.error(DOMAIN, 'testTag', 'Failed to initialize loop playback preference: %{public}s', JSON.stringify(err));
-      // 默认启用循环播放
-      AppStorage.setOrCreate('loopPlaybackEnabled', true);
     }
   }
 
