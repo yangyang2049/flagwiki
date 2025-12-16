@@ -276,11 +276,16 @@ export const countrySymbolsContent: CountrySymbolsSection[] = [
 export function getLocalizedCountrySymbolsContent(language: string): CountrySymbolsSection[] {
   const isEnglish = language === 'en' || (language.length > 3 && language.substring(0, 3) === 'en-');
   
-  return countrySymbolsContent.map(section => ({
-    title: isEnglish ? section.titleEN : section.title,
-    titleEN: section.titleEN,
-    content: isEnglish ? section.contentEN : section.content,
-    contentEN: section.contentEN
-  }));
+  const result: CountrySymbolsSection[] = [];
+  for (let i = 0; i < countrySymbolsContent.length; i++) {
+    const section = countrySymbolsContent[i];
+    result.push({
+      title: isEnglish ? section.titleEN : section.title,
+      titleEN: section.titleEN,
+      content: isEnglish ? section.contentEN : section.content,
+      contentEN: section.contentEN
+    });
+  }
+  return result;
 }
 
