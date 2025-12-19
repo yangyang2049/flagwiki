@@ -230,6 +230,7 @@ export struct AnthemPage {
           }
           .width('100%')
           .padding({ left: 16, right: 16, top: 8, bottom: 8 })
+          .backgroundColor($r('app.color.bg_title_bar'))
         }
 
         // 洲际筛选器

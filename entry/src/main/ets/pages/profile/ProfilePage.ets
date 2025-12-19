@@ -154,7 +154,7 @@ export struct ProfilePage {
     try {
       promptAction.showDialog({
         title: '关于应用',
-        message: '国旗小百科 v1.0.0\n\n一款有趣的国旗知识应用，带你探索世界各国国旗的故事与历史。',
+        message: '国旗小百科 v1.0.1\n\n一款有趣的国旗知识应用，带你探索世界各国国旗的故事与历史。',
         buttons: [
           { text: '确定', color: $r('app.color.button_primary') }
         ]
@@ -415,7 +415,7 @@ export struct ProfilePage {
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.settingItemWithToggle('振动反馈', this.vibrationEnabled, (enabled: boolean) => {
+              this.settingItemWithToggle($r('app.media.icon_vibration'), '振动反馈', this.vibrationEnabled, (enabled: boolean) => {
                 this.saveVibrationPreference(enabled);
               })
               Divider()
@@ -570,9 +570,13 @@ export struct ProfilePage {
   }
 
   @Builder
-  settingItemWithToggle(title: string, enabled: boolean, onToggle: (enabled: boolean) => void) {
+  settingItemWithToggle(icon: Resource, title: string, enabled: boolean, onToggle: (enabled: boolean) => void) {
     Row() {
       Row() {
+        Image(icon)
+          .width(16)
+          .height(16)
+          .margin({ right: 12 })
         Text(title)
           .fontSize(14)
           .fontWeight(FontWeight.Medium)
