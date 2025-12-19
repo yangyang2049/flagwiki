@@ -13,9 +13,9 @@ import { Country, getCountryByCode } from './countryData';
 export function getCoatOfArmsImageSource(countryCode: string): Resource | null {
   const lowerCode = countryCode.toLowerCase();
   try {
-    // 从rawfile/coat_of_arms目录加载PNG格式的国徽
-    // 文件路径格式: coat_of_arms/coat_of_arms_xx.png (如 coat_of_arms/coat_of_arms_cn.png)
-    const filePath = `coat_of_arms/coat_of_arms_${lowerCode}.png`;
+    // 从rawfile/coat_of_arms目录加载WebP格式的国徽
+    // 文件路径格式: coat_of_arms/coat_of_arms_xx.webp (如 coat_of_arms/coat_of_arms_cn.webp)
+    const filePath = `coat_of_arms/coat_of_arms_${lowerCode}.webp`;
     return $rawfile(filePath) as Resource;
   } catch (err) {
     // 资源不存在，返回null

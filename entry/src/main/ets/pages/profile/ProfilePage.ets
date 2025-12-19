@@ -7,12 +7,9 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { Want } from '@kit.AbilityKit';
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import router from '@ohos.router';
-import { i18n } from '@kit.LocalizationKit';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { PreferencesManager } from '../../utils/PreferencesManager';
 import { VibratorUtil } from '../../utils/VibratorUtil';
-import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
-import { LocalizationUtil } from '../../utils/LocalizationUtil';
 
 // 总关卡数
 const QUIZ_TOTAL_LEVELS = 10;
@@ -21,7 +18,7 @@ const INPUT_TOTAL_LEVELS = 39;
 const TRIVIA_TOTAL_LEVELS = 10;
 
 interface ChallengeProgress {
-  name: Resource;
+  name: string;
   emoji: string;
   current: number;
   total: number;
@@ -32,43 +29,10 @@ interface ChallengeProgress {
 export struct ProfilePage {
   @State colorMode: ConfigurationConstant.ColorMode = ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET;
   @State showThemeDialog: boolean = false;
-  @State showLanguageDialog: boolean = false;
-  @State selectedLanguage: string = 'zh'; // 'zh' 或 'en'
   @State vibrationEnabled: boolean = true; // 振动反馈开关，默认启用
-  @State soundEnabled: boolean = true; // 音效开关，默认启用
-  @State loopPlaybackEnabled: boolean = true; // 循环播放开关，默认启用
-  @StorageLink('currentLanguage') systemLanguage: string = 'zh';
   @Prop @Watch('onRefreshKeyChanged') refreshKey: number = 0;
+  private prefs: preferences.Preferences | null = null;
   private context = getContext(this) as common.UIAbilityContext;
-
-  // 辅助函数：从 Resource 获取字符串值
-  private async getStringFromResource(resource: Resource): Promise<string> {
-    try {
-      const resourceManager = this.context.resourceManager;
-      // 在 HarmonyOS 中，Resource 类型可能包含 id 属性（内部属性）
-      // 尝试使用 getStringValue 方法获取字符串值
-      // 定义接口来访问 Resource 的内部 id 属性
-      interface ResourceWithId {
-        id: number;
-      }
-      const resourceRecord = resource as ResourceWithId;
-      const resourceId = resourceRecord.id;
-      if (resourceId !== undefined && resourceId !== null) {
-        try {
-          const value = await resourceManager.getStringValue(resourceId);
-          return value;
-        } catch (e) {
-          // 如果 getStringValue 失败，尝试其他方法
-          console.warn(`getStringValue failed, trying alternative method: ${JSON.stringify(e)}`);
-        }
-      }
-      // 如果无法获取，返回空字符串
-      return '';
-    } catch (err) {
-      console.error(`Failed to get string from resource: ${JSON.stringify(err)}`);
-      return '';
-    }
-  }
 
   // 游戏进度状态
   @State quizLevel: number = 1;
@@ -77,62 +41,16 @@ export struct ProfilePage {
   @State triviaLevel: number = 1;
 
   async aboutToAppear() {
-    // systemLanguage 已通过 @StorageLink 自动同步
-    await VibratorUtil.init(this.context);
-    await SoundEffectUtil.init(this.context);
     await this.loadColorMode();
-    await this.loadLanguage();
     await this.loadGameProgress();
-    await this.loadAllSettings();
+    await this.loadVibrationPreference();
+    await VibratorUtil.init(this.context);
   }
 
   private onRefreshKeyChanged(): void {
-    // 异步加载，不阻塞
-    Promise.all([
-      this.loadColorMode(),
-      this.loadLanguage(),
-      this.loadGameProgress(),
-      this.loadAllSettings()
-    ]).catch((err: Error) => {
-      console.error(`[ProfilePage] Failed to refresh: ${JSON.stringify(err)}`);
-    });
-  }
-
-  // 统一加载所有设置
-  private async loadAllSettings(): Promise<void> {
-    try {
-      const prefs = await PreferencesManager.getPreferences('app_settings');
-      
-      // 一次性读取所有设置
-      const vibration = await prefs.get('vibration_enabled', true) as boolean;
-      const sound = await prefs.get('sound_enabled', true) as boolean;
-      const loop = await prefs.get('loop_playback_enabled', true) as boolean;
-      
-      // 更新状态
-      this.vibrationEnabled = vibration;
-      this.soundEnabled = sound;
-      this.loopPlaybackEnabled = loop;
-      
-      // 同步到全局状态
-      AppStorage.setOrCreate('loopPlaybackEnabled', loop);
-      
-      // 同步工具类的启用状态，确保重新进入页面时能立即生效
-      await VibratorUtil.setEnabled(vibration);
-      await SoundEffectUtil.setEnabled(sound);
-
-      console.info(`[ProfilePage] ✅ Settings loaded - Vibration: ${vibration}, Sound: ${sound}, Loop: ${loop}`);
-    } catch (err) {
-      console.error(`[ProfilePage] ❌ Failed to load settings: ${JSON.stringify(err)}`);
-      // 使用默认值
-      this.vibrationEnabled = true;
-      this.soundEnabled = true;
-      this.loopPlaybackEnabled = true;
-      AppStorage.setOrCreate('loopPlaybackEnabled', true);
-
-      // 同步工具类的默认启用状态，确保反馈功能一致
-      await VibratorUtil.setEnabled(true);
-      await SoundEffectUtil.setEnabled(true);
-    }
+    this.loadColorMode();
+    this.loadGameProgress();
+    this.loadVibrationPreference();
   }
 
   private async loadGameProgress(): Promise<void> {
@@ -150,8 +68,10 @@ export struct ProfilePage {
 
   private async loadColorMode(): Promise<void> {
     try {
-      const prefs = await PreferencesManager.getPreferences('app_settings');
-      const saved: number = await prefs.get('colorMode', ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET) as number;
+      if (!this.prefs) {
+        this.prefs = await PreferencesManager.getPreferences('app_settings');
+      }
+      const saved: number = await this.prefs.get('colorMode', ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET) as number;
       this.colorMode = saved as ConfigurationConstant.ColorMode;
       this.applyColorMode();
     } catch (err) {
@@ -161,15 +81,17 @@ export struct ProfilePage {
 
   private async saveColorMode(): Promise<void> {
     try {
-      const prefs = await PreferencesManager.getPreferences('app_settings');
-      await prefs.put('colorMode', this.colorMode);
-      await prefs.flush();
+      if (!this.prefs) {
+        this.prefs = await PreferencesManager.getPreferences('app_settings');
+      }
+      await this.prefs.put('colorMode', this.colorMode);
+      await this.prefs.flush();
       this.applyColorMode();
     } catch (err) {
       console.error(`Failed to save color mode: ${JSON.stringify(err)}`);
       try {
         promptAction.showToast({
-          message: $r('app.string.save_failed_toast'),
+          message: '保存失败',
           duration: 2000
         });
       } catch (toastErr) {
@@ -186,181 +108,57 @@ export struct ProfilePage {
     }
   }
 
-  private async loadLanguage(): Promise<void> {
-    try {
-      const prefs = await PreferencesManager.getPreferences('app_settings');
-      
-      // 检查是否已经保存过语言偏好
-      const hasLanguageKey = await prefs.has('language');
-      
-      if (hasLanguageKey) {
-        // 已保存过语言偏好，使用保存的值
-        const saved: string = await prefs.get('language', 'zh') as string;
-        this.selectedLanguage = saved;
-        console.info(`[ProfilePage] Using saved language preference: ${saved}`);
-      } else {
-        // 首次安装，检测系统语言
-        const systemLang = await LocalizationUtil.getSystemLanguage(this.context);
-        this.selectedLanguage = systemLang;
-        console.info(`[ProfilePage] First installation, detected system language: ${systemLang}`);
-        
-        // 保存检测到的系统语言作为初始偏好
-        await prefs.put('language', systemLang);
-        await prefs.flush();
-      }
-      
-      // 设置应用偏好语言
-      await this.setAppPreferredLanguage(this.selectedLanguage);
-      
-      // 同步到 AppStorage
-      AppStorage.setOrCreate('currentLanguage', this.selectedLanguage);
-      
-    } catch (err) {
-      console.error(`Failed to load language: ${JSON.stringify(err)}`);
-      // 出错时使用中文作为默认语言
-      this.selectedLanguage = 'zh';
-      AppStorage.setOrCreate('currentLanguage', 'zh');
-    }
-  }
-
-  private async saveLanguage(): Promise<void> {
-    try {
-      const prefs = await PreferencesManager.getPreferences('app_settings');
-      await prefs.put('language', this.selectedLanguage);
-      await prefs.flush();
-      
-      // 设置应用偏好语言
-      await this.setAppPreferredLanguage(this.selectedLanguage);
-      
-      // 同步到AppStorage
-      AppStorage.setOrCreate('currentLanguage', this.selectedLanguage);
-    } catch (err) {
-      console.error(`Failed to save language: ${JSON.stringify(err)}`);
-      try {
-        promptAction.showToast({
-          message: $r('app.string.save_failed_toast'),
-          duration: 2000
-        });
-      } catch (toastErr) {
-        console.error(`Failed to show toast: ${toastErr instanceof Error ? toastErr.message : String(toastErr)}`);
-      }
-    }
-  }
-
-  private async setAppPreferredLanguage(languageCode: string): Promise<void> {
-    try {
-      console.log(`[ProfilePage] Setting app preferred language to: ${languageCode}`);
-      
-      // 将语言代码转换为正确的格式
-      let preferredLanguage = languageCode;
-      if (languageCode === 'zh') {
-        preferredLanguage = 'zh-Hans-CN'; // 简体中文
-      } else if (languageCode === 'en') {
-        preferredLanguage = 'en-Latn-US'; // 美式英语
-      }
-      
-      // 设置应用偏好语言
-      i18n.System.setAppPreferredLanguage(preferredLanguage);
-      console.log(`[ProfilePage] App preferred language set to: ${preferredLanguage}`);
-    } catch (error) {
-      const err = error as BusinessError;
-      console.error(`[ProfilePage] Failed to set app preferred language, error code: ${err.code}, message: ${err.message}`);
-    }
-  }
-
-  private showLanguageSettings(): void {
-    this.showLanguageDialog = true;
-  }
-
-  private getLanguageText(): Resource {
-    if (this.selectedLanguage === 'zh') {
-      return $r('app.string.chinese');
-    } else {
-      return $r('app.string.english');
-    }
-  }
-
   private showThemeSettings(): void {
     this.showThemeDialog = true;
   }
 
-  private getThemeText(): Resource {
+  private getThemeText(): string {
     switch (this.colorMode) {
       case ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT:
-        return $r('app.string.light');
+        return '浅色';
       case ConfigurationConstant.ColorMode.COLOR_MODE_DARK:
-        return $r('app.string.dark');
+        return '深色';
       case ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET:
       default:
-        return $r('app.string.follow_system');
+        return '跟随系统';
     }
   }
 
-  // 保存振动设置
+  private async loadVibrationPreference(): Promise<void> {
+    try {
+      if (!this.prefs) {
+        this.prefs = await PreferencesManager.getPreferences('app_settings');
+      }
+      this.vibrationEnabled = await this.prefs.get('vibration_enabled', true) as boolean;
+    } catch (err) {
+      console.error(`Failed to load vibration preference: ${JSON.stringify(err)}`);
+      this.vibrationEnabled = true; // 默认启用
+    }
+  }
+
   private async saveVibrationPreference(enabled: boolean): Promise<void> {
     try {
-      console.info(`[ProfilePage] 💾 Saving vibration: ${enabled}`);
-      const prefs = await PreferencesManager.getPreferences('app_settings');
-      await prefs.put('vibration_enabled', enabled);
-      await prefs.flush();
+      if (!this.prefs) {
+        this.prefs = await PreferencesManager.getPreferences('app_settings');
+      }
+      await this.prefs.put('vibration_enabled', enabled);
+      await this.prefs.flush();
       this.vibrationEnabled = enabled;
       await VibratorUtil.setEnabled(enabled);
-      console.info(`[ProfilePage] ✅ Vibration saved: ${enabled}`);
     } catch (err) {
-      console.error(`[ProfilePage] ❌ Failed to save vibration: ${JSON.stringify(err)}`);
-    }
-  }
-
-  // 保存音效设置
-  private async saveSoundPreference(enabled: boolean): Promise<void> {
-    try {
-      console.info(`[ProfilePage] 💾 Saving sound: ${enabled}`);
-      const prefs = await PreferencesManager.getPreferences('app_settings');
-      await prefs.put('sound_enabled', enabled);
-      await prefs.flush();
-      this.soundEnabled = enabled;
-      await SoundEffectUtil.setEnabled(enabled);
-      console.info(`[ProfilePage] ✅ Sound saved: ${enabled}`);
-    } catch (err) {
-      console.error(`[ProfilePage] ❌ Failed to save sound: ${JSON.stringify(err)}`);
-    }
-  }
-
-  // 保存循环播放设置
-  private async saveLoopPlaybackPreference(enabled: boolean): Promise<void> {
-    try {
-      console.info(`[ProfilePage] 💾 Saving loop playback: ${enabled}`);
-      const prefs = await PreferencesManager.getPreferences('app_settings');
-      await prefs.put('loop_playback_enabled', enabled);
-      await prefs.flush();
-      this.loopPlaybackEnabled = enabled;
-      AppStorage.setOrCreate('loopPlaybackEnabled', enabled);
-      console.info(`[ProfilePage] ✅ Loop playback saved: ${enabled}`);
-    } catch (err) {
-      console.error(`[ProfilePage] ❌ Failed to save loop playback: ${JSON.stringify(err)}`);
+      console.error(`Failed to save vibration preference: ${JSON.stringify(err)}`);
     }
   }
 
   private showAboutApp(): void {
     try {
-      // 在 HarmonyOS 中，showDialog 支持 Resource 类型
-      interface DialogButton {
-        text: Resource;
-        color: Resource;
-      }
-      interface ShowDialogOptions {
-        title: Resource;
-        message: Resource;
-        buttons: DialogButton[];
-      }
-      const options: ShowDialogOptions = {
-        title: $r('app.string.about_app'),
-        message: $r('app.string.about_app_message'),
+      promptAction.showDialog({
+        title: '关于应用',
+        message: '国旗小百科 v1.0.0\n\n一款有趣的国旗知识应用，带你探索世界各国国旗的故事与历史。',
         buttons: [
-          { text: $r('app.string.confirm'), color: $r('app.color.button_primary') }
+          { text: '确定', color: $r('app.color.button_primary') }
         ]
-      };
-      promptAction.showDialog(options).then(() => {
+      }).then(() => {
       }).catch((err: Error) => {
         console.error(`Failed to show dialog: ${err.message}`);
       });
@@ -371,24 +169,13 @@ export struct ProfilePage {
 
   private showFeedback(): void {
     try {
-      // 在 HarmonyOS 中，showDialog 支持 Resource 类型
-      interface DialogButton {
-        text: Resource;
-        color: Resource;
-      }
-      interface ShowDialogOptions {
-        title: Resource;
-        message: Resource;
-        buttons: DialogButton[];
-      }
-      const options: ShowDialogOptions = {
-        title: $r('app.string.feedback'),
-        message: $r('app.string.feedback_message'),
+      promptAction.showDialog({
+        title: '意见反馈',
+        message: '如有建议或问题，可通过应用商店评论，或者发邮件到 ssz2048@163.com 反馈。感谢您的支持。',
         buttons: [
-          { text: $r('app.string.ok'), color: $r('app.color.button_primary') }
+          { text: '好的', color: $r('app.color.button_primary') }
         ]
-      };
-      promptAction.showDialog(options).then(() => {
+      }).then(() => {
       }).catch((err: Error) => {
         console.error(`Failed to show dialog: ${err.message}`);
       });
@@ -401,17 +188,13 @@ export struct ProfilePage {
     try {
       const bundleName = 'com.douhua.flag';
       const appGalleryUrl = `https://appgallery.huawei.com/app/detail?id=${bundleName}&channelId=SHARE&source=appshare`;
-      // 获取字符串资源值
-      const appTitle = await this.getStringFromResource($r('app.string.app_welcome_title'));
-      const appDesc = await this.getStringFromResource($r('app.string.share_app_description'));
-      const downloadText = await this.getStringFromResource($r('app.string.download'));
-      const shareText = `${appTitle} - ${appDesc}\n\n${downloadText}: ${appGalleryUrl}`;
+      const shareText = `国旗小百科 - 一款有趣的国旗知识应用，带你探索世界各国国旗的故事与历史。\n\n下载链接：${appGalleryUrl}`;
 
       const shareData: systemShare.SharedData = new systemShare.SharedData({
         utd: uniformTypeDescriptor.UniformDataType.TEXT,
         content: shareText,
-        title: appTitle,
-        description: appDesc
+        title: '国旗小百科',
+        description: '探索世界国旗的奥秘'
       });
 
       const controller: systemShare.ShareController = new systemShare.ShareController(shareData);
@@ -427,7 +210,7 @@ export struct ProfilePage {
       console.error(`Failed to share: code: ${error?.code}, message: ${error?.message}`);
       try {
         promptAction.showToast({
-          message: $r('app.string.share_failed'),
+          message: '分享失败',
           duration: 2000
         });
       } catch (toastErr) {
@@ -457,7 +240,7 @@ export struct ProfilePage {
         } catch (fallbackErr) {
           console.error(`Failed to open app market: ${JSON.stringify(fallbackErr)}`);
           promptAction.showToast({
-            message: $r('app.string.cannot_open_app_market'),
+            message: '无法打开应用市场，请手动前往应用市场评分',
             duration: 2000
           });
         }
@@ -466,7 +249,7 @@ export struct ProfilePage {
       console.error(`Failed to open app market: ${JSON.stringify(err)}`);
       try {
         promptAction.showToast({
-          message: $r('app.string.cannot_open_app_market_simple'),
+          message: '无法打开应用市场',
           duration: 2000
         });
       } catch (toastErr) {
@@ -487,28 +270,28 @@ export struct ProfilePage {
   private getChallengeProgressList(): ChallengeProgress[] {
     return [
       {
-        name: $r('app.string.game_quiz'),
+        name: '国旗猜猜',
         emoji: '🎯',
         current: this.quizLevel - 1,
         total: QUIZ_TOTAL_LEVELS,
         color: $r('app.color.button_primary')
       },
       {
-        name: $r('app.string.game_fake_flag'),
+        name: '假旗找茬',
         emoji: '🔍',
         current: this.fakeFlagLevel - 1,
         total: FAKE_FLAG_TOTAL_LEVELS,
         color: $r('app.color.color_green')
       },
       {
-        name: $r('app.string.game_input'),
+        name: '拼写挑战',
         emoji: '⌨️',
         current: this.inputLevel - 1,
         total: INPUT_TOTAL_LEVELS,
         color: $r('app.color.color_orange')
       },
       {
-        name: $r('app.string.game_trivia'),
+        name: '知识问答',
         emoji: '🧩',
         current: this.triviaLevel - 1,
         total: TRIVIA_TOTAL_LEVELS,
@@ -537,24 +320,20 @@ export struct ProfilePage {
                   .justifyContent(FlexAlign.Center)
 
                 Column() {
-                  Text($r('app.string.exploration_progress'))
+                  Text('探索进度')
                     .fontSize(18)
                     .fontWeight(FontWeight.Bold)
                     .fontColor($r('app.color.text_primary'))
 
                   Row() {
-                    if (!LocalizationUtil.isEnglish(this.systemLanguage)) {
-                      Text(`${this.context.resourceManager.getStringSync($r('app.string.completed').id)} `)
-                        .fontSize(14)
-                        .fontColor($r('app.color.text_secondary'))
-                    }
+                    Text(`已完成 `)
+                      .fontSize(14)
+                      .fontColor($r('app.color.text_secondary'))
                     Text(`${this.getTotalCompletedLevels()}`)
                       .fontSize(16)
                       .fontWeight(FontWeight.Bold)
                       .fontColor($r('app.color.button_primary'))
-                    Text(LocalizationUtil.isEnglish(this.systemLanguage) 
-                      ? ` / ${this.getTotalLevels()}`
-                      : ` / ${this.getTotalLevels()}${this.context.resourceManager.getStringSync($r('app.string.level').id)}`)
+                    Text(` / ${this.getTotalLevels()} 关`)
                       .fontSize(14)
                       .fontColor($r('app.color.text_secondary'))
                   }
@@ -573,7 +352,7 @@ export struct ProfilePage {
                     .fontSize(20)
                     .width(32)
 
-                  Text(this.context.resourceManager.getStringSync(game.name.id))
+                  Text(game.name)
                     .fontSize(14)
                     .fontColor($r('app.color.text_primary'))
                     .width(72)
@@ -615,7 +394,7 @@ export struct ProfilePage {
 
             // 我的收藏
             Column() {
-              this.settingItem($r('app.media.icon_favorite'), $r('app.string.my_favorites'), '', () => {
+              this.settingItem($r('app.media.icon_favorite'), '我的收藏', '', () => {
                 router.pushUrl({ url: 'pages/profile/FavoritesPage' })
                   .catch((err: Error) => {
                     console.error(`Failed to navigate to FavoritesPage: ${err.message}`);
@@ -629,43 +408,28 @@ export struct ProfilePage {
 
             // 设置项
             Column() {
-              this.settingItemWithValue($r('app.media.icon_theme'), $r('app.string.dark_mode'), () => this.getThemeText(), () => {
+              this.settingItemWithValue($r('app.media.icon_theme'), '深色模式', () => this.getThemeText(), () => {
                 this.showThemeSettings();
               })
               Divider()
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.settingItemWithValue($r('app.media.icon_language'), $r('app.string.language'), () => this.getLanguageText(), () => {
-                this.showLanguageSettings();
+              this.settingItemWithToggle('振动反馈', this.vibrationEnabled, (enabled: boolean) => {
+                this.saveVibrationPreference(enabled);
               })
               Divider()
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.SoundToggle()
-              Divider()
-                .strokeWidth(0.5)
-                .color($r('app.color.gray_border'))
-                .margin({ left: 16, right: 16 })
-              this.VibrationToggle()
-              Divider()
-                .strokeWidth(0.5)
-                .color($r('app.color.gray_border'))
-                .margin({ left: 16, right: 16 })
-              this.LoopPlaybackToggle()
-              Divider()
-                .strokeWidth(0.5)
-                .color($r('app.color.gray_border'))
-                .margin({ left: 16, right: 16 })
-              this.settingItem($r('app.media.icon_star'), $r('app.string.rate_app'), '', () => {
+              this.settingItem($r('app.media.icon_star'), '应用评分', '', () => {
                 this.rateApp();
               })
               Divider()
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.settingItem($r('app.media.icon_feedback'), $r('app.string.feedback'), '', () => {
+              this.settingItem($r('app.media.icon_feedback'), '意见反馈', '', () => {
                 this.showFeedback();
               })
               Divider()
@@ -676,24 +440,14 @@ export struct ProfilePage {
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.settingItem($r('app.media.icon_about'), $r('app.string.about_app'), '', () => {
+              this.settingItem($r('app.media.icon_about'), '关于应用', '', () => {
                 this.showAboutApp();
               })
               Divider()
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.settingItem($r('app.media.icon_data_info'), $r('app.string.data_info'), '', () => {
-                router.pushUrl({ url: 'pages/profile/DataInfoPage' })
-                  .catch((err: Error) => {
-                    console.error(`Failed to navigate to DataInfoPage: ${err.message}`);
-                  });
-              })
-              Divider()
-                .strokeWidth(0.5)
-                .color($r('app.color.gray_border'))
-                .margin({ left: 16, right: 16 })
-              this.settingItem($r('app.media.icon_share'), $r('app.string.share_app'), '', () => {
+              this.settingItem($r('app.media.icon_share'), '分享应用', '', () => {
                 this.shareApp();
               })
             }
@@ -703,7 +457,7 @@ export struct ProfilePage {
               .margin({ top: 12, bottom: 0 })
 
             // 应用信息
-            Text($r('app.string.app_tagline'))
+            Text('探索世界，从国旗开始 🚩')
               .fontSize(12)
               .fontColor($r('app.color.text_tertiary'))
               .textAlign(TextAlign.Center)
@@ -726,18 +480,13 @@ export struct ProfilePage {
       if (this.showThemeDialog) {
         this.ThemeDialog()
       }
-
-      // 语言设置对话框
-      if (this.showLanguageDialog) {
-        this.LanguageDialog()
-      }
     }
     .width('100%')
       .height('100%')
   }
 
   @Builder
-  settingItem(icon: Resource, title: Resource | string, value: string, onClick?: () => void) {
+  settingItem(icon: Resource, title: string, value: string, onClick?: () => void) {
     Row() {
       Row() {
         Image(icon)
@@ -778,7 +527,7 @@ export struct ProfilePage {
   }
 
   @Builder
-  settingItemWithValue(icon: Resource, title: Resource, valueGetter: () => Resource, onClick?: () => void) {
+  settingItemWithValue(icon: Resource, title: string, valueGetter: () => string, onClick?: () => void) {
     Row() {
       Row() {
         Image(icon)
@@ -792,16 +541,22 @@ export struct ProfilePage {
       }
       .layoutWeight(1)
 
-      Row() {
-        Text(valueGetter())
-          .fontSize(14)
-          .fontColor($r('app.color.text_tertiary'))
-          .maxLines(2)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
+      if (valueGetter() !== '') {
+        Row() {
+          Text(valueGetter())
+            .fontSize(14)
+            .fontColor($r('app.color.text_tertiary'))
+            .maxLines(2)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+          Text('›')
+            .fontSize(20)
+            .fontColor($r('app.color.gray_disabled'))
+            .margin({ left: 8 })
+        }
+      } else {
         Text('›')
           .fontSize(20)
           .fontColor($r('app.color.gray_disabled'))
-          .margin({ left: 8 })
       }
     }
     .width('100%')
@@ -814,86 +569,27 @@ export struct ProfilePage {
       })
   }
 
-
   @Builder
-  SoundToggle() {
+  settingItemWithToggle(title: string, enabled: boolean, onToggle: (enabled: boolean) => void) {
     Row() {
       Row() {
-        Image($r('app.media.icon_sound'))
-          .width(16)
-          .height(16)
-          .margin({ right: 12 })
-        Text($r('app.string.sound'))
+        Text(title)
           .fontSize(14)
           .fontWeight(FontWeight.Medium)
           .fontColor($r('app.color.text_primary'))
       }
       .layoutWeight(1)
 
-      Toggle({ type: ToggleType.Switch, isOn: this.soundEnabled })
+      Toggle({ type: ToggleType.Switch, isOn: enabled })
         .selectedColor($r('app.color.button_primary'))
         .switchPointColor($r('app.color.white'))
         .onChange((isOn: boolean) => {
-          this.saveSoundPreference(isOn);
+          onToggle(isOn);
         })
     }
     .width('100%')
-    .height(56)
-    .padding({ left: 16, right: 16 })
-  }
-
-  @Builder
-  VibrationToggle() {
-    Row() {
-      Row() {
-        Image($r('app.media.icon_vibration'))
-          .width(16)
-          .height(16)
-          .margin({ right: 12 })
-        Text($r('app.string.vibration'))
-          .fontSize(14)
-          .fontWeight(FontWeight.Medium)
-          .fontColor($r('app.color.text_primary'))
-      }
-      .layoutWeight(1)
-
-      Toggle({ type: ToggleType.Switch, isOn: this.vibrationEnabled })
-        .selectedColor($r('app.color.button_primary'))
-        .switchPointColor($r('app.color.white'))
-        .onChange((isOn: boolean) => {
-          this.saveVibrationPreference(isOn);
-        })
-    }
-    .width('100%')
-    .height(56)
-    .padding({ left: 16, right: 16 })
-  }
-
-  @Builder
-  LoopPlaybackToggle() {
-    Row() {
-      Row() {
-        Image($r('app.media.icon_loop'))
-          .width(16)
-          .height(16)
-          .margin({ right: 12 })
-        Text($r('app.string.loop_playback'))
-          .fontSize(14)
-          .fontWeight(FontWeight.Medium)
-          .fontColor($r('app.color.text_primary'))
-      }
-      .layoutWeight(1)
-
-      Toggle({ type: ToggleType.Switch, isOn: this.loopPlaybackEnabled })
-        .selectedColor($r('app.color.button_primary'))
-        .switchPointColor($r('app.color.white'))
-        .onChange((isOn: boolean) => {
-          this.saveLoopPlaybackPreference(isOn);
-        })
-    }
-    .width('100%')
-    .height(56)
-    .padding({ left: 16, right: 16 })
+      .height(56)
+      .padding({ left: 16, right: 16 })
   }
 
   @Builder
@@ -910,17 +606,17 @@ export struct ProfilePage {
 
       // 对话框
       Column() {
-        Text($r('app.string.dark_mode'))
+        Text('深色模式')
           .fontSize(18)
           .fontWeight(FontWeight.Bold)
           .fontColor($r('app.color.text_primary'))
           .margin({ bottom: 20 })
 
-        this.ThemeOption($r('app.string.follow_system'), ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET)
-        this.ThemeOption($r('app.string.light'), ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT)
-        this.ThemeOption($r('app.string.dark'), ConfigurationConstant.ColorMode.COLOR_MODE_DARK)
+        this.ThemeOption('跟随系统', ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET)
+        this.ThemeOption('浅色', ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT)
+        this.ThemeOption('深色', ConfigurationConstant.ColorMode.COLOR_MODE_DARK)
 
-        Button($r('app.string.confirm'))
+        Button('确定')
           .type(ButtonType.Normal)
           .backgroundColor($r('app.color.button_primary'))
           .fontColor($r('app.color.white'))
@@ -951,7 +647,7 @@ export struct ProfilePage {
   }
 
   @Builder
-  ThemeOption(label: Resource, value: ConfigurationConstant.ColorMode) {
+  ThemeOption(label: string, value: ConfigurationConstant.ColorMode) {
     Row() {
       Text(label)
         .fontSize(16)
@@ -972,84 +668,6 @@ export struct ProfilePage {
       .margin({ bottom: 12 })
       .onClick(() => {
         this.colorMode = value;
-      })
-  }
-
-  @Builder
-  LanguageDialog() {
-    Stack({ alignContent: Alignment.Center }) {
-      // 遮罩层
-      Column()
-        .width('100%')
-        .height('100%')
-        .backgroundColor('rgba(0, 0, 0, 0.5)')
-        .onClick(() => {
-          this.showLanguageDialog = false;
-        })
-
-      // 对话框
-      Column() {
-        Text($r('app.string.language'))
-          .fontSize(18)
-          .fontWeight(FontWeight.Bold)
-          .fontColor($r('app.color.text_primary'))
-          .margin({ bottom: 20 })
-
-        this.LanguageOption($r('app.string.chinese'), 'zh')
-        this.LanguageOption($r('app.string.english'), 'en')
-
-        Button($r('app.string.confirm'))
-          .type(ButtonType.Normal)
-          .backgroundColor($r('app.color.button_primary'))
-          .fontColor($r('app.color.white'))
-          .fontSize(16)
-          .width('100%')
-          .height(48)
-          .borderRadius(8)
-          .margin({ top: 20 })
-          .onClick(async () => {
-            await this.saveLanguage();
-            this.showLanguageDialog = false;
-          })
-      }
-      .width('80%')
-        .constraintSize({ maxWidth: 320 })
-        .padding({ left: 24, right: 24, top: 24, bottom: 24 })
-        .backgroundColor($r('app.color.bg_card'))
-        .borderRadius(16)
-        .shadow({
-          radius: 20,
-          color: $r('app.color.shadow'),
-          offsetX: 0,
-          offsetY: 4
-        })
-    }
-    .width('100%')
-      .height('100%')
-  }
-
-  @Builder
-  LanguageOption(label: Resource, value: string) {
-    Row() {
-      Text(label)
-        .fontSize(16)
-        .fontColor($r('app.color.text_primary'))
-        .layoutWeight(1)
-
-      if (this.selectedLanguage === value) {
-        Text('✓')
-          .fontSize(18)
-          .fontColor($r('app.color.button_primary'))
-          .fontWeight(FontWeight.Bold)
-      }
-    }
-    .width('100%')
-      .padding({ top: 16, bottom: 16, left: 16, right: 16 })
-      .borderRadius(8)
-      .backgroundColor(this.selectedLanguage === value ? $r('app.color.bg_blue_light') : $r('app.color.bg_secondary'))
-      .margin({ bottom: 12 })
-      .onClick(() => {
-        this.selectedLanguage = value;
       })
   }
 }

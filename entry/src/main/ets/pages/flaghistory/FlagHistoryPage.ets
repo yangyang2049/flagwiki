@@ -326,7 +326,7 @@ import { LocalizationUtil } from '../../utils/LocalizationUtil';
               .alignItems(VerticalAlign.Center)
 
             // 国旗图片（更窄）
-            Image($rawfile(`flag_history/${item.imagePath}.png`))
+            Image($rawfile(`flag_history/${item.imagePath}.webp`))
               .width('60%')
               .height(160)
               .objectFit(ImageFit.Contain)
@@ -403,7 +403,7 @@ import { LocalizationUtil } from '../../utils/LocalizationUtil';
             // 国旗图片（更窄）
             // 图片资源名称格式：flag_history_{countryCode}_{year}
             // 例如：flag_history_cn_1912
-            Image($rawfile(`flag_history/${item.imagePath}.png`))
+            Image($rawfile(`flag_history/${item.imagePath}.webp`))
               .width('60%')
               .height(160)
               .objectFit(ImageFit.Contain)

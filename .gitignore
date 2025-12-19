@@ -11,12 +11,3 @@
 **/.test
 /.appanalyzer
 /AIRecitation
-# Icon pack folders
-/IconPark - Icons Pack (Community)/
-**/IconPark*/
-**/icons pack*/
-**/icons-pack*/
-
-# macOS system files
-.DS_Store
-**/.DS_Store

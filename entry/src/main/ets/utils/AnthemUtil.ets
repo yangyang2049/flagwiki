@@ -4,40 +4,46 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 
 const DOMAIN = 0x0000;
 
+// 静态列表：实际存在国歌文件的国家代码（作为备份）
+const COUNTRIES_WITH_ANTHEM_STATIC: string[] = [
+  'ad', 'ae', 'af', 'ag', 'al', 'am', 'ao', 'ar', 'at', 'au', 'az',
+  'ba', 'bb', 'bd', 'be', 'bf', 'bg', 'bh', 'bi', 'bj', 'bn', 'bo', 'br', 'bs', 'bw', 'by', 'bz',
+  'ca', 'cf', 'cg', 'ch', 'ci', 'cl', 'cm', 'cn', 'co', 'cr', 'cu', 'cv', 'cy', 'cz',
+  'de', 'dj', 'dk', 'dm', 'do', 'dz',
+  'ec', 'ee', 'eg', 'er', 'es', 'et',
+  'fi', 'fj', 'fm', 'fr',
+  'gb', 'gd', 'ge', 'gh', 'gm', 'gn', 'gq', 'gr', 'gt', 'gy',
+  'hn', 'hr', 'ht', 'hu',
+  'id', 'ie', 'il', 'in', 'iq', 'ir', 'is', 'it',
+  'jm', 'jo', 'jp',
+  'ke', 'kg', 'kh', 'ki', 'km', 'kn', 'kp', 'kr', 'kw', 'kz',
+  'la', 'lb', 'lc', 'li', 'lk', 'lr', 'ls', 'lt', 'lu', 'lv', 'ly',
+  'ma', 'mc', 'md', 'me', 'mg', 'mh', 'mk', 'ml', 'mm', 'mn', 'mr', 'mt', 'mu', 'mv', 'mw', 'mx', 'my', 'mz',
+  'na', 'ne', 'ng', 'ni', 'nl', 'no', 'np', 'nr', 'nz',
+  'pa', 'pe', 'pg', 'ph', 'pk', 'pl', 'ps', 'pt', 'pw', 'py',
+  'qa',
+  'ro', 'rs', 'ru', 'rw',
+  'sa', 'sb', 'sc', 'sd', 'se', 'sg', 'si', 'sk', 'sl', 'sm', 'sn', 'so', 'sr', 'ss', 'st', 'sv', 'sy', 'sz',
+  'td', 'th', 'tj', 'tm', 'tn', 'to', 'tr', 'tt', 'tv', 'tz',
+  'ua', 'ug', 'us', 'uy', 'uz',
+  'va', 'vc', 've', 'vn', 'vu',
+  'ws',
+  'ye',
+  'za', 'zm', 'zw'
+];
+
 // 缓存有国歌的国家代码列表（在首次加载时生成）
 let countriesWithAnthemCache: string[] | null = null;
 
 /**
  * 初始化有国歌的国家列表缓存
+ * 直接使用静态列表，确保一致性
  * @param context UIAbilityContext
  */
 export async function initAnthemCache(context: common.UIAbilityContext): Promise<void> {
-  if (countriesWithAnthemCache !== null) {
-    return;
-  }
-  
-  try {
-    const allCountries = getCountriesByContinent('World');
-    const countriesWithAnthem: string[] = [];
-    
-    for (const country of allCountries) {
-      const anthemPath = `anthems/anthem_${country.code.toLowerCase()}.ogg`;
-      try {
-        await context.resourceManager.getRawFd(anthemPath);
-        // 统一使用小写存储，确保一致性
-        countriesWithAnthem.push(country.code.toLowerCase());
-      } catch {
-        // 文件不存在，跳过
-      }
-    }
-    
-    countriesWithAnthemCache = countriesWithAnthem;
-    hilog.info(DOMAIN, 'AnthemUtil', `Initialized anthem cache: ${countriesWithAnthem.length} countries with anthems`);
-  } catch (error) {
-    const err = error as Error;
-    hilog.error(DOMAIN, 'AnthemUtil', `Failed to init anthem cache: ${err.message}`);
-    countriesWithAnthemCache = [];
-  }
+  // 直接使用静态列表，避免运行时检查导致的不一致
+  countriesWithAnthemCache = COUNTRIES_WITH_ANTHEM_STATIC;
+  hilog.info(DOMAIN, 'AnthemUtil', `Initialized anthem cache: ${COUNTRIES_WITH_ANTHEM_STATIC.length} countries with anthems`);
 }
 
 /**
@@ -45,12 +51,9 @@ export async function initAnthemCache(context: common.UIAbilityContext): Promise
  */
 export function getCountriesWithAnthem(): Country[] {
   const allCountries = getCountriesByContinent('World');
-  if (countriesWithAnthemCache === null) {
-    // 如果缓存未初始化，返回所有国家（会在页面加载时过滤）
-    return allCountries;
-  }
+  const anthemList = countriesWithAnthemCache !== null ? countriesWithAnthemCache : COUNTRIES_WITH_ANTHEM_STATIC;
   return allCountries.filter((country: Country) => {
-    return countriesWithAnthemCache !== null && countriesWithAnthemCache.includes(country.code.toLowerCase());
+    return anthemList.includes(country.code.toLowerCase());
   });
 }
 
@@ -58,11 +61,12 @@ export function getCountriesWithAnthem(): Country[] {
  * 检查国家是否有国歌文件
  */
 export function hasAnthemFile(countryCode: string): boolean {
-  if (countriesWithAnthemCache === null) {
-    // 如果缓存未初始化，返回true（会在页面加载时检查）
-    return true;
+  const lowerCode = countryCode.toLowerCase();
+  if (countriesWithAnthemCache !== null) {
+    return countriesWithAnthemCache.includes(lowerCode);
   }
-  return countriesWithAnthemCache.includes(countryCode.toLowerCase());
+  // 如果缓存未初始化，使用静态列表
+  return COUNTRIES_WITH_ANTHEM_STATIC.includes(lowerCode);
 }
 
 /**
@@ -71,4 +75,6 @@ export function hasAnthemFile(countryCode: string): boolean {
 export function getAnthemFilePath(countryCode: string): string {
   return `anthems/anthem_${countryCode.toLowerCase()}.ogg`;
 }
+
+
 

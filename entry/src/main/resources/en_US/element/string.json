@@ -21,108 +21,12 @@
       "value": "For downloading voice models and online voice services"
     },
     {
-      "name": "background_running_permission_reason",
-      "value": "To continue playing national anthem music in the background"
-    },
-    {
       "name": "app_welcome_title",
       "value": "Flag Wiki"
     },
     {
       "name": "app_welcome_subtitle",
       "value": "Explore the mysteries of world flags"
-    },
-    {
-      "name": "tab_home",
-      "value": "Home"
-    },
-    {
-      "name": "tab_gallery",
-      "value": "Gallery"
-    },
-    {
-      "name": "tab_anthem",
-      "value": "Anthem"
-    },
-    {
-      "name": "tab_paint",
-      "value": "Paint"
-    },
-    {
-      "name": "tab_explore",
-      "value": "Explore"
-    },
-    {
-      "name": "tab_profile",
-      "value": "Me"
-    },
-    {
-      "name": "game_quiz",
-      "value": "Flag Quiz"
-    },
-    {
-      "name": "game_fake_flag",
-      "value": "Fake Flag"
-    },
-    {
-      "name": "game_input",
-      "value": "Input"
-    },
-    {
-      "name": "game_trivia",
-      "value": "Trivia Quiz"
-    },
-    {
-      "name": "game_memory",
-      "value": "Memory Match"
-    },
-    {
-      "name": "game_connections",
-      "value": "Connections"
-    },
-    {
-      "name": "quiz_flag_to_name",
-      "value": "Flag to Name"
-    },
-    {
-      "name": "quiz_name_to_flag",
-      "value": "Name to Flag"
-    },
-    {
-      "name": "level_number",
-      "value": "Level %s"
-    },
-    {
-      "name": "congratulations",
-      "value": "Congratulations!"
-    },
-    {
-      "name": "next_level",
-      "value": "Next Level"
-    },
-    {
-      "name": "perfect_finish",
-      "value": "Perfect Finish"
-    },
-    {
-      "name": "continent_asia",
-      "value": "Asia"
-    },
-    {
-      "name": "continent_europe",
-      "value": "Europe"
-    },
-    {
-      "name": "continent_africa",
-      "value": "Africa"
-    },
-    {
-      "name": "continent_americas",
-      "value": "Americas"
-    },
-    {
-      "name": "continent_oceania",
-      "value": "Oceania"
     },
     {
       "name": "weekly_flag",
@@ -138,7 +42,7 @@
     },
     {
       "name": "flag_gallery",
-      "value": "Gallery"
+      "value": "Flag Gallery"
     },
     {
       "name": "state_flags",
@@ -170,7 +74,7 @@
     },
     {
       "name": "explore_fake_flag",
-      "value": "Fake Flag"
+      "value": "Find the Fake"
     },
     {
       "name": "explore_fake_flag_desc",
@@ -178,7 +82,7 @@
     },
     {
       "name": "explore_spelling",
-      "value": "Input"
+      "value": "Spelling Challenge"
     },
     {
       "name": "explore_spelling_desc",
@@ -215,30 +119,6 @@
     {
       "name": "explore_headsup_desc",
       "value": "Quickly identify flags, challenge your reaction"
-    },
-    {
-      "name": "headsup_tutorial_title",
-      "value": "How to Play"
-    },
-    {
-      "name": "headsup_tutorial_message",
-      "value": "• Tap screen to see answer\n• Tap again for next\n• 10 flags per round"
-    },
-    {
-      "name": "headsup_session_over",
-      "value": "Round Complete!"
-    },
-    {
-      "name": "headsup_session_count",
-      "value": "Completed %s round(s)"
-    },
-    {
-      "name": "headsup_exit",
-      "value": "Exit"
-    },
-    {
-      "name": "headsup_continue",
-      "value": "Continue"
     },
     {
       "name": "basic_info",
@@ -341,6 +221,10 @@
       "value": "From Flag Wiki"
     },
     {
+      "name": "historical_flags",
+      "value": "Historical Flags"
+    },
+    {
       "name": "unknown",
       "value": "Unknown"
     },
@@ -417,18 +301,6 @@
       "value": "Reading feature unavailable"
     },
     {
-      "name": "tts_first_use_title",
-      "value": "About Text-to-Speech Feature"
-    },
-    {
-      "name": "tts_first_use_message",
-      "value": "The text-to-speech feature in this app relies on Huawei phone's TTS (Text-to-Speech) capability.\n\nIf your device has not downloaded the corresponding voice packs, this feature may not work properly. You can download the required voice packs in system settings."
-    },
-    {
-      "name": "tts_first_use_confirm",
-      "value": "I Understand"
-    },
-    {
       "name": "exploration_progress",
       "value": "Exploration Progress"
     },
@@ -443,18 +315,6 @@
     {
       "name": "my_favorites",
       "value": "My Favorites"
-    },
-    {
-      "name": "no_favorites",
-      "value": "No favorites yet"
-    },
-    {
-      "name": "favorite_removed",
-      "value": "Removed from favorites"
-    },
-    {
-      "name": "navigation_failed",
-      "value": "Navigation failed"
     },
     {
       "name": "dark_mode",
@@ -473,32 +333,12 @@
       "value": "Dark"
     },
     {
-      "name": "language",
-      "value": "Language"
-    },
-    {
-      "name": "chinese",
-      "value": "中文"
-    },
-    {
-      "name": "english",
-      "value": "English"
-    },
-    {
       "name": "sound",
       "value": "Sound"
     },
     {
       "name": "vibration",
       "value": "Vibration"
-    },
-    {
-      "name": "loop_playback",
-      "value": "Loop Playback"
-    },
-    {
-      "name": "no_sound_file",
-      "value": "No sound file available"
     },
     {
       "name": "rate_app",
@@ -515,10 +355,6 @@
     {
       "name": "share_app",
       "value": "Share App"
-    },
-    {
-      "name": "data_info",
-      "value": "Data Info"
     },
     {
       "name": "confirm",
@@ -543,6 +379,14 @@
     {
       "name": "level_n",
       "value": "Level {level}"
+    },
+    {
+      "name": "next_level",
+      "value": "Next Level"
+    },
+    {
+      "name": "perfect_finish",
+      "value": "Perfect Finish"
     },
     {
       "name": "play_again",
@@ -573,28 +417,8 @@
       "value": "4. Each level contains multiple flags or state flags, complete all correctly to pass"
     },
     {
-      "name": "paint_category_world",
-      "value": "World"
-    },
-    {
-      "name": "paint_category_world_desc",
-      "value": "Paint world flags"
-    },
-    {
-      "name": "paint_category_us",
-      "value": "United States"
-    },
-    {
-      "name": "paint_category_us_desc",
-      "value": "Paint US state flags"
-    },
-    {
-      "name": "paint_instructions_banner",
-      "value": "How to Play"
-    },
-    {
-      "name": "paint_reset_failed",
-      "value": "Reset failed, please try again"
+      "name": "congratulations",
+      "value": "Congratulations!"
     },
     {
       "name": "all_levels_completed",
@@ -603,6 +427,10 @@
     {
       "name": "restart_question",
       "value": "Restart from level 1?"
+    },
+    {
+      "name": "restart",
+      "value": "Restart"
     },
     {
       "name": "connections_hint",
@@ -618,7 +446,7 @@
     },
     {
       "name": "about_app_message",
-      "value": "Flag Wiki v1.0.0\n\nAn interesting flag knowledge app that takes you to explore the stories and history of world flags."
+      "value": "Flag Wiki 1.0.1\n\nAn interesting flag knowledge app that takes you to explore the stories and history of world flags."
     },
     {
       "name": "feedback_message",
@@ -631,818 +459,6 @@
     {
       "name": "share_app_description",
       "value": "Explore the mysteries of world flags"
-    },
-    {
-      "name": "data_info_title",
-      "value": "Data Information"
-    },
-    {
-      "name": "data_info_overview",
-      "value": "Data Overview"
-    },
-    {
-      "name": "data_info_overview_content",
-      "value": "This app contains the following flag data:\n\n• 193 UN member state flags\n• 2 UN observer state flags\n• 246 state/provincial flags from 11 countries\n• Coat of arms data for 195 countries\n• National anthem data for 188 countries"
-    },
-    {
-      "name": "data_info_source",
-      "value": "Data Source"
-    },
-    {
-      "name": "data_info_source_content",
-      "value": "Wikipedia - Creative Commons License"
-    },
-    {
-      "name": "data_info_note",
-      "value": "Note"
-    },
-    {
-      "name": "data_info_note_content",
-      "value": "The data is for reference only. Please refer to official sources for authoritative information."
-    },
-    {
-      "name": "data_info_state_flags",
-      "value": "State/Provincial Flags Data"
-    },
-    {
-      "name": "data_info_state_flags_content",
-      "value": "This app also includes state/provincial flag data for the following 11 countries:\n\n🇯🇵 Japan (47 Prefectures)\n🇺🇸 United States (50 States)\n🇩🇪 Germany (16 States)\n🇦🇺 Australia (9 States)\n🇧🇷 Brazil (27 States)\n🇨🇦 Canada (13 Provinces)\n🇰🇷 South Korea (17 Administrative Divisions)\n🇨🇭 Switzerland (26 Cantons)\n🇬🇧 United Kingdom (4 Regions)\n🇮🇹 Italy (20 Regions)\n🇪🇸 Spain (17 Autonomous Communities)"
-    },
-    {
-      "name": "data_info_more_coming",
-      "value": "More Data Coming"
-    },
-    {
-      "name": "data_info_more_coming_content",
-      "value": "We are continuously updating and expanding our data content. More flag data for countries and regions is coming soon. Stay tuned!"
-    },
-    {
-      "name": "data_info_coat_of_arms",
-      "value": "Coat of Arms Data"
-    },
-    {
-      "name": "data_info_coat_of_arms_content",
-      "value": "This app contains coat of arms data for %s countries."
-    },
-    {
-      "name": "data_info_anthem",
-      "value": "Anthem Data"
-    },
-    {
-      "name": "data_info_anthem_content",
-      "value": "This app contains anthem data for %s countries."
-    },
-    {
-      "name": "data_info_flags_count",
-      "value": "• Flag data for %s countries"
-    },
-    {
-      "name": "data_info_coat_of_arms_count",
-      "value": "• Coat of arms data for %s countries"
-    },
-    {
-      "name": "data_info_anthem_count",
-      "value": "• National anthem data for %s countries"
-    },
-    {
-      "name": "level_not_found",
-      "value": "Level not found"
-    },
-    {
-      "name": "level_data_load_failed",
-      "value": "Failed to load level data"
-    },
-    {
-      "name": "next",
-      "value": "Next"
-    },
-    {
-      "name": "complete",
-      "value": "Complete"
-    },
-    {
-      "name": "search_country_or_region",
-      "value": "Search country or region"
-    },
-    {
-      "name": "search_country",
-      "value": "Search country"
-    },
-    {
-      "name": "national_anthem",
-      "value": "National Anthem"
-    },
-    {
-      "name": "no_anthem_available",
-      "value": "No anthem available"
-    },
-    {
-      "name": "no_matching_countries",
-      "value": "No matching countries found"
-    },
-    {
-      "name": "modify_keywords_or_select",
-      "value": "Modify keywords or select \"All\" or other continents"
-    },
-    {
-      "name": "no_playing",
-      "value": "No playback"
-    },
-    {
-      "name": "select_song_to_play",
-      "value": "Please select a song to play"
-    },
-    {
-      "name": "loading",
-      "value": "Loading..."
-    },
-    {
-      "name": "level_challenge_success",
-      "value": "Level %s challenge completed"
-    },
-    {
-      "name": "total_countries",
-      "value": "%s countries"
-    },
-    {
-      "name": "total_organizations",
-      "value": "%s organizations"
-    },
-    {
-      "name": "favorite_added",
-      "value": "Added to favorites"
-    },
-    {
-      "name": "download_failed",
-      "value": "Download failed"
-    },
-    {
-      "name": "state_flag_saved",
-      "value": "State flag image saved to gallery"
-    },
-    {
-      "name": "no_data",
-      "value": "No data"
-    },
-    {
-      "name": "belongs_to_country",
-      "value": "Country"
-    },
-    {
-      "name": "state_flag_detail",
-      "value": "State Flag Details"
-    },
-    {
-      "name": "state_flag",
-      "value": "State Flag"
-    },
-    {
-      "name": "historical_flags",
-      "value": "Historical Flags"
-    },
-    {
-      "name": "flag_history",
-      "value": "flag history"
-    },
-    {
-      "name": "current",
-      "value": " (Current)"
-    },
-    {
-      "name": "quiz_flag_to_name_desc",
-      "value": "Select the correct country name based on the flag pattern"
-    },
-    {
-      "name": "quiz_name_to_flag_desc",
-      "value": "Select the correct flag pattern based on the country name"
-    },
-    {
-      "name": "complete_levels_to_unlock",
-      "value": "Complete each level to unlock more levels"
-    },
-    {
-      "name": "time",
-      "value": "Time"
-    },
-    {
-      "name": "moves",
-      "value": "Moves"
-    },
-    {
-      "name": "pairs",
-      "value": "Pairs"
-    },
-    {
-      "name": "total_moves",
-      "value": "Total Moves"
-    },
-    {
-      "name": "pairs_completed",
-      "value": "Pairs Completed"
-    },
-    {
-      "name": "time_up",
-      "value": "Time's Up!"
-    },
-    {
-      "name": "which_country_flag",
-      "value": "Which country's flag is this?"
-    },
-    {
-      "name": "select_correct_flag",
-      "value": "Select the correct flag"
-    },
-    {
-      "name": "challenge_failed",
-      "value": "Challenge Failed"
-    },
-    {
-      "name": "correct_answers_count",
-      "value": "Correctly answered %s questions"
-    },
-    {
-      "name": "correct_answers_count_trivia",
-      "value": "Correctly answered %s questions"
-    },
-    {
-      "name": "max_combo",
-      "value": "Max Combo %s"
-    },
-    {
-      "name": "next_question",
-      "value": "Next"
-    },
-    {
-      "name": "view_results",
-      "value": "View Results"
-    },
-    {
-      "name": "correct_answers",
-      "value": "Correct Answers"
-    },
-    {
-      "name": "correct_answers_label",
-      "value": "Correct Answers"
-    },
-    {
-      "name": "remaining_lives",
-      "value": "Remaining Lives"
-    },
-    {
-      "name": "share_score",
-      "value": "Share Score"
-    },
-    {
-      "name": "combo_streak",
-      "value": "%s Combo!"
-    },
-    {
-      "name": "correct_answers_share",
-      "value": "Correct Answers: %s / %s"
-    },
-    {
-      "name": "max_combo_share",
-      "value": "Max Combo: %s"
-    },
-    {
-      "name": "remaining_lives_share",
-      "value": "Remaining Lives: %s"
-    },
-    {
-      "name": "back_to_levels",
-      "value": "Back to Levels"
-    },
-    {
-      "name": "restart",
-      "value": "Restart"
-    },
-    {
-      "name": "try_again",
-      "value": "Try again!"
-    },
-    {
-      "name": "shuffle",
-      "value": "Shuffle"
-    },
-    {
-      "name": "unselect_all",
-      "value": "Unselect All"
-    },
-    {
-      "name": "submit",
-      "value": "Submit"
-    },
-    {
-      "name": "correct_answer",
-      "value": "✓ Correct!"
-    },
-    {
-      "name": "enter_country_name",
-      "value": "Enter country name"
-    },
-    {
-      "name": "find_fake_flag",
-      "value": "Find the fake flag"
-    },
-    {
-      "name": "correct_found",
-      "value": "Correctly Found"
-    },
-    {
-      "name": "correct_found_count",
-      "value": "Correctly found %s fake flags"
-    },
-    {
-      "name": "delete",
-      "value": "Delete"
-    },
-    {
-      "name": "fun_fact_1",
-      "value": "🇳🇵 Nepal has the world's only non-rectangular flag, made of two triangles!"
-    },
-    {
-      "name": "fun_fact_2",
-      "value": "🇨🇭 Switzerland and Vatican City are the only two countries with square flags!"
-    },
-    {
-      "name": "fun_fact_3",
-      "value": "🇯🇵 The red circle on Japan's flag represents the sun, Japan is called the \"Land of the Rising Sun\"!"
-    },
-    {
-      "name": "fun_fact_4",
-      "value": "🇱🇾 Libya used the world's only solid-color flag (green) from 1977-2011!"
-    },
-    {
-      "name": "fun_fact_5",
-      "value": "🇲🇨 Monaco and Indonesia have almost identical flags, differing only in size ratio!"
-    },
-    {
-      "name": "fun_fact_6",
-      "value": "🇩🇰 Denmark's flag is the world's oldest flag, in use since 1219!"
-    },
-    {
-      "name": "fun_fact_7",
-      "value": "🇧🇷 Brazil's flag has 27 stars representing 26 states and 1 federal district!"
-    },
-    {
-      "name": "fun_fact_8",
-      "value": "🇺🇸 The US flag has 50 stars for 50 states and 13 stripes for the original 13 colonies!"
-    },
-    {
-      "name": "fun_fact_9",
-      "value": "🇨🇦 The maple leaf on Canada's flag has 11 points, the clearest design after wind tunnel testing!"
-    },
-    {
-      "name": "fun_fact_10",
-      "value": "🇬🇧 The UK \"Union Jack\" combines the flags of England, Scotland, and Ireland!"
-    },
-    {
-      "name": "month_1",
-      "value": "January"
-    },
-    {
-      "name": "month_2",
-      "value": "February"
-    },
-    {
-      "name": "month_3",
-      "value": "March"
-    },
-    {
-      "name": "month_4",
-      "value": "April"
-    },
-    {
-      "name": "month_5",
-      "value": "May"
-    },
-    {
-      "name": "month_6",
-      "value": "June"
-    },
-    {
-      "name": "month_7",
-      "value": "July"
-    },
-    {
-      "name": "month_8",
-      "value": "August"
-    },
-    {
-      "name": "month_9",
-      "value": "September"
-    },
-    {
-      "name": "month_10",
-      "value": "October"
-    },
-    {
-      "name": "month_11",
-      "value": "November"
-    },
-    {
-      "name": "month_12",
-      "value": "December"
-    },
-    {
-      "name": "month_jan",
-      "value": "Jan"
-    },
-    {
-      "name": "month_feb",
-      "value": "Feb"
-    },
-    {
-      "name": "month_mar",
-      "value": "Mar"
-    },
-    {
-      "name": "month_apr",
-      "value": "Apr"
-    },
-    {
-      "name": "month_may",
-      "value": "May"
-    },
-    {
-      "name": "month_jun",
-      "value": "Jun"
-    },
-    {
-      "name": "month_jul",
-      "value": "Jul"
-    },
-    {
-      "name": "month_aug",
-      "value": "Aug"
-    },
-    {
-      "name": "month_sep",
-      "value": "Sep"
-    },
-    {
-      "name": "month_oct",
-      "value": "Oct"
-    },
-    {
-      "name": "month_nov",
-      "value": "Nov"
-    },
-    {
-      "name": "month_dec",
-      "value": "Dec"
-    },
-    {
-      "name": "day_suffix",
-      "value": ""
-    },
-    {
-      "name": "save_failed_with_error",
-      "value": "Save failed: %s"
-    },
-    {
-      "name": "details",
-      "value": "Details"
-    },
-    {
-      "name": "also_known_as",
-      "value": ", also known as %s"
-    },
-    {
-      "name": "headquarters_located",
-      "value": "Headquarters is located in %s"
-    },
-    {
-      "name": "region_is",
-      "value": "Region: %s"
-    },
-    {
-      "name": "org_type_is",
-      "value": "Organization type: %s"
-    },
-    {
-      "name": "coverage_population_approx",
-      "value": "Coverage population: approximately %s"
-    },
-    {
-      "name": "website_colon",
-      "value": "Website: %s"
-    },
-    {
-      "name": "capital_is",
-      "value": "Capital: %s"
-    },
-    {
-      "name": "region_belongs",
-      "value": "Region: %s"
-    },
-    {
-      "name": "population_colon",
-      "value": "Population: %s"
-    },
-    {
-      "name": "area_colon",
-      "value": "Area: %s"
-    },
-    {
-      "name": "flag_proportion_is",
-      "value": "Flag proportion: %s"
-    },
-    {
-      "name": "adopted_date_is",
-      "value": "Adopted date: %s"
-    },
-    {
-      "name": "also_known_as_en",
-      "value": ", also known as %s"
-    },
-    {
-      "name": "headquarters_located_en",
-      "value": "Headquarters is located in %s"
-    },
-    {
-      "name": "region_colon_en",
-      "value": "Region: %s"
-    },
-    {
-      "name": "org_type_colon_en",
-      "value": "Organization type: %s"
-    },
-    {
-      "name": "coverage_population_en",
-      "value": "Coverage population: approximately %s"
-    },
-    {
-      "name": "website_colon_en",
-      "value": "Website: %s"
-    },
-    {
-      "name": "capital_colon_en",
-      "value": "Capital: %s"
-    },
-    {
-      "name": "population_colon_en",
-      "value": "Population: %s"
-    },
-    {
-      "name": "area_colon_en",
-      "value": "Area: %s"
-    },
-    {
-      "name": "flag_proportion_en",
-      "value": "Flag proportion: %s"
-    },
-    {
-      "name": "adopted_date_en",
-      "value": "Adopted date: %s"
-    },
-    {
-      "name": "flag",
-      "value": "Flag"
-    },
-    {
-      "name": "national_flag",
-      "value": "National Flag"
-    },
-    {
-      "name": "flag_default_description",
-      "value": "The flag of %s is an important symbol of the country, representing its history, culture, and values."
-    },
-    {
-      "name": "connectionsAsia",
-      "value": "Asia"
-    },
-    {
-      "name": "connectionsEurope",
-      "value": "Europe"
-    },
-    {
-      "name": "connectionsAmericas",
-      "value": "Americas"
-    },
-    {
-      "name": "connectionsAfrica",
-      "value": "Africa"
-    },
-    {
-      "name": "connectionsRedFlags",
-      "value": "Red Flags"
-    },
-    {
-      "name": "connectionsGreenFlags",
-      "value": "Green Flags"
-    },
-    {
-      "name": "connectionsBlueFlags",
-      "value": "Blue Flags"
-    },
-    {
-      "name": "connectionsYellowFlags",
-      "value": "Yellow Flags"
-    },
-    {
-      "name": "connectionsAngloSaxonFlags",
-      "value": "Anglo-Saxon Flags"
-    },
-    {
-      "name": "connectionsSlavicFlags",
-      "value": "Slavic Flags"
-    },
-    {
-      "name": "connectionsNordicFlags",
-      "value": "Nordic Flags"
-    },
-    {
-      "name": "connectionsArabFlags",
-      "value": "Arab Flags"
-    },
-    {
-      "name": "connectionsEastAsia",
-      "value": "East Asia"
-    },
-    {
-      "name": "connectionsSouthAsia",
-      "value": "South Asia"
-    },
-    {
-      "name": "connectionsWestAsia",
-      "value": "West Asia"
-    },
-    {
-      "name": "connectionsSoutheastAsia",
-      "value": "Southeast Asia"
-    },
-    {
-      "name": "connectionsNorthAfrica",
-      "value": "North Africa"
-    },
-    {
-      "name": "connectionsEastAfrica",
-      "value": "East Africa"
-    },
-    {
-      "name": "connectionsSouthAfrica",
-      "value": "South Africa"
-    },
-    {
-      "name": "connectionsWestAfrica",
-      "value": "West Africa"
-    },
-    {
-      "name": "connectionsNorthEurope",
-      "value": "North Europe"
-    },
-    {
-      "name": "connectionsEastEurope",
-      "value": "East Europe"
-    },
-    {
-      "name": "connectionsWestEurope",
-      "value": "West Europe"
-    },
-    {
-      "name": "connectionsSouthEurope",
-      "value": "South Europe"
-    },
-    {
-      "name": "connectionsSocialismCountries",
-      "value": "Socialism Countries"
-    },
-    {
-      "name": "connectionsSun",
-      "value": "Sun"
-    },
-    {
-      "name": "connectionsCrescentAndStar",
-      "value": "Crescent and Star"
-    },
-    {
-      "name": "connectionsAnimal",
-      "value": "Animal"
-    },
-    {
-      "name": "connectionsPanAfricanColors",
-      "value": "Pan-African Colors"
-    },
-    {
-      "name": "connectionsIslandCountries",
-      "value": "Island Countries"
-    },
-    {
-      "name": "connectionsLandlockedCountries",
-      "value": "Landlocked Countries"
-    },
-    {
-      "name": "connectionsBiggestCountries",
-      "value": "Biggest Countries"
-    },
-    {
-      "name": "connectionsFlagsWithManyStripes",
-      "value": "Flags with Many Stripes"
-    },
-    {
-      "name": "connectionsTwoColorFlags",
-      "value": "Two-Color Flags"
-    },
-    {
-      "name": "connectionsFlagsWithWeapons",
-      "value": "Flags with Weapons"
-    },
-    {
-      "name": "connectionsTinyCountries",
-      "value": "Tiny Countries"
-    },
-    {
-      "name": "connectionsFlagsWithStars",
-      "value": "Flags with Stars"
-    },
-    {
-      "name": "connectionsFlagsWithTreesOrPlants",
-      "value": "Flags with Trees or Plants"
-    },
-    {
-      "name": "connectionsFlagsWithCrowns",
-      "value": "Flags with Crowns"
-    },
-    {
-      "name": "connectionsFlagsWithSouthernCross",
-      "value": "Flags with the Southern Cross"
-    },
-    {
-      "name": "connectionsNonRectangularFlags",
-      "value": "Non-Rectangular Flags"
-    },
-    {
-      "name": "connectionsHorizontalTribands",
-      "value": "Horizontal Tribands"
-    },
-    {
-      "name": "connectionsVerticalTribands",
-      "value": "Vertical Tribands"
-    },
-    {
-      "name": "connectionsDiagonalStripes",
-      "value": "Diagonal Stripes"
-    },
-    {
-      "name": "connectionsNileRiverCountries",
-      "value": "Nile River Countries"
-    },
-    {
-      "name": "connectionsAmazonRiverCountries",
-      "value": "Amazon River Countries"
-    },
-    {
-      "name": "connectionsMekongRiverCountries",
-      "value": "Mekong River Countries"
-    },
-    {
-      "name": "connectionsDanubeRiverCountries",
-      "value": "Danube River Countries"
-    },
-    {
-      "name": "state_count_jp",
-      "value": "47 Prefectures"
-    },
-    {
-      "name": "state_count_us",
-      "value": "50 States"
-    },
-    {
-      "name": "state_count_de",
-      "value": "16 States"
-    },
-    {
-      "name": "state_count_au",
-      "value": "9 States"
-    },
-    {
-      "name": "state_count_br",
-      "value": "27 States"
-    },
-    {
-      "name": "state_count_ca",
-      "value": "13 Provinces"
-    },
-    {
-      "name": "state_count_kr",
-      "value": "17 Administrative Divisions"
-    },
-    {
-      "name": "state_count_ch",
-      "value": "26 Cantons"
-    },
-    {
-      "name": "state_count_gb",
-      "value": "4 Countries"
-    },
-    {
-      "name": "state_count_it",
-      "value": "20 Regions"
-    },
-    {
-      "name": "state_count_es",
-      "value": "17 Autonomous Communities"
     }
   ]
 }

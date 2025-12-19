@@ -21,7 +21,6 @@ import { AnthemPlayer } from '../../components/AnthemPlayer';
 export struct AnthemPage {
   @State countries: Country[] = [];
   @State filteredCountries: Country[] = [];
-  @State allCountries: Country[] = []; // 存储所有国家（包括没有国歌的）
   @State selectedContinent: Continent = 'World';
   @State searchText: string = '';
   @State isLoading: boolean = true;
@@ -51,16 +50,14 @@ export struct AnthemPage {
   }
 
   private loadCountries(): void {
-    // 获取所有国家
-    this.allCountries = getCountriesByContinent(this.selectedContinent);
-    
-    // 过滤出有国歌文件的国家（用于正常列表显示）
-    this.countries = this.allCountries.filter((country) => {
+    // 获取所有国家并过滤出有国歌文件的国家
+    const allCountriesInContinent = getCountriesByContinent(this.selectedContinent);
+    this.countries = allCountriesInContinent.filter((country) => {
       return hasAnthemFile(country.code);
     });
     
-    // 前10个热门国家国歌（必须包括中国）
-    const top10CountryCodes = ['cn', 'us', 'gb', 'fr', 'de', 'it', 'jp', 'ca', 'ru', 'au'];
+    // 前10个热门国家国歌（巴西替代日本）
+    const top10CountryCodes = ['cn', 'us', 'gb', 'fr', 'de', 'it', 'br', 'ca', 'ru', 'au'];
     
     // 分离出前10个国家和其他国家
     const top10Countries: Country[] = [];
@@ -92,13 +89,6 @@ export struct AnthemPage {
     // 合并：前10个国家在前，其他国家在后
     this.countries = [...top10Countries, ...otherCountries];
     
-    // 对所有国家也进行排序（用于搜索）
-    this.allCountries.sort((a, b) => {
-      const nameA = getLocalizedCountryName(a, this.systemLanguage);
-      const nameB = getLocalizedCountryName(b, this.systemLanguage);
-      return isEnglish ? nameA.localeCompare(nameB, 'en') : nameA.localeCompare(nameB, 'zh-CN');
-    });
-    
     this.filterCountries();
   }
 
@@ -107,9 +97,9 @@ export struct AnthemPage {
       // 没有搜索时，只显示有国歌的国家
       this.filteredCountries = this.countries;
     } else {
-      // 搜索时，从所有国家中搜索（包括没有国歌的）
+      // 搜索时，只搜索有国歌的国家
       const keyword = this.searchText.trim().toLowerCase();
-      this.filteredCountries = this.allCountries.filter((country) => {
+      this.filteredCountries = this.countries.filter((country) => {
         const localizedName = getLocalizedCountryName(country, this.systemLanguage).toLowerCase();
         return localizedName.includes(keyword) ||
           country.nameCN.toLowerCase().includes(keyword) ||
@@ -361,43 +351,28 @@ export struct AnthemPage {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width('100%')
 
-        if (hasAnthemFile(country.code)) {
-          Text(this.getAnthemName(country.code))
-            .fontSize(13)
-            .fontColor($r('app.color.text_tertiary'))
-            .maxLines(1)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-            .width('100%')
-            .margin({ top: 4 })
-        } else {
-          Text(this.appContext.resourceManager.getStringSync($r('app.string.no_sound_file').id))
-            .fontSize(13)
-            .fontColor($r('app.color.text_tertiary'))
-            .maxLines(1)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-            .width('100%')
-            .margin({ top: 4 })
-            .opacity(0.7)
-        }
+        Text(this.getAnthemName(country.code))
+          .fontSize(13)
+          .fontColor($r('app.color.text_tertiary'))
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .width('100%')
+          .margin({ top: 4 })
       }
       .alignItems(HorizontalAlign.Start)
       .layoutWeight(1)
 
-      // 播放按钮（只在有国歌时显示）
-      if (hasAnthemFile(country.code)) {
-        SymbolGlyph($r('sys.symbol.play'))
-          .fontSize(22)
-          .fontColor([$r('app.color.text_tertiary')])
-          .margin({ left: 8 })
-      }
+      // 播放按钮
+      SymbolGlyph($r('sys.symbol.play'))
+        .fontSize(22)
+        .fontColor([$r('app.color.text_tertiary')])
+        .margin({ left: 8 })
     }
     .width('100%')
     .height(72)
     .padding({ left: 16, right: 16, top: 8, bottom: 8 })
     .onClick(() => {
-      if (hasAnthemFile(country.code)) {
-        this.playAnthem(country);
-      }
+      this.playAnthem(country);
     })
   }
 }

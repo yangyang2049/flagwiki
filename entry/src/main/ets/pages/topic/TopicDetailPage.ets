@@ -1,15 +1,13 @@
 import router from '@ohos.router';
-import { TopicItem, getTopicById, getLocalizedTopicName, getLocalizedTopicDescription } from './TopicData';
-import { getCountryByCode, Country, getFlagImageSource, getInternationalOrgByCode, InternationalOrg, isInternationalOrg, getLocalizedCountryName, getLocalizedOrgName } from '../../utils/countryData';
-import { EtiquetteSection, getEtiquetteContent, getLocalizedEtiquetteContent } from './FlagEtiquetteData';
-import { ManufacturingSection, getManufacturingContent, getLocalizedManufacturingContent } from './FlagManufacturingData';
-import { VexillologySection, getVexillologyContent, getLocalizedVexillologyContent } from './FlagVexillologyData';
-import { HistorySection, getFlagHistoryContent, getLocalizedFlagHistoryContent } from './FiveStarRedFlagHistoryData';
-import { CountrySymbolsSection, getLocalizedCountrySymbolsContent } from './CountrySymbolsData';
+import { TopicItem, getTopicById } from './TopicData';
+import { getCountryByCode, Country, getFlagImageSource, getInternationalOrgByCode, InternationalOrg, isInternationalOrg } from '../../utils/countryData';
+import { EtiquetteSection, getEtiquetteContent } from './FlagEtiquetteData';
+import { ManufacturingSection, getManufacturingContent } from './FlagManufacturingData';
+import { VexillologySection, getVexillologyContent } from './FlagVexillologyData';
+import { HistorySection, getFlagHistoryContent } from './FiveStarRedFlagHistoryData';
 import { TextReaderUtil } from '../../utils/TextReaderUtil';
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
-import { LocalizationUtil } from '../../utils/LocalizationUtil';
 
 interface RouterParams {
   topicId: string;
@@ -19,7 +17,6 @@ interface DisplayItem {
   code: string;
   nameCN: string;
   name: string;
-  localizedName: string; // 本地化名称
 }
 
 interface SimilarFlagPair {
@@ -40,16 +37,12 @@ interface SimilarFlagPair {
   @State manufacturingSections: ManufacturingSection[] = [];
   @State vexillologySections: VexillologySection[] = [];
   @State flagHistorySections: HistorySection[] = [];
-  @State countrySymbolsSections: CountrySymbolsSection[] = [];
   @State isKnowledgeTopic: boolean = false;
   @State isReading: boolean = false;
   @State similarFlagPairs: SimilarFlagPair[] = [];
-  @State showTtsFirstUseDialog: boolean = false;
   private context = getContext(this) as common.UIAbilityContext;
-  @StorageLink('currentLanguage') currentLanguage: string = 'zh';
 
   async aboutToAppear() {
-    // 获取当前系统语言（已通过 @StorageLink 自动同步）
     const params = router.getParams() as RouterParams;
     if (params && params.topicId) {
       this.topic = getTopicById(params.topicId);
@@ -83,25 +76,6 @@ interface SimilarFlagPair {
     }
   }
 
-  private getCountText(): string {
-    if (!this.topic) {
-      return '';
-    }
-    let count: number;
-    if (this.topic.id === 'similar-flags') {
-      // 相似旗专题：每个 pair 包含 2 个国家
-      count = this.similarFlagPairs.length * 2;
-    } else {
-      count = this.displayItems.length;
-    }
-    const countStr = count.toString();
-    if (this.topic.id === 'international') {
-      return this.context.resourceManager.getStringSync($r('app.string.total_organizations').id, countStr);
-    } else {
-      return this.context.resourceManager.getStringSync($r('app.string.total_countries').id, countStr);
-    }
-  }
-
   private loadCountries(): void {
     if (!this.topic) return;
 
@@ -119,8 +93,7 @@ interface SimilarFlagPair {
           displayList.push({
             code: org.code,
             nameCN: org.nameCN,
-            name: org.name,
-            localizedName: getLocalizedOrgName(org, this.currentLanguage)
+            name: org.name
           });
         }
       } else {
@@ -130,8 +103,7 @@ interface SimilarFlagPair {
           displayList.push({
             code: country.code,
             nameCN: country.nameCN,
-            name: country.name,
-            localizedName: getLocalizedCountryName(country, this.currentLanguage)
+            name: country.name
           });
         }
       }
@@ -146,17 +118,15 @@ interface SimilarFlagPair {
 
     this.isLoading = true;
 
-    // 根据专题ID加载对应的知识内容（使用本地化内容）
+    // 根据专题ID加载对应的知识内容
     if (this.topic.id === 'etiquette') {
-      this.etiquetteSections = getLocalizedEtiquetteContent(this.currentLanguage);
+      this.etiquetteSections = getEtiquetteContent();
     } else if (this.topic.id === 'manufacturing') {
-      this.manufacturingSections = getLocalizedManufacturingContent(this.currentLanguage);
+      this.manufacturingSections = getManufacturingContent();
     } else if (this.topic.id === 'vexillology') {
-      this.vexillologySections = getLocalizedVexillologyContent(this.currentLanguage);
+      this.vexillologySections = getVexillologyContent();
     } else if (this.topic.id === 'flag-history') {
-      this.flagHistorySections = getLocalizedFlagHistoryContent(this.currentLanguage);
-    } else if (this.topic.id === 'country-symbols') {
-      this.countrySymbolsSections = getLocalizedCountrySymbolsContent(this.currentLanguage);
+      this.flagHistorySections = getFlagHistoryContent();
     }
 
     this.isLoading = false;
@@ -167,57 +137,16 @@ interface SimilarFlagPair {
 
     this.isLoading = true;
 
-    // 相似旗组合定义（使用本地化名称）
-    const isEnglish = LocalizationUtil.isEnglish(this.currentLanguage);
+    // 相似旗组合定义
     const pairs: SimilarFlagPair[] = [
-      { 
-        code1: 'mc', 
-        nameCN1: isEnglish ? 'Monaco' : '摩纳哥', 
-        code2: 'id', 
-        nameCN2: isEnglish ? 'Indonesia' : '印尼' 
-      },
-      { 
-        code1: 'nl', 
-        nameCN1: isEnglish ? 'Netherlands' : '荷兰', 
-        code2: 'lu', 
-        nameCN2: isEnglish ? 'Luxembourg' : '卢森堡' 
-      },
-      { 
-        code1: 'ro', 
-        nameCN1: isEnglish ? 'Romania' : '罗马尼亚', 
-        code2: 'td', 
-        nameCN2: isEnglish ? 'Chad' : '乍得' 
-      },
-      { 
-        code1: 'cn', 
-        nameCN1: isEnglish ? 'China' : '中国', 
-        code2: 'vn', 
-        nameCN2: isEnglish ? 'Vietnam' : '越南' 
-      },
-      { 
-        code1: 'ke', 
-        nameCN1: isEnglish ? 'Kenya' : '肯尼亚', 
-        code2: 'ss', 
-        nameCN2: isEnglish ? 'South Sudan' : '南苏丹' 
-      },
-      { 
-        code1: 'ad', 
-        nameCN1: isEnglish ? 'Andorra' : '安道尔', 
-        code2: 'md', 
-        nameCN2: isEnglish ? 'Moldova' : '摩尔多瓦' 
-      },
-      { 
-        code1: 'ir', 
-        nameCN1: isEnglish ? 'Iran' : '伊朗', 
-        code2: 'tj', 
-        nameCN2: isEnglish ? 'Tajikistan' : '塔吉克斯坦' 
-      },
-      { 
-        code1: 'ie', 
-        nameCN1: isEnglish ? 'Ireland' : '爱尔兰', 
-        code2: 'ci', 
-        nameCN2: isEnglish ? 'Ivory Coast' : '科特迪瓦' 
-      }
+      { code1: 'mc', nameCN1: '摩纳哥', code2: 'id', nameCN2: '印尼' },
+      { code1: 'nl', nameCN1: '荷兰', code2: 'lu', nameCN2: '卢森堡' },
+      { code1: 'ro', nameCN1: '罗马尼亚', code2: 'td', nameCN2: '乍得' },
+      { code1: 'cn', nameCN1: '中国', code2: 'vn', nameCN2: '越南' },
+      { code1: 'ke', nameCN1: '肯尼亚', code2: 'ss', nameCN2: '南苏丹' },
+      { code1: 'ad', nameCN1: '安道尔', code2: 'md', nameCN2: '摩尔多瓦' },
+      { code1: 'ir', nameCN1: '伊朗', code2: 'tj', nameCN2: '塔吉克斯坦' },
+      { code1: 'ie', nameCN1: '爱尔兰', code2: 'ci', nameCN2: '科特迪瓦' }
     ];
 
     this.similarFlagPairs = pairs;
@@ -225,91 +154,79 @@ interface SimilarFlagPair {
   }
 
   build() {
-    Stack() {
-      Navigation() {
-        if (this.topic) {
+    Navigation() {
+      if (this.topic) {
+        Column() {
+          // 专题介绍卡片 - 无圆角
           Column() {
-            // 专题介绍卡片 - 无圆角
-            Column() {
-              Text(this.topic.emoji)
-                .fontSize(48)
-                .margin({ bottom: 12 })
+            Text(this.topic.emoji)
+              .fontSize(48)
+              .margin({ bottom: 12 })
 
-              Text(getLocalizedTopicName(this.topic, this.currentLanguage))
-                .fontSize(24)
-                .fontWeight(FontWeight.Bold)
-                .fontColor($r('app.color.text_primary'))
+            Text(this.topic.name)
+              .fontSize(24)
+              .fontWeight(FontWeight.Bold)
+              .fontColor($r('app.color.text_primary'))
 
-              Text(getLocalizedTopicDescription(this.topic, this.currentLanguage))
-                .fontSize(14)
-                .fontColor($r('app.color.text_secondary'))
-                .margin({ top: 8 })
-                .textAlign(TextAlign.Center)
-
-              if (!this.isKnowledgeTopic) {
-                Text(this.getCountText())
-                  .fontSize(13)
-                  .fontColor($r('app.color.text_tertiary'))
-                  .margin({ top: 8 })
-              }
-            }
-            .width('100%')
-              .padding(24)
-              .backgroundColor($r('app.color.bg_card'))
-
-            // 内容区域：知识性专题显示知识内容，相似旗显示特殊UI，否则显示国旗列表
-            if (this.isKnowledgeTopic) {
-              this.KnowledgeContentView()
-            } else if (this.topic.id === 'similar-flags') {
-              this.SimilarFlagsView()
-            } else {
-              this.FlagListView()
-            }
-          }
-          .width('100%')
-            .height('100%')
-        } else {
-          Column() {
-            LoadingProgress()
-              .width(40)
-              .height(40)
-              .color($r('app.color.button_primary'))
-            Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
+            Text(this.topic.description)
               .fontSize(14)
-              .fontColor($r('app.color.text_tertiary'))
-              .margin({ top: 12 })
+              .fontColor($r('app.color.text_secondary'))
+              .margin({ top: 8 })
+              .textAlign(TextAlign.Center)
+
+            if (!this.isKnowledgeTopic) {
+              Text(`共 ${this.displayItems.length} 个${this.topic.id === 'international' ? '组织' : '国家'}`)
+                .fontSize(13)
+                .fontColor($r('app.color.text_tertiary'))
+                .margin({ top: 8 })
+            }
           }
           .width('100%')
-            .height('100%')
-            .justifyContent(FlexAlign.Center)
-        }
-      }
-      .title('')
-        .titleMode(NavigationTitleMode.Mini)
-        .backgroundColor($r('app.color.bg_page'))
-        .menus(this.isKnowledgeTopic ? this.MenuBuilder : undefined)
+            .padding(24)
+            .backgroundColor($r('app.color.bg_card'))
 
-      // TTS首次使用提示对话框
-      if (this.showTtsFirstUseDialog) {
-        this.TtsFirstUseDialog()
+          // 内容区域：知识性专题显示知识内容，相似旗显示特殊UI，否则显示国旗列表
+          if (this.isKnowledgeTopic) {
+            this.KnowledgeContentView()
+          } else if (this.topic.id === 'similar-flags') {
+            this.SimilarFlagsView()
+          } else {
+            this.FlagListView()
+          }
+        }
+        .width('100%')
+          .height('100%')
+      } else {
+        Column() {
+          LoadingProgress()
+            .width(40)
+            .height(40)
+            .color($r('app.color.button_primary'))
+          Text('加载中...')
+            .fontSize(14)
+            .fontColor($r('app.color.text_tertiary'))
+            .margin({ top: 12 })
+        }
+        .width('100%')
+          .height('100%')
+          .justifyContent(FlexAlign.Center)
       }
     }
-    .width('100%')
-      .height('100%')
+    .title('')
+      .titleMode(NavigationTitleMode.Mini)
+      .backgroundColor($r('app.color.bg_page'))
+      .menus(this.isKnowledgeTopic ? this.MenuBuilder : undefined)
   }
 
   @Builder
   MenuBuilder() {
     Row({ space: 20 }) {
-      // 只在中文环境下显示朗读按钮
-      if (!LocalizationUtil.isEnglish(this.currentLanguage)) {
-        Image($r('app.media.icon_voice'))
-          .width(24)
-          .height(24)
-          .onClick(() => {
-            this.onReadClick();
-          })
-      }
+      Image($r('app.media.icon_voice'))
+        .width(24)
+        .height(24)
+        .onClick(() => {
+          this.onReadClick();
+        })
     }
     .height('100%')
       .justifyContent(FlexAlign.End)
@@ -321,13 +238,9 @@ interface SimilarFlagPair {
     if (!this.topic) return '';
 
     const lines: string[] = [];
-    const topicName = getLocalizedTopicName(this.topic, this.currentLanguage);
-    const topicDesc = getLocalizedTopicDescription(this.topic, this.currentLanguage);
-    lines.push(topicName);
-    lines.push(topicDesc);
+    lines.push(this.topic.description);
     lines.push('');
 
-    // 使用本地化的内容（section.title 和 section.content 已经是本地化的）
     if (this.topic.id === 'etiquette') {
       for (const section of this.etiquetteSections) {
         lines.push(section.title);
@@ -352,12 +265,6 @@ interface SimilarFlagPair {
         lines.push(section.content);
         lines.push('');
       }
-    } else if (this.topic.id === 'country-symbols') {
-      for (const section of this.countrySymbolsSections) {
-        lines.push(section.title);
-        lines.push(section.content);
-        lines.push('');
-      }
     }
 
     return lines.join('\n');
@@ -367,48 +274,28 @@ interface SimilarFlagPair {
     if (this.isReading) {
       TextReaderUtil.stopRead();
       this.isReading = false;
+      promptAction.showToast({
+        message: '已停止朗读',
+        duration: 2000
+      });
+    } else {
+      try {
+        const title = this.topic?.name || '专题详情';
+        const content = this.getReadContent();
+        await TextReaderUtil.startRead(this.context, title, content);
+        this.isReading = true;
         promptAction.showToast({
-          message: this.context.resourceManager.getStringSync($r('app.string.stop_reading').id),
+          message: '开始朗读',
           duration: 2000
         });
-    } else {
-      // 检查是否首次使用TTS功能
-      const isFirstUse = await TextReaderUtil.isFirstUse(this.context);
-      if (isFirstUse) {
-        // 显示首次使用提示对话框
-        this.showTtsFirstUseDialog = true;
-      } else {
-        // 直接开始朗读
-        await this.startReading();
+      } catch (err) {
+        console.error(`Failed to start read: ${JSON.stringify(err)}`);
+        promptAction.showToast({
+          message: '朗读功能暂不可用',
+          duration: 2000
+        });
       }
     }
-  }
-
-  private async startReading(): Promise<void> {
-    try {
-      const title = this.topic ? getLocalizedTopicName(this.topic, this.currentLanguage) : this.context.resourceManager.getStringSync($r('app.string.details').id);
-      const content = this.getReadContent();
-      await TextReaderUtil.startRead(this.context, title, content);
-      this.isReading = true;
-      promptAction.showToast({
-        message: this.context.resourceManager.getStringSync($r('app.string.start_reading').id),
-        duration: 2000
-      });
-    } catch (err) {
-      console.error(`Failed to start read: ${JSON.stringify(err)}`);
-      promptAction.showToast({
-        message: this.context.resourceManager.getStringSync($r('app.string.reading_unavailable').id),
-        duration: 2000
-      });
-    }
-  }
-
-  private async onTtsFirstUseDialogConfirm(): Promise<void> {
-    // 标记已显示
-    await TextReaderUtil.markFirstUseShown(this.context);
-    this.showTtsFirstUseDialog = false;
-    // 开始朗读
-    await this.startReading();
   }
 
   @Builder
@@ -419,7 +306,7 @@ interface SimilarFlagPair {
           .width(40)
           .height(40)
           .color($r('app.color.button_primary'))
-        Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
+        Text('加载中...')
           .fontSize(14)
           .fontColor($r('app.color.text_tertiary'))
           .margin({ top: 12 })
@@ -432,8 +319,8 @@ interface SimilarFlagPair {
         Column() {
           ForEach(this.similarFlagPairs, (pair: SimilarFlagPair, index: number) => {
             Column() {
-              // 标题：xxx和xxx（使用本地化文本）
-              Text(LocalizationUtil.isEnglish(this.currentLanguage) ? `${pair.nameCN1} and ${pair.nameCN2}` : `${pair.nameCN1}和${pair.nameCN2}`)
+              // 标题：xxx和xxx
+              Text(`${pair.nameCN1}和${pair.nameCN2}`)
                 .fontSize(18)
                 .fontWeight(FontWeight.Bold)
                 .fontColor($r('app.color.text_primary'))
@@ -524,7 +411,7 @@ interface SimilarFlagPair {
           .width(40)
           .height(40)
           .color($r('app.color.button_primary'))
-        Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
+        Text('加载中...')
           .fontSize(14)
           .fontColor($r('app.color.text_tertiary'))
           .margin({ top: 12 })
@@ -563,7 +450,7 @@ interface SimilarFlagPair {
           .width(40)
           .height(40)
           .color($r('app.color.button_primary'))
-        Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
+        Text('加载中...')
           .fontSize(14)
           .fontColor($r('app.color.text_tertiary'))
           .margin({ top: 12 })
@@ -590,10 +477,6 @@ interface SimilarFlagPair {
             ForEach(this.flagHistorySections, (section: HistorySection, index: number) => {
               this.KnowledgeSection(section.title, section.content, index)
             }, (section: HistorySection, index: number) => `flag-history_${index}`)
-          } else if (this.topic?.id === 'country-symbols') {
-            ForEach(this.countrySymbolsSections, (section: CountrySymbolsSection, index: number) => {
-              this.KnowledgeSection(section.title, section.content, index)
-            }, (section: CountrySymbolsSection, index: number) => `country-symbols_${index}`)
           }
         }
         .width('100%')
@@ -638,7 +521,7 @@ interface SimilarFlagPair {
         .objectFit(ImageFit.Contain)
         .borderRadius(4)
 
-      Text(item.localizedName)
+      Text(item.nameCN)
         .fontSize(13)
         .fontColor($r('app.color.text_primary'))
         .margin({ top: 8 })
@@ -647,7 +530,7 @@ interface SimilarFlagPair {
     }
     .width('100%')
       .padding(12)
-      .backgroundColor($r('app.color.bg_flag_topic'))
+      .backgroundColor($r('app.color.bg_card'))
       .borderRadius(12)
       .onClick(() => {
         router.pushUrl({
@@ -657,60 +540,5 @@ interface SimilarFlagPair {
           console.error(`Navigation failed: ${err.message}`);
         });
       })
-  }
-
-  @Builder
-  TtsFirstUseDialog() {
-    Stack({ alignContent: Alignment.Center }) {
-      // 遮罩层
-      Column()
-        .width('100%')
-        .height('100%')
-        .backgroundColor('rgba(0, 0, 0, 0.5)')
-        .onClick(() => {
-          // 不允许点击遮罩层关闭，必须点击确认按钮
-        })
-
-      // 对话框
-      Column() {
-        Text($r('app.string.tts_first_use_title'))
-          .fontSize(18)
-          .fontWeight(FontWeight.Bold)
-          .fontColor($r('app.color.text_primary'))
-          .margin({ bottom: 16 })
-
-        Text($r('app.string.tts_first_use_message'))
-          .fontSize(14)
-          .fontColor($r('app.color.text_primary'))
-          .lineHeight(22)
-          .width('100%')
-          .margin({ bottom: 20 })
-
-        Button($r('app.string.tts_first_use_confirm'))
-          .type(ButtonType.Normal)
-          .backgroundColor($r('app.color.button_primary'))
-          .fontColor($r('app.color.white'))
-          .fontSize(16)
-          .width('100%')
-          .height(44)
-          .borderRadius(8)
-          .onClick(async () => {
-            await this.onTtsFirstUseDialogConfirm();
-          })
-      }
-      .width('85%')
-        .constraintSize({ maxWidth: 400 })
-        .padding({ left: 24, right: 24, top: 24, bottom: 24 })
-        .backgroundColor($r('app.color.bg_card'))
-        .borderRadius(16)
-        .shadow({
-          radius: 20,
-          color: $r('app.color.shadow'),
-          offsetX: 0,
-          offsetY: 4
-        })
-    }
-    .width('100%')
-      .height('100%')
   }
 }
