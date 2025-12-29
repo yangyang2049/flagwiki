@@ -45,5 +45,4 @@ file_review_result.json
 # 临时HTML文件
 flag-history.html
 
-# 应用商店截图（旧版本，新截图应放在screenshots目录）
-store*.png
+# 注意：store*.png 是应用截图，用于 README.md 文档，应保留在仓库中
