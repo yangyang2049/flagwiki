@@ -291,36 +291,9 @@ cd flagwiki
 
 ## 🔗 AppGallery 链接
 
-### Web 链接格式
-
-```
-https://appgallery.huawei.com/app/C[应用ID]
-```
-
-**注意**：`[应用ID]` 是 AppGallery Connect 分配的应用ID（格式类似 `C101234567`），需要在 AppGallery Connect 中查看。如果应用尚未上架，可以使用包名 `com.douhua.flag` 作为临时替代。
-
-### 应用内打开链接格式
-
-```
-appmarket://details?id=[应用ID]&callType=WEB&methodType=4
-```
-
-**注意**：`[应用ID]` 同上。如果使用包名，格式为 `appmarket://details?id=com.douhua.flag`。
-
-### 当前代码中的使用
-
-在 `entry/src/main/ets/pages/profile/ProfilePage.ets` 中，分享功能使用的是包名：
-
-```typescript
-const bundleName = 'com.douhua.flag';
-const appGalleryUrl = `https://appgallery.huawei.com/app/detail?id=${bundleName}&channelId=SHARE&source=appshare`;
-```
-
-如需使用应用ID，请将 `bundleName` 替换为实际的应用ID。
-
-### 搜索说明
-
-在 AppGallery 中搜索"国旗小百科"即可找到本应用。
+- **Web 链接**：https://appgallery.huawei.com/app/detail?id=com.douhua.flag
+- **应用内打开**：`appmarket://details?id=com.douhua.flag&callType=WEB&methodType=4`
+- **搜索**：在 AppGallery 中搜索"国旗小百科"
 
 ## 🛠️ 技术栈
 
