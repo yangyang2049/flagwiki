@@ -2,6 +2,24 @@
 
 ## [未发布]
 
+### 新增 (Added)
+- **开源准备**：为项目开源做准备
+  - 创建完整的 README.md 文档，包含项目介绍、功能说明、技术栈、华为能力、使用指南等
+  - 更新 .gitignore 文件，添加参考文件夹、系统文件等忽略规则
+  - 添加项目结构说明和模板使用指南
+  - 添加贡献指南和联系方式
+
+### 删除 (Removed)
+- **清理参考文件夹和临时文件**：删除所有不相关的参考文件和临时文件
+  - 删除了参考项目文件夹：`Music1.0.0 (2)/`
+  - 删除了参考图标包：`IconPark - Icons Pack (Community)/`
+  - 删除了备份文件夹：`coat of arms svg backup/`
+  - 删除了临时报告文件：`ANTHEM_CHECK_REPORT.md`、`ANTHEM_FIX_SUMMARY.md`、`ANTHEM_PLAYBACK_FIX.md`、`ANTHEM_SEARCH_RESULTS.md`
+  - 删除了临时HTML文件：`flag-history.html`
+  - 删除了旧的应用商店截图：`store.png`、`store2.png`、`store2-1.png`、`store2-2.png`、`store4.png`、`store5.png`
+  - 删除了scripts目录下的所有临时报告和结果文件（`*_report.md`、`*_result.json`、`*_SUMMARY.md`等）
+  - 更新了 .gitignore，添加了临时文件和报告文件的忽略规则
+
 ### 优化 (Optimized)
 - **历史旗帜图片转换为 WebP 格式**：将 2951 张历史旗帜图片从 PNG 转换为 WebP
   - 转换前大小：91 MB

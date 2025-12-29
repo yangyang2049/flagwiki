@@ -1,9 +1,0 @@
-{
-  "module": {
-    "name": "module_aggregated_payment",
-    "type": "har",
-    "deviceTypes": [
-      "default"
-    ],
-  }
-}

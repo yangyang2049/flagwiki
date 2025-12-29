@@ -5,9 +5,45 @@
 **/build
 /.hvigor
 .cxx
+/.cxx
 /.clangd
 /.clang-format
 /.clang-tidy
 **/.test
 /.appanalyzer
+/.preview
 /AIRecitation
+
+# 参考文件夹和资源
+/IconPark - Icons Pack (Community)
+/Music1.0.0 (2)
+/coat of arms svg backup
+
+# 系统文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 临时文件和报告
+*.log
+download_log.txt
+*_report.md
+*_result.json
+*_SUMMARY.md
+*_CHECK_REPORT.md
+*_FIX_SUMMARY.md
+*_SEARCH_RESULTS.md
+*_PLAYBACK_FIX.md
+fix_summary.md
+file_review_report.md
+file_review_result.json
+
+# 临时HTML文件
+flag-history.html
+
+# 应用商店截图（旧版本，新截图应放在screenshots目录）
+store*.png
