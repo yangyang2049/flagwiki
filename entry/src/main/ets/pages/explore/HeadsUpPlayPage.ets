@@ -279,7 +279,7 @@ export struct HeadsUpPlayPage {
         .fontColor($r('app.color.text_primary'))
         .margin({ bottom: 12 })
 
-      Text(this.context.resourceManager.getStringSync($r('app.string.headsup_session_count').id, this.sessionNumber))
+      Text(this.context.resourceManager.getStringSync($r('app.string.headsup_session_count').id, this.sessionNumber.toString()))
         .fontSize(16)
         .fontColor($r('app.color.text_secondary'))
         .margin({ bottom: 60 })

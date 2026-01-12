@@ -159,7 +159,8 @@ interface QuizQuestion {
   }
 
   private selectAnswer(index: number): void {
-    if (this.isAnswered || this.animatingIndex !== -1) return;
+    // 防止重复点击和动画冲突
+    if (this.isAnswered || this.animatingIndex !== -1 || this.showResult) return;
 
     // 点击振动反馈
     VibratorUtil.vibrateTap();
@@ -194,8 +195,22 @@ interface QuizQuestion {
     this.isAnswered = true;
     this.animatingIndex = -1;
 
+    // 安全检查
+    if (!this.questions || this.questions.length === 0 ||
+        this.currentIndex < 0 || this.currentIndex >= this.questions.length) {
+      return;
+    }
+
     const question = this.questions[this.currentIndex];
+    if (!question || !question.choices || index < 0 || index >= question.choices.length) {
+      return;
+    }
+
     const selectedCountry = question.choices[index];
+    if (!selectedCountry || !question.correctCountry) {
+      return;
+    }
+
     this.isCorrect = selectedCountry.code === question.correctCountry.code;
 
     if (this.isCorrect) {
@@ -306,7 +321,14 @@ interface QuizQuestion {
   }
 
   private getCorrectIndex(): number {
+    if (!this.questions || this.questions.length === 0 ||
+        this.currentIndex < 0 || this.currentIndex >= this.questions.length) {
+      return -1;
+    }
     const question = this.questions[this.currentIndex];
+    if (!question || !question.choices || !question.correctCountry) {
+      return -1;
+    }
     return question.choices.findIndex(c => c.code === question.correctCountry.code);
   }
 
@@ -460,7 +482,8 @@ interface QuizQuestion {
 
   @Builder
   ShareContentBuilder() {
-    if (this.questions.length > 0 && this.currentIndex < this.questions.length) {
+    if (this.questions.length > 0 && this.currentIndex >= 0 && this.currentIndex < this.questions.length &&
+        this.questions[this.currentIndex] && this.questions[this.currentIndex].correctCountry) {
       Column({ space: 16 }) {
         // 关卡信息
         Row() {
