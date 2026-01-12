@@ -13,7 +13,6 @@ import { screenshotManager } from '../../utils/ScreenshotManager';
 import { SaveFlagDialog } from '../../components/SaveFlagDialog';
 import { FavoritesManager } from '../../utils/favoritesManager';
 import { getCoatOfArmsImageSource } from '../../utils/coatOfArmsUtil';
-import { getFlagHistory, FlagHistoryItem } from '../../utils/FlagHistoryData';
 
 interface RouterParams {
   countryCode: string;
@@ -30,7 +29,6 @@ interface RouterParams {
   @State flagPixelMap: image.PixelMap | null = null;
   @State isFavorite: boolean = false;
   @State coatOfArmsResource: Resource | null = null;
-  @State flagHistoryItems: FlagHistoryItem[] = [];
   @State sharePixelMap: image.PixelMap | null = null;
   private context = getContext(this) as common.UIAbilityContext;
   private readonly FLAG_CONTAINER_ID = 'flagImageContainer';
@@ -76,8 +74,6 @@ interface RouterParams {
       } else {
         this.country = getCountryByCode(params.countryCode);
         this.flagDesign = getFlagDesign(params.countryCode);
-        // 加载历史国旗数据（仅国家，不包括国际组织）
-        this.flagHistoryItems = getFlagHistory(this.countryCode);
       }
     }
 
@@ -541,10 +537,6 @@ interface RouterParams {
               .padding({ left: 16, right: 16 })
               .margin({ top: 16 })
 
-            // 历史国旗banner（如果有历史数据且是国家，显示在国徽前面）
-            if (this.country && this.flagHistoryItems && this.flagHistoryItems.length > 0) {
-              this.HistoricalFlagsBanner()
-            }
 
             // 国徽（如果有）
             if (this.coatOfArmsResource) {
@@ -1139,69 +1131,6 @@ interface RouterParams {
         .padding({ top: 20, bottom: 20 })
         .backgroundColor($r('app.color.bg_page'))
     }
-  }
-
-  @Builder
-  HistoricalFlagsBanner() {
-    Row() {
-      Column() {
-        // 标题行 - 完全复制涂鸦说明的样式
-        Row() {
-          Text('历史国旗')
-            .fontSize(16)
-            .fontWeight(FontWeight.Bold)
-            .fontColor($r('app.color.text_primary'))
-
-          Blank()
-
-          Image($r('app.media.icon_arrow_right'))
-            .width(20)
-            .height(20)
-        }
-        .width('100%')
-          .alignItems(VerticalAlign.Center)
-          .margin({ bottom: 12 })
-
-        // 历史国旗Grid（最多显示3个，只显示一行）
-        Grid() {
-          ForEach(this.flagHistoryItems.slice(0, 3), (item: FlagHistoryItem, index: number) => {
-            GridItem() {
-              Column() {
-                Image($rawfile(`flag_history/${item.imagePath}.webp`))
-                  .width('100%')
-                  .height(60)
-                  .objectFit(ImageFit.Contain)
-                  .borderRadius(4)
-              }
-              .width('100%')
-                .padding(8)
-                .backgroundColor($r('app.color.bg_secondary'))
-                .borderRadius(8)
-            }
-          }, (item: FlagHistoryItem, index: number) => `history_${item.countryCode}_${item.year}_${index}`)
-        }
-        .columnsTemplate('1fr 1fr 1fr')
-          .columnsGap(8)
-          .rowsGap(8)
-          .width('100%')
-          .cachedCount(3)
-      }
-      .width('100%')
-        .padding(16)
-        .backgroundColor($r('app.color.bg_card'))
-        .borderRadius(16)
-        .onClick(() => {
-          router.pushUrl({
-            url: 'pages/flaghistory/FlagHistoryPage',
-            params: { countryCode: this.countryCode }
-          }).catch((err: Error) => {
-            console.error(`Navigation failed: ${err.message}`);
-          });
-        })
-    }
-    .width('100%')
-      .padding({ left: 16, right: 16 })
-      .margin({ top: 16 })
   }
 }
 

@@ -6,7 +6,7 @@
 
 - **应用名称**：国旗小百科
 - **包名**：com.douhua.flag
-- **版本号**：1.0.1
+- **版本号**：1.1.0
 - **开发平台**：HarmonyOS
 - **开发语言**：ArkTS
 - **最低支持版本**：HarmonyOS 5.0.5(17) 及以上
@@ -34,17 +34,13 @@
 ![国旗画廊](store2.png)
 *浏览全球 195 个国家和地区的国旗，支持按大洲筛选和搜索*
 
-### 历史国旗
-![历史国旗](store2-1.png)
-*查看各国历史国旗演变，了解国旗变迁史*
-
 ### 州旗专区
 ![州旗专区](store2-2.png)
 *查看美国、加拿大、澳大利亚等国家的州旗、省旗信息*
 
 ### 国旗详情
 ![国旗详情](store4.png)
-*查看国旗详细信息，包括国家基本信息、国徽、历史国旗等*
+*查看国旗详细信息，包括国家基本信息、国徽等*
 
 ### 互动游戏
 ![互动游戏](store5.png)
@@ -60,7 +56,6 @@
 - 首都、地区、人口、面积
 - 国旗设计说明
 - 国徽展示
-- 历史国旗浏览
 
 ### 2. 国际组织旗帜
 
@@ -97,7 +92,7 @@
 
 ### 5. 互动挑战
 
-提供多种互动挑战帮助记忆和学习国旗知识：
+提供多种互动挑战帮助记忆和学习国旗知识:
 
 - **国旗猜猜**：看旗猜国名、看名猜国旗两种模式，多种难度等级
 - **假旗找茬**：在四面国旗中找出假旗，锻炼观察力和记忆力
@@ -112,8 +107,6 @@
 - **收藏功能**：收藏喜欢的国旗，方便随时查看
 - **朗读功能**：使用 HarmonyOS 语音服务朗读国旗信息
 - **分享功能**：分享国旗信息到其他应用
-- **历史国旗**：查看各国历史国旗演变
-- **国歌播放**：播放各国国歌（支持循环播放）
 - **振动反馈**：游戏中的触觉反馈（可开关）
 - **音效播放**：游戏中的音效反馈
 - **主题切换**：支持浅色/深色/跟随系统主题
@@ -131,7 +124,6 @@ flagwiki/
 │   └── src/main/
 │       ├── ets/                      # ArkTS 源代码
 │       │   ├── components/            # 公共组件
-│       │   │   ├── AnthemPlayer.ets  # 国歌播放器
 │       │   │   └── SaveFlagDialog.ets # 保存国旗对话框
 │       │   ├── data/                 # 数据文件
 │       │   ├── entryability/         # 应用入口
@@ -139,11 +131,9 @@ flagwiki/
 │       │   ├── entrybackupability/   # 备份能力
 │       │   │   └── EntryBackupAbility.ets
 │       │   ├── pages/                # 页面
-│       │   │   ├── anthem/           # 国歌页面
 │       │   │   ├── connections/      # 连线游戏
 │       │   │   ├── explore/          # 探索页面
 │       │   │   ├── fakeflag/         # 假旗找茬游戏
-│       │   │   ├── flaghistory/      # 历史国旗
 │       │   │   ├── gallery/          # 画廊页面
 │       │   │   ├── home/             # 首页
 │       │   │   ├── inputgame/        # 拼写挑战
@@ -156,12 +146,9 @@ flagwiki/
 │       │   │   └── trivia/           # 知识问答游戏
 │       │   ├── services/             # 服务
 │       │   └── utils/                # 工具类
-│       │       ├── AnthemData.ets    # 国歌数据
-│       │       ├── AnthemUtil.ets    # 国歌工具
 │       │       ├── coatOfArmsUtil.ets # 国徽工具
 │       │       ├── countryData.ets   # 国家数据
 │       │       ├── favoritesManager.ets # 收藏管理
-│       │       ├── FlagHistoryData.ets # 历史国旗数据
 │       │       ├── GameProgressManager.ets # 游戏进度管理
 │       │       ├── PreferencesManager.ets # 偏好设置管理
 │       │       ├── ScreenshotManager.ets # 截图管理
@@ -176,17 +163,13 @@ flagwiki/
 │       │   │   ├── media/           # 媒体资源
 │       │   │   └── profile/         # 配置文件
 │       │   └── rawfile/             # 原始文件
-│       │       ├── anthems/         # 国歌音频
 │       │       ├── coat_of_arms/    # 国徽图片
-│       │       ├── flag_history/     # 历史国旗图片
 │       │       ├── flags/           # 国旗 SVG
 │       │       ├── sfx/             # 音效文件
 │       │       └── state_flags/     # 州旗图片
 │       └── module.json5             # 模块配置
 ├── scripts/                          # 脚本工具
-│   ├── download_anthems.js          # 下载国歌脚本
 │   ├── download_coats_of_arms.js    # 下载国徽脚本
-│   ├── download_flag_history.js     # 下载历史国旗脚本
 │   └── ...                          # 其他工具脚本
 ├── docs/                             # 文档
 ├── CHANGELOG.md                      # 变更日志
@@ -287,7 +270,7 @@ cd flagwiki
 - **应用图标**：`AppScope/resources/base/media/layered_image.png`
 - **启动图标**：`entry/src/main/resources/base/media/startIcon.png`
 
-替换这些文件即可更新应用图标。
+替换 these files即可更新应用图标。
 
 ## 🔗 AppGallery 链接
 
@@ -364,10 +347,7 @@ cd flagwiki
 
 ### 媒体与文件能力
 
-- **音频播放（Audio）**
-  - 使用 `@kit.AudioKit` 中的 `audio` API
-  - 播放国歌音频文件
-  - 使用 `@kit.MediaKit` 中的 `media` API
+- **音效播放**
   - 音效播放使用 `SoundPool` API
   - 封装在 `SoundEffectUtil` 工具类中
 - **图片处理（Image）**
@@ -423,7 +403,7 @@ cd flagwiki
 - 页面文件：使用 PascalCase，如 `FlagDetailPage.ets`
 - 工具类文件：使用 camelCase，如 `VibratorUtil.ets`
 - 数据文件：使用 camelCase，如 `countryData.ets`
-- 组件文件：使用 PascalCase，如 `AnthemPlayer.ets`
+- 组件文件：使用 PascalCase，如 `SaveFlagDialog.ets`
 
 ### 目录结构规范
 
@@ -481,4 +461,3 @@ cd flagwiki
 ---
 
 **注意**：本项目仅供学习和参考使用。国旗数据来源于公开资料，如有错误欢迎指正。
-

@@ -21,10 +21,6 @@
       "value": "用于下载语音模型和在线语音服务"
     },
     {
-      "name": "background_running_permission_reason",
-      "value": "用于在后台继续播放国歌音乐"
-    },
-    {
       "name": "app_welcome_title",
       "value": "国旗小百科"
     },
@@ -39,10 +35,6 @@
     {
       "name": "tab_gallery",
       "value": "画廊"
-    },
-    {
-      "name": "tab_anthem",
-      "value": "国歌"
     },
     {
       "name": "tab_paint",
@@ -493,14 +485,6 @@
       "value": "振动"
     },
     {
-      "name": "loop_playback",
-      "value": "循环播放"
-    },
-    {
-      "name": "no_sound_file",
-      "value": "暂无音频文件"
-    },
-    {
       "name": "rate_app",
       "value": "应用评分"
     },
@@ -618,7 +602,7 @@
     },
     {
       "name": "about_app_message",
-      "value": "国旗小百科 v1.0.1\n\n一款有趣的国旗知识应用，带你探索世界各国国旗的故事与历史。"
+      "value": "国旗小百科 v1.1.0\n\n一款有趣的国旗知识应用，带你探索世界各国国旗的故事与历史。"
     },
     {
       "name": "feedback_message",
@@ -642,7 +626,7 @@
     },
     {
       "name": "data_info_overview_content",
-      "value": "本应用包含以下国旗数据：\n\n• 193 个联合国会员国国旗\n• 2 个联合国观察员国国旗\n• 11 个国家的 246 个州旗/省旗\n• 195 个国家的国徽数据\n• 188 个国家的国歌数据"
+      "value": "本应用包含以下国旗数据：\n\n• 193 个联合国会员国国旗\n• 2 个联合国观察员国国旗\n• 11 个国家的 246 个州旗/省旗\n• 195 个国家的国徽数据"
     },
     {
       "name": "data_info_source",
@@ -685,24 +669,12 @@
       "value": "本应用包含 %s 个国家的国徽数据。"
     },
     {
-      "name": "data_info_anthem",
-      "value": "国歌数据"
-    },
-    {
-      "name": "data_info_anthem_content",
-      "value": "本应用包含 %s 个国家的国歌数据。"
-    },
-    {
       "name": "data_info_flags_count",
       "value": "• %s 个国家的国旗数据"
     },
     {
       "name": "data_info_coat_of_arms_count",
       "value": "• %s 个国家的国徽数据"
-    },
-    {
-      "name": "data_info_anthem_count",
-      "value": "• %s 个国家的国歌数据"
     },
     {
       "name": "level_not_found",
@@ -729,28 +701,12 @@
       "value": "搜索国家"
     },
     {
-      "name": "national_anthem",
-      "value": "国歌"
-    },
-    {
-      "name": "no_anthem_available",
-      "value": "暂无国歌"
-    },
-    {
       "name": "no_matching_countries",
       "value": "未找到匹配的国家"
     },
     {
       "name": "modify_keywords_or_select",
       "value": "修改关键词或选择\"全部\"或其他大洲"
-    },
-    {
-      "name": "no_playing",
-      "value": "暂无播放"
-    },
-    {
-      "name": "select_song_to_play",
-      "value": "请选择歌曲播放"
     },
     {
       "name": "loading",
@@ -795,14 +751,6 @@
     {
       "name": "state_flag",
       "value": "州旗"
-    },
-    {
-      "name": "historical_flags",
-      "value": "历史国旗"
-    },
-    {
-      "name": "flag_history",
-      "value": "国旗变迁史"
     },
     {
       "name": "current",

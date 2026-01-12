@@ -57,27 +57,6 @@
 
 ### 3. 同名但不同用途的文件 ⚠️ **低优先级（建议重命名）**
 
-#### FlagHistoryData.ets（同名但不同用途）
-**状态**：功能不同，但名称容易混淆
-
-**文件位置**：
-1. `entry/src/main/ets/pages/topic/FlagHistoryData.ets` - 五星红旗历史知识数据（专题内容）
-2. `entry/src/main/ets/utils/FlagHistoryData.ets` - 历史国旗数据工具（各国历史国旗数据）
-
-**用途**：
-- `pages/topic/FlagHistoryData.ets`：存储五星红旗历史专题的知识内容（设计背景、设计过程等）
-- `utils/FlagHistoryData.ets`：存储各国国旗的历史变迁数据（年份、图片路径等）
-
-**影响**：
-- 文件名容易混淆
-- 但功能不同，属于合理设计
-- 导入路径不同，不会冲突
-
-**建议**：
-- **低优先级**：考虑重命名 `pages/topic/FlagHistoryData.ets` 为 `FlagHistoryContentData.ets` 或 `FlagHistoryTopicData.ets`
-- 或者重命名为 `FiveStarRedFlagHistoryData.ets` 更明确
-
----
 
 ### 4. 测试文件 ✅ **正常**
 
@@ -144,7 +123,7 @@
 
 ### 同名文件统计
 - **完全重复**：2个（layered_image.json，但属于正常层级结构）
-- **同名不同用途**：2个（FlagHistoryData.ets - 2个，List.test.ets - 2个）
+- **同名不同用途**：1个（List.test.ets - 2个）
 - **相似名称**：12个（Levels 相关文件，正常）
 
 ### 已清理文件
@@ -163,11 +142,6 @@
 无
 
 ### 低优先级
-1. ~~**重命名建议**：`entry/src/main/ets/pages/topic/FlagHistoryData.ets`~~ ✅ **已完成**
-   - ~~建议重命名为：`FlagHistoryContentData.ets` 或 `FiveStarRedFlagHistoryData.ets`~~
-   - **已重命名为**：`FiveStarRedFlagHistoryData.ets`
-   - **原因**：避免与 `utils/FlagHistoryData.ets` 混淆
-   - **状态**：已完成，已更新 `TopicDetailPage.ets` 中的导入路径
 
 ---
 

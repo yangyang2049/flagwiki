@@ -32,13 +32,6 @@ export const topics: TopicItem[] = [
     countryCodes: [] // 空数组表示这是知识性专题
   },
   {
-    id: 'flag-history',
-    name: '五星红旗历史',
-    description: '五星红旗的设计背景、历史演变、法律地位和文化意义',
-    emoji: '🇨🇳',
-    countryCodes: [] // 空数组表示这是知识性专题
-  },
-  {
     id: 'similar-flags',
     name: '相似旗',
     description: '一些国家的国旗相似度较高，仅在比例、颜色深度或细节上有所不同',

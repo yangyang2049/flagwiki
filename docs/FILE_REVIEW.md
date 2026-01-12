@@ -39,13 +39,6 @@
 
 ### 2. 重复的数据文件 ⚠️ **低优先级**
 
-#### FlagHistoryData.ets（重复定义）
-**状态**：同名但不同用途
-
-**问题描述**：
-- 存在两个 `FlagHistoryData.ets` 文件：
-  1. `entry/src/main/ets/pages/topic/FlagHistoryData.ets` - 五星红旗历史知识数据
-  2. `entry/src/main/ets/utils/FlagHistoryData.ets` - 历史国旗数据工具
 
 **影响**：
 - 文件名容易混淆

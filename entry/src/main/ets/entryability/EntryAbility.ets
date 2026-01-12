@@ -16,19 +16,6 @@ export default class EntryAbility extends UIAbility {
     // 初始化 PreferencesManager
     PreferencesManager.init(this.context);
 
-    // 初始化循环播放设置
-    try {
-      hilog.info(DOMAIN, 'testTag', '========== EntryAbility: Loading loop playback ==========');
-      const prefs = await PreferencesManager.getPreferences('app_settings');
-      hilog.info(DOMAIN, 'testTag', 'Got prefs instance');
-      const loopPlaybackEnabled: boolean = await prefs.get('loop_playback_enabled', true) as boolean;
-      AppStorage.setOrCreate('loopPlaybackEnabled', loopPlaybackEnabled);
-      hilog.info(DOMAIN, 'testTag', '✅ Loop playback loaded: %{public}s, synced to AppStorage', loopPlaybackEnabled.toString());
-    } catch (err) {
-      hilog.error(DOMAIN, 'testTag', '❌ Failed to load loop playback preference: %{public}s', JSON.stringify(err));
-      AppStorage.setOrCreate('loopPlaybackEnabled', true);
-    }
-
     // 初始化语言设置
     this.initializeLanguage();
 

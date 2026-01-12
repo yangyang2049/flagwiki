@@ -154,7 +154,7 @@ export struct ProfilePage {
     try {
       promptAction.showDialog({
         title: '关于应用',
-        message: '国旗小百科 v1.0.1\n\n一款有趣的国旗知识应用，带你探索世界各国国旗的故事与历史。',
+        message: '国旗小百科 v1.1.0\n\n一款有趣的国旗知识应用，带你探索世界各国国旗的故事与历史。',
         buttons: [
           { text: '确定', color: $r('app.color.button_primary') }
         ]

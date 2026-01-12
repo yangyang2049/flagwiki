@@ -4,7 +4,6 @@ import { getCountryByCode, Country, getFlagImageSource, getInternationalOrgByCod
 import { EtiquetteSection, getEtiquetteContent } from './FlagEtiquetteData';
 import { ManufacturingSection, getManufacturingContent } from './FlagManufacturingData';
 import { VexillologySection, getVexillologyContent } from './FlagVexillologyData';
-import { HistorySection, getFlagHistoryContent } from './FiveStarRedFlagHistoryData';
 import { TextReaderUtil } from '../../utils/TextReaderUtil';
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
@@ -36,7 +35,6 @@ interface SimilarFlagPair {
   @State etiquetteSections: EtiquetteSection[] = [];
   @State manufacturingSections: ManufacturingSection[] = [];
   @State vexillologySections: VexillologySection[] = [];
-  @State flagHistorySections: HistorySection[] = [];
   @State isKnowledgeTopic: boolean = false;
   @State isReading: boolean = false;
   @State similarFlagPairs: SimilarFlagPair[] = [];
@@ -125,8 +123,6 @@ interface SimilarFlagPair {
       this.manufacturingSections = getManufacturingContent();
     } else if (this.topic.id === 'vexillology') {
       this.vexillologySections = getVexillologyContent();
-    } else if (this.topic.id === 'flag-history') {
-      this.flagHistorySections = getFlagHistoryContent();
     }
 
     this.isLoading = false;
@@ -255,12 +251,6 @@ interface SimilarFlagPair {
       }
     } else if (this.topic.id === 'vexillology') {
       for (const section of this.vexillologySections) {
-        lines.push(section.title);
-        lines.push(section.content);
-        lines.push('');
-      }
-    } else if (this.topic.id === 'flag-history') {
-      for (const section of this.flagHistorySections) {
         lines.push(section.title);
         lines.push(section.content);
         lines.push('');
@@ -473,10 +463,6 @@ interface SimilarFlagPair {
             ForEach(this.vexillologySections, (section: VexillologySection, index: number) => {
               this.KnowledgeSection(section.title, section.content, index)
             }, (section: VexillologySection, index: number) => `vexillology_${index}`)
-          } else if (this.topic?.id === 'flag-history') {
-            ForEach(this.flagHistorySections, (section: HistorySection, index: number) => {
-              this.KnowledgeSection(section.title, section.content, index)
-            }, (section: HistorySection, index: number) => `flag-history_${index}`)
           }
         }
         .width('100%')
