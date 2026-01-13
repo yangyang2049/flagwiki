@@ -60,7 +60,6 @@ struct ContinentPage {
               Blank()
             }
             .width('80%')
-            .height(40)
             .padding({ left: 10, right: 10, top: 6, bottom: 6 })
             .backgroundColor('rgba(255, 255, 255, 0.1)')
             .borderRadius(8)

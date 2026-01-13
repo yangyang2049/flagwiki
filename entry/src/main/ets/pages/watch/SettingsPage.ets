@@ -5,9 +5,6 @@ import { WatchSoundManager } from '../../utils/WatchSoundManager'
 
 @Component
 export struct SettingsPage {
-  @StorageLink('currentLanguage') currentLanguage: string = 'zh'
-  @State difficulty: string = 'medium'
-  @State questionCount: number = 10
   @State vibrationEnabled: boolean = true
   @State soundEnabled: boolean = true
 
@@ -35,8 +32,6 @@ export struct SettingsPage {
       if (!this.prefs) {
         return
       }
-      this.difficulty = await this.prefs.get('difficulty', 'medium') as string
-      this.questionCount = await this.prefs.get('question_count', 10) as number
       this.vibrationEnabled = await this.prefs.get('vibration_enabled', true) as boolean
       this.soundEnabled = await this.prefs.get('sound_enabled', true) as boolean
     } catch (error) {
@@ -54,23 +49,6 @@ export struct SettingsPage {
     } catch (error) {
       console.error(`[WatchSettingsPage] Failed to save ${key}:`, error)
     }
-  }
-
-  private setLanguage(lang: string): void {
-    AppStorage.setOrCreate('currentLanguage', lang)
-    this.currentLanguage = lang
-  }
-
-  @Builder
-  private SelectButton(label: Resource | string, selected: boolean, onClick: () => void) {
-    Button(label)
-      .fontSize(12)
-      .fontColor(selected ? '#FFFFFF' : '#FFFFFF')
-      .backgroundColor(selected ? $r('app.color.button_primary') : 'rgba(255, 255, 255, 0.12)')
-      .borderRadius(6)
-      .height(28)
-      .padding({ left: 10, right: 10 })
-      .onClick(onClick)
   }
 
   build() {
@@ -130,68 +108,6 @@ export struct SettingsPage {
           }
           .width('100%')
           .height(44)
-          .padding({ left: 12, right: 12, top: 8, bottom: 8 })
-          .backgroundColor('rgba(255, 255, 255, 0.1)')
-          .borderRadius(8)
-          .margin({ top: 6, bottom: 6 })
-
-          Column() {
-            Text($r('app.string.watch_difficulty'))
-              .fontSize(14)
-              .fontColor('#FFFFFF')
-              .margin({ bottom: 6 })
-
-            Row() {
-              this.SelectButton($r('app.string.watch_difficulty_easy'), this.difficulty === 'easy', async () => {
-                this.difficulty = 'easy'
-                await this.saveSetting('difficulty', 'easy')
-              })
-
-              this.SelectButton($r('app.string.watch_difficulty_medium'), this.difficulty === 'medium', async () => {
-                this.difficulty = 'medium'
-                await this.saveSetting('difficulty', 'medium')
-              })
-
-              this.SelectButton($r('app.string.watch_difficulty_hard'), this.difficulty === 'hard', async () => {
-                this.difficulty = 'hard'
-                await this.saveSetting('difficulty', 'hard')
-              })
-            }
-            .width('100%')
-            .justifyContent(FlexAlign.SpaceBetween)
-          }
-          .width('100%')
-          .padding({ left: 12, right: 12, top: 8, bottom: 8 })
-          .backgroundColor('rgba(255, 255, 255, 0.1)')
-          .borderRadius(8)
-          .margin({ top: 6, bottom: 6 })
-
-          Column() {
-            Text($r('app.string.watch_question_count'))
-              .fontSize(14)
-              .fontColor('#FFFFFF')
-              .margin({ bottom: 6 })
-
-            Row() {
-              this.SelectButton('10', this.questionCount === 10, async () => {
-                this.questionCount = 10
-                await this.saveSetting('question_count', 10)
-              })
-
-              this.SelectButton('20', this.questionCount === 20, async () => {
-                this.questionCount = 20
-                await this.saveSetting('question_count', 20)
-              })
-
-              this.SelectButton('50', this.questionCount === 50, async () => {
-                this.questionCount = 50
-                await this.saveSetting('question_count', 50)
-              })
-            }
-            .width('100%')
-            .justifyContent(FlexAlign.SpaceBetween)
-          }
-          .width('100%')
           .padding({ left: 12, right: 12, top: 8, bottom: 8 })
           .backgroundColor('rgba(255, 255, 255, 0.1)')
           .borderRadius(8)

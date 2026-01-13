@@ -1,3 +1,4 @@
+import display from '@ohos.display'
 import vibrator from '@ohos.vibrator'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { preferences } from '@kit.ArkData'
@@ -26,6 +27,7 @@ struct FlagToNamePage {
   @State promptAnimating: boolean = false
   @State contentOpacity: number = 1
   @State showOptions: boolean = false
+  @State optionTextWidth: number = 200
   @State autoNext: boolean = true
   @State vibrationEnabled: boolean = true
   @State soundEnabled: boolean = true
@@ -38,6 +40,7 @@ struct FlagToNamePage {
   private context: common.UIAbilityContext | null = null
 
   async aboutToAppear() {
+    this.updateOptionMetrics()
     await this.initPreferences()
     await this.loadSettings()
     this.buildCountryPool()
@@ -311,14 +314,67 @@ struct FlagToNamePage {
     this.timeoutIds = []
   }
 
+  private updateOptionMetrics(): void {
+    try {
+      const displayInfo = display.getDefaultDisplaySync()
+      const screenWidth = px2vp(displayInfo.width)
+      const containerPadding = 32
+      const optionRowWidth = Math.max(0, (screenWidth - containerPadding) * 0.8)
+      this.optionTextWidth = Math.max(0, optionRowWidth - 20)
+    } catch (error) {
+      console.error('[WatchFlagToNamePage] Failed to get display info:', error)
+    }
+  }
+
+  private getOptionName(country: Country): string {
+    return getLocalizedCountryName(country, this.currentLanguage)
+  }
+
+  private estimateTextUnits(text: string): number {
+    let units = 0
+    for (const char of text) {
+      if (char === ' ' || char === '-' || char === '.' || char === ',' || char === '\'') {
+        units += 0.5
+      } else {
+        units += 1
+      }
+    }
+    return units
+  }
+
+  private getMaxUnitsForFont(fontSize: number): number {
+    if (this.optionTextWidth <= 0) {
+      return 0
+    }
+    const averageCharWidth = fontSize * 0.56
+    const perLine = Math.floor(this.optionTextWidth / averageCharWidth)
+    return Math.max(1, perLine * 2)
+  }
+
+  private getOptionFontSize(country: Country): number {
+    const name = this.getOptionName(country)
+    const units = this.estimateTextUnits(name)
+    const maxUnits = this.getMaxUnitsForFont(14)
+    if (units > maxUnits) {
+      return 12
+    }
+    return 14
+  }
+
+  private getOptionLineHeight(country: Country): number {
+    return this.getOptionFontSize(country) + 2
+  }
+
   @Builder
   private NameOptionButton(country: Country, index: number) {
     Row() {
-      Text(getLocalizedCountryName(country, this.currentLanguage))
-        .fontSize(14)
+      Text(this.getOptionName(country))
+        .fontSize(this.getOptionFontSize(country))
         .fontColor(this.getOptionTextColor(index))
-        .maxLines(1)
+        .maxLines(2)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
+        .textAlign(TextAlign.Center)
+        .lineHeight(this.getOptionLineHeight(country))
     }
     .width('80%')
     .height(36)

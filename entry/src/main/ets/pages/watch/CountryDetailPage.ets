@@ -59,26 +59,32 @@ struct CountryDetailPage {
   }
 
   @Builder
-  private InfoRow(label: Resource | string, value: string) {
+  private InfoRow(label: Resource | string, value: string, labelWeight: number = 4, valueWeight: number = 6) {
     Row() {
       Text(label)
         .fontSize(12)
         .fontColor('rgba(255, 255, 255, 0.7)')
-
-      Blank()
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
+        .layoutWeight(labelWeight)
+        .textAlign(TextAlign.Start)
 
       Text(value)
         .fontSize(12)
         .fontWeight(FontWeight.Medium)
         .fontColor('#FFFFFF')
-        .maxLines(1)
+        .maxLines(2)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
+        .textAlign(TextAlign.End)
+        .layoutWeight(valueWeight)
+        .margin({ left: 8 })
     }
     .width('100%')
     .padding({ top: 6, bottom: 6 })
+    .alignItems(VerticalAlign.Top)
   }
 
-  private getFlagDescription(): string {
+  private getFlagDescription(): Resource | string {
     if (!this.country) {
       return ''
     }
@@ -86,10 +92,7 @@ struct CountryDetailPage {
     if (description) {
       return description
     }
-    if (LocalizationUtil.isEnglish(this.currentLanguage)) {
-      return `The flag of ${this.country.name} is a symbol of its history, culture, and values.`
-    }
-    return `${this.country.nameCN}的国旗是这个国家的重要象征，代表着国家的历史、文化和价值观。`
+    return $r('app.string.watch_flag_desc_unavailable')
   }
 
   build() {
@@ -115,7 +118,7 @@ struct CountryDetailPage {
             Column() {
               this.InfoRow($r('app.string.capital'), getLocalizedCapital(this.country, this.currentLanguage))
               this.InfoRow($r('app.string.region'), getLocalizedRegionName(this.country.region, this.currentLanguage))
-              this.InfoRow($r('app.string.population'), this.formatPopulation(this.country.population))
+              this.InfoRow($r('app.string.population'), this.formatPopulation(this.country.population), 3, 7)
               this.InfoRow($r('app.string.area'), this.formatArea(this.country.area))
             }
             .width('85%')
@@ -135,6 +138,7 @@ struct CountryDetailPage {
                 .fontSize(12)
                 .fontColor('#FFFFFF')
                 .lineHeight(16)
+                .textAlign(TextAlign.Start)
             }
             .width('85%')
             .alignItems(HorizontalAlign.Start)

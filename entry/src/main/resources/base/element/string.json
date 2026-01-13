@@ -1471,6 +1471,10 @@
     {
       "name": "watch_next_question",
       "value": "下一题"
+    },
+    {
+      "name": "watch_flag_desc_unavailable",
+      "value": "暂无国旗说明"
     }
   ]
 }

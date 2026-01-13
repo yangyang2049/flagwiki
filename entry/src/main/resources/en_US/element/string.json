@@ -539,6 +539,10 @@
     {
       "name": "watch_next_question",
       "value": "Next"
+    },
+    {
+      "name": "watch_flag_desc_unavailable",
+      "value": "No flag details"
     }
   ]
 }

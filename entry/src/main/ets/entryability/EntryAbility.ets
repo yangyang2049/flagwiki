@@ -51,38 +51,16 @@ export default class EntryAbility extends UIAbility {
 
   private initializeLanguage(): void {
     try {
-      // 尝试多种方法获取正确的系统语言
-      const systemLocale = i18n.System.getSystemLocale();
-      const appPreferredLanguage = i18n.System.getAppPreferredLanguage();
-
-      hilog.info(DOMAIN, 'testTag', 'System locale: %{public}s', systemLocale);
-      hilog.info(DOMAIN, 'testTag', 'App preferred language: %{public}s', appPreferredLanguage);
-
-      let languageCode = 'zh'; // 默认中文
-
-      // 使用应用偏好语言（如果可用），否则回退到系统语言
-      const languageToCheck = appPreferredLanguage || systemLocale;
-      hilog.info(DOMAIN, 'testTag', 'Language to check: %{public}s', languageToCheck);
-
-      if (languageToCheck.startsWith('zh')) {
-        languageCode = 'zh';
-        hilog.info(DOMAIN, 'testTag', 'Detected Chinese language: %{public}s', languageToCheck);
-      } else if (languageToCheck.startsWith('en')) {
-        languageCode = 'en';
-        hilog.info(DOMAIN, 'testTag', 'Detected English language: %{public}s', languageToCheck);
-      } else {
-        hilog.info(DOMAIN, 'testTag', 'Unknown language: %{public}s, defaulting to Chinese', languageToCheck);
-      }
-
-      hilog.info(DOMAIN, 'testTag', 'Setting initial language to: %{public}s', languageCode);
+      const languageCode = 'en-US';
+      hilog.info(DOMAIN, 'testTag', 'Forcing language to: %{public}s', languageCode);
       AppStorage.setOrCreate('currentLanguage', languageCode);
+      i18n.System.setAppPreferredLanguage('en-Latn-US');
 
-      // 验证语言是否已设置
       const verifyLang = AppStorage.get<string>('currentLanguage');
       hilog.info(DOMAIN, 'testTag', 'Verified language in AppStorage: %{public}s', verifyLang || 'undefined');
     } catch (error) {
       hilog.error(DOMAIN, 'testTag', 'Failed to initialize language: %{public}s', JSON.stringify(error));
-      AppStorage.setOrCreate('currentLanguage', 'zh'); // 回退到中文
+      AppStorage.setOrCreate('currentLanguage', 'en-US');
     }
   }
 
