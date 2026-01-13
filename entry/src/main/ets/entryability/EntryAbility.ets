@@ -2,6 +2,7 @@ import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.Ab
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { i18n } from '@kit.LocalizationKit';
+import { DeviceHelper } from '../utils/DeviceHelper';
 import { FavoritesManager } from '../utils/favoritesManager';
 import { GameProgressManager } from '../utils/GameProgressManager';
 import { PreferencesManager } from '../utils/PreferencesManager';
@@ -92,8 +93,8 @@ export default class EntryAbility extends UIAbility {
   onWindowStageCreate(windowStage: window.WindowStage): void {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
-
-    windowStage.loadContent('pages/Index', (err) => {
+    const mainPage = DeviceHelper.isWearable() ? 'pages/watch/Index' : 'pages/Index';
+    windowStage.loadContent(mainPage, (err) => {
       if (err.code) {
         hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
         return;

@@ -459,6 +459,86 @@
     {
       "name": "share_app_description",
       "value": "Explore the mysteries of world flags"
+    },
+    {
+      "name": "watch_learn",
+      "value": "Learn"
+    },
+    {
+      "name": "watch_practice",
+      "value": "Practice"
+    },
+    {
+      "name": "watch_settings",
+      "value": "Settings"
+    },
+    {
+      "name": "watch_name_to_flag",
+      "value": "Name → Flag"
+    },
+    {
+      "name": "watch_flag_to_name",
+      "value": "Flag → Name"
+    },
+    {
+      "name": "watch_mark_learned",
+      "value": "Mark Learned"
+    },
+    {
+      "name": "watch_mark_unlearned",
+      "value": "Unmark"
+    },
+    {
+      "name": "watch_question_count",
+      "value": "Questions"
+    },
+    {
+      "name": "watch_difficulty",
+      "value": "Difficulty"
+    },
+    {
+      "name": "watch_difficulty_easy",
+      "value": "Easy"
+    },
+    {
+      "name": "watch_difficulty_medium",
+      "value": "Medium"
+    },
+    {
+      "name": "watch_difficulty_hard",
+      "value": "Hard"
+    },
+    {
+      "name": "watch_language",
+      "value": "Language"
+    },
+    {
+      "name": "watch_language_zh",
+      "value": "Chinese"
+    },
+    {
+      "name": "watch_language_en",
+      "value": "English"
+    },
+    {
+      "name": "watch_vibration_feedback",
+      "value": "Vibration"
+    },
+    {
+      "name": "watch_auto_next",
+      "value": "Auto Next"
+    },
+    {
+      "name": "watch_correct",
+      "value": "Correct"
+    },
+    {
+      "name": "watch_wrong",
+      "value": "Wrong"
+    },
+    {
+      "name": "watch_next_question",
+      "value": "Next"
     }
   ]
 }

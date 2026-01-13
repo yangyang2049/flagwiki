@@ -23,6 +23,11 @@
     "pages/stateflag/StateFlagGalleryPage",
     "pages/stateflag/StateFlagDetailPage",
     "pages/profile/FavoritesPage",
-    "pages/profile/DataInfoPage"
+    "pages/profile/DataInfoPage",
+    "pages/watch/Index",
+    "pages/watch/NameToFlagPage",
+    "pages/watch/FlagToNamePage",
+    "pages/watch/ContinentPage",
+    "pages/watch/CountryDetailPage"
   ]
 }

@@ -1391,6 +1391,86 @@
     {
       "name": "state_count_es",
       "value": "17 个自治区"
+    },
+    {
+      "name": "watch_learn",
+      "value": "学习"
+    },
+    {
+      "name": "watch_practice",
+      "value": "练习"
+    },
+    {
+      "name": "watch_settings",
+      "value": "设置"
+    },
+    {
+      "name": "watch_name_to_flag",
+      "value": "名称选旗帜"
+    },
+    {
+      "name": "watch_flag_to_name",
+      "value": "旗帜选名称"
+    },
+    {
+      "name": "watch_mark_learned",
+      "value": "标记已学"
+    },
+    {
+      "name": "watch_mark_unlearned",
+      "value": "取消标记"
+    },
+    {
+      "name": "watch_question_count",
+      "value": "题目数量"
+    },
+    {
+      "name": "watch_difficulty",
+      "value": "难度"
+    },
+    {
+      "name": "watch_difficulty_easy",
+      "value": "简单"
+    },
+    {
+      "name": "watch_difficulty_medium",
+      "value": "中等"
+    },
+    {
+      "name": "watch_difficulty_hard",
+      "value": "困难"
+    },
+    {
+      "name": "watch_language",
+      "value": "语言"
+    },
+    {
+      "name": "watch_language_zh",
+      "value": "中文"
+    },
+    {
+      "name": "watch_language_en",
+      "value": "English"
+    },
+    {
+      "name": "watch_vibration_feedback",
+      "value": "振动反馈"
+    },
+    {
+      "name": "watch_auto_next",
+      "value": "自动下一题"
+    },
+    {
+      "name": "watch_correct",
+      "value": "正确"
+    },
+    {
+      "name": "watch_wrong",
+      "value": "错误"
+    },
+    {
+      "name": "watch_next_question",
+      "value": "下一题"
     }
   ]
 }
