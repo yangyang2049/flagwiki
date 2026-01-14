@@ -118,7 +118,7 @@ struct CountryDetailPage {
             Column() {
               this.InfoRow($r('app.string.capital'), getLocalizedCapital(this.country, this.currentLanguage))
               this.InfoRow($r('app.string.region'), getLocalizedRegionName(this.country.region, this.currentLanguage))
-              this.InfoRow($r('app.string.population'), this.formatPopulation(this.country.population), 3, 7)
+              this.InfoRow($r('app.string.population'), this.formatPopulation(this.country.population), 5, 5)
               this.InfoRow($r('app.string.area'), this.formatArea(this.country.area))
             }
             .width('85%')
