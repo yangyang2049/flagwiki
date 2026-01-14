@@ -9,6 +9,10 @@ import { PreferencesManager } from '../../utils/PreferencesManager'
 import { WatchSoundManager } from '../../utils/WatchSoundManager'
 
 type Difficulty = 'easy' | 'medium' | 'hard'
+interface ReviewItem {
+  country: Country
+  delayRounds: number
+}
 
 @Entry
 @Component
@@ -38,8 +42,13 @@ struct FlagToNamePage {
 
   private prefs: preferences.Preferences | null = null
   private countryPool: Country[] = []
+  private sessionPlan: Country[] = []
+  private sessionCursor: number = 0
+  private pendingReviews: ReviewItem[] = []
+  private activeReviews: Country[] = []
   private timeoutIds: number[] = []
   private context: common.UIAbilityContext | null = null
+  private hasStarted: boolean = false
 
   async aboutToAppear() {
     this.ensureContext()
@@ -106,10 +115,115 @@ struct FlagToNamePage {
     }
   }
 
+  private buildSessionPlan(): void {
+    const pool = this.countryPool.length > 0 ? this.countryPool : Countries
+    const sorted = [...pool].sort((a, b) => b.population - a.population)
+    const total = Math.min(this.totalQuestions, sorted.length)
+    const plan: Country[] = []
+    const used = new Set<string>()
+    if (total <= 0) {
+      this.sessionPlan = []
+      this.sessionCursor = 0
+      return
+    }
+    for (let i = 0; i < total; i++) {
+      const start = Math.floor((i * sorted.length) / total)
+      const end = Math.max(start, Math.floor(((i + 1) * sorted.length) / total) - 1)
+      const bucket = sorted.slice(start, end + 1).filter(item => !used.has(item.code))
+      let pick: Country | undefined = undefined
+      if (bucket.length > 0) {
+        pick = bucket[Math.floor(Math.random() * bucket.length)]
+      } else {
+        pick = sorted.find(item => !used.has(item.code))
+      }
+      if (pick) {
+        plan.push(pick)
+        used.add(pick.code)
+      }
+    }
+    if (this.activeReviews.length > 0 && plan.length > 0) {
+      const indices = plan.map((_, index) => index)
+      const remaining: ReviewItem[] = []
+      for (const review of this.activeReviews) {
+        if (used.has(review.code)) {
+          continue
+        }
+        if (indices.length === 0) {
+          remaining.push({ country: review, delayRounds: 1 })
+          continue
+        }
+        const pickIndex = Math.floor(Math.random() * indices.length)
+        const replaceIndex = indices.splice(pickIndex, 1)[0]
+        const replaced = plan[replaceIndex]
+        if (replaced) {
+          used.delete(replaced.code)
+        }
+        plan[replaceIndex] = review
+        used.add(review.code)
+      }
+      if (remaining.length > 0) {
+        this.pendingReviews = [...this.pendingReviews, ...remaining]
+      }
+    }
+    this.activeReviews = []
+    this.sessionPlan = plan
+    this.sessionCursor = 0
+  }
+
+  private getNextCountry(pool: Country[]): Country | null {
+    if (this.sessionCursor < this.sessionPlan.length) {
+      const next = this.sessionPlan[this.sessionCursor]
+      this.sessionCursor += 1
+      return next
+    }
+    if (pool.length === 0) {
+      return null
+    }
+    return pool[Math.floor(Math.random() * pool.length)] ?? null
+  }
+
+  private scheduleReview(country: Country): void {
+    const exists = this.pendingReviews.some(item => item.country.code === country.code) ||
+      this.activeReviews.some(item => item.code === country.code)
+    if (exists) {
+      return
+    }
+    const delayRounds = Math.random() < 0.5 ? 1 : 2
+    const item: ReviewItem = { country, delayRounds }
+    this.pendingReviews.push(item)
+  }
+
+  private advanceReviewRounds(): void {
+    if (this.pendingReviews.length === 0) {
+      this.activeReviews = []
+      return
+    }
+    const nextPending: ReviewItem[] = []
+    const ready: Country[] = []
+    for (const item of this.pendingReviews) {
+      const remaining = item.delayRounds - 1
+      if (remaining <= 0) {
+        ready.push(item.country)
+      } else {
+        nextPending.push({ country: item.country, delayRounds: remaining })
+      }
+    }
+    this.pendingReviews = nextPending
+    this.activeReviews = ready
+  }
+
   private startQuestion(resetProgress: boolean = false): void {
     if (resetProgress) {
       this.questionIndex = 0
       this.correctCount = 0
+      if (!this.hasStarted) {
+        this.hasStarted = true
+        this.pendingReviews = []
+        this.activeReviews = []
+      } else {
+        this.advanceReviewRounds()
+      }
+      this.buildSessionPlan()
     }
     this.clearTimers()
     this.selectedIndex = -1
@@ -145,8 +259,11 @@ struct FlagToNamePage {
 
   private pickQuestion(): void {
     const pool = this.countryPool.length >= 4 ? this.countryPool : Countries
-    const randomIndex = Math.floor(Math.random() * pool.length)
-    this.currentCountry = pool[randomIndex]
+    const nextCountry = this.getNextCountry(pool)
+    if (!nextCountry) {
+      return
+    }
+    this.currentCountry = nextCountry
     this.promptToken += 1
     this.choices = this.generateChoices(this.currentCountry, pool)
     this.optionsToken += 1
@@ -173,6 +290,8 @@ struct FlagToNamePage {
     const isCorrect = index === this.getCorrectIndex()
     if (isCorrect) {
       this.correctCount += 1
+    } else if (this.currentCountry) {
+      this.scheduleReview(this.currentCountry)
     }
 
     if (this.vibrationEnabled) {
@@ -192,10 +311,15 @@ struct FlagToNamePage {
 
     this.isTransitioning = true
 
+    const answerHoldDelay = 400
+    const answerGapDelay = 400
+
     this.addTimer(() => {
       this.showOptions = false
       this.contentOpacity = 0
-    }, 400)
+      this.currentCountry = null
+      this.choices = []
+    }, answerHoldDelay)
 
     this.addTimer(() => {
       if (this.questionIndex + 1 >= this.totalQuestions) {
@@ -205,7 +329,7 @@ struct FlagToNamePage {
         this.questionIndex += 1
         this.startQuestion()
       }
-    }, 900)
+    }, answerHoldDelay + answerGapDelay)
   }
 
   private startNextRound(): void {
@@ -500,6 +624,7 @@ struct FlagToNamePage {
           .opacity(this.showOptions ? 1 : 0)
           .animation({ duration: 200, curve: Curve.EaseOut })
         }
+        .opacity(this.contentOpacity)
       }
     }
     .width('100%')

@@ -2,6 +2,7 @@ import { preferences } from '@kit.ArkData'
 import { common } from '@kit.AbilityKit'
 import { PreferencesManager } from '../../utils/PreferencesManager'
 import { WatchSoundManager } from '../../utils/WatchSoundManager'
+import { WatchLayout } from '../../utils/WatchUiConstants'
 
 @Component
 export struct SettingsPage {
@@ -90,7 +91,7 @@ export struct SettingsPage {
           .padding({ left: 12, right: 12, top: 8, bottom: 8 })
           .backgroundColor('rgba(255, 255, 255, 0.1)')
           .borderRadius(8)
-          .margin({ top: 6, bottom: 6 })
+          .margin({ top: WatchLayout.listItemCompactGap, bottom: WatchLayout.listItemCompactGap })
 
           Row() {
             Text($r('app.string.watch_vibration_feedback'))
@@ -111,8 +112,22 @@ export struct SettingsPage {
           .padding({ left: 12, right: 12, top: 8, bottom: 8 })
           .backgroundColor('rgba(255, 255, 255, 0.1)')
           .borderRadius(8)
-          .margin({ top: 6, bottom: 6 })
+          .margin({ top: WatchLayout.listItemCompactGap, bottom: WatchLayout.listItemCompactGap })
 
+          Column() {
+            Text($r('app.string.watch_phone_version_richer'))
+              .fontSize(12)
+              .fontColor('rgba(255, 255, 255, 0.6)')
+              .textAlign(TextAlign.Center)
+              .margin({ top: 16, bottom: 8 })
+
+            Text($r('app.string.watch_company_name'))
+              .fontSize(11)
+              .fontColor('rgba(255, 255, 255, 0.5)')
+              .textAlign(TextAlign.Center)
+          }
+          .width('100%')
+          .margin({ top: WatchLayout.listItemGap })
         }
         .width('80%')
         .alignItems(HorizontalAlign.Center)

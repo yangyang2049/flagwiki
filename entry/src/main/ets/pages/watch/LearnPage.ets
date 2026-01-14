@@ -1,6 +1,7 @@
 import router from '@ohos.router'
 import { Countries, Continent, ContinentNames, ContinentNamesEN } from '../../utils/countryData'
 import { LocalizationUtil } from '../../utils/LocalizationUtil'
+import { WatchLayout } from '../../utils/WatchUiConstants'
 
 @Component
 export struct LearnPage {
@@ -55,7 +56,7 @@ export struct LearnPage {
                 }
               })
             })
-            .margin({ bottom: 10 })
+            .margin({ bottom: WatchLayout.listItemGap })
           }, (continent: Continent) => continent)
         }
         .width('100%')

@@ -481,6 +481,14 @@
       "value": "Flag → Name"
     },
     {
+      "name": "watch_flashcards",
+      "value": "Flashcards"
+    },
+    {
+      "name": "watch_flashcards_flip_hint",
+      "value": "Tap card to flip"
+    },
+    {
       "name": "watch_mark_learned",
       "value": "Mark Learned"
     },
@@ -529,6 +537,14 @@
       "value": "Auto Next"
     },
     {
+      "name": "watch_phone_version_richer",
+      "value": "Full experience available on Phone"
+    },
+    {
+      "name": "watch_company_name",
+      "value": "Douhua Technology Co., Ltd."
+    },
+    {
       "name": "watch_correct",
       "value": "Correct"
     },
@@ -575,6 +591,30 @@
     {
       "name": "watch_exit",
       "value": "Exit"
+    },
+    {
+      "name": "watch_privacy_agreement",
+      "value": "Privacy Agreement"
+    },
+    {
+      "name": "watch_scan_to_view_details",
+      "value": "Scan to view details"
+    },
+    {
+      "name": "watch_confirm",
+      "value": "Confirm"
+    },
+    {
+      "name": "watch_cancel",
+      "value": "Cancel"
+    },
+    {
+      "name": "watch_qr_code_generating",
+      "value": "Generating..."
+    },
+    {
+      "name": "watch_load_failed",
+      "value": "Load failed"
     },
     {
       "name": "watch_flag_desc_unavailable",

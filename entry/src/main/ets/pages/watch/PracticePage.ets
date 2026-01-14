@@ -1,4 +1,5 @@
 import router from '@ohos.router'
+import { WatchLayout } from '../../utils/WatchUiConstants'
 
 @Component
 export struct PracticePage {
@@ -29,7 +30,7 @@ export struct PracticePage {
             url: 'pages/watch/NameToFlagPage'
           })
         })
-        .margin({ bottom: 10 })
+        .margin({ bottom: WatchLayout.listItemGap })
 
         Row() {
           Text($r('app.string.watch_flag_to_name'))
@@ -45,6 +46,24 @@ export struct PracticePage {
         .onClick(() => {
           router.pushUrl({
             url: 'pages/watch/FlagToNamePage'
+          })
+        })
+
+        Row() {
+          Text($r('app.string.watch_flashcards'))
+            .fontSize(16)
+            .fontColor('#FFFFFF')
+            .layoutWeight(1)
+        }
+        .width('80%')
+        .height(44)
+        .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+        .backgroundColor('rgba(255, 255, 255, 0.1)')
+        .borderRadius(8)
+        .margin({ top: WatchLayout.listItemGap })
+        .onClick(() => {
+          router.pushUrl({
+            url: 'pages/watch/FlashcardPage'
           })
         })
       }

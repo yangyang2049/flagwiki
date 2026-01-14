@@ -1413,6 +1413,14 @@
       "value": "旗帜 → 名称"
     },
     {
+      "name": "watch_flashcards",
+      "value": "闪卡"
+    },
+    {
+      "name": "watch_flashcards_flip_hint",
+      "value": "点击卡片翻转"
+    },
+    {
       "name": "watch_mark_learned",
       "value": "标记已学"
     },
@@ -1461,6 +1469,14 @@
       "value": "自动下一题"
     },
     {
+      "name": "watch_phone_version_richer",
+      "value": "更多功能请在手机端体验"
+    },
+    {
+      "name": "watch_company_name",
+      "value": "重庆豆花科技有限公司"
+    },
+    {
       "name": "watch_correct",
       "value": "正确"
     },
@@ -1507,6 +1523,30 @@
     {
       "name": "watch_exit",
       "value": "退出"
+    },
+    {
+      "name": "watch_privacy_agreement",
+      "value": "隐私协议"
+    },
+    {
+      "name": "watch_scan_to_view_details",
+      "value": "扫描查看详情"
+    },
+    {
+      "name": "watch_confirm",
+      "value": "确认"
+    },
+    {
+      "name": "watch_cancel",
+      "value": "取消"
+    },
+    {
+      "name": "watch_qr_code_generating",
+      "value": "生成中..."
+    },
+    {
+      "name": "watch_load_failed",
+      "value": "加载失败"
     },
     {
       "name": "watch_flag_desc_unavailable",
