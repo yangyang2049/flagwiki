@@ -1,3 +1,4 @@
+import router from '@ohos.router'
 import vibrator from '@ohos.vibrator'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { preferences } from '@kit.ArkData'
@@ -28,6 +29,7 @@ struct NameToFlagPage {
   @State soundEnabled: boolean = true
   @State difficulty: Difficulty = 'medium'
   @State isTransitioning: boolean = false
+  @State showResults: boolean = false
 
   private prefs: preferences.Preferences | null = null
   private countryPool: Country[] = []
@@ -35,6 +37,7 @@ struct NameToFlagPage {
   private context: common.UIAbilityContext | null = null
 
   async aboutToAppear() {
+    this.ensureContext()
     await this.initPreferences()
     await this.loadSettings()
     this.buildCountryPool()
@@ -77,9 +80,7 @@ struct NameToFlagPage {
       return
     }
     try {
-      if (!this.context) {
-        this.context = this.getUIContext()?.getHostContext() as common.UIAbilityContext
-      }
+      this.ensureContext()
       if (this.context) {
         void WatchSoundManager.initialize(this.context)
       }
@@ -183,26 +184,24 @@ struct NameToFlagPage {
 
     this.addTimer(() => {
       if (this.questionIndex + 1 >= this.totalQuestions) {
-        this.questionIndex = 0
-        this.correctCount = 0
+        // Show results screen instead of auto-restarting
+        this.showResults = true
       } else {
         this.questionIndex += 1
+        this.startQuestion()
       }
-      this.startQuestion()
     }, 900)
   }
 
-  private goNextQuestion(): void {
-    if (this.isTransitioning) {
-      return
-    }
-    if (this.questionIndex + 1 >= this.totalQuestions) {
-      this.questionIndex = 0
-      this.correctCount = 0
-    } else {
-      this.questionIndex += 1
-    }
-    this.startQuestion()
+  private startNextRound(): void {
+    this.showResults = false
+    this.questionIndex = 0
+    this.correctCount = 0
+    this.startQuestion(true)
+  }
+
+  private exitGame(): void {
+    router.back()
   }
 
   private getCorrectIndex(): number {
@@ -226,25 +225,51 @@ struct NameToFlagPage {
     return 'rgba(255, 255, 255, 0.1)'
   }
 
-  private getOptionBorderColor(index: number): string {
-    if (!this.isAnswered) {
-      return 'rgba(255, 255, 255, 0.2)'
-    }
-    const correctIndex = this.getCorrectIndex()
-    if (index === correctIndex) {
-      return '#4CAF50'
-    }
-    if (index === this.selectedIndex) {
-      return '#EF5350'
-    }
-    return 'rgba(255, 255, 255, 0.2)'
-  }
 
   private getPromptText(): string {
     if (!this.currentCountry) {
       return ''
     }
     return getLocalizedCountryName(this.currentCountry, this.currentLanguage)
+  }
+
+  private ensureContext(): void {
+    if (!this.context) {
+      this.context = this.getUIContext()?.getHostContext() as common.UIAbilityContext
+    }
+  }
+
+  private getResultScoreText(): string {
+    this.ensureContext()
+    if (!this.context) {
+      return ''
+    }
+    return this.context.resourceManager.getStringSync(
+      $r('app.string.watch_result_score').id,
+      this.correctCount.toString(),
+      this.totalQuestions.toString()
+    )
+  }
+
+  private getResultRatingText(): string {
+    this.ensureContext()
+    if (!this.context) {
+      return ''
+    }
+    const ratio = this.totalQuestions > 0 ? this.correctCount / this.totalQuestions : 0
+    let ratingRes = $r('app.string.watch_result_work_better')
+    if (ratio >= 1) {
+      ratingRes = $r('app.string.watch_result_perfect')
+    } else if (ratio >= 0.9) {
+      ratingRes = $r('app.string.watch_result_excellent')
+    } else if (ratio >= 0.75) {
+      ratingRes = $r('app.string.watch_result_good')
+    } else if (ratio >= 0.6) {
+      ratingRes = $r('app.string.watch_result_soso')
+    } else if (ratio >= 0.4) {
+      ratingRes = $r('app.string.watch_result_not_good')
+    }
+    return this.context.resourceManager.getStringSync(ratingRes.id)
   }
 
   private vibrateCorrect(): void {
@@ -306,7 +331,6 @@ struct NameToFlagPage {
     .alignItems(HorizontalAlign.Center)
     .backgroundColor(this.getOptionBackgroundColor(index))
     .borderRadius(8)
-    .border({ width: 1, color: this.getOptionBorderColor(index) })
     .onClick(() => {
       this.selectOption(index)
     })
@@ -314,73 +338,106 @@ struct NameToFlagPage {
 
   build() {
     Column() {
-      Column() {
-        Blank()
-          .height(12)
-
+      if (this.showResults) {
+        // Results screen
         Column() {
-          Column() {
-            Text(this.getPromptText())
-              .fontSize(14)
-              .fontWeight(FontWeight.Medium)
-              .fontColor('#FFFFFF')
-              .textAlign(TextAlign.Center)
-              .maxLines(2)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-              .width('80%')
-              .margin({ bottom: 4 })
-          }
-          .opacity(this.promptOpacity)
-          .animation({ duration: 240, curve: Curve.EaseOut })
+          Text(this.getResultScoreText())
+            .fontSize(16)
+            .fontWeight(FontWeight.Bold)
+            .fontColor('#FFFFFF')
+            .textAlign(TextAlign.Center)
+            .margin({ bottom: 16 })
+
+          Text(this.getResultRatingText())
+            .fontSize(16)
+            .fontColor('rgba(255, 255, 255, 0.7)')
+            .textAlign(TextAlign.Center)
+            .margin({ bottom: 32 })
+
+          Button($r('app.string.watch_next_round'))
+            .fontSize(16)
+            .fontColor('#FFFFFF')
+            .backgroundColor($r('app.color.button_primary'))
+            .borderRadius(8)
+            .height(44)
+            .width('60%')
+            .margin({ bottom: 12 })
+            .onClick(() => {
+              this.startNextRound()
+            })
+
+          Button($r('app.string.watch_exit'))
+            .fontSize(16)
+            .fontColor('#FFFFFF')
+            .backgroundColor('rgba(255, 255, 255, 0.1)')
+            .borderRadius(8)
+            .height(44)
+            .width('60%')
+            .onClick(() => {
+              this.exitGame()
+            })
         }
         .width('100%')
         .layoutWeight(1)
+        .backgroundColor('#000000')
         .justifyContent(FlexAlign.Center)
         .alignItems(HorizontalAlign.Center)
-
+      } else {
+        // Game screen
         Column() {
-        Grid() {
-          ForEach(this.choices, (country: Country, index: number) => {
-            GridItem() {
-              this.FlagGridItem(country, index)
-            }
-          }, (country: Country, index: number) => `${this.optionsToken}-${country.code}-${index}`)
-        }
-          .columnsTemplate('1fr 1fr')
-          .rowsTemplate('1fr 1fr')
-          .columnsGap(4)
-          .rowsGap(4)
-          .width('85%')
-          .height(140)
+          Blank()
+            .height(12)
 
-          if (this.isAnswered && !this.autoNext) {
-            Button($r('app.string.watch_next_question'))
-              .fontSize(14)
-              .fontColor('#FFFFFF')
-              .backgroundColor($r('app.color.button_primary'))
-              .borderRadius(8)
-              .height(36)
-              .width('80%')
-              .margin({ top: 4 })
-              .onClick(() => {
-                this.goNextQuestion()
-              })
+          Column() {
+            Column() {
+              Text(this.getPromptText())
+                .fontSize(14)
+                .fontWeight(FontWeight.Medium)
+                .fontColor('#FFFFFF')
+                .textAlign(TextAlign.Center)
+                .maxLines(2)
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
+                .width('80%')
+                .margin({ bottom: 4 })
+            }
+            .opacity(this.promptOpacity)
+            .animation({ duration: 240, curve: Curve.EaseOut })
           }
-      }
-      .width('100%')
-      .alignItems(HorizontalAlign.Center)
-      .margin({ top: 12, bottom: 2 })
-      .opacity(this.showOptions ? 1 : 0)
-      .animation({ duration: 200, curve: Curve.EaseOut })
+          .width('100%')
+          .layoutWeight(1)
+          .justifyContent(FlexAlign.Center)
+          .alignItems(HorizontalAlign.Center)
+
+          Column() {
+            Grid() {
+              ForEach(this.choices, (country: Country, index: number) => {
+                GridItem() {
+                  this.FlagGridItem(country, index)
+                }
+              }, (country: Country, index: number) => `${this.optionsToken}-${country.code}-${index}`)
+            }
+            .columnsTemplate('1fr 1fr')
+            .rowsTemplate('1fr 1fr')
+            .columnsGap(4)
+            .rowsGap(4)
+            .width('85%')
+            .height(140)
+          }
+          .width('100%')
+          .alignItems(HorizontalAlign.Center)
+          .margin({ top: 12, bottom: 2 })
+          .opacity(this.showOptions ? 1 : 0)
+          .animation({ duration: 200, curve: Curve.EaseOut })
+        }
+      .
+      width('100%')
+        .height('100%')
+        .padding({
+          left: 16,
+          right: 16,
+          bottom: 16,
+          top: 24
+        })
+        .backgroundColor('#000000')
     }
-      .width('100%')
-      .height('100%')
-      .opacity(this.contentOpacity)
-      .animation({ duration: 200, curve: Curve.EaseOut })
-    }
-    .width('100%')
-    .height('100%')
-    .padding({ left: 16, right: 16, bottom: 16, top: 24 })
-    .backgroundColor('#000000')
-  }
-}
+  }}}

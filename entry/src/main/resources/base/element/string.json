@@ -1406,11 +1406,11 @@
     },
     {
       "name": "watch_name_to_flag",
-      "value": "名称选旗帜"
+      "value": "名称 → 旗帜"
     },
     {
       "name": "watch_flag_to_name",
-      "value": "旗帜选名称"
+      "value": "旗帜 → 名称"
     },
     {
       "name": "watch_mark_learned",
@@ -1471,6 +1471,42 @@
     {
       "name": "watch_next_question",
       "value": "下一题"
+    },
+    {
+      "name": "watch_result_score",
+      "value": "正确：%s/%s"
+    },
+    {
+      "name": "watch_result_perfect",
+      "value": "完美"
+    },
+    {
+      "name": "watch_result_excellent",
+      "value": "优秀"
+    },
+    {
+      "name": "watch_result_good",
+      "value": "良好"
+    },
+    {
+      "name": "watch_result_soso",
+      "value": "一般"
+    },
+    {
+      "name": "watch_result_not_good",
+      "value": "不太好"
+    },
+    {
+      "name": "watch_result_work_better",
+      "value": "继续努力"
+    },
+    {
+      "name": "watch_next_round",
+      "value": "下一轮"
+    },
+    {
+      "name": "watch_exit",
+      "value": "退出"
     },
     {
       "name": "watch_flag_desc_unavailable",

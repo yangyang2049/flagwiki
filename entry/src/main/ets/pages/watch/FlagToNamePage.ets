@@ -1,3 +1,4 @@
+import router from '@ohos.router'
 import display from '@ohos.display'
 import vibrator from '@ohos.vibrator'
 import { BusinessError } from '@kit.BasicServicesKit'
@@ -33,6 +34,7 @@ struct FlagToNamePage {
   @State soundEnabled: boolean = true
   @State difficulty: Difficulty = 'medium'
   @State isTransitioning: boolean = false
+  @State showResults: boolean = false
 
   private prefs: preferences.Preferences | null = null
   private countryPool: Country[] = []
@@ -40,6 +42,7 @@ struct FlagToNamePage {
   private context: common.UIAbilityContext | null = null
 
   async aboutToAppear() {
+    this.ensureContext()
     this.updateOptionMetrics()
     await this.initPreferences()
     await this.loadSettings()
@@ -83,9 +86,7 @@ struct FlagToNamePage {
       return
     }
     try {
-      if (!this.context) {
-        this.context = this.getUIContext()?.getHostContext() as common.UIAbilityContext
-      }
+      this.ensureContext()
       if (this.context) {
         void WatchSoundManager.initialize(this.context)
       }
@@ -198,26 +199,24 @@ struct FlagToNamePage {
 
     this.addTimer(() => {
       if (this.questionIndex + 1 >= this.totalQuestions) {
-        this.questionIndex = 0
-        this.correctCount = 0
+        // Show results screen instead of auto-restarting
+        this.showResults = true
       } else {
         this.questionIndex += 1
+        this.startQuestion()
       }
-      this.startQuestion()
     }, 900)
   }
 
-  private goNextQuestion(): void {
-    if (this.isTransitioning) {
-      return
-    }
-    if (this.questionIndex + 1 >= this.totalQuestions) {
-      this.questionIndex = 0
-      this.correctCount = 0
-    } else {
-      this.questionIndex += 1
-    }
-    this.startQuestion()
+  private startNextRound(): void {
+    this.showResults = false
+    this.questionIndex = 0
+    this.correctCount = 0
+    this.startQuestion(true)
+  }
+
+  private exitGame(): void {
+    router.back()
   }
 
   private getCorrectIndex(): number {
@@ -241,19 +240,6 @@ struct FlagToNamePage {
     return 'rgba(255, 255, 255, 0.1)'
   }
 
-  private getOptionBorderColor(index: number): string {
-    if (!this.isAnswered) {
-      return 'rgba(255, 255, 255, 0.2)'
-    }
-    const correctIndex = this.getCorrectIndex()
-    if (index === correctIndex) {
-      return '#4CAF50'
-    }
-    if (index === this.selectedIndex) {
-      return '#EF5350'
-    }
-    return 'rgba(255, 255, 255, 0.2)'
-  }
 
   private getOptionTextColor(index: number): string {
     if (!this.isAnswered) {
@@ -267,6 +253,45 @@ struct FlagToNamePage {
       return '#FFFFFF'
     }
     return 'rgba(255, 255, 255, 0.7)'
+  }
+
+  private ensureContext(): void {
+    if (!this.context) {
+      this.context = this.getUIContext()?.getHostContext() as common.UIAbilityContext
+    }
+  }
+
+  private getResultScoreText(): string {
+    this.ensureContext()
+    if (!this.context) {
+      return ''
+    }
+    return this.context.resourceManager.getStringSync(
+      $r('app.string.watch_result_score').id,
+      this.correctCount.toString(),
+      this.totalQuestions.toString()
+    )
+  }
+
+  private getResultRatingText(): string {
+    this.ensureContext()
+    if (!this.context) {
+      return ''
+    }
+    const ratio = this.totalQuestions > 0 ? this.correctCount / this.totalQuestions : 0
+    let ratingRes = $r('app.string.watch_result_work_better')
+    if (ratio >= 1) {
+      ratingRes = $r('app.string.watch_result_perfect')
+    } else if (ratio >= 0.9) {
+      ratingRes = $r('app.string.watch_result_excellent')
+    } else if (ratio >= 0.75) {
+      ratingRes = $r('app.string.watch_result_good')
+    } else if (ratio >= 0.6) {
+      ratingRes = $r('app.string.watch_result_soso')
+    } else if (ratio >= 0.4) {
+      ratingRes = $r('app.string.watch_result_not_good')
+    }
+    return this.context.resourceManager.getStringSync(ratingRes.id)
   }
 
   private vibrateCorrect(): void {
@@ -382,7 +407,6 @@ struct FlagToNamePage {
     .justifyContent(FlexAlign.Center)
     .backgroundColor(this.getOptionBackgroundColor(index))
     .borderRadius(8)
-    .border({ width: 1, color: this.getOptionBorderColor(index) })
     .margin({ bottom: 4 })
     .onClick(() => {
       this.selectOption(index)
@@ -391,63 +415,92 @@ struct FlagToNamePage {
 
   build() {
     Column() {
-      Column() {
-        Blank()
-          .height(4)
-
+      if (this.showResults) {
+        // Results screen
         Column() {
-          Column() {
-            if (this.currentCountry) {
-              Image($rawfile(`flags/${this.currentCountry.code}.svg`))
-                .key(`${this.promptToken}-${this.currentCountry.code}`)
-                .width(64)
-                .height(40)
-                .objectFit(ImageFit.Contain)
-                .margin({ bottom: 4 })
-            }
-          }
-          .scale({ x: this.promptScale, y: this.promptScale })
-          .translate({ x: 0, y: this.promptOffsetY })
-          .animation({ duration: this.promptAnimating ? 520 : 0, curve: Curve.EaseOut })
+          Text(this.getResultScoreText())
+            .fontSize(16)
+            .fontWeight(FontWeight.Bold)
+            .fontColor('#FFFFFF')
+            .textAlign(TextAlign.Center)
+            .margin({ bottom: 16 })
+
+          Text(this.getResultRatingText())
+            .fontSize(16)
+            .fontColor('rgba(255, 255, 255, 0.7)')
+            .textAlign(TextAlign.Center)
+            .margin({ bottom: 32 })
+
+          Button($r('app.string.watch_next_round'))
+            .fontSize(16)
+            .fontColor('#FFFFFF')
+            .backgroundColor($r('app.color.button_primary'))
+            .borderRadius(8)
+            .height(44)
+            .width('60%')
+            .margin({ bottom: 12 })
+            .onClick(() => {
+              this.startNextRound()
+            })
+
+          Button($r('app.string.watch_exit'))
+            .fontSize(16)
+            .fontColor('#FFFFFF')
+            .backgroundColor('rgba(255, 255, 255, 0.1)')
+            .borderRadius(8)
+            .height(44)
+            .width('60%')
+            .onClick(() => {
+              this.exitGame()
+            })
         }
         .width('100%')
         .layoutWeight(1)
+        .backgroundColor('#000000')
         .justifyContent(FlexAlign.Center)
         .alignItems(HorizontalAlign.Center)
-
+      } else {
+        // Game screen
         Column() {
+          Blank()
+            .height(4)
+
           Column() {
-            ForEach(this.choices, (country: Country, index: number) => {
-              this.NameOptionButton(country, index)
-            }, (country: Country, index: number) => `${this.optionsToken}-${country.code}-${index}`)
+            Column() {
+              if (this.currentCountry) {
+                Image($rawfile(`flags/${this.currentCountry.code}.svg`))
+                  .key(`${this.promptToken}-${this.currentCountry.code}`)
+                  .width(64)
+                  .height(40)
+                  .objectFit(ImageFit.Contain)
+                  .margin({ bottom: 4 })
+              }
+            }
+            .scale({ x: this.promptScale, y: this.promptScale })
+            .translate({ x: 0, y: this.promptOffsetY })
+            .animation({ duration: this.promptAnimating ? 520 : 0, curve: Curve.EaseOut })
+          }
+          .width('100%')
+          .layoutWeight(1)
+          .justifyContent(FlexAlign.Center)
+          .alignItems(HorizontalAlign.Center)
+
+          Column() {
+            Column() {
+              ForEach(this.choices, (country: Country, index: number) => {
+                this.NameOptionButton(country, index)
+              }, (country: Country, index: number) => `${this.optionsToken}-${country.code}-${index}`)
+            }
+            .width('100%')
+            .alignItems(HorizontalAlign.Center)
           }
           .width('100%')
           .alignItems(HorizontalAlign.Center)
-
-          if (this.isAnswered && !this.autoNext) {
-            Button($r('app.string.watch_next_question'))
-              .fontSize(14)
-              .fontColor('#FFFFFF')
-              .backgroundColor($r('app.color.button_primary'))
-              .borderRadius(8)
-              .height(36)
-              .width('80%')
-              .margin({ top: 4 })
-              .onClick(() => {
-                this.goNextQuestion()
-              })
-          }
+          .margin({ top: 12, bottom: 2 })
+          .opacity(this.showOptions ? 1 : 0)
+          .animation({ duration: 200, curve: Curve.EaseOut })
         }
-        .width('100%')
-        .alignItems(HorizontalAlign.Center)
-        .margin({ top: 12, bottom: 2 })
-        .opacity(this.showOptions ? 1 : 0)
-        .animation({ duration: 200, curve: Curve.EaseOut })
       }
-      .width('100%')
-      .height('100%')
-      .opacity(this.contentOpacity)
-      .animation({ duration: 200, curve: Curve.EaseOut })
     }
     .width('100%')
     .height('100%')

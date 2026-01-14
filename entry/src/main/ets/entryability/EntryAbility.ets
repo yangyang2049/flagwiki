@@ -1,11 +1,11 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
-import { i18n } from '@kit.LocalizationKit';
 import { DeviceHelper } from '../utils/DeviceHelper';
 import { FavoritesManager } from '../utils/favoritesManager';
 import { GameProgressManager } from '../utils/GameProgressManager';
 import { PreferencesManager } from '../utils/PreferencesManager';
+import { LocalizationUtil } from '../utils/LocalizationUtil';
 
 const DOMAIN = 0x0000;
 
@@ -18,7 +18,7 @@ export default class EntryAbility extends UIAbility {
     PreferencesManager.init(this.context);
 
     // 初始化语言设置
-    this.initializeLanguage();
+    await this.initializeLanguage();
 
     // 加载并应用主题设置
     try {
@@ -49,18 +49,16 @@ export default class EntryAbility extends UIAbility {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
   }
 
-  private initializeLanguage(): void {
+  private async initializeLanguage(): Promise<void> {
     try {
-      const languageCode = 'en-US';
-      hilog.info(DOMAIN, 'testTag', 'Forcing language to: %{public}s', languageCode);
-      AppStorage.setOrCreate('currentLanguage', languageCode);
-      i18n.System.setAppPreferredLanguage('en-Latn-US');
-
+      const languageCode = await LocalizationUtil.getSystemLanguage(this.context);
+      const fallbackLanguage = languageCode || 'zh';
+      AppStorage.setOrCreate('currentLanguage', fallbackLanguage);
       const verifyLang = AppStorage.get<string>('currentLanguage');
-      hilog.info(DOMAIN, 'testTag', 'Verified language in AppStorage: %{public}s', verifyLang || 'undefined');
+      hilog.info(DOMAIN, 'testTag', 'Initialized language in AppStorage: %{public}s', verifyLang || 'undefined');
     } catch (error) {
       hilog.error(DOMAIN, 'testTag', 'Failed to initialize language: %{public}s', JSON.stringify(error));
-      AppStorage.setOrCreate('currentLanguage', 'en-US');
+      AppStorage.setOrCreate('currentLanguage', 'zh');
     }
   }
 

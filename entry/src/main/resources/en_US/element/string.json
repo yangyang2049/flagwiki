@@ -541,6 +541,42 @@
       "value": "Next"
     },
     {
+      "name": "watch_result_score",
+      "value": "Correct: %s/%s"
+    },
+    {
+      "name": "watch_result_perfect",
+      "value": "Perfect"
+    },
+    {
+      "name": "watch_result_excellent",
+      "value": "Excellent"
+    },
+    {
+      "name": "watch_result_good",
+      "value": "Good"
+    },
+    {
+      "name": "watch_result_soso",
+      "value": "So-so"
+    },
+    {
+      "name": "watch_result_not_good",
+      "value": "Not good"
+    },
+    {
+      "name": "watch_result_work_better",
+      "value": "Work better"
+    },
+    {
+      "name": "watch_next_round",
+      "value": "Next Round"
+    },
+    {
+      "name": "watch_exit",
+      "value": "Exit"
+    },
+    {
       "name": "watch_flag_desc_unavailable",
       "value": "No flag details"
     }
