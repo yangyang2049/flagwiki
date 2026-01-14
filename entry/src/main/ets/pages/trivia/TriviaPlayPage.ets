@@ -7,6 +7,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { image } from '@kit.ImageKit';
 import fs from '@ohos.file.fs';
 import { fileUri } from '@kit.CoreFileKit';
+import { GameOverDialog } from '../../components/GameOverDialog';
 import { getCountryByCode, getLocalizedCountryName } from '../../utils/countryData';
 import { TriviaLevel, TriviaQuestion, getTriviaLevel, getTotalTriviaLevels } from './TriviaLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
@@ -39,6 +40,7 @@ interface RouterParams {
   private context = getContext(this) as common.UIAbilityContext;
   private readonly SHARE_CONTAINER_ID = 'triviaShareContainer';
   private timeoutIds: number[] = []; // 存储所有setTimeout的ID，用于清理
+  private gameOverDialogController: CustomDialogController | null = null;
 
   async aboutToAppear() {
     // 初始化音效播放器
@@ -239,21 +241,32 @@ interface RouterParams {
     const correctAnswersText = this.context.resourceManager.getStringSync($r('app.string.correct_answers_count_trivia').id, this.correctAnswers.toString());
     const backText = this.context.resourceManager.getStringSync($r('app.string.back').id);
     const restartText = this.context.resourceManager.getStringSync($r('app.string.restart').id);
-    
-    promptAction.showDialog({
-      title: challengeFailed,
-      message: correctAnswersText,
-      buttons: [
-        { text: backText, color: '#666666' },
-        { text: restartText, color: '#1677FF' }
-      ]
-    }).then((result) => {
-      if (result.index === 0) {
-        router.back();
-      } else {
-        this.restartGame();
+
+    if (this.gameOverDialogController) {
+      try {
+        this.gameOverDialogController.close();
+      } catch (error) {
+        console.warn('[TriviaPlayPage] Failed to close game over dialog:', error);
       }
+    }
+
+    this.gameOverDialogController = new CustomDialogController({
+      builder: GameOverDialog({
+        title: challengeFailed,
+        message: correctAnswersText,
+        backText,
+        restartText,
+        onBack: () => {
+          router.back();
+        },
+        onRestart: () => {
+          this.restartGame();
+        }
+      }),
+      autoCancel: false,
+      customStyle: true
     });
+    this.gameOverDialogController.open();
   }
 
   private restartGame(): void {
@@ -813,4 +826,3 @@ interface RouterParams {
       .backgroundColor($r('app.color.bg_page'))
   }
 }
-

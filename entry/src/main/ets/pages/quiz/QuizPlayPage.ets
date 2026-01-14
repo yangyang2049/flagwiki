@@ -7,6 +7,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { image } from '@kit.ImageKit';
 import fs from '@ohos.file.fs';
 import { fileUri } from '@kit.CoreFileKit';
+import { GameOverDialog } from '../../components/GameOverDialog';
 import { Country, getCountryByCode, Countries, getLocalizedCountryName } from '../../utils/countryData';
 import { QuizLevel, getQuizLevel, getAllQuizLevels } from './QuizLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
@@ -48,6 +49,7 @@ interface QuizQuestion {
   private context = getContext(this) as common.UIAbilityContext;
   private readonly SHARE_CONTAINER_ID = 'quizShareContainer';
   private timeoutIds: number[] = []; // 存储所有setTimeout的ID，用于清理
+  private gameOverDialogController: CustomDialogController | null = null;
 
   async aboutToAppear() {
     // 初始化音效播放器和振动工具
@@ -280,21 +282,32 @@ interface QuizQuestion {
     const maxComboText = this.context.resourceManager.getStringSync($r('app.string.max_combo').id, this.maxCombo.toString());
     const backText = this.context.resourceManager.getStringSync($r('app.string.back').id);
     const restartText = this.context.resourceManager.getStringSync($r('app.string.restart').id);
-    
-    promptAction.showDialog({
-      title: challengeFailed,
-      message: `${correctAnswersText}\n${maxComboText}`,
-      buttons: [
-        { text: backText, color: '#666666' },
-        { text: restartText, color: '#1677FF' }
-      ]
-    }).then((result) => {
-      if (result.index === 0) {
-        router.back();
-      } else {
-        this.restartQuiz();
+
+    if (this.gameOverDialogController) {
+      try {
+        this.gameOverDialogController.close();
+      } catch (error) {
+        console.warn('[QuizPlayPage] Failed to close game over dialog:', error);
       }
+    }
+
+    this.gameOverDialogController = new CustomDialogController({
+      builder: GameOverDialog({
+        title: challengeFailed,
+        message: `${correctAnswersText}\n${maxComboText}`,
+        backText,
+        restartText,
+        onBack: () => {
+          router.back();
+        },
+        onRestart: () => {
+          this.restartQuiz();
+        }
+      }),
+      autoCancel: false,
+      customStyle: true
     });
+    this.gameOverDialogController.open();
   }
 
   private restartQuiz(): void {
@@ -1163,4 +1176,3 @@ interface QuizQuestion {
     return lines.join('\n');
   }
 }
-
