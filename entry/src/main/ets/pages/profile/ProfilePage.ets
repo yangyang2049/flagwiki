@@ -457,7 +457,7 @@ export struct ProfilePage {
               .margin({ top: 12, bottom: 0 })
 
             // 应用信息
-            Text('探索世界，从国旗开始 🚩')
+            Text($r('app.string.profile_watch_launched'))
               .fontSize(12)
               .fontColor($r('app.color.text_tertiary'))
               .textAlign(TextAlign.Center)

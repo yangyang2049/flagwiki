@@ -1461,6 +1461,10 @@
       "value": "English"
     },
     {
+      "name": "profile_watch_launched",
+      "value": "⌚ 手表端已上线！"
+    },
+    {
       "name": "app_language_code",
       "value": "zh"
     },

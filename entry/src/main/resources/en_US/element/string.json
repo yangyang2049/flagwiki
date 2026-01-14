@@ -529,6 +529,10 @@
       "value": "English"
     },
     {
+      "name": "profile_watch_launched",
+      "value": "⌚ Watch version is live!"
+    },
+    {
       "name": "app_language_code",
       "value": "en"
     },
