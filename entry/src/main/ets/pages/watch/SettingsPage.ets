@@ -57,7 +57,7 @@ export struct SettingsPage {
       Text($r('app.string.watch_settings'))
         .fontSize(14)
         .fontWeight(FontWeight.Medium)
-        .fontColor('#FFFFFF')
+        .fontColor($r('app.color.button_primary'))
         .width('100%')
         .textAlign(TextAlign.Center)
         .margin({ top: 8, bottom: 8 })
@@ -135,7 +135,11 @@ export struct SettingsPage {
       }
       .width('100%')
       .layoutWeight(1)
+      .scrollable(ScrollDirection.Vertical)
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
+      .focusable(true)
+      .defaultFocus(true)
     }
     .width('100%')
     .height('100%')

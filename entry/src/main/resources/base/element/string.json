@@ -1406,11 +1406,11 @@
     },
     {
       "name": "watch_name_to_flag",
-      "value": "名称 → 旗帜"
+      "value": "名称 → 国旗"
     },
     {
       "name": "watch_flag_to_name",
-      "value": "旗帜 → 名称"
+      "value": "国旗 → 名称"
     },
     {
       "name": "watch_flashcards",
@@ -1459,6 +1459,10 @@
     {
       "name": "watch_language_en",
       "value": "English"
+    },
+    {
+      "name": "app_language_code",
+      "value": "zh"
     },
     {
       "name": "watch_vibration_feedback",

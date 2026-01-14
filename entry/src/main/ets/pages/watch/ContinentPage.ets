@@ -34,7 +34,7 @@ struct ContinentPage {
       Text(this.getContinentName())
         .fontSize(14)
         .fontWeight(FontWeight.Medium)
-        .fontColor('#FFFFFF')
+        .fontColor($r('app.color.button_primary'))
         .width('100%')
         .textAlign(TextAlign.Center)
         .margin({ top: 8, bottom: 8 })
@@ -44,13 +44,13 @@ struct ContinentPage {
           ForEach(this.continentCountries, (country: Country) => {
             Row() {
               Image($rawfile(`flags/${country.code}.svg`))
-                .width(28)
-                .height(18)
+                .width(32)
+                .height(26)
                 .objectFit(ImageFit.Contain)
                 .margin({ right: 10 })
 
               Text(getLocalizedCountryName(country, this.currentLanguage))
-                .fontSize(14)
+                .fontSize(16)
                 .fontColor('#FFFFFF')
                 .maxLines(2)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -60,6 +60,7 @@ struct ContinentPage {
               Blank()
             }
             .width('80%')
+            .height(52)
             .padding({ left: 10, right: 10, top: 6, bottom: 6 })
             .backgroundColor('rgba(255, 255, 255, 0.1)')
             .borderRadius(8)
@@ -76,15 +77,19 @@ struct ContinentPage {
         }
         .width('100%')
         .alignItems(HorizontalAlign.Center)
-        .padding({ top: 4, bottom: 12 })
+        .padding({ top: 4, bottom: 0 })
       }
       .width('100%')
       .layoutWeight(1)
+      .scrollable(ScrollDirection.Vertical)
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
+      .focusable(true)
+      .defaultFocus(true)
     }
     .width('100%')
     .height('100%')
-    .padding(16)
+    .padding({ left: 16, right: 16, top: 16, bottom: 0 })
     .backgroundColor('#000000')
   }
 }

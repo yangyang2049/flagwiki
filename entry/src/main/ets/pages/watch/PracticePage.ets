@@ -8,7 +8,7 @@ export struct PracticePage {
       Text($r('app.string.watch_practice'))
         .fontSize(14)
         .fontWeight(FontWeight.Medium)
-        .fontColor('#FFFFFF')
+        .fontColor($r('app.color.button_primary'))
         .width('100%')
         .textAlign(TextAlign.Center)
         .margin({ top: 8, bottom: 8 })

@@ -529,6 +529,10 @@
       "value": "English"
     },
     {
+      "name": "app_language_code",
+      "value": "en"
+    },
+    {
       "name": "watch_vibration_feedback",
       "value": "Vibration"
     },

@@ -21,7 +21,8 @@ export struct WatchPrivacyAgreement {
   }
 
   private getAgreementUrl(): string {
-    if (this.currentLanguage === 'en' || this.currentLanguage.startsWith('en-')) {
+    const language = (this.currentLanguage || '').toLowerCase()
+    if (language === 'en' || language.startsWith('en-') || language.startsWith('en_')) {
       return this.agreementUrlEn
     }
     return this.agreementUrlZh
@@ -121,6 +122,8 @@ export struct WatchPrivacyAgreement {
       .scrollable(ScrollDirection.Vertical)
       .scrollBar(BarState.Off)
       .edgeEffect(EdgeEffect.Spring)
+      .focusable(true)
+      .defaultFocus(true)
     }
     .width('100%')
     .height('100%')

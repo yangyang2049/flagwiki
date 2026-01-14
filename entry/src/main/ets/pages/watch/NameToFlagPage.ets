@@ -345,10 +345,10 @@ struct NameToFlagPage {
     }
     const correctIndex = this.getCorrectIndex()
     if (index === correctIndex) {
-      return '#2E7D32'
+      return '#34C759'
     }
     if (index === this.selectedIndex) {
-      return '#C62828'
+      return '#FF453A'
     }
     return 'rgba(255, 255, 255, 0.1)'
   }
@@ -582,4 +582,3 @@ struct NameToFlagPage {
     .backgroundColor('#000000')
   }
 }
-

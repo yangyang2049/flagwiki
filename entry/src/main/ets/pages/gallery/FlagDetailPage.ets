@@ -13,6 +13,7 @@ import { screenshotManager } from '../../utils/ScreenshotManager';
 import { SaveFlagDialog } from '../../components/SaveFlagDialog';
 import { FavoritesManager } from '../../utils/favoritesManager';
 import { getCoatOfArmsImageSource } from '../../utils/coatOfArmsUtil';
+import { DeviceHelper } from '../../utils/DeviceHelper';
 
 interface RouterParams {
   countryCode: string;
@@ -20,7 +21,7 @@ interface RouterParams {
 
 @Entry
 @Component
-  struct FlagDetailPage {
+struct FlagDetailPage {
   @State country: Country | undefined = undefined;
   @State internationalOrg: InternationalOrg | undefined = undefined;
   @State flagDesign: FlagDesign | undefined = undefined;
@@ -35,6 +36,7 @@ interface RouterParams {
   private readonly FLAG_DOWNLOAD_CONTAINER_ID = 'flagDownloadContainer';
   private readonly SHARE_CONTAINER_ID = 'flagShareContainer';
   private countryCode: string = '';
+  private readonly isWearable: boolean = DeviceHelper.isWearable();
 
   // 保存对话框控制器
   private saveDialogController: CustomDialogController = new CustomDialogController({
@@ -165,7 +167,7 @@ interface RouterParams {
 
     try {
       promptAction.showToast({
-        message: '正在准备图片...',
+        message: '正在准备图片...', 
         duration: 1000
       });
 
@@ -262,378 +264,403 @@ interface RouterParams {
   }
 
   @Builder
-  buildInternationalOrgPage() {
-    if (this.internationalOrg) {
-      Scroll() {
-        Column() {
-          // 隐藏的分享容器（包含旗帜和基本信息）
-          Column() {
-            if (this.internationalOrg) {
-              this.ShareContentBuilder()
-            }
-          }
-          .id(this.SHARE_CONTAINER_ID)
-          .position({ x: -1000, y: -1000 })
-          .width(400)
-          .backgroundColor($r('app.color.bg_page'))
-
-          // 隐藏的下载容器（无 padding，仅用于截图）
-          Column() {
-            Image(getFlagImageSource(this.internationalOrg.code))
-              .width('100%')
-              .height(200)
-              .objectFit(ImageFit.Contain)
-          }
-          .width(400)
-            .height(200)
-            .backgroundColor(Color.White)
-            .id(this.FLAG_DOWNLOAD_CONTAINER_ID)
-            .position({ x: -1000, y: -1000 })
-
-          // 旗帜图片（展示用，有 padding）
-          Column() {
-            Image(getFlagImageSource(this.internationalOrg.code))
-              .width('100%')
-              .height(200)
-              .objectFit(ImageFit.Contain)
-          }
-          .width('100%')
-            .padding(16)
-            .id(this.FLAG_CONTAINER_ID)
-
-          // 组织名称
-          Column() {
-            Text(this.internationalOrg.nameCN)
-              .fontSize(28)
-              .fontWeight(FontWeight.Bold)
-              .fontColor($r('app.color.text_primary'))
-              .textAlign(TextAlign.Center)
-              .maxLines(2)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-              .margin({ bottom: 4 })
-
-            Text(this.internationalOrg.name)
-              .fontSize(16)
-              .fontColor($r('app.color.text_secondary'))
-              .textAlign(TextAlign.Center)
-              .maxLines(2)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-          }
-          .width('100%')
-            .padding({ left: 16, right: 16, top: 20, bottom: 16 })
-            .alignItems(HorizontalAlign.Center)
-
-          // 基本信息卡片
-          Row() {
-            Column() {
-              Text('基本信息')
-                .fontSize(16)
-                .fontWeight(FontWeight.Bold)
-                .fontColor($r('app.color.text_primary'))
-                .margin({ bottom: 16 })
-                .alignSelf(ItemAlign.Start)
-
-              this.InfoItem('总部', this.internationalOrg.headquartersCN)
-              Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-              this.InfoItem('地区', this.internationalOrg.region)
-              Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-              this.InfoItem('组织类型', this.internationalOrg.orgTypeCN)
-              Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-              this.InfoItem('覆盖人口', this.formatPopulation(this.internationalOrg.population))
-              if (this.internationalOrg.website) {
-                Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.InfoItem('网站', this.internationalOrg.website)
-              }
-              if (this.internationalOrg.description) {
-                Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.DescriptionItem('简介', this.internationalOrg.description)
-              }
-            }
-          .padding(16)
-              .layoutWeight(1)
-              .backgroundColor($r('app.color.bg_card'))
-              .borderRadius(16)
-          }
-          .width('100%')
-            .padding({ left: 16, right: 16 })
-            .margin({ top: 8 })
-
-          // 底部操作按钮
-          Row({ space: 16 }) {
-            // 收藏按钮
-            Button() {
-              Row({ space: 8 }) {
-                Image(this.isFavorite ? $r('app.media.icon_favorite_selected') : $r('app.media.icon_favorite'))
-                  .width(20)
-                  .height(20)
-                Text(this.isFavorite ? '已收藏' : '收藏')
-                  .fontSize(15)
-                  .fontColor(this.isFavorite ? $r('app.color.button_primary') : $r('app.color.text_primary'))
-              }
-            }
-          .layoutWeight(1)
-              .height(48)
-              .backgroundColor($r('app.color.bg_card'))
-              .borderRadius(12)
-              .onClick(() => {
-                this.toggleFavorite();
-              })
-
-            // 下载按钮
-            Button() {
-              Row({ space: 8 }) {
-                Image($r('app.media.icon_download'))
-                  .width(20)
-                  .height(20)
-                Text('下载')
-                  .fontSize(15)
-                  .fontColor($r('app.color.text_primary'))
-              }
-            }
-          .layoutWeight(1)
-              .height(48)
-              .backgroundColor($r('app.color.bg_card'))
-              .borderRadius(12)
-              .onClick(() => {
-                this.onDownloadClick();
-              })
-          }
-          .width('100%')
-            .padding({ left: 16, right: 16 })
-            .margin({ top: 20, bottom: 24 })
+  buildInternationalOrgContent() {
+    Column() {
+      // 隐藏的分享容器（包含旗帜和基本信息）
+      Column() {
+        if (this.internationalOrg) {
+          this.ShareContentBuilder()
         }
-        .width('100%')
+      }
+      .id(this.SHARE_CONTAINER_ID)
+      .position({ x: -1000, y: -1000 })
+      .width(400)
+      .backgroundColor($r('app.color.bg_page'))
+
+      // 隐藏的下载容器（无 padding，仅用于截图）
+      Column() {
+        Image(getFlagImageSource(this.internationalOrg!.code))
+          .width('100%')
+          .height(200)
+          .objectFit(ImageFit.Contain)
+      }
+      .width(400)
+      .height(200)
+      .backgroundColor(Color.White)
+      .id(this.FLAG_DOWNLOAD_CONTAINER_ID)
+      .position({ x: -1000, y: -1000 })
+
+      // 旗帜图片（展示用，有 padding）
+      Column() {
+        Image(getFlagImageSource(this.internationalOrg!.code))
+          .width('100%')
+          .height(200)
+          .objectFit(ImageFit.Contain)
       }
       .width('100%')
-        .height('100%')
-        .scrollBar(BarState.Off)
-        .edgeEffect(EdgeEffect.Spring)
-        .backgroundColor($r('app.color.bg_page'))
+      .padding(16)
+      .id(this.FLAG_CONTAINER_ID)
+
+      // 组织名称
+      Column() {
+        Text(this.internationalOrg!.nameCN)
+          .fontSize(28)
+          .fontWeight(FontWeight.Bold)
+          .fontColor($r('app.color.text_primary'))
+          .textAlign(TextAlign.Center)
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .margin({ bottom: 4 })
+
+        Text(this.internationalOrg!.name)
+          .fontSize(16)
+          .fontColor($r('app.color.text_secondary'))
+          .textAlign(TextAlign.Center)
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+      }
+      .width('100%')
+      .padding({ left: 16, right: 16, top: 20, bottom: 16 })
+      .alignItems(HorizontalAlign.Center)
+
+      // 基本信息卡片
+      Row() {
+        Column() {
+          Text('基本信息')
+            .fontSize(16)
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r('app.color.text_primary'))
+            .margin({ bottom: 16 })
+            .alignSelf(ItemAlign.Start)
+
+          this.InfoItem('总部', this.internationalOrg!.headquartersCN)
+          Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+          this.InfoItem('地区', this.internationalOrg!.region)
+          Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+          this.InfoItem('组织类型', this.internationalOrg!.orgTypeCN)
+          Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+          this.InfoItem('覆盖人口', this.formatPopulation(this.internationalOrg!.population))
+          if (this.internationalOrg!.website) {
+            Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+            this.InfoItem('网站', this.internationalOrg!.website)
+          }
+          if (this.internationalOrg!.description) {
+            Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+            this.DescriptionItem('简介', this.internationalOrg!.description)
+          }
+        }
+        .padding(16)
+        .layoutWeight(1)
+        .backgroundColor($r('app.color.bg_card'))
+        .borderRadius(16)
+      }
+      .width('100%')
+      .padding({ left: 16, right: 16 })
+      .margin({ top: 8 })
+
+      // 底部操作按钮
+      Row({ space: 16 }) {
+        // 收藏按钮
+        Button() {
+          Row({ space: 8 }) {
+            Image(this.isFavorite ? $r('app.media.icon_favorite_selected') : $r('app.media.icon_favorite'))
+              .width(20)
+              .height(20)
+            Text(this.isFavorite ? '已收藏' : '收藏')
+              .fontSize(15)
+              .fontColor(this.isFavorite ? $r('app.color.button_primary') : $r('app.color.text_primary'))
+          }
+        }
+        .layoutWeight(1)
+        .height(48)
+        .backgroundColor($r('app.color.bg_card'))
+        .borderRadius(12)
+        .focusable(!this.isWearable)
+        .onClick(() => {
+          this.toggleFavorite();
+        })
+
+        // 下载按钮
+        Button() {
+          Row({ space: 8 }) {
+            Image($r('app.media.icon_download'))
+              .width(20)
+              .height(20)
+            Text('下载')
+              .fontSize(15)
+              .fontColor($r('app.color.text_primary'))
+          }
+        }
+        .layoutWeight(1)
+        .height(48)
+        .backgroundColor($r('app.color.bg_card'))
+        .borderRadius(12)
+        .focusable(!this.isWearable)
+        .onClick(() => {
+          this.onDownloadClick();
+        })
+      }
+      .width('100%')
+      .padding({ left: 16, right: 16 })
+      .margin({ top: 20, bottom: 24 })
+    }
+    .width('100%')
+  }
+
+  @Builder
+  buildCountryContent() {
+    Column() {
+      // 隐藏的分享容器（包含国旗和基本信息）
+      Column() {
+        if (this.country) {
+          this.ShareContentBuilder()
+        }
+      }
+      .id(this.SHARE_CONTAINER_ID)
+      .position({ x: -1000, y: -1000 })
+      .width(400)
+      .backgroundColor($r('app.color.bg_page'))
+
+      // 隐藏的下载容器（无 padding，仅用于截图）
+      Column() {
+        Image(getFlagImageSource(this.country!.code))
+          .width('100%')
+          .height(200)
+          .objectFit(ImageFit.Contain)
+      }
+      .width(400)
+      .height(200)
+      .backgroundColor(Color.White)
+      .id(this.FLAG_DOWNLOAD_CONTAINER_ID)
+      .position({ x: -1000, y: -1000 })
+
+      // 国旗图片（展示用，有 padding）
+      Column() {
+        Image(getFlagImageSource(this.country!.code))
+          .width('100%')
+          .height(200)
+          .objectFit(ImageFit.Contain)
+      }
+      .width('100%')
+      .padding(16)
+      .id(this.FLAG_CONTAINER_ID)
+
+      // 国家名称
+      Column() {
+        Text(this.country!.nameCN)
+          .fontSize(28)
+          .fontWeight(FontWeight.Bold)
+          .fontColor($r('app.color.text_primary'))
+          .textAlign(TextAlign.Center)
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .margin({ bottom: 4 })
+
+        Text(this.country!.name)
+          .fontSize(16)
+          .fontColor($r('app.color.text_secondary'))
+          .textAlign(TextAlign.Center)
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+      }
+      .width('100%')
+      .padding({ left: 16, right: 16, top: 20, bottom: 16 })
+      .alignItems(HorizontalAlign.Center)
+
+      // 基本信息卡片
+      Row() {
+        Column() {
+          Text('基本信息')
+            .fontSize(16)
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r('app.color.text_primary'))
+            .margin({ bottom: 16 })
+            .alignSelf(ItemAlign.Start)
+
+          this.InfoItem('首都', this.country!.capitalCN)
+          Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+          this.InfoItem('所属地区', this.getRegionName(this.country!.region))
+          Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+          this.InfoItem('人口', this.formatPopulation(this.country!.population))
+          Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+          this.InfoItem('面积', this.formatArea(this.country!.area))
+          Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+          this.InfoItem('国家代码', this.country!.code.toUpperCase())
+        }
+        .padding(16)
+        .layoutWeight(1)
+        .backgroundColor($r('app.color.bg_card'))
+        .borderRadius(16)
+      }
+      .width('100%')
+      .padding({ left: 16, right: 16 })
+      .margin({ top: 8 })
+
+      // 关于这面国旗
+      Row() {
+        Column() {
+          Text('关于这面国旗')
+            .fontSize(16)
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r('app.color.text_primary'))
+            .margin({ bottom: 16 })
+            .alignSelf(ItemAlign.Start)
+
+          this.InfoItem('国旗比例', this.getFlagProportion())
+          Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
+          this.InfoItem('采用日期', this.getFlagAdopted())
+          Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 16 })
+
+          Text(this.getFlagDescription())
+            .fontSize(14)
+            .fontColor($r('app.color.text_dark'))
+            .lineHeight(22)
+            .width('100%')
+            .textAlign(TextAlign.Start)
+        }
+        .padding(16)
+        .layoutWeight(1)
+        .backgroundColor($r('app.color.bg_card'))
+        .borderRadius(16)
+        .alignItems(HorizontalAlign.Start)
+      }
+      .width('100%')
+      .padding({ left: 16, right: 16 })
+      .margin({ top: 16 })
+
+      // 国徽（如果有）
+      if (this.coatOfArmsResource) {
+        Row() {
+          Column() {
+            Text('国徽')
+              .fontSize(16)
+              .fontWeight(FontWeight.Bold)
+              .fontColor($r('app.color.text_primary'))
+              .margin({ bottom: 16 })
+              .alignSelf(ItemAlign.Start)
+
+            Column() {
+              Image(this.coatOfArmsResource)
+                .width(200)
+                .height(200)
+                .objectFit(ImageFit.Contain)
+            }
+            .width('100%')
+            .alignItems(HorizontalAlign.Center)
+          }
+          .padding(16)
+          .layoutWeight(1)
+          .backgroundColor($r('app.color.bg_card'))
+          .borderRadius(16)
+          .alignItems(HorizontalAlign.Start)
+        }
+        .width('100%')
+        .padding({ left: 16, right: 16 })
+        .margin({ top: 16 })
+      }
+
+      // 底部操作按钮
+      Row({ space: 16 }) {
+        // 收藏按钮
+        Button() {
+          Row({ space: 8 }) {
+            Image(this.isFavorite ? $r('app.media.icon_favorite_selected') : $r('app.media.icon_favorite'))
+              .width(20)
+              .height(20)
+            Text(this.isFavorite ? '已收藏' : '收藏')
+              .fontSize(15)
+              .fontColor(this.isFavorite ? $r('app.color.button_primary') : $r('app.color.text_primary'))
+          }
+        }
+        .layoutWeight(1)
+        .height(48)
+        .backgroundColor($r('app.color.bg_card'))
+        .borderRadius(12)
+        .focusable(!this.isWearable)
+        .onClick(() => {
+          this.toggleFavorite();
+        })
+
+        // 下载按钮
+        Button() {
+          Row({ space: 8 }) {
+            Image($r('app.media.icon_download'))
+              .width(20)
+              .height(20)
+            Text('下载')
+              .fontSize(15)
+              .fontColor($r('app.color.text_primary'))
+          }
+        }
+        .layoutWeight(1)
+        .height(48)
+        .backgroundColor($r('app.color.bg_card'))
+        .borderRadius(12)
+        .focusable(!this.isWearable)
+        .onClick(() => {
+          this.onDownloadClick();
+        })
+      }
+      .width('100%')
+      .padding({ left: 16, right: 16 })
+      .margin({ top: 20, bottom: 24 })
+    }
+    .width('100%')
+  }
+
+  @Builder
+  buildContent() {
+    if (this.internationalOrg) {
+      this.buildInternationalOrgContent()
+    } else if (this.country) {
+      this.buildCountryContent()
+    } else {
+      Column() {
+        Text('国家信息加载失败')
+          .fontSize(16)
+          .fontColor($r('app.color.text_tertiary'))
+      }
+      .width('100%')
+      .height('100%')
+      .justifyContent(FlexAlign.Center)
     }
   }
 
   build() {
-    Navigation() {
-      if (this.internationalOrg) {
-        this.buildInternationalOrgPage()
-      } else if (this.country) {
+    if (this.isWearable) {
+      Column() {
         Scroll() {
-          Column() {
-            // 隐藏的分享容器（包含国旗和基本信息）
-            Column() {
-              if (this.country) {
-                this.ShareContentBuilder()
-              }
-            }
-            .id(this.SHARE_CONTAINER_ID)
-            .position({ x: -1000, y: -1000 })
-            .width(400)
-            .backgroundColor($r('app.color.bg_page'))
-
-            // 隐藏的下载容器（无 padding，仅用于截图）
-            Column() {
-              Image(getFlagImageSource(this.country.code))
-                .width('100%')
-                .height(200)
-                .objectFit(ImageFit.Contain)
-            }
-            .width(400)
-              .height(200)
-              .backgroundColor(Color.White)
-              .id(this.FLAG_DOWNLOAD_CONTAINER_ID)
-              .position({ x: -1000, y: -1000 })
-
-            // 国旗图片（展示用，有 padding）
-            Column() {
-              Image(getFlagImageSource(this.country.code))
-                .width('100%')
-                .height(200)
-                .objectFit(ImageFit.Contain)
-            }
-            .width('100%')
-              .padding(16)
-              .id(this.FLAG_CONTAINER_ID)
-
-            // 国家名称
-            Column() {
-              Text(this.country.nameCN)
-                .fontSize(28)
-                .fontWeight(FontWeight.Bold)
-                .fontColor($r('app.color.text_primary'))
-                .textAlign(TextAlign.Center)
-                .maxLines(2)
-                .textOverflow({ overflow: TextOverflow.Ellipsis })
-                .margin({ bottom: 4 })
-
-              Text(this.country.name)
-                .fontSize(16)
-                .fontColor($r('app.color.text_secondary'))
-                .textAlign(TextAlign.Center)
-                .maxLines(2)
-                .textOverflow({ overflow: TextOverflow.Ellipsis })
-            }
-            .width('100%')
-              .padding({ left: 16, right: 16, top: 20, bottom: 16 })
-              .alignItems(HorizontalAlign.Center)
-
-            // 基本信息卡片
-            Row() {
-              Column() {
-                Text('基本信息')
-                  .fontSize(16)
-                  .fontWeight(FontWeight.Bold)
-                  .fontColor($r('app.color.text_primary'))
-                  .margin({ bottom: 16 })
-                  .alignSelf(ItemAlign.Start)
-
-                this.InfoItem('首都', this.country.capitalCN)
-                Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.InfoItem('所属地区', this.getRegionName(this.country.region))
-                Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.InfoItem('人口', this.formatPopulation(this.country.population))
-                Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.InfoItem('面积', this.formatArea(this.country.area))
-                Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.InfoItem('国家代码', this.country.code.toUpperCase())
-              }
-              .padding(16)
-                .layoutWeight(1)
-                .backgroundColor($r('app.color.bg_card'))
-                .borderRadius(16)
-            }
-            .width('100%')
-              .padding({ left: 16, right: 16 })
-              .margin({ top: 8 })
-
-            // 关于这面国旗
-            Row() {
-              Column() {
-                Text('关于这面国旗')
-                  .fontSize(16)
-                  .fontWeight(FontWeight.Bold)
-                  .fontColor($r('app.color.text_primary'))
-                  .margin({ bottom: 16 })
-                  .alignSelf(ItemAlign.Start)
-
-                this.InfoItem('国旗比例', this.getFlagProportion())
-                Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.InfoItem('采用日期', this.getFlagAdopted())
-                Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 16 })
-
-                Text(this.getFlagDescription())
-                  .fontSize(14)
-                  .fontColor($r('app.color.text_dark'))
-                  .lineHeight(22)
-                  .width('100%')
-                  .textAlign(TextAlign.Start)
-              }
-              .padding(16)
-                .layoutWeight(1)
-                .backgroundColor($r('app.color.bg_card'))
-                .borderRadius(16)
-                .alignItems(HorizontalAlign.Start)
-            }
-            .width('100%')
-              .padding({ left: 16, right: 16 })
-              .margin({ top: 16 })
-
-
-            // 国徽（如果有）
-            if (this.coatOfArmsResource) {
-              Row() {
-                Column() {
-                  Text('国徽')
-                    .fontSize(16)
-                    .fontWeight(FontWeight.Bold)
-                    .fontColor($r('app.color.text_primary'))
-                    .margin({ bottom: 16 })
-                    .alignSelf(ItemAlign.Start)
-
-                  Column() {
-                    Image(this.coatOfArmsResource)
-                      .width(200)
-                      .height(200)
-                      .objectFit(ImageFit.Contain)
-                  }
-                  .width('100%')
-                    .alignItems(HorizontalAlign.Center)
-                }
-                .padding(16)
-                  .layoutWeight(1)
-                  .backgroundColor($r('app.color.bg_card'))
-                  .borderRadius(16)
-                  .alignItems(HorizontalAlign.Start)
-              }
-              .width('100%')
-                .padding({ left: 16, right: 16 })
-                .margin({ top: 16 })
-            }
-
-            // 底部操作按钮
-            Row({ space: 16 }) {
-              // 收藏按钮
-              Button() {
-                Row({ space: 8 }) {
-                  Image(this.isFavorite ? $r('app.media.icon_favorite_selected') : $r('app.media.icon_favorite'))
-                    .width(20)
-                    .height(20)
-                  Text(this.isFavorite ? '已收藏' : '收藏')
-                    .fontSize(15)
-                    .fontColor(this.isFavorite ? $r('app.color.button_primary') : $r('app.color.text_primary'))
-                }
-              }
-              .layoutWeight(1)
-                .height(48)
-                .backgroundColor($r('app.color.bg_card'))
-                .borderRadius(12)
-                .onClick(() => {
-                  this.toggleFavorite();
-                })
-
-              // 下载按钮
-              Button() {
-                Row({ space: 8 }) {
-                  Image($r('app.media.icon_download'))
-                    .width(20)
-                    .height(20)
-                  Text('下载')
-                    .fontSize(15)
-                    .fontColor($r('app.color.text_primary'))
-                }
-              }
-              .layoutWeight(1)
-                .height(48)
-                .backgroundColor($r('app.color.bg_card'))
-                .borderRadius(12)
-                .onClick(() => {
-                  this.onDownloadClick();
-                })
-            }
-            .width('100%')
-              .padding({ left: 16, right: 16 })
-              .margin({ top: 20, bottom: 24 })
-          }
-          .width('100%')
+          this.buildContent()
         }
         .width('100%')
-          .height('100%')
-          .scrollBar(BarState.Off)
-          .edgeEffect(EdgeEffect.Spring)
-          .backgroundColor($r('app.color.bg_page'))
-      } else {
-        Column() {
-          Text('国家信息加载失败')
-            .fontSize(16)
-            .fontColor($r('app.color.text_tertiary'))
-        }
-        .width('100%')
-          .height('100%')
-          .justifyContent(FlexAlign.Center)
+        .layoutWeight(1)
+        .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring)
+        .scrollable(ScrollDirection.Vertical)
+        .focusable(true)
+        .defaultFocus(true)
       }
-    }
-    .titleMode(NavigationTitleMode.Mini)
+      .width('100%')
+      .height('100%')
+      .backgroundColor($r('app.color.bg_page'))
+    } else {
+      Navigation() {
+        Scroll() {
+          this.buildContent()
+        }
+        .width('100%')
+        .height('100%')
+        .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring)
+        .scrollable(ScrollDirection.Vertical)
+        .focusable(true)
+        .defaultFocus(true)
+        .backgroundColor($r('app.color.bg_page'))
+      }
+      .titleMode(NavigationTitleMode.Mini)
       .backgroundColor($r('app.color.bg_page'))
       .menus(this.MenuBuilder)
+    }
   }
 
   @Builder
@@ -654,9 +681,9 @@ interface RouterParams {
         })
     }
     .height('100%')
-      .justifyContent(FlexAlign.End)
-      .alignItems(VerticalAlign.Center)
-      .padding({ right: 16 })
+    .justifyContent(FlexAlign.End)
+    .alignItems(VerticalAlign.Center)
+    .padding({ right: 16 })
   }
 
   @Builder
@@ -675,7 +702,7 @@ interface RouterParams {
         .alignSelf(ItemAlign.Start)
     }
     .width('100%')
-      .alignItems(HorizontalAlign.Start)
+    .alignItems(HorizontalAlign.Start)
   }
 
   @Builder
@@ -811,7 +838,7 @@ interface RouterParams {
 
     this.isSharing = true;
     promptAction.showToast({
-      message: '正在准备分享...',
+      message: '正在准备分享...', 
       duration: 1500
     });
 
@@ -869,7 +896,7 @@ interface RouterParams {
       const shareData = new systemShare.SharedData({
         utd: utdTypeId,
         uri: imageUri,
-        title: `${orgName}${this.internationalOrg ? '旗帜' : '国旗'}`,
+        title: `${orgName}${this.internationalOrg ? '旗帜' : '国旗'}`, 
         description: '来自国旗小百科'
       });
 
@@ -968,7 +995,7 @@ interface RouterParams {
       Column({ space: 16 }) {
         // 旗帜图片
         Column() {
-          Image(getFlagImageSource(this.internationalOrg.code))
+          Image(getFlagImageSource(this.internationalOrg!.code))
             .width('100%')
             .height(200)
             .objectFit(ImageFit.Contain)
@@ -979,7 +1006,7 @@ interface RouterParams {
 
         // 组织名称
         Column() {
-          Text(this.internationalOrg.nameCN)
+          Text(this.internationalOrg!.nameCN)
             .fontSize(28)
             .fontWeight(FontWeight.Bold)
             .fontColor($r('app.color.text_primary'))
@@ -988,7 +1015,7 @@ interface RouterParams {
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .margin({ bottom: 4 })
 
-          Text(this.internationalOrg.name)
+          Text(this.internationalOrg!.name)
             .fontSize(16)
             .fontColor($r('app.color.text_secondary'))
             .textAlign(TextAlign.Center)
@@ -1009,20 +1036,20 @@ interface RouterParams {
               .margin({ bottom: 16 })
               .alignSelf(ItemAlign.Start)
 
-            this.InfoItem('总部', this.internationalOrg.headquartersCN)
+            this.InfoItem('总部', this.internationalOrg!.headquartersCN)
             Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoItem('地区', this.internationalOrg.region)
+            this.InfoItem('地区', this.internationalOrg!.region)
             Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoItem('组织类型', this.internationalOrg.orgTypeCN)
+            this.InfoItem('组织类型', this.internationalOrg!.orgTypeCN)
             Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoItem('覆盖人口', this.formatPopulation(this.internationalOrg.population))
-            if (this.internationalOrg.website) {
+            this.InfoItem('覆盖人口', this.formatPopulation(this.internationalOrg!.population))
+            if (this.internationalOrg!.website) {
               Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-              this.InfoItem('网站', this.internationalOrg.website)
+              this.InfoItem('网站', this.internationalOrg!.website)
             }
-            if (this.internationalOrg.description) {
+            if (this.internationalOrg!.description) {
               Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-              this.DescriptionItem('简介', this.internationalOrg.description)
+              this.DescriptionItem('简介', this.internationalOrg!.description)
             }
           }
           .padding(16)
@@ -1040,7 +1067,7 @@ interface RouterParams {
       Column({ space: 16 }) {
         // 国旗图片
         Column() {
-          Image(getFlagImageSource(this.country.code))
+          Image(getFlagImageSource(this.country!.code))
             .width('100%')
             .height(200)
             .objectFit(ImageFit.Contain)
@@ -1051,7 +1078,7 @@ interface RouterParams {
 
         // 国家名称
         Column() {
-          Text(this.country.nameCN)
+          Text(this.country!.nameCN)
             .fontSize(28)
             .fontWeight(FontWeight.Bold)
             .fontColor($r('app.color.text_primary'))
@@ -1060,7 +1087,7 @@ interface RouterParams {
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .margin({ bottom: 4 })
 
-          Text(this.country.name)
+          Text(this.country!.name)
             .fontSize(16)
             .fontColor($r('app.color.text_secondary'))
             .textAlign(TextAlign.Center)
@@ -1081,15 +1108,15 @@ interface RouterParams {
               .margin({ bottom: 16 })
               .alignSelf(ItemAlign.Start)
 
-            this.InfoItem('首都', this.country.capitalCN)
+            this.InfoItem('首都', this.country!.capitalCN)
             Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoItem('所属地区', this.getRegionName(this.country.region))
+            this.InfoItem('所属地区', this.getRegionName(this.country!.region))
             Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoItem('人口', this.formatPopulation(this.country.population))
+            this.InfoItem('人口', this.formatPopulation(this.country!.population))
             Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoItem('面积', this.formatArea(this.country.area))
+            this.InfoItem('面积', this.formatArea(this.country!.area))
             Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-            this.InfoItem('国家代码', this.country.code.toUpperCase())
+            this.InfoItem('国家代码', this.country!.code.toUpperCase())
           }
           .padding(16)
             .layoutWeight(1)
@@ -1124,7 +1151,7 @@ interface RouterParams {
               .borderRadius(16)
           }
           .width('100%')
-            .padding({ left: 16, right: 16 })
+          .padding({ left: 16, right: 16 })
         }
       }
       .width('100%')
@@ -1133,4 +1160,3 @@ interface RouterParams {
     }
   }
 }
-

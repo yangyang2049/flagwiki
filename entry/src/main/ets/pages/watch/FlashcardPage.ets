@@ -1,8 +1,12 @@
 import { common } from '@kit.AbilityKit'
+import vibrator from '@ohos.vibrator'
 import promptAction from '@ohos.promptAction'
 import curves from '@ohos.curves'
+import { BusinessError } from '@kit.BasicServicesKit'
+import { preferences } from '@kit.ArkData'
 import { Countries, Country, getLocalizedCountryName } from '../../utils/countryData'
 import { FavoritesManager } from '../../utils/favoritesManager'
+import { PreferencesManager } from '../../utils/PreferencesManager'
 
 @Entry
 @Component
@@ -16,8 +20,10 @@ struct FlashcardPage {
   @State flipAngle: number = 0
   @State isFavorite: boolean = false
   @State hasShownIntro: boolean = false
+  @State vibrationEnabled: boolean = true
 
   private context: common.UIAbilityContext | null = null
+  private prefs: preferences.Preferences | null = null
   private timeoutIds: number[] = []
 
   async aboutToAppear() {
@@ -25,7 +31,10 @@ struct FlashcardPage {
     if (this.context) {
       await FavoritesManager.init(this.context)
     }
+    await this.initPreferences()
+    await this.loadSettings()
     this.startSession()
+    this.loadIntroState()
     this.showIntroToast()
   }
 
@@ -53,9 +62,37 @@ struct FlashcardPage {
         duration: 2000
       })
       this.hasShownIntro = true
+      AppStorage.set('watchFlashcardsIntroShown', true)
     } catch (error) {
       console.error('[WatchFlashcardPage] Failed to show intro toast:', error)
     }
+  }
+
+  private async initPreferences(): Promise<void> {
+    if (this.prefs) {
+      return
+    }
+    try {
+      this.prefs = await PreferencesManager.getPreferences('watch_settings')
+    } catch (error) {
+      console.error('[WatchFlashcardPage] Failed to init preferences:', error)
+    }
+  }
+
+  private async loadSettings(): Promise<void> {
+    try {
+      if (!this.prefs) {
+        return
+      }
+      this.vibrationEnabled = await this.prefs.get('vibration_enabled', true) as boolean
+    } catch (error) {
+      console.error('[WatchFlashcardPage] Failed to load settings:', error)
+    }
+  }
+
+  private loadIntroState(): void {
+    const stored = AppStorage.get<boolean>('watchFlashcardsIntroShown')
+    this.hasShownIntro = stored === true
   }
 
   private startSession(): void {
@@ -123,6 +160,7 @@ struct FlashcardPage {
     if (!this.currentCountry) {
       return
     }
+    this.vibrateTap()
     const pageUrl = `flag:${this.currentCountry.code}`
     if (this.isFavorite) {
       await FavoritesManager.removeFavorite(pageUrl)
@@ -133,6 +171,21 @@ struct FlashcardPage {
         pageUrl: pageUrl
       })
       this.isFavorite = true
+    }
+  }
+
+  private vibrateTap(): void {
+    if (!this.vibrationEnabled) {
+      return
+    }
+    try {
+      vibrator.vibrate(50, (error: BusinessError) => {
+        if (error) {
+          console.error('[WatchFlashcardPage] Vibrate tap failed:', error)
+        }
+      })
+    } catch (error) {
+      console.error('[WatchFlashcardPage] Vibrate tap failed:', error)
     }
   }
 

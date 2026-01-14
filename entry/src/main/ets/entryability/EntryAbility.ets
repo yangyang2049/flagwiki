@@ -1,4 +1,4 @@
-import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
+import { AbilityConstant, Configuration, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { DeviceHelper } from '../utils/DeviceHelper';
@@ -51,14 +51,27 @@ export default class EntryAbility extends UIAbility {
 
   private async initializeLanguage(): Promise<void> {
     try {
-      const languageCode = await LocalizationUtil.getSystemLanguage(this.context);
-      const fallbackLanguage = languageCode || 'zh';
+      const resourceLanguage = this.getAppLanguageCode();
+      const systemLanguage = await LocalizationUtil.getSystemLanguage(this.context);
+      const fallbackLanguage = (resourceLanguage || systemLanguage || 'zh').toLowerCase();
       AppStorage.setOrCreate('currentLanguage', fallbackLanguage);
+      AppStorage.set('currentLanguage', fallbackLanguage);
       const verifyLang = AppStorage.get<string>('currentLanguage');
       hilog.info(DOMAIN, 'testTag', 'Initialized language in AppStorage: %{public}s', verifyLang || 'undefined');
     } catch (error) {
       hilog.error(DOMAIN, 'testTag', 'Failed to initialize language: %{public}s', JSON.stringify(error));
       AppStorage.setOrCreate('currentLanguage', 'zh');
+      AppStorage.set('currentLanguage', 'zh');
+    }
+  }
+
+  private getAppLanguageCode(): string {
+    try {
+      const language = this.context.resourceManager.getStringSync($r('app.string.app_language_code').id);
+      return typeof language === 'string' ? language.trim().toLowerCase() : '';
+    } catch (error) {
+      hilog.warn(DOMAIN, 'testTag', 'Failed to read app language code: %{public}s', JSON.stringify(error));
+      return '';
     }
   }
 
@@ -82,6 +95,11 @@ export default class EntryAbility extends UIAbility {
   onWindowStageDestroy(): void {
     // Main window is destroyed, release UI related resources
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageDestroy');
+  }
+
+  onConfigurationUpdated(config: Configuration): void {
+    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onConfigurationUpdated');
+    void this.initializeLanguage();
   }
 
   onForeground(): void {
