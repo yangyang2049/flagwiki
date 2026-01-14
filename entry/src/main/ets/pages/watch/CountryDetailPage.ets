@@ -122,7 +122,7 @@ struct CountryDetailPage {
   }
 
   build() {
-    Column() {
+
       Scroll(this.scrollScroller) {
         Column() {
           Image(this.getFlagSource())
@@ -182,12 +182,11 @@ struct CountryDetailPage {
       .scrollable(ScrollDirection.Vertical)
       .scrollBar(BarState.Off)
       .edgeEffect(EdgeEffect.Spring)
-    }
-    .width('100%')
+      .focusable(true)
+      .defaultFocus(true)
+
     .height('100%')
     .padding({ left: 16, right: 16, top: 0, bottom: 0 })
     .backgroundColor('#000000')
-    .focusable(true)
-    .defaultFocus(true)
   }
 }
