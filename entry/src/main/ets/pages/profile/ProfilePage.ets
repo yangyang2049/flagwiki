@@ -471,10 +471,12 @@ export struct ProfilePage {
           .justifyContent(FlexAlign.Center)
       }
       .width('100%')
-        .height('100%')
-        .scrollBar(BarState.Off)
-        .edgeEffect(EdgeEffect.Spring)
-        .align(Alignment.TopStart)
+      .height('100%')
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
+      .align(Alignment.TopStart)
+      .focusable(true)
+      .defaultFocus(true)
 
       // 主题设置对话框
       if (this.showThemeDialog) {

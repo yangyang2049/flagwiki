@@ -6,6 +6,8 @@ import { ProfilePage } from './profile/ProfilePage';
 import { preferences } from '@kit.ArkData';
 import common from '@ohos.app.ability.common';
 import { PreferencesManager } from '../utils/PreferencesManager';
+import router from '@ohos.router';
+import { shouldAllowEdgeSwipeExit } from '../utils/WatchGestureHelper';
 
 interface TabItem {
   title: Resource;
@@ -186,6 +188,21 @@ struct Index {
           if (index === 4) {
             this.profileRefreshKey++;
           }
+        })
+        .onGestureRecognizerJudgeBegin((event: BaseGestureEvent, current: GestureRecognizer,
+          others: Array<GestureRecognizer>): GestureJudgeResult => {
+          // 只在首页（第一个tab）时允许右滑退出
+          if (this.currentTabIndex === 0 && shouldAllowEdgeSwipeExit(event, current)) {
+            console.info('[Index] Right swipe from left edge on home page, allow exit');
+            try {
+              router.back();
+            } catch (err) {
+              // 如果是根页面，back() 会失败，这是正常情况
+              console.info('[Index] Cannot go back from root page');
+            }
+            return GestureJudgeResult.REJECT;
+          }
+          return GestureJudgeResult.CONTINUE;
         })
       }
       .width('100%')

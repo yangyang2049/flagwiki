@@ -1,5 +1,19 @@
 # 变更日志
 
+## [未发布]
+
+### 修复 (Fixed)
+- **手表版右滑退出功能**：为手表版应用首页添加右滑退出功能（参考jifen/watch项目实现）
+  - 在 `pages/watch/Index.ets` 的 ArcSwiper 组件上添加了 `onGestureRecognizerJudgeBegin` 回调
+  - 添加 `shouldAllowExit` 方法判断是否允许退出
+  - 使用 `innerSelectedIndex` 跟踪当前选中的页面索引
+  - 只在第一个页面（LearnPage）向右滑动时允许退出应用
+  - 返回 `GestureJudgeResult.REJECT` 以允许系统处理退出手势
+- **旋转表冠适配**：为应用首页和设置界面的Scroll组件添加旋转表冠支持
+  - 在HomePage的Scroll组件中添加了`focusable(true)`和`defaultFocus(true)`属性
+  - 在ProfilePage的Scroll组件中添加了`focusable(true)`和`defaultFocus(true)`属性
+  - 手表版 LearnPage、SettingsPage 已有旋转表冠支持
+
 ## [1.1.0] - 2025-01-12
 
 ### 新增 (Added)

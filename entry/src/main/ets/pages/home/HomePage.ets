@@ -381,5 +381,7 @@ export struct HomePage {
     .height('100%')
     .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.Spring)
+    .focusable(true)
+    .defaultFocus(true)
   }
 }
