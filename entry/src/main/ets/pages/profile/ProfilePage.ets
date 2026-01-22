@@ -10,6 +10,7 @@ import router from '@ohos.router';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { PreferencesManager } from '../../utils/PreferencesManager';
 import { VibratorUtil } from '../../utils/VibratorUtil';
+import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
 // 总关卡数
 const QUIZ_TOTAL_LEVELS = 10;
@@ -429,6 +430,13 @@ export struct ProfilePage {
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
+              this.settingItem($r('app.media.icon_share'), '分享应用', '', () => {
+                this.shareApp();
+              })
+              Divider()
+                .strokeWidth(0.5)
+                .color($r('app.color.gray_border'))
+                .margin({ left: 16, right: 16 })
               this.settingItem($r('app.media.icon_feedback'), '意见反馈', '', () => {
                 this.showFeedback();
               })
@@ -442,13 +450,6 @@ export struct ProfilePage {
                 .margin({ left: 16, right: 16 })
               this.settingItem($r('app.media.icon_about'), '关于应用', '', () => {
                 this.showAboutApp();
-              })
-              Divider()
-                .strokeWidth(0.5)
-                .color($r('app.color.gray_border'))
-                .margin({ left: 16, right: 16 })
-              this.settingItem($r('app.media.icon_share'), '分享应用', '', () => {
-                this.shareApp();
               })
             }
             .width('100%')
@@ -464,7 +465,7 @@ export struct ProfilePage {
               .margin({ top: 40, bottom: 40 })
           }
           .width('100%')
-            .constraintSize({ maxWidth: 400 })
+            .constraintSize({ maxWidth: getContentMaxWidth() })
             .padding({ left: 20, right: 20, bottom: 16 })
         }
         .width('100%')

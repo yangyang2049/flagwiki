@@ -2,6 +2,41 @@
 
 ## [未发布]
 
+### 新增 (Added)
+- **资源优化和Tree Shaking支持**：
+  - 新增SVG优化脚本 (`scripts/optimize-svgs.js`)：压缩SVG文件，移除元数据、注释和空白，可节省10-30%空间
+  - 新增未使用导入检查脚本 (`scripts/check-unused-imports.js`)：自动检测可能未使用的导入语句
+  - 新增未使用文件清理脚本 (`scripts/remove-unused-files.js`)：移除确认未使用的文件
+  - 更新构建配置 (`entry/build-profile.json5`)：启用tree shaking，确保未使用的代码在构建时被移除
+  - 创建优化脚本说明文档 (`scripts/README.md`)
+- **平板与 2-in-1 设备支持**：适配 pad、2-in-1 设备，限制页面内容宽度，不采用左右分栏布局
+  - `DeviceHelper` 新增 `isTablet()`、`is2in1()`、`isPadOr2in1()`
+  - 新增 `LayoutHelper`：`CONTENT_MAX_WIDTH_PAD`（600vp）、`getContentMaxWidth()`、`isPadOr2in1Layout()`
+  - `module.json5` 的 `deviceTypes` 增加 `tablet`、`2in1`
+  - **标题栏和Tab栏保持全宽**（系统默认行为），仅限制各Tab页面内容宽度
+  - **各Tab页面内容适配**：
+    - `HomePage`：内容区使用 `Row` 居中，`Column` 限制最大宽度 600vp（pad/2in1）
+    - `GalleryPage`：搜索区域和洲际筛选器保持全宽；Grid 全宽，根据屏幕宽度和 pad/2in1 动态调整列数（3-6列），item 大小自适应
+    - `PaintHomePage`：内容区使用 `Row` 居中，`Column` 限制最大宽度 600vp（pad/2in1）
+    - `ExplorePage`：内容区使用 `Row` 居中，`Column` 限制最大宽度 600vp（pad/2in1）
+    - `ProfilePage`：内容区已居中，调整 `constraintSize` 使用 `getContentMaxWidth()`（pad/2in1 时 600vp，手机时 10000vp）
+  - 所有Tab页面保持单列布局，无左右分栏设计
+  - **子页面内容适配**：为所有子页面添加内容宽度限制和居中布局（pad/2in1）
+    - `FlagDetailPage`：国旗详情页内容限制最大宽度 600vp 并居中
+    - `TopicDetailPage`：专题详情页内容限制最大宽度 600vp 并居中
+    - `StateFlagDetailPage`：州旗详情页内容限制最大宽度 600vp 并居中
+    - `StateFlagGalleryPage`：州旗画廊页内容限制最大宽度 600vp 并居中
+    - `FavoritesPage`：收藏页内容限制最大宽度 600vp 并居中
+  - **所有子页面内容适配**：为所有Tab内的子页面添加内容宽度限制和居中布局（pad/2in1）
+    - **PlayPages（游戏页面）**：
+      - `PaintPlayPage`、`QuizPlayPage`、`FakeFlagPlayPage`、`InputPlayPage`、`TriviaPlayPage`、`MemoryPlayPage`、`ConnectionsPlayPage`、`HeadsUpPlayPage`：所有游戏页面内容限制最大宽度 600vp 并居中
+    - **LevelsPages（关卡选择页面）**：
+      - `QuizLevelsPage`、`FakeFlagLevelsPage`、`InputLevelsPage`、`TriviaLevelsPage`、`MemoryLevelsPage`、`ConnectionsLevelsPage`：所有关卡选择页面内容限制最大宽度 600vp 并居中
+    - **ListPages（列表页面）**：
+      - `StateFlagCountryListPage`、`TopicListPage`：所有列表页面内容限制最大宽度 600vp 并居中
+    - **其他详情页面**：
+      - `DataInfoPage`、`QuizSelectPage`：其他详情页面内容限制最大宽度 600vp 并居中
+
 ### 修复 (Fixed)
 - **手表版右滑退出功能**：为手表版应用首页添加右滑退出功能（参考jifen/watch项目实现）
   - 在 `pages/watch/Index.ets` 的 ArcSwiper 组件上添加了 `onGestureRecognizerJudgeBegin` 回调

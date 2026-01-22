@@ -7,6 +7,7 @@ import { MemoryLevel, getMemoryLevel, getAllMemoryLevels } from './MemoryLevels'
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
+import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
 interface RouterParams {
   levelId: number;
@@ -357,9 +358,10 @@ interface Card {
   build() {
     Stack() {
       Navigation() {
-        Column() {
-          // 顶部状态栏
-          Row() {
+        Row() {
+          Column() {
+            // 顶部状态栏
+            Row() {
             // 步数
             Column() {
               Text($r('app.string.moves'))
@@ -400,7 +402,6 @@ interface Card {
           }
           .width('100%')
             .padding({ left: 20, right: 20, top: 16, bottom: 16 })
-            .backgroundColor($r('app.color.bg_card'))
 
           // 卡片网格 - 限制在屏幕内不滚动
           Grid() {
@@ -417,14 +418,20 @@ interface Card {
             .width('100%')
             .layoutWeight(1)
             .padding({ left: 16, right: 16, top: 12, bottom: 12 })
-        }
-        .width('100%')
+          }
+          .width('100%')
           .height('100%')
           .backgroundColor($r('app.color.bg_page'))
+          .constraintSize({ maxWidth: getContentMaxWidth() })
+        }
+        .width('100%')
+        .height('100%')
+        .justifyContent(FlexAlign.Center)
       }
       .title('')
-        .titleMode(NavigationTitleMode.Mini)
-        .backgroundColor($r('app.color.bg_page'))
+      .titleMode(NavigationTitleMode.Mini)
+      .mode(NavigationMode.Stack)
+      .backgroundColor($r('app.color.bg_page'))
 
       // 结果弹窗
       if (this.showResult) {
@@ -643,4 +650,3 @@ interface Card {
       .height('100%')
   }
 }
-

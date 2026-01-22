@@ -2,6 +2,7 @@ import router from '@ohos.router';
 import common from '@ohos.app.ability.common';
 import { CountryStateData, StateInfo, getCountryStateData, getStateFlagPath } from '../../utils/StateFlagData';
 import { LocalizationUtil } from '../../utils/LocalizationUtil';
+import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
 interface RouterParams {
   countryCode: string;
@@ -109,78 +110,84 @@ interface RouterParams {
           .justifyContent(FlexAlign.Center)
           .backgroundColor($r('app.color.bg_page'))
       } else if (this.countryData) {
-        Column() {
-          // 顶部国家信息
+        Row() {
           Column() {
-            Image($rawfile(`flags/${this.countryData.countryCode}.svg`))
-              .width(64)
-              .height(42)
-              .objectFit(ImageFit.Contain)
-              .margin({ bottom: 8 })
+            // 顶部国家信息
+            Column() {
+              Image($rawfile(`flags/${this.countryData.countryCode}.svg`))
+                .width(64)
+                .height(42)
+                .objectFit(ImageFit.Contain)
+                .margin({ bottom: 8 })
 
-            Text(this.getCountryName())
-              .fontSize(18)
-              .fontWeight(FontWeight.Bold)
-              .fontColor($r('app.color.text_primary'))
+              Text(this.getCountryName())
+                .fontSize(18)
+                .fontWeight(FontWeight.Bold)
+                .fontColor($r('app.color.text_primary'))
 
-            Text(this.getTotalCountText())
-              .fontSize(13)
-              .fontColor($r('app.color.text_tertiary'))
-              .margin({ top: 4 })
+              Text(this.getTotalCountText())
+                .fontSize(13)
+                .fontColor($r('app.color.text_tertiary'))
+                .margin({ top: 4 })
+            }
+            .width('100%')
+              .padding(24)
+              .backgroundColor($r('app.color.bg_card'))
+              .alignItems(HorizontalAlign.Center)
+
+            // 州旗网格
+            Scroll() {
+              Grid() {
+                ForEach(this.countryData.states, (state: StateInfo) => {
+                  GridItem() {
+                    Column() {
+                      Image($rawfile(getStateFlagPath(this.countryData!.countryCode, state.code)))
+                        .width('100%')
+                        .height(72)
+                        .objectFit(ImageFit.Contain)
+                        .borderRadius(4)
+
+                      Text(this.getStateName(state))
+                        .fontSize(12)
+                        .fontColor($r('app.color.text_primary'))
+                        .margin({ top: 8 })
+                        .maxLines(1)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                    }
+                    .width('100%')
+                      .padding(10)
+                      .backgroundColor($r('app.color.bg_card'))
+                      .borderRadius(12)
+                      .onClick(() => {
+                        router.pushUrl({
+                          url: 'pages/stateflag/StateFlagDetailPage',
+                          params: {
+                            countryCode: this.countryData!.countryCode,
+                            stateCode: state.code
+                          }
+                        });
+                      })
+                  }
+                })
+              }
+              .columnsTemplate('1fr 1fr 1fr')
+                .columnsGap(10)
+                .rowsGap(10)
+                .width('100%')
+                .padding({ left: 16, right: 16, top: 16, bottom: 16 })
+            }
+            .layoutWeight(1)
+              .scrollBar(BarState.Off)
+              .edgeEffect(EdgeEffect.Spring)
           }
           .width('100%')
-            .padding(24)
-            .backgroundColor($r('app.color.bg_card'))
-            .alignItems(HorizontalAlign.Center)
-
-          // 州旗网格
-          Scroll() {
-            Grid() {
-              ForEach(this.countryData.states, (state: StateInfo) => {
-                GridItem() {
-                  Column() {
-                    Image($rawfile(getStateFlagPath(this.countryData!.countryCode, state.code)))
-                      .width('100%')
-                      .height(72)
-                      .objectFit(ImageFit.Contain)
-                      .borderRadius(4)
-
-                    Text(this.getStateName(state))
-                      .fontSize(12)
-                      .fontColor($r('app.color.text_primary'))
-                      .margin({ top: 8 })
-                      .maxLines(1)
-                      .textOverflow({ overflow: TextOverflow.Ellipsis })
-                  }
-                  .width('100%')
-                    .padding(10)
-                    .backgroundColor($r('app.color.bg_card'))
-                    .borderRadius(12)
-                    .onClick(() => {
-                      router.pushUrl({
-                        url: 'pages/stateflag/StateFlagDetailPage',
-                        params: {
-                          countryCode: this.countryData!.countryCode,
-                          stateCode: state.code
-                        }
-                      });
-                    })
-                }
-              })
-            }
-            .columnsTemplate('1fr 1fr 1fr')
-              .columnsGap(10)
-              .rowsGap(10)
-              .width('100%')
-              .padding({ left: 16, right: 16, top: 16, bottom: 16 })
-          }
-          .layoutWeight(1)
-            .scrollBar(BarState.Off)
-            .edgeEffect(EdgeEffect.Spring)
-        }
-        .width('100%')
           .height('100%')
           .backgroundColor($r('app.color.bg_page'))
+          .constraintSize({ maxWidth: getContentMaxWidth() })
+        }
+        .width('100%')
+        .height('100%')
+        .justifyContent(FlexAlign.Center)
       } else {
         Column() {
           Text(this.context.resourceManager.getStringSync($r('app.string.no_data').id))
@@ -195,6 +202,7 @@ interface RouterParams {
     }
     .title('')
     .titleMode(NavigationTitleMode.Mini)
+    .mode(NavigationMode.Stack)
     .backgroundColor($r('app.color.bg_page'))
   }
 }

@@ -5,6 +5,7 @@ import { FavoritesManager, FavoriteItem } from '../../utils/favoritesManager';
 import { getFlagImageSource, getInternationalOrgByCode, isInternationalOrg, getLocalizedOrgName } from '../../utils/countryData';
 import { getStateFlagPath, getCountryStateData, CountryStateData, StateInfo } from '../../utils/StateFlagData';
 import { LocalizationUtil } from '../../utils/LocalizationUtil';
+import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
 @Entry
 @Component
@@ -179,83 +180,95 @@ export struct FavoritesPage {
 
   build() {
     Navigation() {
-      if (this.favorites.length === 0) {
+      Row() {
         Column() {
-          Text($r('app.string.no_favorites'))
-            .fontSize(16)
-            .fontColor($r('app.color.text_tertiary'))
-            .margin({ top: 100 })
-        }
-        .width('100%')
-      } else {
-        List() {
-          ForEach(this.favorites, (item: FavoriteItem, index: number) => {
-            ListItem() {
-              Row() {
-                if (item.pageUrl.startsWith('flag:')) {
-                  // 国旗类型，显示国旗图片
-                  Image(getFlagImageSource(item.pageUrl.substring(5)))
-                    .width(32)
-                    .height(22)
-                    .objectFit(ImageFit.Contain)
-                    .margin({ right: 12 })
-                    .borderRadius(2)
-                } else if (item.pageUrl.startsWith('stateflag:') && this.isValidStateFlagUrl(item.pageUrl)) {
-                  // 州旗类型，显示州旗图片
-                  Image($rawfile(this.getStateFlagImagePath(item.pageUrl)))
-                    .width(32)
-                    .height(22)
-                    .objectFit(ImageFit.Contain)
-                    .margin({ right: 12 })
-                    .borderRadius(2)
-                } else {
-                  // 其他类型，显示收藏图标
-                  Image($r('app.media.icon_favorite_selected'))
-                    .width(20)
-                    .height(20)
-                    .margin({ right: 12 })
-                }
-                Text(this.getLocalizedName(item))
-                  .fontSize(16)
-                  .fontColor($r('app.color.text_primary'))
-                  .layoutWeight(1)
-                if (this.isEditMode) {
-                  Button() {
-                    Text($r('app.string.delete'))
-                      .fontSize(14)
-                      .fontColor($r('app.color.color_red'))
+          if (this.favorites.length === 0) {
+            Column() {
+              Text($r('app.string.no_favorites'))
+                .fontSize(16)
+                .fontColor($r('app.color.text_tertiary'))
+                .margin({ top: 100 })
+            }
+            .width('100%')
+          } else {
+            List() {
+              ForEach(this.favorites, (item: FavoriteItem, index: number) => {
+                ListItem() {
+                  Row() {
+                    if (item.pageUrl.startsWith('flag:')) {
+                      // 国旗类型，显示国旗图片
+                      Image(getFlagImageSource(item.pageUrl.substring(5)))
+                        .width(32)
+                        .height(22)
+                        .objectFit(ImageFit.Contain)
+                        .margin({ right: 12 })
+                        .borderRadius(2)
+                    } else if (item.pageUrl.startsWith('stateflag:') && this.isValidStateFlagUrl(item.pageUrl)) {
+                      // 州旗类型，显示州旗图片
+                      Image($rawfile(this.getStateFlagImagePath(item.pageUrl)))
+                        .width(32)
+                        .height(22)
+                        .objectFit(ImageFit.Contain)
+                        .margin({ right: 12 })
+                        .borderRadius(2)
+                    } else {
+                      // 其他类型，显示收藏图标
+                      Image($r('app.media.icon_favorite_selected'))
+                        .width(20)
+                        .height(20)
+                        .margin({ right: 12 })
+                    }
+                    Text(this.getLocalizedName(item))
+                      .fontSize(16)
+                      .fontColor($r('app.color.text_primary'))
+                      .layoutWeight(1)
+                    if (this.isEditMode) {
+                      Button() {
+                        Text($r('app.string.delete'))
+                          .fontSize(14)
+                          .fontColor($r('app.color.color_red'))
+                      }
+                      .type(ButtonType.Normal)
+                      .backgroundColor(Color.Transparent)
+                      .padding({ left: 12, right: 12 })
+                      .onClick(() => {
+                        this.deleteFavorite(item);
+                      })
+                    }
                   }
-                  .type(ButtonType.Normal)
-                  .backgroundColor(Color.Transparent)
-                  .padding({ left: 12, right: 12 })
+                  .width('100%')
+                  .height(56)
+                  .padding({ left: 16, right: 16 })
+                  .backgroundColor($r('app.color.bg_card'))
                   .onClick(() => {
-                    this.deleteFavorite(item);
+                    if (this.isEditMode) {
+                      // 编辑模式下点击删除
+                      this.deleteFavorite(item);
+                    } else {
+                      // 正常模式下点击导航
+                      this.navigateToTool(item.pageUrl);
+                    }
                   })
                 }
-              }
-              .width('100%')
-              .height(56)
-              .padding({ left: 16, right: 16 })
-              .backgroundColor($r('app.color.bg_card'))
-              .onClick(() => {
-                if (this.isEditMode) {
-                  // 编辑模式下点击删除
-                  this.deleteFavorite(item);
-                } else {
-                  // 正常模式下点击导航
-                  this.navigateToTool(item.pageUrl);
-                }
-              })
+              }, (item: FavoriteItem, index: number) => `${item.pageUrl}_${index}`)
             }
-          }, (item: FavoriteItem, index: number) => `${item.pageUrl}_${index}`)
+            .width('100%')
+            .divider({ strokeWidth: 0.5, color: $r('app.color.gray_border'), startMargin: 16, endMargin: 16 })
+            .margin({ top: 16 })
+            .scrollBar(BarState.Off)
+          }
         }
         .width('100%')
-        .divider({ strokeWidth: 0.5, color: $r('app.color.gray_border'), startMargin: 16, endMargin: 16 })
-        .margin({ top: 16 })
+        .height('100%')
+        .constraintSize({ maxWidth: 600 })
       }
+      .width('100%')
+      .height('100%')
+      .justifyContent(FlexAlign.Center)
     }
     .title($r('app.string.my_favorites'))
     .titleMode(NavigationTitleMode.Mini)
+    .mode(NavigationMode.Stack)
     .hideBackButton(false)
     .backgroundColor($r('app.color.bg_page'))
     .menus(this.MenuBuilder)
@@ -266,4 +279,3 @@ export struct FavoritesPage {
     return true;
   }
 }
-

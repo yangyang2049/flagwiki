@@ -7,6 +7,8 @@ import { VexillologySection, getVexillologyContent } from './FlagVexillologyData
 import { TextReaderUtil } from '../../utils/TextReaderUtil';
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
+import { getContentMaxWidth } from '../../utils/LayoutHelper';
+import { DeviceHelper } from '../../utils/DeviceHelper';
 
 interface RouterParams {
   topicId: string;
@@ -151,67 +153,79 @@ interface SimilarFlagPair {
 
   build() {
     Navigation() {
-      if (this.topic) {
+      Row() {
         Column() {
-          // 专题介绍卡片 - 无圆角
-          Column() {
-            Text(this.topic.emoji)
-              .fontSize(48)
-              .margin({ bottom: 12 })
+          if (this.topic) {
+            Column() {
+              // 专题介绍卡片 - 无圆角
+              Column() {
+                Text(this.topic.emoji)
+                  .fontSize(48)
+                  .margin({ bottom: 12 })
 
-            Text(this.topic.name)
-              .fontSize(24)
-              .fontWeight(FontWeight.Bold)
-              .fontColor($r('app.color.text_primary'))
+                Text(this.topic.name)
+                  .fontSize(24)
+                  .fontWeight(FontWeight.Bold)
+                  .fontColor($r('app.color.text_primary'))
 
-            Text(this.topic.description)
-              .fontSize(14)
-              .fontColor($r('app.color.text_secondary'))
-              .margin({ top: 8 })
-              .textAlign(TextAlign.Center)
+                Text(this.topic.description)
+                  .fontSize(14)
+                  .fontColor($r('app.color.text_secondary'))
+                  .margin({ top: 8 })
+                  .textAlign(TextAlign.Center)
 
-            if (!this.isKnowledgeTopic) {
-              Text(`共 ${this.displayItems.length} 个${this.topic.id === 'international' ? '组织' : '国家'}`)
-                .fontSize(13)
-                .fontColor($r('app.color.text_tertiary'))
-                .margin({ top: 8 })
+                if (!this.isKnowledgeTopic) {
+                  Text(`共 ${this.topic.id === 'similar-flags' ? this.similarFlagPairs.length : this.displayItems.length} 个${this.topic.id === 'international' ? '组织' : (this.topic.id === 'similar-flags' ? '对相似旗帜' : '国家')}`)
+                    .fontSize(13)
+                    .fontColor($r('app.color.text_tertiary'))
+                    .margin({ top: 8 })
+                }
+              }
+              .width('100%')
+                .padding(24)
+                .backgroundColor(DeviceHelper.isPadOr2in1() ? Color.Transparent : $r('app.color.bg_card'))
+
+              // 内容区域：知识性专题显示知识内容，相似旗显示特殊UI，否则显示国旗列表
+              if (this.isKnowledgeTopic) {
+                this.KnowledgeContentView()
+              } else if (this.topic.id === 'similar-flags') {
+                this.SimilarFlagsView()
+              } else {
+                this.FlagListView()
+              }
             }
-          }
-          .width('100%')
-            .padding(24)
-            .backgroundColor($r('app.color.bg_card'))
-
-          // 内容区域：知识性专题显示知识内容，相似旗显示特殊UI，否则显示国旗列表
-          if (this.isKnowledgeTopic) {
-            this.KnowledgeContentView()
-          } else if (this.topic.id === 'similar-flags') {
-            this.SimilarFlagsView()
+            .width('100%')
+            .height('100%')
+            .constraintSize({ maxWidth: getContentMaxWidth() })
           } else {
-            this.FlagListView()
+            Column() {
+              LoadingProgress()
+                .width(40)
+                .height(40)
+                .color($r('app.color.button_primary'))
+              Text('加载中...')
+                .fontSize(14)
+                .fontColor($r('app.color.text_tertiary'))
+                .margin({ top: 12 })
+            }
+            .width('100%')
+            .height('100%')
+            .justifyContent(FlexAlign.Center)
+            .constraintSize({ maxWidth: getContentMaxWidth() })
           }
         }
         .width('100%')
-          .height('100%')
-      } else {
-        Column() {
-          LoadingProgress()
-            .width(40)
-            .height(40)
-            .color($r('app.color.button_primary'))
-          Text('加载中...')
-            .fontSize(14)
-            .fontColor($r('app.color.text_tertiary'))
-            .margin({ top: 12 })
-        }
-        .width('100%')
-          .height('100%')
-          .justifyContent(FlexAlign.Center)
+        .height('100%')
       }
+      .width('100%')
+      .height('100%')
+      .justifyContent(FlexAlign.Center)
     }
     .title('')
-      .titleMode(NavigationTitleMode.Mini)
-      .backgroundColor($r('app.color.bg_page'))
-      .menus(this.isKnowledgeTopic ? this.MenuBuilder : undefined)
+    .titleMode(NavigationTitleMode.Mini)
+    .mode(NavigationMode.Stack)
+    .backgroundColor($r('app.color.bg_page'))
+    .menus(this.isKnowledgeTopic ? this.MenuBuilder : undefined)
   }
 
   @Builder

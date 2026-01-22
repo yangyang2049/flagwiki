@@ -1,11 +1,13 @@
 import router from '@ohos.router';
+import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
 @Component
 export struct ExplorePage {
 
   build() {
     Scroll() {
-      Column() {
+      Row() {
+        Column() {
         // 国旗猜猜卡片
         Row() {
           Column() {
@@ -285,14 +287,18 @@ export struct ExplorePage {
           .onClick(() => {
             router.pushUrl({ url: 'pages/explore/HeadsUpPlayPage' });
           })
+        }
+        .width('100%')
+        .padding({ bottom: 60 })
+        .constraintSize({ maxWidth: getContentMaxWidth() })
       }
       .width('100%')
-      .padding({ bottom: 60 })
+      .justifyContent(FlexAlign.Center)
     }
     .width('100%')
-      .height('100%')
-      .scrollBar(BarState.Off)
-      .edgeEffect(EdgeEffect.Spring)
-      .backgroundColor($r('app.color.bg_page'))
+    .height('100%')
+    .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring)
+    .backgroundColor($r('app.color.bg_page'))
   }
 }

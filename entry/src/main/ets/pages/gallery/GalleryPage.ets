@@ -1,5 +1,6 @@
 import router from '@ohos.router';
 import { common } from '@kit.AbilityKit';
+import display from '@ohos.display';
 import {
   Country,
   Continent,
@@ -12,6 +13,7 @@ import {
   getLocalizedRegionName
 } from '../../utils/countryData';
 import { LocalizationUtil } from '../../utils/LocalizationUtil';
+import { DeviceHelper } from '../../utils/DeviceHelper';
 
 @Component
 export struct GalleryPage {
@@ -19,13 +21,45 @@ export struct GalleryPage {
   @State filteredCountries: Country[] = [];
   @State selectedContinent: Continent = 'World';
   @State searchText: string = '';
+  @State screenWidth: number = 360;
   @Prop @Watch('onSearchExpandedChanged') isSearchExpanded: boolean = false;
   @StorageLink('currentLanguage') @Watch('onLanguageChanged') systemLanguage: string = 'zh';
   @Prop context?: common.UIAbilityContext;
   private appContext = getContext(this) as common.UIAbilityContext;
 
   aboutToAppear() {
+    this.updateScreenWidth();
     this.loadCountries();
+  }
+
+  private updateScreenWidth(): void {
+    try {
+      const displayInfo = display.getDefaultDisplaySync();
+      this.screenWidth = px2vp(displayInfo.width);
+    } catch (error) {
+      console.error('[GalleryPage] Error getting screen width:', error);
+      this.screenWidth = 360;
+    }
+  }
+
+  private getGridColumns(): string {
+    // 根据屏幕宽度和是否为pad/2in1调整列数
+    const isPadOr2in1 = DeviceHelper.isPadOr2in1();
+    if (isPadOr2in1) {
+      // pad/2in1: 根据宽度调整，但保持全屏
+      if (this.screenWidth >= 1200) {
+        return '1fr 1fr 1fr 1fr 1fr 1fr'; // 6列
+      } else if (this.screenWidth >= 900) {
+        return '1fr 1fr 1fr 1fr 1fr'; // 5列
+      } else if (this.screenWidth >= 600) {
+        return '1fr 1fr 1fr 1fr'; // 4列
+      } else {
+        return '1fr 1fr 1fr'; // 3列
+      }
+    } else {
+      // 手机: 保持3列
+      return '1fr 1fr 1fr';
+    }
   }
 
   private onLanguageChanged(): void {
@@ -90,7 +124,7 @@ export struct GalleryPage {
 
   build() {
     Column() {
-      // 搜索区域
+      // 搜索区域 - 全宽
       if (this.isSearchExpanded) {
         Row() {
           Search({ 
@@ -107,10 +141,10 @@ export struct GalleryPage {
             })
         }
         .width('100%')
-          .padding({ left: 16, right: 16, top: 8, bottom: 8 })
+        .padding({ left: 16, right: 16, top: 8, bottom: 8 })
       }
 
-      // 洲际筛选器
+      // 洲际筛选器 - 全宽
       Scroll() {
         Row() {
           ForEach(getAllContinents(), (continent: Continent) => {
@@ -120,12 +154,12 @@ export struct GalleryPage {
         .padding({ left: 16, right: 16 })
       }
       .scrollable(ScrollDirection.Horizontal)
-        .scrollBar(BarState.Off)
-        .width('100%')
-        .height(44)
-        .backgroundColor($r('app.color.bg_title_bar'))
+      .scrollBar(BarState.Off)
+      .width('100%')
+      .height(44)
+      .backgroundColor($r('app.color.bg_title_bar'))
 
-      // 国旗网格
+      // 国旗网格 - 全宽，根据屏幕宽度调整列数
       if (this.filteredCountries.length === 0) {
         Column() {
           if (this.searchText.trim() !== '') {
@@ -145,9 +179,9 @@ export struct GalleryPage {
           }
         }
         .width('100%')
-          .layoutWeight(1)
-          .justifyContent(FlexAlign.Center)
-          .alignItems(HorizontalAlign.Center)
+        .layoutWeight(1)
+        .justifyContent(FlexAlign.Center)
+        .alignItems(HorizontalAlign.Center)
       } else {
         Grid() {
           ForEach(this.filteredCountries, (country: Country) => {
@@ -156,18 +190,18 @@ export struct GalleryPage {
             }
           })
         }
-        .columnsTemplate('1fr 1fr 1fr')
-          .columnsGap(12)
-          .rowsGap(16)
-          .padding({ left: 16, right: 16, top: 12, bottom: 16 })
-          .layoutWeight(1)
-          .backgroundColor($r('app.color.bg_gallery'))
-          .edgeEffect(EdgeEffect.Spring)
+        .columnsTemplate(this.getGridColumns())
+        .columnsGap(12)
+        .rowsGap(16)
+        .padding({ left: 16, right: 16, top: 12, bottom: 16 })
+        .layoutWeight(1)
+        .backgroundColor($r('app.color.bg_gallery'))
+        .edgeEffect(EdgeEffect.Spring)
       }
     }
     .width('100%')
-      .height('100%')
-      .backgroundColor($r('app.color.bg_title_bar'))
+    .height('100%')
+    .backgroundColor($r('app.color.bg_title_bar'))
   }
 
   @Builder

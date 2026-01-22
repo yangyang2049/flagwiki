@@ -7,6 +7,7 @@ import { PreferencesManager } from '../../utils/PreferencesManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 import { LocalizationUtil } from '../../utils/LocalizationUtil';
+import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
 const QUESTIONS_PER_SESSION = 10;
 const PREFS_NAME = 'heads_up_settings';
@@ -172,28 +173,39 @@ export struct HeadsUpPlayPage {
 
   build() {
     Navigation() {
-      Stack() {
-        if (this.showSessionOver) {
-          this.SessionOverView()
-        } else if (this.currentCountry) {
-          this.GameView()
-        } else {
-          Column() {
-            Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
-              .fontSize(16)
-              .fontColor($r('app.color.text_tertiary'))
+      Row() {
+        Column() {
+          Stack() {
+            if (this.showSessionOver) {
+              this.SessionOverView()
+            } else if (this.currentCountry) {
+              this.GameView()
+            } else {
+              Column() {
+                Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
+                  .fontSize(16)
+                  .fontColor($r('app.color.text_tertiary'))
+              }
+              .width('100%')
+              .height('100%')
+              .justifyContent(FlexAlign.Center)
+            }
           }
           .width('100%')
           .height('100%')
-          .justifyContent(FlexAlign.Center)
+          .backgroundColor($r('app.color.bg_page'))
+          .constraintSize({ maxWidth: getContentMaxWidth() })
         }
+        .width('100%')
+        .height('100%')
       }
       .width('100%')
       .height('100%')
-      .backgroundColor($r('app.color.bg_page'))
+      .justifyContent(FlexAlign.Center)
     }
     .title('')
     .titleMode(NavigationTitleMode.Mini)
+    .mode(NavigationMode.Stack)
     .backgroundColor($r('app.color.bg_page'))
   }
 

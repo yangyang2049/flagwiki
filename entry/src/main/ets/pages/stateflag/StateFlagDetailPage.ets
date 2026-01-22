@@ -12,6 +12,7 @@ import { screenshotManager } from '../../utils/ScreenshotManager';
 import { SaveFlagDialog } from '../../components/SaveFlagDialog';
 import { FavoritesManager } from '../../utils/favoritesManager';
 import { TextReaderUtil } from '../../utils/TextReaderUtil';
+import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
 interface RouterParams {
   countryCode: string;
@@ -211,7 +212,8 @@ struct StateFlagDetailPage {
         .backgroundColor($r('app.color.bg_page'))
       } else if (this.countryData && this.stateInfo) {
         Scroll() {
-          Column() {
+          Row() {
+            Column() {
             // 隐藏的分享容器（包含州旗和基本信息）
             Column({ space: 16 }) {
               // 州旗图片
@@ -383,8 +385,12 @@ struct StateFlagDetailPage {
             .width('100%')
             .padding({ left: 16, right: 16 })
             .margin({ top: 20, bottom: 24 })
+            }
+            .width('100%')
+            .constraintSize({ maxWidth: getContentMaxWidth() })
           }
           .width('100%')
+          .justifyContent(FlexAlign.Center)
         }
         .width('100%')
         .height('100%')
@@ -405,6 +411,7 @@ struct StateFlagDetailPage {
     }
     .title(this.stateInfo?.nameCN || '州旗详情')
     .titleMode(NavigationTitleMode.Mini)
+    .mode(NavigationMode.Stack)
     .backgroundColor($r('app.color.bg_page'))
     .menus(this.MenuBuilder)
   }

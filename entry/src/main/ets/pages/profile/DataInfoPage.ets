@@ -1,5 +1,6 @@
 import router from '@ohos.router';
 import { common } from '@kit.AbilityKit';
+import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
 @Entry
 @Component
@@ -10,7 +11,8 @@ export struct DataInfoPage {
   build() {
     Navigation() {
       Scroll() {
-        Column() {
+        Row() {
+          Column() {
           // 数据概览卡片
           Column() {
             Text($r('app.string.data_info_overview'))
@@ -19,7 +21,7 @@ export struct DataInfoPage {
               .fontColor($r('app.color.text_primary'))
               .margin({ bottom: 12 })
               .width('100%')
-            
+
             Text($r('app.string.data_info_overview_content'))
               .fontSize(14)
               .fontColor($r('app.color.text_secondary'))
@@ -40,13 +42,13 @@ export struct DataInfoPage {
               .fontColor($r('app.color.text_primary'))
               .margin({ bottom: 12 })
               .width('100%')
-            
+
             Text($r('app.string.data_info_source_content'))
               .fontSize(14)
               .fontColor($r('app.color.text_secondary'))
               .lineHeight(22)
               .width('100%')
-            
+
             Text($r('app.string.data_info_note_content'))
               .fontSize(14)
               .fontColor($r('app.color.text_tertiary'))
@@ -68,7 +70,7 @@ export struct DataInfoPage {
               .fontColor($r('app.color.text_primary'))
               .margin({ bottom: 12 })
               .width('100%')
-            
+
             Text($r('app.string.data_info_state_flags_content'))
               .fontSize(14)
               .fontColor($r('app.color.text_secondary'))
@@ -90,7 +92,7 @@ export struct DataInfoPage {
               .fontColor($r('app.color.text_primary'))
               .margin({ bottom: 12 })
               .width('100%')
-            
+
             Text($r('app.string.data_info_more_coming_content'))
               .fontSize(14)
               .fontColor($r('app.color.text_secondary'))
@@ -102,29 +104,24 @@ export struct DataInfoPage {
           .backgroundColor($r('app.color.bg_card'))
           .borderRadius(12)
           .margin({ top: 12, bottom: 16 })
+          }
+          .width('100%')
+          .padding({ left: 20, right: 20 })
+          .alignItems(HorizontalAlign.Start)
+          .constraintSize({ maxWidth: getContentMaxWidth() })
         }
         .width('100%')
-        .padding({ left: 20, right: 20 })
-        .alignItems(HorizontalAlign.Start)
+        .height('100%')
       }
       .width('100%')
       .layoutWeight(1)
-      .scrollBar(BarState.Auto)
+      .scrollBar(BarState.Off)
       .edgeEffect(EdgeEffect.Spring)
     }
     .title($r('app.string.data_info_title'))
     .titleMode(NavigationTitleMode.Mini)
+    .mode(NavigationMode.Stack)
     .hideBackButton(false)
     .backgroundColor($r('app.color.bg_page'))
   }
-
-  onBackPress(): boolean {
-    router.back();
-    return true;
-  }
 }
-
-
-
-
-

@@ -14,6 +14,7 @@ import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 import { screenshotManager } from '../../utils/ScreenshotManager';
+import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
 interface RouterParams {
   levelId: number;
@@ -418,11 +419,12 @@ interface RouterParams {
 
   build() {
     Navigation() {
-      Column() {
-        if (this.showResult) {
-          this.ResultView()
-        } else if (this.level && this.getCurrentQuestion()) {
-          Column() {
+      Row() {
+        Column() {
+          if (this.showResult) {
+            this.ResultView()
+          } else if (this.level && this.getCurrentQuestion()) {
+            Column() {
             // 隐藏的分享容器（包含问题 UI）
             Column() {
               if (this.level && this.getCurrentQuestion()) {
@@ -488,7 +490,7 @@ interface RouterParams {
 
               // 下一题按钮
               if (this.isAnswered) {
-                Button(this.currentIndex < (this.level?.questions.length || 0) - 1 
+                Button(this.currentIndex < (this.level?.questions.length || 0) - 1
                   ? this.context.resourceManager.getStringSync($r('app.string.next_question').id)
                   : this.context.resourceManager.getStringSync($r('app.string.view_results').id))
                   .width('80%')
@@ -506,22 +508,29 @@ interface RouterParams {
               .height('100%')
               .backgroundColor($r('app.color.bg_page'))
           }
-        } else {
-          Column() {
-            Text($r('app.string.loading'))
-              .fontSize(16)
-              .fontColor($r('app.color.text_tertiary'))
-          }
-          .width('100%')
+          } else {
+            Column() {
+              Text($r('app.string.loading'))
+                .fontSize(16)
+                .fontColor($r('app.color.text_tertiary'))
+            }
+            .width('100%')
             .height('100%')
             .justifyContent(FlexAlign.Center)
+            .constraintSize({ maxWidth: getContentMaxWidth() })
+          }
         }
+        .width('100%')
+        .height('100%')
+        .constraintSize({ maxWidth: getContentMaxWidth() })
       }
       .width('100%')
-        .height('100%')
+      .height('100%')
+      .justifyContent(FlexAlign.Center)
     }
     .title('')
     .titleMode(NavigationTitleMode.Mini)
+    .mode(NavigationMode.Stack)
     .backgroundColor($r('app.color.bg_page'))
     .menus(this.MenuBuilder)
   }

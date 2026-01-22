@@ -15,6 +15,7 @@ import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil, SoundType } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 import { LocalizationUtil } from '../../utils/LocalizationUtil';
+import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
 interface RouterParams {
   categoryId: string;
@@ -436,203 +437,218 @@ const US_STATE_NAMES_EN: Record<string, string> = {
 
   build() {
     Navigation() {
-      if (this.levelCompleted) {
-        this.LevelCompleteView()
-      } else {
-        Stack({ alignContent: Alignment.TopStart }) {
-          // Web游戏区域
-          Column() {
-            Web({
-              src: $rawfile('paint_game.html'),
-              controller: this.webController
-            })
-              .javaScriptAccess(true)
-              .domStorageAccess(true)
-              .backgroundColor($r('app.color.bg_page'))
-              .opacity(this.webOpacity)
-              .transition(TransitionEffect.OPACITY.animation({ duration: 400, curve: curves.cubicBezier(0.42, 0, 0.58, 1) }))
-              .onPageEnd(() => {
-                this.isWebReady = true;
-                // 等待 HTML 和 JavaScript 函数加载完成
-                const id = setTimeout(() => {
-                  this.setupGame().then(() => {
-                    // 使用动画渐显
-                    animateTo({
-                      duration: 300,
-                      curve: curves.cubicBezier(0.42, 0, 0.58, 1)
-                    }, () => {
-                      this.webOpacity = 1;
+      Row() {
+        Column() {
+          if (this.levelCompleted) {
+            this.LevelCompleteView()
+          } else {
+            // Core elements container - limited to 600vp width
+            Column() {
+              Stack({ alignContent: Alignment.TopStart }) {
+                // Web游戏区域
+                Column() {
+                  Web({
+                    src: $rawfile('paint_game.html'),
+                    controller: this.webController
+                  })
+                    .javaScriptAccess(true)
+                    .domStorageAccess(true)
+                    .backgroundColor($r('app.color.bg_page'))
+                    .opacity(this.webOpacity)
+                    .transition(TransitionEffect.OPACITY.animation({ duration: 400, curve: curves.cubicBezier(0.42, 0, 0.58, 1) }))
+                    .onPageEnd(() => {
+                  this.isWebReady = true;
+                  // 等待 HTML 和 JavaScript 函数加载完成
+                  const id = setTimeout(() => {
+                    this.setupGame().then(() => {
+                      // 使用动画渐显
+                      animateTo({
+                        duration: 300,
+                        curve: curves.cubicBezier(0.42, 0, 0.58, 1)
+                      }, () => {
+                        this.webOpacity = 1;
+                      });
+                    }).catch(() => {
+                      // 即使出错也显示
+                      animateTo({
+                        duration: 300,
+                        curve: curves.cubicBezier(0.42, 0, 0.58, 1)
+                      }, () => {
+                        this.webOpacity = 1;
+                      });
                     });
-                  }).catch(() => {
-                    // 即使出错也显示
-                    animateTo({
-                      duration: 300,
-                      curve: curves.cubicBezier(0.42, 0, 0.58, 1)
-                    }, () => {
-                      this.webOpacity = 1;
-                    });
-                  });
-                  // 移除已执行的定时器ID
-                  const index = this.timeoutIds.indexOf(id);
-                  if (index > -1) {
-                    this.timeoutIds.splice(index, 1);
+                    // 移除已执行的定时器ID
+                    const index = this.timeoutIds.indexOf(id);
+                    if (index > -1) {
+                      this.timeoutIds.splice(index, 1);
+                    }
+                  }, 150);
+                  this.timeoutIds.push(id);
+                    })
+                    .onConsole((event) => {
+                      if (event) {
+                        console.info('WebConsole:', event.message.getMessage());
+                      }
+                      return false;
+                    })
+                    .javaScriptProxy({
+                  object: {
+                    onPaintCorrect: async () => {
+                      // 播放正确答案音效和振动
+                      await SoundEffectUtil.playCorrect();
+                      VibratorUtil.vibrateCorrect();
+                      // 延迟显示按钮（在音效播放后）
+                      this.showNextButton = true;
+                      const id1 = setTimeout(() => {
+                        this.showNextButtonAnimated = true;
+                        // 移除已执行的定时器ID
+                        const index1 = this.timeoutIds.indexOf(id1);
+                        if (index1 > -1) {
+                          this.timeoutIds.splice(index1, 1);
+                        }
+                      }, 400);
+                      this.timeoutIds.push(id1);
+                    },
+                    onPaintIncorrect: async () => {
+                      // 播放错误答案音效和振动
+                      await SoundEffectUtil.playIncorrect();
+                      VibratorUtil.vibrateIncorrect();
+                      // 错误时重置游戏
+                      const id2 = setTimeout(() => {
+                        this.setupGame();
+                        // 移除已执行的定时器ID
+                        const index2 = this.timeoutIds.indexOf(id2);
+                        if (index2 > -1) {
+                          this.timeoutIds.splice(index2, 1);
+                        }
+                      }, 2000);
+                      this.timeoutIds.push(id2);
+                    },
+                    onPaintSound: async () => {
+                      // 播放填色音效
+                      await SoundEffectUtil.playSound(SoundType.TAP);
+                    }
+                  },
+                      name: 'NativeInterface',
+                      methodList: ['onPaintCorrect', 'onPaintIncorrect', 'onPaintSound'],
+                      controller: this.webController
+                    })
+                    .width('100%')
+                    .layoutWeight(1)
+
+                  // 底部按钮区域（延迟显示）
+                  if (this.showNextButton) {
+                    Button(this.currentFlagIndex < (this.currentLevel?.flags.length || 0) - 1
+                      ? this.context.resourceManager.getStringSync($r('app.string.next').id)
+                      : this.context.resourceManager.getStringSync($r('app.string.complete').id))
+                      .constraintSize({ minWidth: 320 })
+                      .height(48)
+                      .fontSize(17)
+                      .fontWeight(FontWeight.Bold)
+                      .backgroundColor($r('app.color.button_primary'))
+                      .margin({ bottom: 32 })
+                      .opacity(this.showNextButtonAnimated ? 1 : 0)
+                      .scale({ x: this.showNextButtonAnimated ? 1 : 0.8, y: this.showNextButtonAnimated ? 1 : 0.8 })
+                      .animation({
+                        duration: 300,
+                        curve: Curve.EaseOut
+                      })
+                      .onClick(async () => {
+                        await this.onNext();
+                      })
                   }
-                }, 150);
-                this.timeoutIds.push(id);
-              })
-              .onConsole((event) => {
-                if (event) {
-                  console.info('WebConsole:', event.message.getMessage());
                 }
-                return false;
-              })
-              .javaScriptProxy({
-                object: {
-                  onPaintCorrect: async () => {
-                    // 播放正确答案音效和振动
-                    await SoundEffectUtil.playCorrect();
-                    VibratorUtil.vibrateCorrect();
-                    // 延迟显示按钮（在音效播放后）
-                    this.showNextButton = true;
-                    const id1 = setTimeout(() => {
-                      this.showNextButtonAnimated = true;
-                      // 移除已执行的定时器ID
-                      const index1 = this.timeoutIds.indexOf(id1);
-                      if (index1 > -1) {
-                        this.timeoutIds.splice(index1, 1);
-                      }
-                    }, 400);
-                    this.timeoutIds.push(id1);
-                  },
-                  onPaintIncorrect: async () => {
-                    // 播放错误答案音效和振动
-                    await SoundEffectUtil.playIncorrect();
-                    VibratorUtil.vibrateIncorrect();
-                    // 错误时重置游戏
-                    const id2 = setTimeout(() => {
-                      this.setupGame();
-                      // 移除已执行的定时器ID
-                      const index2 = this.timeoutIds.indexOf(id2);
-                      if (index2 > -1) {
-                        this.timeoutIds.splice(index2, 1);
-                      }
-                    }, 2000);
-                    this.timeoutIds.push(id2);
-                  },
-                  onPaintSound: async () => {
-                    // 播放填色音效
-                    await SoundEffectUtil.playSound(SoundType.TAP);
+                .width('100%')
+                .height('100%')
+                .backgroundColor($r('app.color.bg_page'))
+                .transition(TransitionEffect.OPACITY.animation({ duration: 600, curve: curves.cubicBezier(0.4, 0.0, 0.2, 1.0) }))
+
+                // 顶部状态栏
+                Row() {
+                  // 返回按钮
+                  Image($r('app.media.icon_back'))
+                    .width(24)
+                    .height(24)
+                    .onClick(async () => {
+                      await SoundEffectUtil.playButton();
+                      VibratorUtil.vibrateTap();
+                      router.back();
+                    })
+
+                  // 关卡信息
+                  Column() {
+                    Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, this.levelId.toString()))
+                      .fontSize(16)
+                      .fontWeight(FontWeight.Bold)
+                      .fontColor($r('app.color.button_primary'))
+
+                    // 进度指示器
+                    Row({ space: 4 }) {
+                      ForEach(Array.from({ length: this.currentLevel?.flags.length || 3 }), (_: undefined, index: number) => {
+                        Circle()
+                          .width(8)
+                          .height(8)
+                          .fill(index <= this.currentFlagIndex ? '#1677FF' : '#B3E5FC')
+                      })
+                    }
+                    .margin({ top: 4 })
                   }
-                },
-                name: 'NativeInterface',
-                methodList: ['onPaintCorrect', 'onPaintIncorrect', 'onPaintSound'],
-                controller: this.webController
-              })
-              .width('100%')
-              .layoutWeight(1)
+                  .layoutWeight(1)
+                    .alignItems(HorizontalAlign.Center)
 
-            // 底部按钮区域（延迟显示）
-            if (this.showNextButton) {
-              Button(this.currentFlagIndex < (this.currentLevel?.flags.length || 0) - 1 
-                ? this.context.resourceManager.getStringSync($r('app.string.next').id)
-                : this.context.resourceManager.getStringSync($r('app.string.complete').id))
-                .width('80%')
-                .height(48)
-                .fontSize(17)
-                .fontWeight(FontWeight.Bold)
-                .backgroundColor($r('app.color.button_primary'))
-                .margin({ bottom: 32 })
-                .opacity(this.showNextButtonAnimated ? 1 : 0)
-                .scale({ x: this.showNextButtonAnimated ? 1 : 0.8, y: this.showNextButtonAnimated ? 1 : 0.8 })
-                .animation({
-                  duration: 300,
-                  curve: Curve.EaseOut
-                })
-                .onClick(async () => {
-                  await this.onNext();
-                })
-            }
-          }
-          .width('100%')
-            .height('100%')
-            .backgroundColor($r('app.color.bg_page'))
-            .transition(TransitionEffect.OPACITY.animation({ duration: 600, curve: curves.cubicBezier(0.4, 0.0, 0.2, 1.0) }))
+                  // 提示按钮
+                  Image($r('app.media.icon_hint'))
+                    .width(24)
+                    .height(24)
+                    .onClick(() => {
+                      this.onHintTapped();
+                    })
+                }
+                .width('100%')
+                  .height(56)
+                  .padding({ left: 16, right: 16 })
+                  .backgroundColor(Color.Transparent)
 
-          // 顶部状态栏
-          Row() {
-            // 返回按钮
-            Image($r('app.media.icon_back'))
-              .width(24)
-              .height(24)
-              .onClick(async () => {
-                await SoundEffectUtil.playButton();
-                VibratorUtil.vibrateTap();
-                router.back();
-              })
-
-            // 关卡信息
-            Column() {
-              Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, this.levelId.toString()))
-                .fontSize(16)
-                .fontWeight(FontWeight.Bold)
-                .fontColor($r('app.color.button_primary'))
-
-              // 进度指示器
-              Row({ space: 4 }) {
-                ForEach(Array.from({ length: this.currentLevel?.flags.length || 3 }), (_: undefined, index: number) => {
-                  Circle()
-                    .width(8)
-                    .height(8)
-                    .fill(index <= this.currentFlagIndex ? '#1677FF' : '#B3E5FC')
-                })
+                // 提示国旗显示
+                if (this.showHint) {
+                  Column() {
+                    Image($rawfile(this.currentFlagPath))
+                      .width(140)
+                      .height(90)
+                      .objectFit(ImageFit.Contain)
+                  }
+                  .width(160)
+                    .height(110)
+                    .backgroundColor(Color.White)
+                    .borderRadius(8)
+                    .justifyContent(FlexAlign.Center)
+                    .shadow({
+                      radius: 8,
+                      color: 'rgba(0, 0, 0, 0.2)',
+                      offsetX: 0,
+                      offsetY: 3
+                    })
+                    .position({ x: '50%', y: 70 })
+                    .translate({ x: '-50%' })
+                }
               }
-              .margin({ top: 4 })
+              .width('100%')
+              .height('100%')
             }
-            .layoutWeight(1)
-              .alignItems(HorizontalAlign.Center)
-
-            // 提示按钮
-            Image($r('app.media.icon_hint'))
-              .width(24)
-              .height(24)
-              .onClick(() => {
-                this.onHintTapped();
-              })
-          }
-          .width('100%')
-            .height(56)
-            .padding({ left: 16, right: 16 })
-            .backgroundColor(Color.Transparent)
-
-          // 提示国旗显示
-          if (this.showHint) {
-            Column() {
-              Image($rawfile(this.currentFlagPath))
-                .width(140)
-                .height(90)
-                .objectFit(ImageFit.Contain)
-            }
-            .width(160)
-              .height(110)
-              .backgroundColor(Color.White)
-              .borderRadius(8)
-              .justifyContent(FlexAlign.Center)
-              .shadow({
-                radius: 8,
-                color: 'rgba(0, 0, 0, 0.2)',
-                offsetX: 0,
-                offsetY: 3
-              })
-              .position({ x: '50%', y: 70 })
-              .translate({ x: '-50%' })
+            .height('100%')
+            .constraintSize({ maxWidth: 600 })
           }
         }
         .width('100%')
-          .height('100%')
+        .height('100%')
       }
+      .width('100%')
+      .height('100%')
+      .justifyContent(FlexAlign.Center)
     }
     .hideTitleBar(true)
-      .hideBackButton(true)
+    .hideBackButton(true)
+    .mode(NavigationMode.Stack)
   }
 
   @Builder
@@ -673,11 +689,11 @@ const US_STATE_NAMES_EN: Record<string, string> = {
         .margin({ top: 32 })
       }
       .width('100%')
-        .translate({ y: this.contentTranslateY })
-        .animation({
-          duration: 1200,
-          curve: Curve.EaseOut
-        })
+      .translate({ y: this.contentTranslateY })
+      .animation({
+        duration: 1200,
+        curve: Curve.EaseOut
+      })
 
       Blank()
 
@@ -688,7 +704,7 @@ const US_STATE_NAMES_EN: Record<string, string> = {
           Button(this.levelId < getTotalLevels(this.categoryId) 
             ? this.context.resourceManager.getStringSync($r('app.string.next_level').id)
             : this.context.resourceManager.getStringSync($r('app.string.perfect_finish').id))
-            .width('80%')
+            .constraintSize({ minWidth: 320 })
             .height(48)
             .fontSize(17)
             .fontWeight(FontWeight.Bold)
@@ -713,7 +729,7 @@ const US_STATE_NAMES_EN: Record<string, string> = {
 
           // 返回按钮
           Button(this.context.resourceManager.getStringSync($r('app.string.back').id))
-            .width('80%')
+            .constraintSize({ minWidth: 320 })
             .height(48)
             .fontSize(17)
             .fontWeight(FontWeight.Medium)
@@ -738,8 +754,7 @@ const US_STATE_NAMES_EN: Record<string, string> = {
       }
     }
     .width('100%')
-      .height('100%')
-      .backgroundColor($r('app.color.bg_page'))
+    .height('100%')
+    .backgroundColor($r('app.color.bg_page'))
   }
 }
-

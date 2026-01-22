@@ -2,6 +2,7 @@ import router from '@ohos.router';
 import { TopicItem, getAllTopics } from '../topic/TopicData';
 import { WeeklyFlagItem, getCurrentWeekFlag } from '../../utils/WeeklyFlagData';
 import { getCountryByCode, getFlagImageSource } from '../../utils/countryData';
+import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
 @Component
 export struct HomePage {
@@ -12,8 +13,27 @@ export struct HomePage {
 
   aboutToAppear() {
     this.weeklyFlag = getCurrentWeekFlag();
-    // 随机显示趣味知识
     this.funFactIndex = Math.floor(Math.random() * this.funFacts.length);
+  }
+
+  @Builder
+  shortcutItem(emoji: string, title: string, onClick: () => void) {
+    Column() {
+      Stack() {
+        Circle()
+          .width(48)
+          .height(48)
+          .fill($r('app.color.bg_blue_light'))
+        Text(emoji)
+          .fontSize(22)
+      }
+      Text(title)
+        .fontSize(13)
+        .fontColor($r('app.color.text_dark'))
+        .margin({ top: 10 })
+    }
+    .layoutWeight(1)
+    .onClick(onClick)
   }
 
   private getRegionName(region: string): string {
@@ -56,7 +76,8 @@ export struct HomePage {
 
   build() {
     Scroll() {
-      Column() {
+      Row() {
+        Column() {
         // 欢迎卡片
         Column() {
           Row() {
@@ -74,49 +95,31 @@ export struct HomePage {
             .alignItems(HorizontalAlign.Start)
             .layoutWeight(1)
 
-            // 扇形国旗装饰
+            // 国旗装饰
             Stack() {
-              // 印度 - 最左侧
-              Image(getFlagImageSource('in'))
-                .width(40)
-                .height(27)
-                .objectFit(ImageFit.Contain)
-                .rotate({ angle: -25 })
-                .offset({ x: -32, y: 12 })
-
-              // 美国 - 左侧
+              // 美国
               Image(getFlagImageSource('us'))
-                .width(42)
-                .height(28)
+                .width(36)
+                .height(24)
                 .objectFit(ImageFit.Contain)
-                .rotate({ angle: -12 })
-                .offset({ x: -16, y: 4 })
+                .offset({ x: -20, y: 0 })
 
-              // 巴西 - 右侧
-              Image(getFlagImageSource('br'))
-                .width(42)
-                .height(28)
-                .objectFit(ImageFit.Contain)
-                .rotate({ angle: 12 })
-                .offset({ x: 16, y: 4 })
-
-              // 法国 - 最右侧
-              Image(getFlagImageSource('fr'))
-                .width(40)
-                .height(27)
-                .objectFit(ImageFit.Contain)
-                .rotate({ angle: 25 })
-                .offset({ x: 32, y: 12 })
-
-              // 中国 - 中间，最上层
+              // 中国 - 中间
               Image(getFlagImageSource('cn'))
-                .width(48)
-                .height(32)
+                .width(42)
+                .height(28)
                 .objectFit(ImageFit.Contain)
-                .offset({ x: 0, y: -8 })
+                .offset({ x: 0, y: -4 })
+
+              // 法国
+              Image(getFlagImageSource('fr'))
+                .width(36)
+                .height(24)
+                .objectFit(ImageFit.Contain)
+                .offset({ x: 20, y: 0 })
             }
-            .width(110)
-            .height(65)
+            .width(90)
+            .height(50)
           }
           .width('100%')
           .justifyContent(FlexAlign.SpaceBetween)
@@ -200,85 +203,10 @@ export struct HomePage {
           .margin({ bottom: 16 })
 
           Row() {
-            // 国旗画廊
-            Column() {
-              Stack() {
-                Circle()
-                  .width(48)
-                  .height(48)
-                  .fill($r('app.color.bg_blue_light'))
-                Text('🇺🇳')
-                  .fontSize(22)
-              }
-              Text('国旗画廊')
-                .fontSize(13)
-                .fontColor($r('app.color.text_dark'))
-                .margin({ top: 10 })
-            }
-            .layoutWeight(1)
-            .onClick(() => {
-              this.onTabChange(1);
-            })
-
-            // 各国州旗
-            Column() {
-              Stack() {
-                Circle()
-                  .width(48)
-                  .height(48)
-                  .fill($r('app.color.bg_blue_light'))
-                Text('🇺🇸')
-                  .fontSize(22)
-              }
-              Text('各国州旗')
-                .fontSize(13)
-                .fontColor($r('app.color.text_dark'))
-                .margin({ top: 10 })
-            }
-            .layoutWeight(1)
-            .onClick(() => {
-              router.pushUrl({ url: 'pages/stateflag/StateFlagCountryListPage' });
-            })
-
-            // 国旗猜猜
-            Column() {
-              Stack() {
-                Circle()
-                  .width(48)
-                  .height(48)
-                  .fill($r('app.color.bg_blue_light'))
-                Text('🎯')
-                  .fontSize(22)
-              }
-              Text('国旗猜猜')
-                .fontSize(13)
-                .fontColor($r('app.color.text_dark'))
-                .margin({ top: 10 })
-            }
-            .layoutWeight(1)
-            .onClick(() => {
-              router.pushUrl({ url: 'pages/quiz/QuizSelectPage' });
-            })
-
-            // 收藏夹
-            Column() {
-              Stack() {
-                Circle()
-                  .width(48)
-                  .height(48)
-                  .fill($r('app.color.bg_blue_light'))
-                Text('⭐')
-                  .fontSize(22)
-              }
-              Text('收藏夹')
-                .fontSize(13)
-                .fontColor($r('app.color.text_dark'))
-                .margin({ top: 10 })
-            }
-            .layoutWeight(1)
-            .onClick(() => {
-              router.pushUrl({ url: 'pages/profile/FavoritesPage' });
-            })
+            this.shortcutItem('🇺🇳', '国旗画廊', () => this.onTabChange(1))
+            this.shortcutItem('🇺🇸', '各国州旗', () => router.pushUrl({ url: 'pages/stateflag/StateFlagCountryListPage' }))
+            this.shortcutItem('🎯', '国旗猜猜', () => router.pushUrl({ url: 'pages/quiz/QuizSelectPage' }))
+            this.shortcutItem('⭐', '收藏夹', () => router.pushUrl({ url: 'pages/profile/FavoritesPage' }))
           }
           .width('100%')
         }
@@ -373,9 +301,13 @@ export struct HomePage {
         .backgroundColor($r('app.color.bg_card'))
         .borderRadius(16)
         .margin({ top: 16, bottom: 16 })
+        }
+        .width('100%')
+        .padding({ left: 16, right: 16 })
+        .constraintSize({ maxWidth: getContentMaxWidth() })
       }
       .width('100%')
-      .padding({ left: 16, right: 16 })
+      .justifyContent(FlexAlign.Center)
     }
     .width('100%')
     .height('100%')

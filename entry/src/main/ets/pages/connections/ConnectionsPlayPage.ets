@@ -7,6 +7,7 @@ import { ConnectionsLevel, getConnectionsLevel, FlagGroup, FlagTile, getLocalize
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
+import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
 interface RouterParams {
   levelId: number;
@@ -337,10 +338,29 @@ struct ConnectionsPlayPage {
     }
   }
 
+  private isFlagSelected(countryCode: string): boolean {
+    for (let i = 0; i < this.selectedCountryCodes.length; i++) {
+      if (this.selectedCountryCodes[i] === countryCode) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private isFlagHintHighlighted(countryCode: string): boolean {
+    for (let i = 0; i < this.hintGroupCodes.length; i++) {
+      if (this.hintGroupCodes[i] === countryCode) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   build() {
     Navigation() {
-          Column() {
-            // 关卡标题
+      Row() {
+        Column() {
+          // 关卡标题
             Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 0).toString()))
               .fontSize(20)
               .fontWeight(FontWeight.Bold)
@@ -429,7 +449,38 @@ struct ConnectionsPlayPage {
                 Grid() {
                   ForEach(this.getUnusedFlags(), (flag: FlagTile) => {
                     GridItem() {
-                      this.FlagTileItem(flag)
+                      Column() {
+                        Image(getFlagImageSource(flag.countryCode))
+                          .width('100%')
+                          .height('100%')
+                          .objectFit(ImageFit.Contain)
+                      }
+                      .width('100%')
+                      .height(80)
+                      .backgroundColor(Color.Transparent)
+                      .border({
+                        width: (this.isFlagSelected(flag.countryCode) || this.isFlagHintHighlighted(flag.countryCode)) ? 2 : 0,
+                        color: this.isFlagSelected(flag.countryCode) ? '#10B981' : (this.isFlagHintHighlighted(flag.countryCode) ? '#F59E0B' : Color.Transparent),
+                        style: BorderStyle.Solid
+                      })
+                      .borderRadius(0)
+                      .shadow(this.isFlagHintHighlighted(flag.countryCode) ? {
+                        radius: 8,
+                        color: 'rgba(245, 158, 11, 0.3)',
+                        offsetX: 0,
+                        offsetY: 2
+                      } : undefined)
+                      .scale({
+                        x: (this.isFlagSelected(flag.countryCode) || this.isFlagHintHighlighted(flag.countryCode)) ? 1.05 : 1,
+                        y: (this.isFlagSelected(flag.countryCode) || this.isFlagHintHighlighted(flag.countryCode)) ? 1.05 : 1
+                      })
+                      .animation({
+                        duration: 200,
+                        curve: Curve.EaseInOut
+                      })
+                      .onClick(() => {
+                        this.selectFlag(flag.countryCode);
+                      })
                     }
                   })
                 }
@@ -441,7 +492,7 @@ struct ConnectionsPlayPage {
               }
               .layoutWeight(1)
               .width('100%')
-              .scrollBar(BarState.Auto)
+              .scrollBar(BarState.Off)
               .edgeEffect(EdgeEffect.Spring)
 
               // 操作按钮（游戏完成时隐藏）
@@ -566,71 +617,15 @@ struct ConnectionsPlayPage {
           .width('100%')
           .height('100%')
           .backgroundColor($r('app.color.bg_page'))
+          .constraintSize({ maxWidth: getContentMaxWidth() })
         }
-        .title('')
-        .titleMode(NavigationTitleMode.Mini)
-        .backgroundColor($r('app.color.bg_page'))
-  }
-
-  private isFlagSelected(countryCode: string): boolean {
-    for (let i = 0; i < this.selectedCountryCodes.length; i++) {
-      if (this.selectedCountryCodes[i] === countryCode) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private isFlagHintHighlighted(countryCode: string): boolean {
-    for (let i = 0; i < this.hintGroupCodes.length; i++) {
-      if (this.hintGroupCodes[i] === countryCode) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  @Builder
-  FlagTileItem(flag: FlagTile) {
-    Column() {
-      Image(getFlagImageSource(flag.countryCode))
         .width('100%')
         .height('100%')
-        .objectFit(ImageFit.Contain)
+        .justifyContent(FlexAlign.Center)
+      }
+      .title('')
+      .titleMode(NavigationTitleMode.Mini)
+      .mode(NavigationMode.Stack)
+      .backgroundColor($r('app.color.bg_page'))
     }
-    .width('100%')
-    .height(80)
-    .backgroundColor(this.isFlagSelected(flag.countryCode) ? '#D1FAE5' : Color.Transparent)
-    .border({
-      width: (this.isFlagSelected(flag.countryCode) || this.isFlagHintHighlighted(flag.countryCode)) ? 2 : 0,
-      color: this.isFlagSelected(flag.countryCode) ? '#10B981' : (this.isFlagHintHighlighted(flag.countryCode) ? '#F59E0B' : Color.Transparent),
-      style: BorderStyle.Solid
-    })
-    .borderRadius(0)
-    .shadow(this.isFlagHintHighlighted(flag.countryCode) ? {
-      radius: 8,
-      color: 'rgba(245, 158, 11, 0.3)',
-      offsetX: 0,
-      offsetY: 2
-    } : undefined)
-    .scale({
-      x: (this.isFlagSelected(flag.countryCode) || this.isFlagHintHighlighted(flag.countryCode)) ? 1.05 : 1,
-      y: (this.isFlagSelected(flag.countryCode) || this.isFlagHintHighlighted(flag.countryCode)) ? 1.05 : 1
-    })
-    .animation({
-      duration: 200,
-      curve: Curve.EaseInOut
-    })
-    .onClick(() => {
-      this.selectFlag(flag.countryCode);
-    })
   }
-
-}
-
-
-
-
-
-
-

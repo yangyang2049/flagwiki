@@ -6,6 +6,8 @@
     "mainElement": "EntryAbility",
     "deviceTypes": [
       "phone",
+      "tablet",
+      "2in1",
       "wearable"
     ],
     "deliveryWithInstall": true,
@@ -15,16 +17,6 @@
       {
         "name": "ohos.permission.VIBRATE",
         "reason": "$string:vibrate_permission_reason",
-        "usedScene": {
-          "abilities": [
-            "EntryAbility"
-          ],
-          "when": "inuse"
-        }
-      },
-      {
-        "name": "ohos.permission.INTERNET",
-        "reason": "$string:internet_permission_reason",
         "usedScene": {
           "abilities": [
             "EntryAbility"
@@ -66,7 +58,7 @@
             "name": "ohos.extension.backup",
             "resource": "$profile:backup_config"
           }
-        ],
+        ]
       }
     ]
   }

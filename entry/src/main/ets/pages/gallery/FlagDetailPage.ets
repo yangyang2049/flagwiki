@@ -14,6 +14,7 @@ import { SaveFlagDialog } from '../../components/SaveFlagDialog';
 import { FavoritesManager } from '../../utils/favoritesManager';
 import { getCoatOfArmsImageSource } from '../../utils/coatOfArmsUtil';
 import { DeviceHelper } from '../../utils/DeviceHelper';
+import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
 interface RouterParams {
   countryCode: string;
@@ -646,7 +647,15 @@ struct FlagDetailPage {
     } else {
       Navigation() {
         Scroll() {
-          this.buildContent()
+          Row() {
+            Column() {
+              this.buildContent()
+            }
+            .width('100%')
+            .constraintSize({ maxWidth: getContentMaxWidth() })
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.Center)
         }
         .width('100%')
         .height('100%')
@@ -658,6 +667,7 @@ struct FlagDetailPage {
         .backgroundColor($r('app.color.bg_page'))
       }
       .titleMode(NavigationTitleMode.Mini)
+      .mode(NavigationMode.Stack)
       .backgroundColor($r('app.color.bg_page'))
       .menus(this.MenuBuilder)
     }

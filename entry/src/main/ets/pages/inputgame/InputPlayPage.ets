@@ -6,6 +6,7 @@ import { InputGameLevel, getInputGameLevel, getTotalInputLevels } from './InputG
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
+import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
 interface RouterParams {
   levelId: number;
@@ -219,10 +220,12 @@ interface RouterParams {
 
   build() {
     Navigation() {
-      if (this.showResult) {
-        this.ResultView()
-      } else if (this.level) {
+      Row() {
         Column() {
+          if (this.showResult) {
+            this.ResultView()
+          } else if (this.level) {
+            Column() {
           // 顶部状态栏
           Row() {
             Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString()))
@@ -335,24 +338,34 @@ interface RouterParams {
           }
 
           Blank()
-        }
-        .width('100%')
+          }
+          .width('100%')
           .height('100%')
           .backgroundColor($r('app.color.bg_page'))
-      } else {
-        Column() {
-          Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
-            .fontSize(16)
-            .fontColor($r('app.color.text_tertiary'))
-        }
-        .width('100%')
+          .constraintSize({ maxWidth: getContentMaxWidth() })
+        } else {
+          Column() {
+            Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
+              .fontSize(16)
+              .fontColor($r('app.color.text_tertiary'))
+          }
+          .width('100%')
           .height('100%')
           .justifyContent(FlexAlign.Center)
+          .constraintSize({ maxWidth: getContentMaxWidth() })
+        }
       }
+      .width('100%')
+      .height('100%')
+    }
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Center)
     }
     .title('')
-      .titleMode(NavigationTitleMode.Mini)
-      .backgroundColor($r('app.color.bg_page'))
+    .titleMode(NavigationTitleMode.Mini)
+    .mode(NavigationMode.Stack)
+    .backgroundColor($r('app.color.bg_page'))
   }
 
   @Builder

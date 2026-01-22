@@ -14,6 +14,7 @@ import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 import { screenshotManager } from '../../utils/ScreenshotManager';
+import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
 interface RouterParams {
   quizType: string;
@@ -371,108 +372,119 @@ interface QuizQuestion {
 
   build() {
     Navigation() {
-      Column() {
-        if (this.showResult) {
-          this.ResultView()
-        } else if (this.questions.length > 0) {
-          Column() {
-            // 隐藏的分享容器（包含问题 UI）
+      Row() {
+        Column() {
+          if (this.showResult) {
+            this.ResultView()
+          } else if (this.questions.length > 0) {
             Column() {
-              if (this.questions.length > 0) {
-                this.ShareContentBuilder()
-              }
-            }
-            .id(this.SHARE_CONTAINER_ID)
-            .position({ x: -1000, y: -1000 })
-            .width(400)
-            .backgroundColor($r('app.color.bg_page'))
-
-            Column() {
-              // 顶部状态栏
-              Row() {
-                // 左侧：第几关
-                Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString()))
-                  .fontSize(15)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor($r('app.color.text_secondary'))
-                  .layoutWeight(1)
-
-                // 中间：生命值
-                Row() {
-                  ForEach(Array.from({ length: this.level?.lives || 5 }), (_: undefined, index: number) => {
-                    Text(index < this.lives ? '❤️' : '🖤')
-                      .fontSize(14)
-                      .margin({ left: 1, right: 1 })
-                  })
+              // 隐藏的分享容器（包含问题 UI）
+              Column() {
+                if (this.questions.length > 0) {
+                  this.ShareContentBuilder()
                 }
-                .layoutWeight(1)
-                  .justifyContent(FlexAlign.Center)
+              }
+              .id(this.SHARE_CONTAINER_ID)
+              .position({ x: -1000, y: -1000 })
+              .width(400)
+              .backgroundColor($r('app.color.bg_page'))
 
-                // 右侧：序号
-                Text(`${this.currentIndex + 1} / ${this.questions.length}`)
-                  .fontSize(15)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor($r('app.color.text_secondary'))
+              Column() {
+                // 顶部状态栏
+                Row() {
+                  // 左侧：第几关
+                  Text(this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString()))
+                    .fontSize(15)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor($r('app.color.text_secondary'))
+                    .layoutWeight(1)
+
+                  // 中间：生命值
+                  Row() {
+                    ForEach(Array.from({ length: this.level?.lives || 5 }), (_: undefined, index: number) => {
+                      Text(index < this.lives ? '❤️' : '🖤')
+                        .fontSize(14)
+                        .margin({ left: 1, right: 1 })
+                    })
+                  }
                   .layoutWeight(1)
-                  .textAlign(TextAlign.End)
+                    .justifyContent(FlexAlign.Center)
+
+                  // 右侧：序号
+                  Text(`${this.currentIndex + 1} / ${this.questions.length}`)
+                    .fontSize(15)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor($r('app.color.text_secondary'))
+                    .layoutWeight(1)
+                    .textAlign(TextAlign.End)
+                }
+                .width('100%')
+                  .padding({ left: 20, right: 20, top: 12, bottom: 12 })
+
+                // 连击提示
+                if (this.combo >= 3) {
+                  Text(`🔥 ${this.context.resourceManager.getStringSync($r('app.string.combo_streak').id, this.combo.toString())}`)
+                    .fontSize(16)
+                    .fontWeight(FontWeight.Bold)
+                    .fontColor($r('app.color.color_orange'))
+                    .padding({ top: 8, bottom: 8 })
+                }
+
+                // 题目区域
+                if (this.quizType === 'flagToName') {
+                  this.FlagToNameQuestion()
+                } else {
+                  this.NameToFlagQuestion()
+                }
+
+                Blank()
+
+                // 下一题按钮
+                if (this.isAnswered) {
+                  Button(this.currentIndex < this.questions.length - 1 
+                    ? this.context.resourceManager.getStringSync($r('app.string.next_question').id)
+                    : this.context.resourceManager.getStringSync($r('app.string.view_results').id))
+                    .width('80%')
+                    .height(48)
+                    .fontSize(17)
+                    .fontWeight(FontWeight.Bold)
+                    .backgroundColor($r('app.color.button_primary'))
+                    .margin({ bottom: 32 })
+                    .onClick(async () => {
+                      await this.nextQuestion();
+                    })
+                }
               }
               .width('100%')
-                .padding({ left: 20, right: 20, top: 12, bottom: 12 })
-
-              // 连击提示
-              if (this.combo >= 3) {
-                Text(`🔥 ${this.context.resourceManager.getStringSync($r('app.string.combo_streak').id, this.combo.toString())}`)
-                  .fontSize(16)
-                  .fontWeight(FontWeight.Bold)
-                  .fontColor($r('app.color.color_orange'))
-                  .padding({ top: 8, bottom: 8 })
-              }
-
-              // 题目区域
-              if (this.quizType === 'flagToName') {
-                this.FlagToNameQuestion()
-              } else {
-                this.NameToFlagQuestion()
-              }
-
-              Blank()
-
-              // 下一题按钮
-              if (this.isAnswered) {
-                Button(this.currentIndex < this.questions.length - 1 
-                  ? this.context.resourceManager.getStringSync($r('app.string.next_question').id)
-                  : this.context.resourceManager.getStringSync($r('app.string.view_results').id))
-                  .width('80%')
-                  .height(48)
-                  .fontSize(17)
-                  .fontWeight(FontWeight.Bold)
-                  .backgroundColor($r('app.color.button_primary'))
-                  .margin({ bottom: 32 })
-                  .onClick(async () => {
-                    await this.nextQuestion();
-                  })
-              }
+                .height('100%')
+                .backgroundColor($r('app.color.bg_page'))
             }
             .width('100%')
-              .height('100%')
-              .backgroundColor($r('app.color.bg_page'))
-          }
-        } else {
-          Column() {
-            Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
-              .fontSize(16)
-              .fontColor($r('app.color.text_tertiary'))
-          }
-          .width('100%')
+            .height('100%')
+            .constraintSize({ maxWidth: getContentMaxWidth() })
+          } else {
+            Column() {
+              Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
+                .fontSize(16)
+                .fontColor($r('app.color.text_tertiary'))
+            }
+            .width('100%')
             .height('100%')
             .justifyContent(FlexAlign.Center)
+            .constraintSize({ maxWidth: getContentMaxWidth() })
+          }
         }
+        .width('100%')
+        .height('100%')
       }
       .width('100%')
+      .height('100%')
+      .justifyContent(FlexAlign.Center)
         .height('100%')
     }
     .title('')
     .titleMode(NavigationTitleMode.Mini)
+    .mode(NavigationMode.Stack)
     .backgroundColor($r('app.color.bg_page'))
     .menus(this.MenuBuilder)
   }

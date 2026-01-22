@@ -8,6 +8,7 @@ import display from '@ohos.display';
 import promptAction from '@ohos.promptAction';
 import { paintCategories, PaintCategory, getTotalLevels } from './PaintGameData';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
+import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
 @CustomDialog
 struct HowToPlayDialog {
@@ -266,8 +267,9 @@ export struct PaintHomePage {
 
   build() {
     Scroll() {
-      Column() {
-        // 世界涂鸦 - 大卡片 (高度占屏幕1/2)
+      Row() {
+        Column() {
+          // 世界涂鸦 - 大卡片 (高度占屏幕1/2)
         Stack({ alignContent: Alignment.TopEnd }) {
           // 中心内容
           Column() {
@@ -412,9 +414,13 @@ export struct PaintHomePage {
         .onClick(() => {
           this.showHowToPlayDialog();
         })
+        }
+        .width('100%')
+        .padding({ left: 16, right: 16, top: 16 })
+        .constraintSize({ maxWidth: getContentMaxWidth() })
       }
       .width('100%')
-      .padding({ left: 16, right: 16, top: 16 })
+      .justifyContent(FlexAlign.Center)
     }
     .width('100%')
     .height('100%')

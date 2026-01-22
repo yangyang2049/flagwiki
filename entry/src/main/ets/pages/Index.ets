@@ -105,7 +105,7 @@ struct Index {
   build() {
     Stack() {
       Column() {
-        // 顶部标题栏
+        // 顶部标题栏 - 保持全宽
         Row() {
           Text(this.getTitleText())
             .fontSize(20)
@@ -136,7 +136,7 @@ struct Index {
           offsetY: 2
         })
 
-        // 主内容区域 - Tabs
+        // 主内容区域 - Tabs - 保持全宽
         Tabs({ barPosition: BarPosition.End, controller: this.tabController }) {
           TabContent() {
             HomePage({

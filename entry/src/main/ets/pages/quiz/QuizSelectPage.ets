@@ -1,16 +1,18 @@
 import router from '@ohos.router';
 import common from '@ohos.app.ability.common';
+import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
 @Entry
 @Component
 struct QuizSelectPage {
   private context = getContext(this) as common.UIAbilityContext;
 
-  build() {
+  build(): void {
     Navigation() {
-      Column() {
-        // 看旗猜国名
-        Row() {
+      Row() {
+        Column() {
+          // 看旗猜国名
+          Row() {
           Column() {
             Text('🏳️')
               .fontSize(40)
@@ -101,15 +103,21 @@ struct QuizSelectPage {
             .fontSize(13)
             .fontColor($r('app.color.text_tertiary'))
             .textAlign(TextAlign.Center)
+          }
+          .width('100%')
+          .margin({ top: 32 })
         }
         .width('100%')
-        .margin({ top: 32 })
+        .height('100%')
+        .constraintSize({ maxWidth: getContentMaxWidth() })
       }
       .width('100%')
       .height('100%')
+      .justifyContent(FlexAlign.Center)
     }
     .title(this.context.resourceManager.getStringSync($r('app.string.game_quiz').id))
     .titleMode(NavigationTitleMode.Mini)
+    .mode(NavigationMode.Stack)
     .backgroundColor($r('app.color.bg_page'))
   }
 }
