@@ -563,12 +563,14 @@ struct ConnectionsPlayPage {
 
                   // 第二行：Hint, Solve
                   Row() {
-                    Button('💡')
+                    Button(this.context.resourceManager.getStringSync($r('app.string.hint').id))
                       .type(ButtonType.Normal)
-                      .fontSize(16)
+                      .fontSize(14)
+                      .fontWeight(FontWeight.Medium)
                       .backgroundColor('rgba(22, 119, 255, 0.5)')
+                      .fontColor(Color.White)
                       .borderRadius(25)
-                      .width(50)
+                      .width(80)
                       .height(50)
                       .onClick(() => {
                         this.useHint();
@@ -577,12 +579,14 @@ struct ConnectionsPlayPage {
                     Blank()
                       .width(20)
 
-                    Button('✓')
+                    Button(this.context.resourceManager.getStringSync($r('app.string.solve').id))
                       .type(ButtonType.Normal)
-                      .fontSize(16)
+                      .fontSize(14)
+                      .fontWeight(FontWeight.Medium)
                       .backgroundColor('rgba(22, 119, 255, 0.5)')
+                      .fontColor(Color.White)
                       .borderRadius(25)
-                      .width(50)
+                      .width(80)
                       .height(50)
                       .onClick(() => {
                         this.useSolve();

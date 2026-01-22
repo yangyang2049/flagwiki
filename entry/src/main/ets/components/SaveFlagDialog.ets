@@ -111,13 +111,13 @@ export struct SaveFlagDialog {
               })
           }
 
-          Text('保存国旗图片到相册')
+          Text($r('app.string.save_flag_to_album'))
             .fontSize(15)
             .fontColor($r('app.color.text_secondary'))
             .margin({ bottom: 16 })
 
           Row() {
-            Button('取消')
+            Button($r('app.string.cancel'))
               .fontSize(14)
               .fontColor($r('app.color.text_primary'))
               .backgroundColor($r('app.color.bg_secondary'))

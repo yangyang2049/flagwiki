@@ -129,12 +129,6 @@ struct Index {
         .backgroundColor($r('app.color.bg_title_bar'))
         .justifyContent(FlexAlign.SpaceBetween)
         .alignItems(VerticalAlign.Center)
-        .shadow({
-          radius: 4,
-          color: 'rgba(0, 0, 0, 0.06)',
-          offsetX: 0,
-          offsetY: 2
-        })
 
         // 主内容区域 - Tabs - 保持全宽
         Tabs({ barPosition: BarPosition.End, controller: this.tabController }) {

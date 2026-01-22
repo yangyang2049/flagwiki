@@ -132,7 +132,7 @@ interface RouterParams {
             }
             .width('100%')
               .padding(24)
-              .backgroundColor($r('app.color.bg_card'))
+              .backgroundColor(Color.Transparent)
               .alignItems(HorizontalAlign.Center)
 
             // 州旗网格

@@ -240,6 +240,8 @@ export struct FavoritesPage {
                   .height(56)
                   .padding({ left: 16, right: 16 })
                   .backgroundColor($r('app.color.bg_card'))
+                  .borderRadius(8)
+                  .margin({ bottom: 8 })
                   .onClick(() => {
                     if (this.isEditMode) {
                       // 编辑模式下点击删除
@@ -250,6 +252,7 @@ export struct FavoritesPage {
                     }
                   })
                 }
+                .margin({ left: 16, right: 16, top: 4, bottom: 4 })
               }, (item: FavoriteItem, index: number) => `${item.pageUrl}_${index}`)
             }
             .width('100%')

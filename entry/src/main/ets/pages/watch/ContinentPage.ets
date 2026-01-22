@@ -1,5 +1,6 @@
 import router from '@ohos.router'
-import { Countries, Country, Continent, ContinentNames, ContinentNamesEN, getLocalizedCountryName } from '../../utils/countryData'
+import common from '@ohos.app.ability.common'
+import { Countries, Country, Continent, getLocalizedCountryName } from '../../utils/countryData'
 import { LocalizationUtil } from '../../utils/LocalizationUtil'
 
 @Entry
@@ -8,6 +9,7 @@ struct ContinentPage {
   @StorageLink('currentLanguage') currentLanguage: string = 'zh'
   @State continent: Continent = 'Asia'
   @State continentCountries: Country[] = []
+  private scroller: Scroller = new Scroller()
 
   aboutToAppear() {
     this.loadContinent()
@@ -22,11 +24,34 @@ struct ContinentPage {
     this.continentCountries = Countries.filter(country => country.region === this.continent)
   }
 
+  private context = getContext(this) as common.UIAbilityContext;
+
   private getContinentName(): string {
-    if (LocalizationUtil.isEnglish(this.currentLanguage)) {
-      return ContinentNamesEN[this.continent] || this.continent
+    const rm = this.context.resourceManager;
+    let resource: Resource;
+    switch (this.continent) {
+      case 'World':
+        resource = $r('app.string.region_world');
+        break;
+      case 'Asia':
+        resource = $r('app.string.region_asia');
+        break;
+      case 'Europe':
+        resource = $r('app.string.region_europe');
+        break;
+      case 'Africa':
+        resource = $r('app.string.region_africa');
+        break;
+      case 'Americas':
+        resource = $r('app.string.region_americas');
+        break;
+      case 'Oceania':
+        resource = $r('app.string.region_oceania');
+        break;
+      default:
+        return this.continent; // fallback to original continent name
     }
-    return ContinentNames[this.continent] || this.continent
+    return rm.getStringSync(resource.id);
   }
 
   build() {
@@ -39,7 +64,7 @@ struct ContinentPage {
         .textAlign(TextAlign.Center)
         .margin({ top: 8, bottom: 8 })
 
-      Scroll() {
+      Scroll(this.scroller) {
         Column() {
           ForEach(this.continentCountries, (country: Country) => {
             Row() {

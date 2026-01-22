@@ -8,6 +8,7 @@ import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
+import UiConstants from '../../utils/UiConstants';
 
 interface RouterParams {
   levelId: number;
@@ -393,7 +394,7 @@ interface Card {
               Text($r('app.string.pairs'))
                 .fontSize(12)
                 .fontColor($r('app.color.text_secondary'))
-              Text(`${this.matchedPairs}/${this.level?.pairs || 0}`)
+              Text(this.context.resourceManager.getStringSync($r('app.string.progress_indicator').id, this.matchedPairs.toString(), (this.level?.pairs || 0).toString()))
                 .fontSize(20)
                 .fontWeight(FontWeight.Bold)
                 .fontColor($r('app.color.text_primary'))
@@ -466,7 +467,7 @@ interface Card {
       } else {
         // 显示卡片背面 - 白色背景，旗帜emoji
         Column() {
-          Text('🏳️')
+          Text(UiConstants.FLAG_EMOJI)
             .fontSize(this.getQuestionMarkSize())
             .fontWeight(FontWeight.Bold)
         }
@@ -542,7 +543,7 @@ interface Card {
 
       // 对话框
       Column() {
-        Text(this.isWin ? '🎉' : '⏰')
+        Text(this.isWin ? UiConstants.CELEBRATION : UiConstants.CLOCK)
           .fontSize(56)
           .margin({ top: 24 })
 

@@ -40,22 +40,22 @@ export type Continent = 'World' | 'Asia' | 'Europe' | 'Africa' | 'Americas' | 'O
 
 // 洲名称映射（中文）
 export const ContinentNames: Record<Continent, string> = {
-    'World': '全部',
-    'Asia': '亚洲',
-    'Europe': '欧洲',
-    'Africa': '非洲',
-    'Americas': '美洲',
-    'Oceania': '大洋洲'
+  'World': '世界',
+  'Asia': '亚洲',
+  'Europe': '欧洲',
+  'Africa': '非洲',
+  'Americas': '美洲',
+  'Oceania': '大洋洲'
 };
 
 // 洲名称映射（英文）
 export const ContinentNamesEN: Record<Continent, string> = {
-    'World': 'All',
-    'Asia': 'Asia',
-    'Europe': 'Europe',
-    'Africa': 'Africa',
-    'Americas': 'Americas',
-    'Oceania': 'Oceania'
+  'World': 'World',
+  'Asia': 'Asia',
+  'Europe': 'Europe',
+  'Africa': 'Africa',
+  'Americas': 'Americas',
+  'Oceania': 'Oceania'
 };
 
 // 完整的国家数据列表
@@ -309,15 +309,6 @@ export function getLocalizedCapital(country: Country, language: string): string 
     return country.capitalCN;
 }
 
-// 本地化工具函数：根据语言获取地区名称
-export function getLocalizedRegionName(region: string, language: string): string {
-    const continent = region as Continent;
-    if (language === 'en' || language.startsWith('en-')) {
-        return ContinentNamesEN[continent] || region;
-    }
-    return ContinentNames[continent] || region;
-}
-
 // 本地化工具函数：根据语言获取标志设计描述
 export function getLocalizedFlagDesign(flagDesign: FlagDesign | undefined, language: string): string {
     if (!flagDesign) {
@@ -343,6 +334,15 @@ export function getLocalizedOrgHeadquarters(org: InternationalOrg, language: str
         return org.headquarters;
     }
     return org.headquartersCN;
+}
+
+// 本地化工具函数：根据语言获取区域名称
+export function getLocalizedRegionName(region: string, language: string): string {
+    const continent = region as Continent;
+    if (language === 'en' || language.startsWith('en-')) {
+        return ContinentNamesEN[continent] || region;
+    }
+    return ContinentNames[continent] || region;
 }
 
 // 获取所有洲

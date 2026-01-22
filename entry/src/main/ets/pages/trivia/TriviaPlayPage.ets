@@ -15,6 +15,7 @@ import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 import { screenshotManager } from '../../utils/ScreenshotManager';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
+import UiConstants from '../../utils/UiConstants';
 
 interface RouterParams {
   levelId: number;
@@ -406,17 +407,16 @@ interface RouterParams {
           .height(28)
           .backgroundColor(option === this.getCurrentQuestion()?.answer ? $r('app.color.color_green') : $r('app.color.color_red'))
           .borderRadius(14)
-        Text(option === this.getCurrentQuestion()?.answer ? '✓' : '✗')
-          .fontSize(14)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(Color.White)
-      }
-      .opacity(1)
-        .animation({ duration: 200, curve: Curve.EaseOut })
-        .margin({ right: 12 })
-    }
-  }
-
+                  Text(option === this.getCurrentQuestion()?.answer ? UiConstants.CORRECT_MARK : UiConstants.INCORRECT_MARK)
+                    .fontSize(14)
+                    .fontWeight(FontWeight.Bold)
+                    .fontColor(Color.White)
+              }
+              .opacity(1)
+                .animation({ duration: 200, curve: Curve.EaseOut })
+                .margin({ right: 12 })
+            }
+          }
   build() {
     Navigation() {
       Row() {
@@ -445,17 +445,16 @@ interface RouterParams {
                   .fontColor($r('app.color.text_secondary'))
                   .layoutWeight(1)
 
-                Row() {
-                  ForEach(Array.from({ length: this.level?.lives || 3 }), (_: undefined, index: number) => {
-                    Text(index < this.lives ? '❤️' : '🖤')
-                      .fontSize(14)
-                      .margin({ left: 1, right: 1 })
-                  })
-                }
-                .layoutWeight(1)
+                                  Row() {
+                                    ForEach(Array.from({ length: this.level?.lives || 3 }), (_: undefined, index: number) => {
+                                      Text(index < this.lives ? UiConstants.HEART_FILLED : UiConstants.HEART_EMPTY)
+                                        .fontSize(14)
+                                        .margin({ left: 1, right: 1 })
+                                    })
+                                  }                .layoutWeight(1)
                   .justifyContent(FlexAlign.Center)
 
-                Text(`${this.currentIndex + 1} / ${this.level?.questions.length}`)
+                Text(this.context.resourceManager.getStringSync($r('app.string.progress_indicator').id, (this.currentIndex + 1).toString(), (this.level?.questions.length || 0).toString()))
                   .fontSize(15)
                   .fontWeight(FontWeight.Medium)
                   .fontColor($r('app.color.text_secondary'))
@@ -742,7 +741,7 @@ interface RouterParams {
   @Builder
   ResultView() {
     Column() {
-      Text('🎉')
+      Text(UiConstants.CELEBRATION)
         .fontSize(64)
         .margin({ top: 60 })
 
@@ -773,17 +772,16 @@ interface RouterParams {
 
         Divider().color($r('app.color.gray_very_light'))
 
-        Row() {
-          Text(this.context.resourceManager.getStringSync($r('app.string.remaining_lives').id))
-            .fontSize(16)
-            .fontColor($r('app.color.text_secondary'))
-          Blank()
-          Text(`${this.lives} ❤️`)
-            .fontSize(16)
-            .fontWeight(FontWeight.Bold)
-            .fontColor($r('app.color.text_primary'))
-        }
-        .width('100%')
+                  Row() {
+                    Text(this.context.resourceManager.getStringSync($r('app.string.remaining_lives').id))
+                      .fontSize(16)
+                      .fontColor($r('app.color.text_secondary'))
+                    Blank()
+                    Text(`${this.lives} ${UiConstants.HEART_FILLED}`)
+                      .fontSize(16)
+                      .fontWeight(FontWeight.Bold)
+                      .fontColor($r('app.color.text_primary'))
+                  }        .width('100%')
           .padding({ top: 16, bottom: 16 })
       }
       .width('100%')

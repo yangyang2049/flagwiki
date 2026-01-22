@@ -72,21 +72,21 @@ struct StateFlagDetailPage {
   }
 
   private async toggleFavorite(): Promise<void> {
-    const name = this.stateInfo?.nameCN || '未知';
+    const name = this.stateInfo?.nameCN || this.context.resourceManager.getStringSync($r('app.string.unknown').id);
     const pageUrl = `stateflag:${this.countryCode}:${this.stateCode}`;
 
     if (this.isFavorite) {
       await FavoritesManager.removeFavorite(pageUrl);
       this.isFavorite = false;
       promptAction.showToast({
-        message: '已取消收藏',
+        message: this.context.resourceManager.getStringSync($r('app.string.favorite_removed').id),
         duration: 2000
       });
     } else {
       await FavoritesManager.addFavorite({ name: name, pageUrl: pageUrl });
       this.isFavorite = true;
       promptAction.showToast({
-        message: '已添加到收藏',
+        message: this.context.resourceManager.getStringSync($r('app.string.favorite_added').id),
         duration: 2000
       });
     }
@@ -119,7 +119,7 @@ struct StateFlagDetailPage {
 
     try {
       promptAction.showToast({
-        message: '正在准备图片...',
+        message: this.context.resourceManager.getStringSync($r('app.string.preparing_image').id),
         duration: 1000
       });
 
@@ -130,7 +130,7 @@ struct StateFlagDetailPage {
       const pixmap = await screenshotManager.captureSnapshot(this.FLAG_DOWNLOAD_CONTAINER_ID);
       if (!pixmap) {
         promptAction.showToast({
-          message: '截取图片失败',
+          message: this.context.resourceManager.getStringSync($r('app.string.screenshot_failed').id),
           duration: 2000
         });
         return;
@@ -146,13 +146,13 @@ struct StateFlagDetailPage {
           },
           onSaveSuccess: () => {
             promptAction.showToast({
-              message: '旗帜图片已保存到相册',
+              message: this.context.resourceManager.getStringSync($r('app.string.flag_saved_to_album').id),
               duration: 2000
             });
           },
           onSaveError: (error: Error) => {
             promptAction.showToast({
-              message: `保存失败: ${error.message}`,
+              message: this.context.resourceManager.getStringSync($r('app.string.save_failed_with_error').id, error.message),
               duration: 2000
             });
             this.releaseFlagPixelMap();
@@ -169,7 +169,7 @@ struct StateFlagDetailPage {
     } catch (error) {
       console.error('[StateFlagDetailPage] Download error:', error);
       promptAction.showToast({
-        message: '下载失败',
+        message: this.context.resourceManager.getStringSync($r('app.string.download_failed').id),
         duration: 2000
       });
     }
@@ -177,10 +177,10 @@ struct StateFlagDetailPage {
 
   private async doSaveFlag(): Promise<void> {
     if (!this.flagPixelMap || !this.stateInfo) {
-      throw new Error('图片或州旗信息不存在');
+      throw new Error(this.context.resourceManager.getStringSync($r('app.string.image_or_state_info_not_exist').id));
     }
 
-    const fileName = screenshotManager.generateFileName('州旗', this.stateInfo.nameCN);
+    const fileName = screenshotManager.generateFileName(this.context.resourceManager.getStringSync($r('app.string.state_flag_details').id), this.stateInfo.nameCN);
     const success = await screenshotManager.saveToGallery(
       this.flagPixelMap,
       fileName,
@@ -189,7 +189,7 @@ struct StateFlagDetailPage {
     );
 
     if (!success) {
-      throw new Error('保存到相册失败');
+      throw new Error(this.context.resourceManager.getStringSync($r('app.string.failed_to_save_to_album').id));
     }
   }
 
@@ -201,7 +201,7 @@ struct StateFlagDetailPage {
             .width(40)
             .height(40)
             .color($r('app.color.button_primary'))
-          Text('加载中...')
+          Text(this.context.resourceManager.getStringSync($r('app.string.loading').id))
             .fontSize(14)
             .fontColor($r('app.color.text_tertiary'))
             .margin({ top: 12 })
@@ -248,18 +248,18 @@ struct StateFlagDetailPage {
               // 基本信息卡片
               Row() {
                 Column() {
-                  Text('基本信息')
+                  Text(this.context.resourceManager.getStringSync($r('app.string.basic_info').id))
                     .fontSize(17)
                     .fontWeight(FontWeight.Bold)
                     .fontColor($r('app.color.text_primary'))
                     .alignSelf(ItemAlign.Start)
                     .margin({ bottom: 16 })
 
-                  this.InfoRow('所属国家', `${this.countryData.countryEmoji} ${this.countryData.countryNameCN}`)
+                  this.InfoRow(this.context.resourceManager.getStringSync($r('app.string.belongs_to_country').id), `${this.countryData.countryEmoji} ${this.countryData.countryNameCN}`)
                   Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                  this.InfoRow('首府', this.stateInfo.capitalCN)
+                  this.InfoRow(this.context.resourceManager.getStringSync($r('app.string.capital').id), this.stateInfo.capitalCN)
                   Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                  this.InfoRow('地区', this.stateInfo.regionCN)
+                  this.InfoRow(this.context.resourceManager.getStringSync($r('app.string.region').id), this.stateInfo.regionCN)
                 }
                 .padding(20)
                   .layoutWeight(1)
@@ -320,18 +320,18 @@ struct StateFlagDetailPage {
             // 基本信息卡片
             Row() {
               Column() {
-                Text('基本信息')
+                Text(this.context.resourceManager.getStringSync($r('app.string.basic_info').id))
                   .fontSize(17)
                   .fontWeight(FontWeight.Bold)
                   .fontColor($r('app.color.text_primary'))
                   .alignSelf(ItemAlign.Start)
                   .margin({ bottom: 16 })
 
-                this.InfoRow('所属国家', `${this.countryData.countryEmoji} ${this.countryData.countryNameCN}`)
+                this.InfoRow(this.context.resourceManager.getStringSync($r('app.string.belongs_to_country').id), `${this.countryData.countryEmoji} ${this.countryData.countryNameCN}`)
                 Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.InfoRow('首府', this.stateInfo.capitalCN)
+                this.InfoRow(this.context.resourceManager.getStringSync($r('app.string.capital').id), this.stateInfo.capitalCN)
                 Divider().color($r('app.color.gray_very_light')).margin({ top: 12, bottom: 12 })
-                this.InfoRow('地区', this.stateInfo.regionCN)
+                this.InfoRow(this.context.resourceManager.getStringSync($r('app.string.region').id), this.stateInfo.regionCN)
               }
               .padding(20)
               .layoutWeight(1)
@@ -350,7 +350,7 @@ struct StateFlagDetailPage {
                   Image(this.isFavorite ? $r('app.media.icon_favorite_selected') : $r('app.media.icon_favorite'))
                     .width(20)
                     .height(20)
-                  Text(this.isFavorite ? '已收藏' : '收藏')
+                  Text(this.isFavorite ? this.context.resourceManager.getStringSync($r('app.string.favorited').id) : this.context.resourceManager.getStringSync($r('app.string.favorite').id))
                     .fontSize(15)
                     .fontColor(this.isFavorite ? $r('app.color.button_primary') : $r('app.color.text_primary'))
                 }
@@ -369,7 +369,7 @@ struct StateFlagDetailPage {
                   Image($r('app.media.icon_download'))
                     .width(20)
                     .height(20)
-                  Text('下载')
+                  Text(this.context.resourceManager.getStringSync($r('app.string.download').id))
                     .fontSize(15)
                     .fontColor($r('app.color.text_primary'))
                 }
@@ -399,7 +399,7 @@ struct StateFlagDetailPage {
         .backgroundColor($r('app.color.bg_page'))
       } else {
         Column() {
-          Text('暂无数据')
+          Text(this.context.resourceManager.getStringSync($r('app.string.no_data').id))
             .fontSize(14)
             .fontColor($r('app.color.text_tertiary'))
         }
@@ -409,7 +409,7 @@ struct StateFlagDetailPage {
         .backgroundColor($r('app.color.bg_page'))
       }
     }
-    .title(this.stateInfo?.nameCN || '州旗详情')
+    .title(this.stateInfo?.nameCN || this.context.resourceManager.getStringSync($r('app.string.state_flag_details').id))
     .titleMode(NavigationTitleMode.Mini)
     .mode(NavigationMode.Stack)
     .backgroundColor($r('app.color.bg_page'))
@@ -462,10 +462,10 @@ struct StateFlagDetailPage {
     }
 
     const lines: string[] = [];
-    lines.push(`${this.stateInfo.nameCN}，英文名${this.stateInfo.name}。`);
-    lines.push(`所属国家是${this.countryData.countryNameCN}。`);
-    lines.push(`首府是${this.stateInfo.capitalCN}。`);
-    lines.push(`地区是${this.stateInfo.regionCN}。`);
+    lines.push(`${this.stateInfo.nameCN}` + this.context.resourceManager.getStringSync($r('app.string.read_other_name').id, this.stateInfo.name));
+    lines.push(this.context.resourceManager.getStringSync($r('app.string.read_state_belongs_to').id, this.countryData.countryNameCN));
+    lines.push(this.context.resourceManager.getStringSync($r('app.string.read_state_capital').id, this.stateInfo.capitalCN));
+    lines.push(this.context.resourceManager.getStringSync($r('app.string.read_state_region').id, this.stateInfo.regionCN));
 
     return lines.join('');
   }
@@ -475,23 +475,23 @@ struct StateFlagDetailPage {
       TextReaderUtil.stopRead();
       this.isReading = false;
       promptAction.showToast({
-        message: '已停止朗读',
+        message: this.context.resourceManager.getStringSync($r('app.string.stop_reading').id),
         duration: 2000
       });
     } else {
       try {
-        const title = this.stateInfo?.nameCN || '州旗详情';
+        const title = this.stateInfo?.nameCN || this.context.resourceManager.getStringSync($r('app.string.state_flag_details').id);
         const content = this.getReadContent();
         await TextReaderUtil.startRead(this.context, title, content);
         this.isReading = true;
         promptAction.showToast({
-          message: '开始朗读',
+          message: this.context.resourceManager.getStringSync($r('app.string.start_reading').id),
           duration: 2000
         });
       } catch (err) {
         console.error(`Failed to start read: ${JSON.stringify(err)}`);
         promptAction.showToast({
-          message: '朗读功能暂不可用',
+          message: this.context.resourceManager.getStringSync($r('app.string.reading_unavailable').id),
           duration: 2000
         });
       }
@@ -503,7 +503,7 @@ struct StateFlagDetailPage {
 
     this.isSharing = true;
     promptAction.showToast({
-      message: '正在准备分享...',
+      message: this.context.resourceManager.getStringSync($r('app.string.preparing_share').id),
       duration: 1500
     });
 
@@ -517,7 +517,7 @@ struct StateFlagDetailPage {
       const pixmap = await screenshotManager.captureSnapshot(this.SHARE_CONTAINER_ID);
       if (!pixmap) {
         promptAction.showToast({
-          message: '截取图片失败',
+          message: this.context.resourceManager.getStringSync($r('app.string.screenshot_failed').id),
           duration: 2000
         });
         this.isSharing = false;
@@ -561,8 +561,8 @@ struct StateFlagDetailPage {
       const shareData = new systemShare.SharedData({
         utd: utdTypeId,
         uri: imageUri,
-        title: `${stateName}州旗`,
-        description: '来自国旗小百科'
+        title: this.context.resourceManager.getStringSync($r('app.string.share_state_flag_title').id, stateName),
+        description: this.context.resourceManager.getStringSync($r('app.string.from_app').id)
       });
 
       const controller = new systemShare.ShareController(shareData);
@@ -591,7 +591,7 @@ struct StateFlagDetailPage {
       const error = err as BusinessError;
       console.error(`Failed to share: code: ${error?.code}, message: ${error?.message}`);
       promptAction.showToast({
-        message: '分享失败',
+        message: this.context.resourceManager.getStringSync($r('app.string.share_failed').id),
         duration: 2000
       });
 
@@ -617,11 +617,11 @@ struct StateFlagDetailPage {
     const lines: string[] = [];
     lines.push(`🏳️ ${this.stateInfo.nameCN} (${this.stateInfo.name})`);
     lines.push('');
-    lines.push(`📍 所属国家：${this.countryData.countryEmoji} ${this.countryData.countryNameCN}`);
-    lines.push(`🏛️ 首府：${this.stateInfo.capitalCN}`);
-    lines.push(`🌍 地区：${this.stateInfo.regionCN}`);
+    lines.push(this.context.resourceManager.getStringSync($r('app.string.share_state_country').id) + `${this.countryData.countryEmoji} ${this.countryData.countryNameCN}`);
+    lines.push(this.context.resourceManager.getStringSync($r('app.string.share_state_capital').id) + this.stateInfo.capitalCN);
+    lines.push(this.context.resourceManager.getStringSync($r('app.string.share_state_region').id) + this.stateInfo.regionCN);
     lines.push('');
-    lines.push('—— 来自「国旗小百科」');
+    lines.push('—— ' + this.context.resourceManager.getStringSync($r('app.string.from_app_plain').id));
 
     return lines.join('\n');
   }

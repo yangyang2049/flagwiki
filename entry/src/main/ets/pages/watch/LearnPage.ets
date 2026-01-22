@@ -7,6 +7,7 @@ import { WatchLayout } from '../../utils/WatchUiConstants'
 export struct LearnPage {
   @StorageLink('currentLanguage') currentLanguage: string = 'zh'
   private readonly continents: Continent[] = ['Asia', 'Europe', 'Africa', 'Americas', 'Oceania']
+  private scroller: Scroller = new Scroller()
 
   private getContinentName(continent: Continent): string {
     if (LocalizationUtil.isEnglish(this.currentLanguage)) {
@@ -29,7 +30,7 @@ export struct LearnPage {
         .textAlign(TextAlign.Center)
         .margin({ top: 8, bottom: 8 })
 
-      Scroll() {
+      Scroll(this.scroller) {
         Column() {
           ForEach(this.continents, (continent: Continent) => {
             Row() {

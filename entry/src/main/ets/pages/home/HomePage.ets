@@ -1,19 +1,100 @@
 import router from '@ohos.router';
-import { TopicItem, getAllTopics } from '../topic/TopicData';
+import common from '@ohos.app.ability.common';
+import { TopicItem, getAllTopics, getTopicName } from '../topic/TopicData';
 import { WeeklyFlagItem, getCurrentWeekFlag } from '../../utils/WeeklyFlagData';
-import { getCountryByCode, getFlagImageSource } from '../../utils/countryData';
+import { getCountryByCode, getFlagImageSource, getLocalizedCountryName } from '../../utils/countryData';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
+import { LocalizationUtil } from '../../utils/LocalizationUtil';
 
 @Component
 export struct HomePage {
   @Prop refreshKey: number = 0;
   @State funFactIndex: number = 0;
   @State weeklyFlag: WeeklyFlagItem | undefined = undefined;
+  @State funFactsList: string[] = [];
+  @StorageLink('currentLanguage') @Watch('onCurrentLanguageChanged') currentLanguage: string = 'zh';
+  private context = getContext(this) as common.UIAbilityContext;
   onTabChange: (index: number) => void = () => {};
+
+  private get isEnglish(): boolean {
+    try {
+      if (!this.currentLanguage) {
+        return false;
+      }
+      return LocalizationUtil.isEnglish(this.currentLanguage);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  private onCurrentLanguageChanged(): void {
+    // 当语言改变时，重新加载 fun facts 并更新索引
+    this.loadFunFacts();
+    this.updateFunFactIndex();
+  }
 
   aboutToAppear() {
     this.weeklyFlag = getCurrentWeekFlag();
-    this.funFactIndex = Math.floor(Math.random() * this.funFacts.length);
+    // 加载 fun facts
+    this.loadFunFacts();
+    // Ensure funFacts is available before accessing length
+    this.updateFunFactIndex();
+  }
+
+  private loadFunFacts(): void {
+    try {
+      const context = getContext(this) as common.UIAbilityContext;
+      const facts: string[] = [];
+      // 使用资源映射表，避免动态构建资源ID可能的问题
+      const factResources: Resource[] = [
+        $r('app.string.fun_fact_1'),
+        $r('app.string.fun_fact_2'),
+        $r('app.string.fun_fact_3'),
+        $r('app.string.fun_fact_4'),
+        $r('app.string.fun_fact_5'),
+        $r('app.string.fun_fact_6'),
+        $r('app.string.fun_fact_7'),
+        $r('app.string.fun_fact_8'),
+        $r('app.string.fun_fact_9'),
+        $r('app.string.fun_fact_10')
+      ];
+      
+      for (let i = 0; i < factResources.length; i++) {
+        try {
+          const fact = context.resourceManager.getStringSync(factResources[i].id);
+          // 检查获取到的字符串是否为空
+          if (fact && fact.trim().length > 0) {
+            facts.push(fact);
+          } else {
+            // 如果获取到的字符串为空，记录警告但继续
+            console.warn(`[HomePage] fun_fact_${i + 1} is empty`);
+          }
+        } catch (err) {
+          // 如果单个资源获取失败，记录错误但继续
+          console.error(`[HomePage] Failed to load fun_fact_${i + 1}:`, err);
+        }
+      }
+      this.funFactsList = facts;
+    } catch (e) {
+      // 如果出错，返回空数组
+      console.error('[HomePage] Failed to load fun facts:', e);
+      this.funFactsList = [];
+    }
+  }
+
+  private updateFunFactIndex(): void {
+    try {
+      const facts = this.funFactsList || [];
+      this.funFactIndex = facts.length > 0 ? Math.floor(Math.random() * facts.length) : 0;
+    } catch (e) {
+      // 如果出错，使用默认值
+      this.funFactIndex = 0;
+    }
+  }
+
+  private getTopicCount(): number {
+    // 如果内容宽度 >= 600vp，显示5个，否则显示4个
+    return getContentMaxWidth() >= 600 ? 5 : 4;
   }
 
   @Builder
@@ -37,14 +118,46 @@ export struct HomePage {
   }
 
   private getRegionName(region: string): string {
-    const regionMap: Record<string, string> = {
-      'Asia': '亚洲',
-      'Europe': '欧洲',
-      'Africa': '非洲',
-      'Americas': '美洲',
-      'Oceania': '大洋洲'
-    };
-    return regionMap[region] || region;
+    try {
+      const context = getContext(this) as common.UIAbilityContext;
+      let resource: Resource;
+      switch (region) {
+        case 'Asia':
+          resource = $r('app.string.region_asia');
+          break;
+        case 'Europe':
+          resource = $r('app.string.region_europe');
+          break;
+        case 'Africa':
+          resource = $r('app.string.region_africa');
+          break;
+        case 'Americas':
+          resource = $r('app.string.region_americas');
+          break;
+        case 'Oceania':
+          resource = $r('app.string.region_oceania');
+          break;
+        default:
+          return region; // fallback to original region name
+      }
+      return context.resourceManager.getStringSync(resource.id);
+    } catch (e) {
+      return region; // fallback
+    }
+  }
+
+  private getWeeklyFlagCountryName(): string {
+    if (!this.weeklyFlag) return '';
+    const country = getCountryByCode(this.weeklyFlag.countryCode);
+    return country ? getLocalizedCountryName(country, this.currentLanguage) : this.weeklyFlag.countryNameCN;
+  }
+
+  private getWeeklyFlagNationalDay(): string {
+    if (!this.weeklyFlag) return '';
+    const dayStr = this.isEnglish 
+      ? this.weeklyFlag.nationalDay.replace('-', '/')
+      : this.weeklyFlag.nationalDay.replace('-', '月') + '日';
+    return this.context.resourceManager.getStringSync($r('app.string.national_day_colon').id) + dayStr;
   }
 
   private getWeeklyFlagRegion(): string {
@@ -56,22 +169,29 @@ export struct HomePage {
     return '';
   }
 
-  // 国旗趣味小知识
-  private funFacts: string[] = [
-    '🇳🇵 尼泊尔是世界上唯一非矩形的国旗，由两个三角形组成！',
-    '🇨🇭 瑞士和梵蒂冈是世界上仅有的两个正方形国旗！',
-    '🇯🇵 日本国旗上的红色圆形代表太阳，日本被称为"日出之国"！',
-    '🇱🇾 利比亚在1977-2011年使用过世界上唯一的纯色国旗（绿色）！',
-    '🇲🇨 摩纳哥和印度尼西亚的国旗几乎相同，只是尺寸比例不同！',
-    '🇩🇰 丹麦国旗是世界上使用时间最长的国旗，自1219年开始使用！',
-    '🇧🇷 巴西国旗上的27颗星星代表26个州和1个联邦区！',
-    '🇺🇸 美国国旗的50颗星代表50个州，13道条纹代表最初的13个殖民地！',
-    '🇨🇦 加拿大国旗上的枫叶有11个尖角，这是经过风洞测试最清晰的设计！',
-    '🇬🇧 英国国旗"米字旗"由英格兰、苏格兰和爱尔兰的旗帜组合而成！'
-  ];
+  private getCurrentFunFact(): string {
+    try {
+      const facts = this.funFactsList || [];
+      if (facts && Array.isArray(facts) && facts.length > 0 && this.funFactIndex >= 0 && this.funFactIndex < facts.length) {
+        const fact: string = facts[this.funFactIndex];
+        return fact !== undefined && fact !== null ? fact : '';
+      }
+      return '';
+    } catch (e) {
+      return '';
+    }
+  }
 
   private switchFunFact(): void {
-    this.funFactIndex = (this.funFactIndex + 1) % this.funFacts.length;
+    try {
+      const facts = this.funFactsList || [];
+      if (facts.length > 0) {
+        this.funFactIndex = (this.funFactIndex + 1) % facts.length;
+      }
+    } catch (e) {
+      // 如果出错，重置为0
+      this.funFactIndex = 0;
+    }
   }
 
   build() {
@@ -82,11 +202,11 @@ export struct HomePage {
         Column() {
           Row() {
             Column() {
-              Text('国旗小百科')
+              Text($r('app.string.app_welcome_title'))
                 .fontSize(24)
                 .fontWeight(FontWeight.Bold)
                 .fontColor($r('app.color.text_white'))
-              Text('探索世界各国国旗的奥秘')
+              Text($r('app.string.app_welcome_subtitle'))
                 .fontSize(14)
                 .fontColor($r('app.color.text_white'))
                 .opacity(0.85)
@@ -137,7 +257,7 @@ export struct HomePage {
         if (this.weeklyFlag) {
           Column() {
             Row() {
-              Text('本周国旗')
+              Text($r('app.string.weekly_flag'))
                 .fontSize(17)
                 .fontWeight(FontWeight.Bold)
                 .fontColor($r('app.color.text_primary'))
@@ -155,12 +275,12 @@ export struct HomePage {
 
               // 国家信息
               Column() {
-                Text(this.weeklyFlag.countryNameCN)
+                Text(this.getWeeklyFlagCountryName())
                   .fontSize(18)
                   .fontWeight(FontWeight.Bold)
                   .fontColor($r('app.color.text_primary'))
                   .margin({ bottom: 6 })
-                Text(`国庆日: ${this.weeklyFlag.nationalDay.replace('-', '月')}日`)
+                Text(this.getWeeklyFlagNationalDay())
                   .fontSize(13)
                   .fontColor($r('app.color.text_secondary'))
                   .margin({ bottom: 4 })
@@ -194,7 +314,7 @@ export struct HomePage {
         // 快捷入口区
         Column() {
           Row() {
-            Text('快捷入口')
+            Text($r('app.string.quick_entrance'))
               .fontSize(17)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
@@ -203,10 +323,10 @@ export struct HomePage {
           .margin({ bottom: 16 })
 
           Row() {
-            this.shortcutItem('🇺🇳', '国旗画廊', () => this.onTabChange(1))
-            this.shortcutItem('🇺🇸', '各国州旗', () => router.pushUrl({ url: 'pages/stateflag/StateFlagCountryListPage' }))
-            this.shortcutItem('🎯', '国旗猜猜', () => router.pushUrl({ url: 'pages/quiz/QuizSelectPage' }))
-            this.shortcutItem('⭐', '收藏夹', () => router.pushUrl({ url: 'pages/profile/FavoritesPage' }))
+            this.shortcutItem('🇺🇳', this.context.resourceManager.getStringSync($r('app.string.flag_gallery').id), () => this.onTabChange(1))
+            this.shortcutItem('🇺🇸', this.context.resourceManager.getStringSync($r('app.string.state_flags').id), () => router.pushUrl({ url: 'pages/stateflag/StateFlagCountryListPage' }))
+            this.shortcutItem('🎯', this.context.resourceManager.getStringSync($r('app.string.flag_quiz').id), () => router.pushUrl({ url: 'pages/quiz/QuizSelectPage' }))
+            this.shortcutItem('⭐', this.context.resourceManager.getStringSync($r('app.string.favorites').id), () => router.pushUrl({ url: 'pages/profile/FavoritesPage' }))
           }
           .width('100%')
         }
@@ -219,7 +339,7 @@ export struct HomePage {
         // 专题推荐
         Column() {
           Row() {
-            Text('专题推荐')
+            Text($r('app.string.topic_recommendations'))
               .fontSize(17)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
@@ -237,12 +357,12 @@ export struct HomePage {
           // 横向滚动的专题卡片
           Scroll() {
             Row() {
-              ForEach(getAllTopics().slice(0, 4), (topic: TopicItem) => {
+              ForEach(getAllTopics().slice(0, this.getTopicCount()), (topic: TopicItem) => {
                 Column() {
                   Text(topic.emoji)
                     .fontSize(32)
                     .margin({ bottom: 8 })
-                  Text(topic.name)
+                  Text(getTopicName(topic.id, this.context, this.currentLanguage))
                     .fontSize(14)
                     .fontWeight(FontWeight.Medium)
                     .fontColor($r('app.color.text_primary'))
@@ -276,7 +396,7 @@ export struct HomePage {
         // 趣味小知识
         Column() {
           Row() {
-            Text('💡 趣味小知识')
+            Text($r('app.string.fun_facts'))
               .fontSize(17)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
@@ -291,7 +411,7 @@ export struct HomePage {
           .width('100%')
           .margin({ bottom: 16 })
 
-          Text(this.funFacts[this.funFactIndex])
+          Text(this.getCurrentFunFact())
             .fontSize(15)
             .fontColor($r('app.color.text_dark'))
             .lineHeight(24)

@@ -117,6 +117,10 @@
       "value": "大洋洲"
     },
     {
+      "name": "national_day_colon",
+      "value": "国庆日: "
+    },
+    {
       "name": "weekly_flag",
       "value": "本周国旗"
     },
@@ -602,7 +606,7 @@
     },
     {
       "name": "about_app_message",
-      "value": "国旗小百科 v1.1.0\n\n一款有趣的国旗知识应用，带你探索世界各国国旗的故事与历史。"
+      "value": "国旗小百科 v2.0.0\n\n一款有趣的国旗知识应用，带你探索世界各国国旗的故事与历史。"
     },
     {
       "name": "feedback_message",
@@ -685,6 +689,10 @@
       "value": "关卡数据加载失败"
     },
     {
+      "name": "country_info_load_failed",
+      "value": "国家信息加载失败"
+    },
+    {
       "name": "next",
       "value": "下一个"
     },
@@ -713,8 +721,12 @@
       "value": "加载中..."
     },
     {
-      "name": "level_challenge_success",
-      "value": "第%s关挑战成功"
+      "name": "topic",
+      "value": "专题"
+    },
+    {
+      "name": "topic_detail",
+      "value": "专题详情"
     },
     {
       "name": "total_countries",
@@ -723,6 +735,150 @@
     {
       "name": "total_organizations",
       "value": "共 %s 个组织"
+    },
+    {
+      "name": "total_similar_flags",
+      "value": "共 %s 对相似旗帜"
+    },
+    {
+      "name": "reading_stopped",
+      "value": "已停止朗读"
+    },
+    {
+      "name": "reading_started",
+      "value": "开始朗读"
+    },
+    {
+      "name": "level_challenge_success",
+      "value": "第%s关挑战成功"
+    },
+    {
+      "name": "topic_vexillology",
+      "value": "旗帜学"
+    },
+    {
+      "name": "topic_vexillology_desc",
+      "value": "旗帜学（国旗学）的基础知识、研究方法和历史演变"
+    },
+    {
+      "name": "topic_etiquette",
+      "value": "国旗礼仪"
+    },
+    {
+      "name": "topic_etiquette_desc",
+      "value": "国旗在国际场合的使用规范和礼仪知识"
+    },
+    {
+      "name": "topic_manufacturing",
+      "value": "国旗制作"
+    },
+    {
+      "name": "topic_manufacturing_desc",
+      "value": "国旗制作的流程、材料、工厂和质量标准"
+    },
+    {
+      "name": "topic_similar_flags",
+      "value": "相似旗"
+    },
+    {
+      "name": "topic_similar_flags_desc",
+      "value": "一些国家的国旗相似度较高，仅在比例、颜色深度或细节上有所不同"
+    },
+    {
+      "name": "topic_international",
+      "value": "国际组织"
+    },
+    {
+      "name": "topic_international_desc",
+      "value": "主要国际组织的旗帜"
+    },
+    {
+      "name": "topic_nordic",
+      "value": "北欧旗帜"
+    },
+    {
+      "name": "topic_nordic_desc",
+      "value": "以北欧十字为特征的斯堪的纳维亚国家旗帜"
+    },
+    {
+      "name": "topic_tricolor",
+      "value": "三色旗"
+    },
+    {
+      "name": "topic_tricolor_desc",
+      "value": "由三种颜色条纹组成的经典国旗设计"
+    },
+    {
+      "name": "topic_pan_arab",
+      "value": "泛阿拉伯旗帜"
+    },
+    {
+      "name": "topic_pan_arab_desc",
+      "value": "采用红、白、黑、绿泛阿拉伯色彩的国旗"
+    },
+    {
+      "name": "topic_pan_african",
+      "value": "泛非洲旗帜"
+    },
+    {
+      "name": "topic_pan_african_desc",
+      "value": "采用红、黄、绿泛非洲色彩的国旗"
+    },
+    {
+      "name": "topic_sun",
+      "value": "太阳旗"
+    },
+    {
+      "name": "topic_sun_desc",
+      "value": "国旗上绘有太阳图案的国家"
+    },
+    {
+      "name": "topic_crescent_moon",
+      "value": "星月旗"
+    },
+    {
+      "name": "topic_crescent_moon_desc",
+      "value": "国旗上绘有星月标志的国家"
+    },
+    {
+      "name": "topic_animals",
+      "value": "国旗上的动物"
+    },
+    {
+      "name": "topic_animals_desc",
+      "value": "国旗上绘有动物图案的国家"
+    },
+    {
+      "name": "topic_blue_ensign",
+      "value": "蓝船旗"
+    },
+    {
+      "name": "topic_blue_ensign_desc",
+      "value": "来自英国的民用船旗蓝船旗，米字旗代表前英国殖民地，象征为英联邦成员"
+    },
+    {
+      "name": "topic_pan_slavic",
+      "value": "泛斯拉夫旗"
+    },
+    {
+      "name": "topic_pan_slavic_desc",
+      "value": "采用红、白、蓝泛斯拉夫色彩的国旗，代表斯拉夫民族的团结"
+    },
+    {
+      "name": "topic_central_america",
+      "value": "泛中美洲联邦色旗"
+    },
+    {
+      "name": "topic_central_america_desc",
+      "value": "中美洲联邦国旗，蓝色代表加勒比海和太平洋，白色代表和平，很多前中美洲联邦共和国的成员国采用"
+    },
+    {
+      "name": "topic_miranda",
+      "value": "泛米兰达色旗"
+    },
+    {
+      "name": "topic_miranda_desc",
+      "value": "该旗为弗朗西斯科·德·米兰达于南美独立运动所用的旗帜，其中红色是南美洲，黄色是西班牙，蓝色是海。后为前大哥伦比亚共和国的会员国采用"
     },
     {
       "name": "favorite_added",
@@ -857,6 +1013,50 @@
       "value": "剩余生命：%s"
     },
     {
+      "name": "progress_indicator",
+      "value": "%s / %s"
+    },
+    {
+      "name": "quiz_level_1",
+      "value": "入门"
+    },
+    {
+      "name": "quiz_level_2",
+      "value": "初级"
+    },
+    {
+      "name": "quiz_level_3",
+      "value": "进阶"
+    },
+    {
+      "name": "quiz_level_4",
+      "value": "中级"
+    },
+    {
+      "name": "quiz_level_5",
+      "value": "高级"
+    },
+    {
+      "name": "quiz_level_6",
+      "value": "专家"
+    },
+    {
+      "name": "quiz_level_7",
+      "value": "大师"
+    },
+    {
+      "name": "quiz_level_8",
+      "value": "精英"
+    },
+    {
+      "name": "quiz_level_9",
+      "value": "学者"
+    },
+    {
+      "name": "quiz_level_10",
+      "value": "博士"
+    },
+    {
       "name": "back_to_levels",
       "value": "返回关卡列表"
     },
@@ -879,6 +1079,14 @@
     {
       "name": "submit",
       "value": "提交"
+    },
+    {
+      "name": "hint",
+      "value": "提示"
+    },
+    {
+      "name": "solve",
+      "value": "解答"
     },
     {
       "name": "correct_answer",
@@ -1559,6 +1767,74 @@
     {
       "name": "watch_flag_desc_unavailable",
       "value": "暂无国旗说明"
+    },
+    {
+      "name": "theme_light",
+      "value": "浅色"
+    },
+    {
+      "name": "theme_dark",
+      "value": "深色"
+    },
+    {
+      "name": "theme_follow_system",
+      "value": "跟随系统"
+    },
+    {
+      "name": "cannot_open_market",
+      "value": "无法打开应用市场"
+    },
+    {
+      "name": "cannot_open_market_manual",
+      "value": "无法打开应用市场，请手动前往应用市场评分"
+    },
+    {
+      "name": "data_statistics",
+      "value": "数据统计"
+    },
+    {
+      "name": "game_progress",
+      "value": "游戏进度"
+    },
+    {
+      "name": "settings",
+      "value": "设置"
+    },
+    {
+      "name": "vibration_feedback",
+      "value": "振动反馈"
+    },
+    {
+      "name": "app_rating",
+      "value": "应用评分"
+    },
+    {
+      "name": "game_flag_quiz",
+      "value": "国旗猜猜"
+    },
+    {
+      "name": "game_spelling_challenge",
+      "value": "拼写挑战"
+    },
+    {
+      "name": "levels_separator",
+      "value": " / "
+    },
+    {
+      "name": "levels_unit",
+      "value": " 关"
+    },
+    {
+      "name": "share_app_title",
+      "value": "国旗小百科"
+    },
+    {
+      "name": "historical_flags",
+      "value": "历史国旗"
+    },
+    {
+      "name": "state_flags_all",
+      "value": "各国州旗"
     }
   ]
 }

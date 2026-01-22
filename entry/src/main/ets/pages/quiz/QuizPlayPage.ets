@@ -9,17 +9,19 @@ import fs from '@ohos.file.fs';
 import { fileUri } from '@kit.CoreFileKit';
 import { GameOverDialog } from '../../components/GameOverDialog';
 import { Country, getCountryByCode, Countries, getLocalizedCountryName } from '../../utils/countryData';
-import { QuizLevel, getQuizLevel, getAllQuizLevels } from './QuizLevels';
+import { QuizLevel, getQuizLevel, getAllQuizLevels, getQuizLevelName } from './QuizLevels';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 import { screenshotManager } from '../../utils/ScreenshotManager';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
+import UiConstants from '../../utils/UiConstants';
 
 interface RouterParams {
   quizType: string;
   levelId: number;
 }
+
 
 interface QuizQuestion {
   correctCountry: Country;
@@ -402,7 +404,7 @@ interface QuizQuestion {
                   // 中间：生命值
                   Row() {
                     ForEach(Array.from({ length: this.level?.lives || 5 }), (_: undefined, index: number) => {
-                      Text(index < this.lives ? '❤️' : '🖤')
+                      Text(index < this.lives ? UiConstants.HEART_FILLED : UiConstants.HEART_EMPTY)
                         .fontSize(14)
                         .margin({ left: 1, right: 1 })
                     })
@@ -411,7 +413,7 @@ interface QuizQuestion {
                     .justifyContent(FlexAlign.Center)
 
                   // 右侧：序号
-                  Text(`${this.currentIndex + 1} / ${this.questions.length}`)
+                  Text(this.context.resourceManager.getStringSync($r('app.string.progress_indicator').id, (this.currentIndex + 1).toString(), this.questions.length.toString()))
                     .fontSize(15)
                     .fontWeight(FontWeight.Medium)
                     .fontColor($r('app.color.text_secondary'))
@@ -423,7 +425,7 @@ interface QuizQuestion {
 
                 // 连击提示
                 if (this.combo >= 3) {
-                  Text(`🔥 ${this.context.resourceManager.getStringSync($r('app.string.combo_streak').id, this.combo.toString())}`)
+                  Text(`${UiConstants.COMBO_FIRE} ${this.context.resourceManager.getStringSync($r('app.string.combo_streak').id, this.combo.toString())}`)
                     .fontSize(16)
                     .fontWeight(FontWeight.Bold)
                     .fontColor($r('app.color.color_orange'))
@@ -971,7 +973,7 @@ interface QuizQuestion {
             .height(28)
             .backgroundColor(index === this.getCorrectIndex() ? $r('app.color.color_green') : $r('app.color.color_red'))
             .borderRadius(14)
-          Text(index === this.getCorrectIndex() ? '✓' : '✗')
+          Text(index === this.getCorrectIndex() ? UiConstants.CORRECT_MARK : UiConstants.INCORRECT_MARK)
             .fontSize(14)
             .fontWeight(FontWeight.Bold)
             .fontColor(Color.White)
@@ -986,7 +988,7 @@ interface QuizQuestion {
             .height(28)
             .backgroundColor(index === this.getCorrectIndex() ? $r('app.color.color_green') : $r('app.color.color_red'))
             .borderRadius(14)
-          Text(index === this.getCorrectIndex() ? '✓' : '✗')
+          Text(index === this.getCorrectIndex() ? UiConstants.CORRECT_MARK : UiConstants.INCORRECT_MARK)
             .fontSize(14)
             .fontWeight(FontWeight.Bold)
             .fontColor(Color.White)
@@ -1003,7 +1005,7 @@ interface QuizQuestion {
     Column() {
       // 可分享的内容区域
       Column() {
-        Text('🎉')
+        Text(UiConstants.CELEBRATION)
           .fontSize(64)
           .margin({ top: 40 })
 
@@ -1013,7 +1015,7 @@ interface QuizQuestion {
           .fontColor($r('app.color.text_primary'))
           .margin({ top: 24 })
 
-        Text(`${this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString())} · ${this.level?.name}`)
+        Text(`${this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString())} · ${this.level ? getQuizLevelName(this.level.id, this.context) : ''}`)
           .fontSize(16)
           .fontColor($r('app.color.text_secondary'))
           .margin({ top: 8 })
@@ -1055,7 +1057,7 @@ interface QuizQuestion {
               .fontSize(16)
               .fontColor($r('app.color.text_secondary'))
             Blank()
-            Text(`${this.lives} ❤️`)
+            Text(`${this.lives} ${UiConstants.HEART_FILLED}`)
               .fontSize(16)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.text_primary'))
@@ -1171,18 +1173,20 @@ interface QuizQuestion {
 
   private async buildShareText(quizTypeName: string): Promise<string> {
     const lines: string[] = [];
-    const congratsText = await this.context.resourceManager.getStringValue($r('app.string.congratulations').id);
-    lines.push(`🎉 ${congratsText}`);
+    const rm = this.context.resourceManager;
+    const congratsText = await rm.getStringValue($r('app.string.congratulations').id);
+    lines.push(`${UiConstants.CELEBRATION} ${congratsText}`);
     lines.push('');
-    lines.push(`🎮 ${quizTypeName}`);
-    const levelText = this.context.resourceManager.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString());
-    lines.push(`🏆 ${levelText} · ${this.level?.name}`);
+    lines.push(`${UiConstants.GAME_CONTROLLER} ${quizTypeName}`);
+    const levelText = rm.getStringSync($r('app.string.level_number').id, (this.level?.id || 1).toString());
+    const levelName = this.level ? getQuizLevelName(this.level.id, this.context) : '';
+    lines.push(`${UiConstants.TROPHY} ${levelText} · ${levelName}`);
     lines.push('');
-    lines.push(`✅ ${this.context.resourceManager.getStringSync($r('app.string.correct_answers_share').id, this.correctAnswers.toString(), this.questions.length.toString())}`);
-    lines.push(`🔥 ${this.context.resourceManager.getStringSync($r('app.string.max_combo_share').id, this.maxCombo.toString())}`);
-    lines.push(`❤️ ${this.context.resourceManager.getStringSync($r('app.string.remaining_lives_share').id, this.lives.toString())}`);
+    lines.push(`${UiConstants.CORRECT_MARK} ${rm.getStringSync($r('app.string.correct_answers_share').id, this.correctAnswers.toString(), this.questions.length.toString())}`);
+    lines.push(`${UiConstants.COMBO_FIRE} ${rm.getStringSync($r('app.string.max_combo_share').id, this.maxCombo.toString())}`);
+    lines.push(`${UiConstants.HEART_FILLED} ${rm.getStringSync($r('app.string.remaining_lives_share').id, this.lives.toString())}`);
     lines.push('');
-    const fromAppText = this.context.resourceManager.getStringSync($r('app.string.from_app').id);
+    const fromAppText = rm.getStringSync($r('app.string.from_app').id);
     lines.push(`—— ${fromAppText}`);
 
     return lines.join('\n');

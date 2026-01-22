@@ -1,4 +1,6 @@
 // 专题数据配置
+import common from '@ohos.app.ability.common';
+import { LocalizationUtil } from '../../utils/LocalizationUtil';
 
 export interface TopicItem {
   id: string;
@@ -6,6 +8,80 @@ export interface TopicItem {
   description: string;
   emoji: string;
   countryCodes: string[];
+}
+
+// 获取专题的本地化名称
+export function getTopicName(topicId: string, context: common.UIAbilityContext, language: string): string {
+  const nameKeyMap: Record<string, Resource> = {
+    'vexillology': $r('app.string.topic_vexillology'),
+    'etiquette': $r('app.string.topic_etiquette'),
+    'manufacturing': $r('app.string.topic_manufacturing'),
+    'similar-flags': $r('app.string.topic_similar_flags'),
+    'international': $r('app.string.topic_international'),
+    'nordic': $r('app.string.topic_nordic'),
+    'tricolor': $r('app.string.topic_tricolor'),
+    'pan-arab': $r('app.string.topic_pan_arab'),
+    'pan-african': $r('app.string.topic_pan_african'),
+    'sun': $r('app.string.topic_sun'),
+    'crescent-moon': $r('app.string.topic_crescent_moon'),
+    'animals': $r('app.string.topic_animals'),
+    'blue-ensign': $r('app.string.topic_blue_ensign'),
+    'pan-slavic': $r('app.string.topic_pan_slavic'),
+    'central-america': $r('app.string.topic_central_america'),
+    'miranda': $r('app.string.topic_miranda')
+  };
+  
+  const resource = nameKeyMap[topicId];
+  if (resource) {
+    try {
+      return context.resourceManager.getStringSync(resource.id);
+    } catch (e) {
+      // 如果资源获取失败，返回默认值
+      const topic = topics.find(t => t.id === topicId);
+      return topic ? topic.name : topicId;
+    }
+  }
+  
+  // 如果找不到资源，返回默认值
+  const topic = topics.find(t => t.id === topicId);
+  return topic ? topic.name : topicId;
+}
+
+// 获取专题的本地化描述
+export function getTopicDescription(topicId: string, context: common.UIAbilityContext, language: string): string {
+  const descKeyMap: Record<string, Resource> = {
+    'vexillology': $r('app.string.topic_vexillology_desc'),
+    'etiquette': $r('app.string.topic_etiquette_desc'),
+    'manufacturing': $r('app.string.topic_manufacturing_desc'),
+    'similar-flags': $r('app.string.topic_similar_flags_desc'),
+    'international': $r('app.string.topic_international_desc'),
+    'nordic': $r('app.string.topic_nordic_desc'),
+    'tricolor': $r('app.string.topic_tricolor_desc'),
+    'pan-arab': $r('app.string.topic_pan_arab_desc'),
+    'pan-african': $r('app.string.topic_pan_african_desc'),
+    'sun': $r('app.string.topic_sun_desc'),
+    'crescent-moon': $r('app.string.topic_crescent_moon_desc'),
+    'animals': $r('app.string.topic_animals_desc'),
+    'blue-ensign': $r('app.string.topic_blue_ensign_desc'),
+    'pan-slavic': $r('app.string.topic_pan_slavic_desc'),
+    'central-america': $r('app.string.topic_central_america_desc'),
+    'miranda': $r('app.string.topic_miranda_desc')
+  };
+  
+  const resource = descKeyMap[topicId];
+  if (resource) {
+    try {
+      return context.resourceManager.getStringSync(resource.id);
+    } catch (e) {
+      // 如果资源获取失败，返回默认值
+      const topic = topics.find(t => t.id === topicId);
+      return topic ? topic.description : '';
+    }
+  }
+  
+  // 如果找不到资源，返回默认值
+  const topic = topics.find(t => t.id === topicId);
+  return topic ? topic.description : '';
 }
 
 export const topics: TopicItem[] = [

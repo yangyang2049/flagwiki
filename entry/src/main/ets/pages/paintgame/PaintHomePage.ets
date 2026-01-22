@@ -9,6 +9,7 @@ import promptAction from '@ohos.promptAction';
 import { paintCategories, PaintCategory, getTotalLevels } from './PaintGameData';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
+import UiConstants from '../../utils/UiConstants';
 
 @CustomDialog
 struct HowToPlayDialog {
@@ -18,7 +19,7 @@ struct HowToPlayDialog {
   build() {
     Column() {
       Row() {
-        Text('🎨')
+        Text(UiConstants.PAINT_PALETTE)
           .fontSize(28)
         Text(` ${this.context.resourceManager.getStringSync($r('app.string.paint_instructions_title').id)}`)
           .fontSize(20)
@@ -78,7 +79,7 @@ struct AllLevelsCompletedDialog {
   build() {
     Column() {
       Row() {
-        Text('🎉')
+        Text(UiConstants.CELEBRATION)
           .fontSize(28)
         Text(` ${this.context.resourceManager.getStringSync($r('app.string.congratulations').id)}`)
           .fontSize(20)
@@ -273,7 +274,7 @@ export struct PaintHomePage {
         Stack({ alignContent: Alignment.TopEnd }) {
           // 中心内容
           Column() {
-            Text('🌍')
+            Text(UiConstants.WORLD_EMOJI)
               .fontSize(56)
               .margin({ bottom: 12 })
 
@@ -391,7 +392,7 @@ export struct PaintHomePage {
 
         // 涂鸦说明 Banner
         Row() {
-          Text('🎨')
+          Text(UiConstants.PAINT_PALETTE)
             .fontSize(20)
           Text(` ${this.context.resourceManager.getStringSync($r('app.string.paint_instructions_banner').id)}`)
             .fontSize(15)

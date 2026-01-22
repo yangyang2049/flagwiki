@@ -3,6 +3,706 @@
     {
       "name": "app_name",
       "value": "Flag Wiki"
+    },
+    {
+      "name": "fun_fact_1",
+      "value": "🇳🇵 Nepal has the world's only non-rectangular flag, made of two triangles!"
+    },
+    {
+      "name": "fun_fact_2",
+      "value": "🇨🇭 Switzerland and Vatican City are the only two countries with square flags!"
+    },
+    {
+      "name": "fun_fact_3",
+      "value": "🇯🇵 The red circle on Japan's flag represents the sun, Japan is called the \"Land of the Rising Sun\"!"
+    },
+    {
+      "name": "fun_fact_4",
+      "value": "🇱🇾 Libya used the world's only solid-color flag (green) from 1977-2011!"
+    },
+    {
+      "name": "fun_fact_5",
+      "value": "🇲🇨 Monaco and Indonesia have almost identical flags, differing only in aspect ratio!"
+    },
+    {
+      "name": "fun_fact_6",
+      "value": "🇩🇰 Denmark's flag is the world's oldest flag, in use since 1219!"
+    },
+    {
+      "name": "fun_fact_7",
+      "value": "🇧🇷 Brazil's flag has 27 stars representing 26 states and 1 federal district!"
+    },
+    {
+      "name": "fun_fact_8",
+      "value": "🇺🇸 The US flag has 50 stars for 50 states, and 13 stripes for the original 13 colonies!"
+    },
+    {
+      "name": "fun_fact_9",
+      "value": "🇨🇦 Canada's maple leaf has 11 points, designed for maximum clarity in wind tunnel tests!"
+    },
+    {
+      "name": "fun_fact_10",
+      "value": "🇬🇧 The UK's \"Union Jack\" combines the flags of England, Scotland, and Ireland!"
+    },
+    {
+      "name": "region_asia",
+      "value": "Asia"
+    },
+    {
+      "name": "region_europe",
+      "value": "Europe"
+    },
+    {
+      "name": "region_africa",
+      "value": "Africa"
+    },
+    {
+      "name": "region_americas",
+      "value": "Americas"
+    },
+    {
+      "name": "region_oceania",
+      "value": "Oceania"
+    },
+    {
+      "name": "region_world",
+      "value": "All"
+    },
+    {
+      "name": "loading",
+      "value": "Loading..."
+    },
+    {
+      "name": "favorite",
+      "value": "Favorite"
+    },
+    {
+      "name": "favorited",
+      "value": "Favorited"
+    },
+    {
+      "name": "download",
+      "value": "Download"
+    },
+    {
+      "name": "basic_info",
+      "value": "Basic Information"
+    },
+    {
+      "name": "about_flag",
+      "value": "About This Flag"
+    },
+    {
+      "name": "coat_of_arms",
+      "value": "Coat of Arms"
+    },
+    {
+      "name": "no_data",
+      "value": "No data"
+    },
+    {
+      "name": "population_unit_billion",
+      "value": " billion"
+    },
+    {
+      "name": "population_unit_million",
+      "value": " million"
+    },
+    {
+      "name": "population_unit_thousand",
+      "value": " thousand"
+    },
+    {
+      "name": "population_unit_person",
+      "value": ""
+    },
+    {
+      "name": "area_unit_million_km2",
+      "value": " million km²"
+    },
+    {
+      "name": "area_unit_thousand_km2",
+      "value": " thousand km²"
+    },
+    {
+      "name": "area_unit_km2",
+      "value": " km²"
+    },
+    {
+      "name": "default_flag_description",
+      "value": "The flag of %s is an important symbol of the country, representing its history, culture, and values."
+    },
+    {
+      "name": "share_capital",
+      "value": "📍 Capital: "
+    },
+    {
+      "name": "share_region",
+      "value": "🌍 Region: "
+    },
+    {
+      "name": "share_population",
+      "value": "👥 Population: "
+    },
+    {
+      "name": "share_area",
+      "value": "📐 Area: "
+    },
+    {
+      "name": "share_flag_proportion",
+      "value": "📏 Flag Proportion: "
+    },
+    {
+      "name": "share_adopted_date",
+      "value": "📅 Adopted Date: "
+    },
+    {
+      "name": "share_design",
+      "value": "🎨 "
+    },
+    {
+      "name": "share_headquarters",
+      "value": "📍 Headquarters: "
+    },
+    {
+      "name": "share_org_type",
+      "value": "🏛️ Organization Type: "
+    },
+    {
+      "name": "share_coverage_population",
+      "value": "👥 Coverage Population: "
+    },
+    {
+      "name": "share_website",
+      "value": "🌐 Website: "
+    },
+    {
+      "name": "share_introduction",
+      "value": "📝 Introduction: "
+    },
+    {
+      "name": "read_capital",
+      "value": "Capital: %s."
+    },
+    {
+      "name": "read_region",
+      "value": "Region: %s."
+    },
+    {
+      "name": "read_population",
+      "value": "Population: %s."
+    },
+    {
+      "name": "read_area",
+      "value": "Area: %s."
+    },
+    {
+      "name": "read_flag_proportion",
+      "value": "Flag proportion: %s."
+    },
+    {
+      "name": "read_adopted_date",
+      "value": "Adopted date: %s."
+    },
+    {
+      "name": "read_org_headquarters",
+      "value": "Headquarters located in %s."
+    },
+    {
+      "name": "read_org_region",
+      "value": "Region: %s."
+    },
+    {
+      "name": "read_org_type",
+      "value": "Organization type: %s."
+    },
+    {
+      "name": "read_org_population",
+      "value": "Coverage population: approximately %s."
+    },
+    {
+      "name": "read_org_website",
+      "value": "Website: %s."
+    },
+    {
+      "name": "read_other_name",
+      "value": ", Chinese name %s."
+    },
+    {
+      "name": "state_flag_details",
+      "value": "State Flag Details"
+    },
+    {
+      "name": "belongs_to_country",
+      "value": "Country"
+    },
+    {
+      "name": "capital",
+      "value": "Capital"
+    },
+    {
+      "name": "region",
+      "value": "Region"
+    },
+    {
+      "name": "favorite_removed",
+      "value": "Removed from favorites"
+    },
+    {
+      "name": "favorite_added",
+      "value": "Added to favorites"
+    },
+    {
+      "name": "preparing_image",
+      "value": "Preparing image..."
+    },
+    {
+      "name": "screenshot_failed",
+      "value": "Failed to capture image"
+    },
+    {
+      "name": "flag_saved_to_album",
+      "value": "Flag image saved to album"
+    },
+    {
+      "name": "save_failed_with_error",
+      "value": "Save failed: %s"
+    },
+    {
+      "name": "download_failed",
+      "value": "Download failed"
+    },
+    {
+      "name": "image_or_state_info_not_exist",
+      "value": "Image or state info does not exist"
+    },
+    {
+      "name": "failed_to_save_to_album",
+      "value": "Failed to save to album"
+    },
+    {
+      "name": "stop_reading",
+      "value": "Stopped reading"
+    },
+    {
+      "name": "start_reading",
+      "value": "Start reading"
+    },
+    {
+      "name": "reading_unavailable",
+      "value": "Reading feature is currently unavailable"
+    },
+    {
+      "name": "preparing_share",
+      "value": "Preparing for sharing..."
+    },
+    {
+      "name": "share_state_flag_title",
+      "value": "%s State Flag"
+    },
+    {
+      "name": "from_app",
+      "value": "From Flag Wiki"
+    },
+    {
+      "name": "share_failed",
+      "value": "Share failed"
+    },
+    {
+      "name": "read_state_belongs_to",
+      "value": "Belongs to country %s."
+    },
+    {
+      "name": "read_state_capital",
+      "value": "Capital is %s."
+    },
+    {
+      "name": "read_state_region",
+      "value": "Region is %s。"
+    },
+    {
+      "name": "share_state_country",
+      "value": "📍 Country: "
+    },
+    {
+      "name": "share_state_capital",
+      "value": "🏛️ Capital: "
+    },
+    {
+      "name": "share_state_region",
+      "value": "🌍 Region: "
+    },
+    {
+      "name": "from_app_plain",
+      "value": "Flag Wiki"
+    },
+    {
+      "name": "save_flag_to_album",
+      "value": "Save flag to album"
+    },
+    {
+      "name": "cancel",
+      "value": "Cancel"
+    },
+    {
+      "name": "level_not_found",
+      "value": "Level out of range, returning to home page"
+    },
+    {
+      "name": "level_data_load_failed",
+      "value": "Level data does not exist, returning to home page"
+    },
+    {
+      "name": "state_alabama",
+      "value": "Alabama"
+    },
+    {
+      "name": "state_alaska",
+      "value": "Alaska"
+    },
+    {
+      "name": "state_arizona",
+      "value": "Arizona"
+    },
+    {
+      "name": "state_arkansas",
+      "value": "Arkansas"
+    },
+    {
+      "name": "state_california",
+      "value": "California"
+    },
+    {
+      "name": "state_colorado",
+      "value": "Colorado"
+    },
+    {
+      "name": "state_connecticut",
+      "value": "Connecticut"
+    },
+    {
+      "name": "state_delaware",
+      "value": "Delaware"
+    },
+    {
+      "name": "state_district_of_columbia",
+      "value": "District of Columbia"
+    },
+    {
+      "name": "state_florida",
+      "value": "Florida"
+    },
+    {
+      "name": "state_georgia",
+      "value": "Georgia"
+    },
+    {
+      "name": "state_hawaii",
+      "value": "Hawaii"
+    },
+    {
+      "name": "state_idaho",
+      "value": "Idaho"
+    },
+    {
+      "name": "state_illinois",
+      "value": "Illinois"
+    },
+    {
+      "name": "state_indiana",
+      "value": "Indiana"
+    },
+    {
+      "name": "state_iowa",
+      "value": "Iowa"
+    },
+    {
+      "name": "state_kansas",
+      "value": "Kansas"
+    },
+    {
+      "name": "state_kentucky",
+      "value": "Kentucky"
+    },
+    {
+      "name": "state_louisiana",
+      "value": "Louisiana"
+    },
+    {
+      "name": "state_maine",
+      "value": "Maine"
+    },
+    {
+      "name": "state_maryland",
+      "value": "Maryland"
+    },
+    {
+      "name": "state_massachusetts",
+      "value": "Massachusetts"
+    },
+    {
+      "name": "state_michigan",
+      "value": "Michigan"
+    },
+    {
+      "name": "state_minnesota",
+      "value": "Minnesota"
+    },
+    {
+      "name": "state_mississippi",
+      "value": "Mississippi"
+    },
+    {
+      "name": "state_missouri",
+      "value": "Missouri"
+    },
+    {
+      "name": "state_montana",
+      "value": "Montana"
+    },
+    {
+      "name": "state_nebraska",
+      "value": "Nebraska"
+    },
+    {
+      "name": "state_nevada",
+      "value": "Nevada"
+    },
+    {
+      "name": "state_new_hampshire",
+      "value": "New Hampshire"
+    },
+    {
+      "name": "state_new_jersey",
+      "value": "New Jersey"
+    },
+    {
+      "name": "state_new_mexico",
+      "value": "New Mexico"
+    },
+    {
+      "name": "state_new_york",
+      "value": "New York"
+    },
+    {
+      "name": "state_north_carolina",
+      "value": "North Carolina"
+    },
+    {
+      "name": "state_north_dakota",
+      "value": "North Dakota"
+    },
+    {
+      "name": "state_ohio",
+      "value": "Ohio"
+    },
+    {
+      "name": "state_oklahoma",
+      "value": "Oklahoma"
+    },
+    {
+      "name": "state_oregon",
+      "value": "Oregon"
+    },
+    {
+      "name": "state_pennsylvania",
+      "value": "Pennsylvania"
+    },
+    {
+      "name": "state_rhode_island",
+      "value": "Rhode Island"
+    },
+    {
+      "name": "state_south_carolina",
+      "value": "South Carolina"
+    },
+    {
+      "name": "state_south_dakota",
+      "value": "South Dakota"
+    },
+    {
+      "name": "state_tennessee",
+      "value": "Tennessee"
+    },
+    {
+      "name": "state_texas",
+      "value": "Texas"
+    },
+    {
+      "name": "state_utah",
+      "value": "Utah"
+    },
+    {
+      "name": "state_vermont",
+      "value": "Vermont"
+    },
+    {
+      "name": "state_virginia",
+      "value": "Virginia"
+    },
+    {
+      "name": "state_washington",
+      "value": "Washington"
+    },
+    {
+      "name": "state_west_virginia",
+      "value": "West Virginia"
+    },
+    {
+      "name": "state_wisconsin",
+      "value": "Wisconsin"
+    },
+    {
+      "name": "state_wyoming",
+      "value": "Wyoming"
+    },
+    {
+      "name": "progress_indicator",
+      "value": "%s / %s"
+    },
+    {
+      "name": "population_unit_billion_short",
+      "value": " B"
+    },
+    {
+      "name": "population_unit_million_short",
+      "value": " M"
+    },
+    {
+      "name": "population_unit_thousand_short",
+      "value": " K"
+    },
+    {
+      "name": "area_unit_million_km2_short",
+      "value": " M km²"
+    },
+    {
+      "name": "area_unit_km2_short",
+      "value": " km²"
+    },
+    {
+      "name": "next",
+      "value": "Next"
+    },
+    {
+      "name": "complete",
+      "value": "Complete"
+    },
+    {
+      "name": "enter_country_name",
+      "value": "Enter country name"
+    },
+    {
+      "name": "correct_found",
+      "value": "Correctly Found"
+    },
+    {
+      "name": "correct_found_count",
+      "value": "Correctly found %s fake flags"
+    },
+    {
+      "name": "find_fake_flag",
+      "value": "Find the Fake Flag"
+    },
+    {
+      "name": "quiz_flag_to_name_desc",
+      "value": "Select the correct country name based on the flag pattern"
+    },
+    {
+      "name": "quiz_name_to_flag_desc",
+      "value": "Select the correct flag pattern based on the country name"
+    },
+    {
+      "name": "complete_levels_to_unlock",
+      "value": "Complete each level challenge to unlock more levels"
+    },
+    {
+      "name": "which_country_flag",
+      "value": "Which country's flag is this?"
+    },
+    {
+      "name": "select_correct_flag",
+      "value": "Please select the correct flag"
+    },
+    {
+      "name": "challenge_failed",
+      "value": "Challenge Failed"
+    },
+    {
+      "name": "correct_answers_count",
+      "value": "Correctly answered %s questions"
+    },
+    {
+      "name": "max_combo",
+      "value": "Max Combo %s"
+    },
+    {
+      "name": "next_question",
+      "value": "Next Question"
+    },
+    {
+      "name": "view_results",
+      "value": "View Results"
+    },
+    {
+      "name": "correct_answers",
+      "value": "Correct Answers"
+    },
+    {
+      "name": "remaining_lives",
+      "value": "Remaining Lives"
+    },
+    {
+      "name": "share_score",
+      "value": "Share Score"
+    },
+    {
+      "name": "combo_streak",
+      "value": "%s Combo!"
+    },
+    {
+      "name": "correct_answers_share",
+      "value": "Correct Answers: %s / %s"
+    },
+    {
+      "name": "max_combo_share",
+      "value": "Max Combo: %s"
+    },
+    {
+      "name": "remaining_lives_share",
+      "value": "Remaining Lives: %s"
+    },
+    {
+      "name": "level_challenge_success",
+      "value": "Level %s Challenge Success"
+    },
+    {
+      "name": "no_favorites",
+      "value": "No Favorites"
+    },
+    {
+      "name": "navigation_failed",
+      "value": "Navigation Failed"
+    },
+    {
+      "name": "delete",
+      "value": "Delete"
+    },
+    {
+      "name": "search_country_or_region",
+      "value": "Search country or region"
+    },
+    {
+      "name": "search_country",
+      "value": "Search country"
+    },
+    {
+      "name": "no_matching_countries",
+      "value": "No matching countries found"
+    },
+    {
+      "name": "modify_keywords_or_select",
+      "value": "Modify keywords or select \"All\" or other continents"
     }
   ]
 }

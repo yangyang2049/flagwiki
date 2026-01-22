@@ -29,6 +29,26 @@
       "value": "Explore the mysteries of world flags"
     },
     {
+      "name": "tab_home",
+      "value": "Home"
+    },
+    {
+      "name": "tab_gallery",
+      "value": "Gallery"
+    },
+    {
+      "name": "tab_paint",
+      "value": "Paint"
+    },
+    {
+      "name": "tab_explore",
+      "value": "Explore"
+    },
+    {
+      "name": "tab_profile",
+      "value": "Profile"
+    },
+    {
       "name": "weekly_flag",
       "value": "Flag of the Week"
     },
@@ -63,6 +83,34 @@
     {
       "name": "fun_facts",
       "value": "💡 Fun Facts"
+    },
+    {
+      "name": "continent_asia",
+      "value": "Asia"
+    },
+    {
+      "name": "continent_europe",
+      "value": "Europe"
+    },
+    {
+      "name": "continent_africa",
+      "value": "Africa"
+    },
+    {
+      "name": "continent_americas",
+      "value": "Americas"
+    },
+    {
+      "name": "continent_oceania",
+      "value": "Oceania"
+    },
+    {
+      "name": "state_flags_all",
+      "value": "State Flags"
+    },
+    {
+      "name": "national_day_colon",
+      "value": "National Day: "
     },
     {
       "name": "explore_flag_quiz",
@@ -119,6 +167,30 @@
     {
       "name": "explore_headsup_desc",
       "value": "Quickly identify flags, challenge your reaction"
+    },
+    {
+      "name": "headsup_tutorial_title",
+      "value": "How to Play"
+    },
+    {
+      "name": "headsup_tutorial_message",
+      "value": "• Tap the screen to see the answer\n• Tap again for the next flag\n• 10 flags per session"
+    },
+    {
+      "name": "headsup_session_over",
+      "value": "Session Complete!"
+    },
+    {
+      "name": "headsup_session_count",
+      "value": "Completed %s sessions"
+    },
+    {
+      "name": "headsup_exit",
+      "value": "Exit"
+    },
+    {
+      "name": "headsup_continue",
+      "value": "Continue"
     },
     {
       "name": "basic_info",
@@ -317,6 +389,18 @@
       "value": "My Favorites"
     },
     {
+      "name": "no_favorites",
+      "value": "No Favorites"
+    },
+    {
+      "name": "favorite_removed",
+      "value": "Removed from Favorites"
+    },
+    {
+      "name": "navigation_failed",
+      "value": "Navigation Failed"
+    },
+    {
       "name": "dark_mode",
       "value": "Dark Mode"
     },
@@ -385,6 +469,50 @@
       "value": "Next Level"
     },
     {
+      "name": "shuffle",
+      "value": "Shuffle"
+    },
+    {
+      "name": "unselect_all",
+      "value": "Unselect All"
+    },
+    {
+      "name": "submit",
+      "value": "Submit"
+    },
+    {
+      "name": "hint",
+      "value": "Hint"
+    },
+    {
+      "name": "solve",
+      "value": "Solve"
+    },
+    {
+      "name": "moves",
+      "value": "Moves"
+    },
+    {
+      "name": "pairs",
+      "value": "Pairs"
+    },
+    {
+      "name": "total_moves",
+      "value": "Total Moves"
+    },
+    {
+      "name": "pairs_completed",
+      "value": "Pairs Completed"
+    },
+    {
+      "name": "next",
+      "value": "Next"
+    },
+    {
+      "name": "complete",
+      "value": "Complete"
+    },
+    {
       "name": "perfect_finish",
       "value": "Perfect Finish"
     },
@@ -395,6 +523,14 @@
     {
       "name": "back",
       "value": "Back"
+    },
+    {
+      "name": "level_number",
+      "value": "Level %s"
+    },
+    {
+      "name": "paint_reset_failed",
+      "value": "Reset failed, please try again"
     },
     {
       "name": "paint_instructions_title",
@@ -415,6 +551,26 @@
     {
       "name": "paint_instruction_4",
       "value": "4. Each level contains multiple flags or state flags, complete all correctly to pass"
+    },
+    {
+      "name": "paint_category_world",
+      "value": "World"
+    },
+    {
+      "name": "paint_category_world_desc",
+      "value": "Paint world flags"
+    },
+    {
+      "name": "paint_category_us",
+      "value": "United States"
+    },
+    {
+      "name": "paint_category_us_desc",
+      "value": "Paint US state flags"
+    },
+    {
+      "name": "paint_instructions_banner",
+      "value": "How to Play"
     },
     {
       "name": "congratulations",
@@ -625,8 +781,452 @@
       "value": "Load failed"
     },
     {
+      "name": "quiz_level_1",
+      "value": "Beginner"
+    },
+    {
+      "name": "quiz_level_2",
+      "value": "Elementary"
+    },
+    {
+      "name": "quiz_level_3",
+      "value": "Intermediate"
+    },
+    {
+      "name": "quiz_level_4",
+      "value": "Advanced"
+    },
+    {
+      "name": "quiz_level_5",
+      "value": "Expert"
+    },
+    {
+      "name": "quiz_level_6",
+      "value": "Master"
+    },
+    {
+      "name": "quiz_level_7",
+      "value": "Grandmaster"
+    },
+    {
+      "name": "quiz_level_8",
+      "value": "Elite"
+    },
+    {
+      "name": "quiz_level_9",
+      "value": "Scholar"
+    },
+    {
+      "name": "quiz_level_10",
+      "value": "Doctor"
+    },
+    {
+      "name": "country_info_load_failed",
+      "value": "Failed to load country information"
+    },
+    {
+      "name": "total_countries",
+      "value": "%s countries"
+    },
+    {
+      "name": "total_organizations",
+      "value": "%s organizations"
+    },
+    {
+      "name": "total_similar_flags",
+      "value": "%s pairs of similar flags"
+    },
+    {
+      "name": "topic",
+      "value": "Topics"
+    },
+    {
+      "name": "topic_detail",
+      "value": "Topic Details"
+    },
+    {
+      "name": "reading_stopped",
+      "value": "Reading stopped"
+    },
+    {
+      "name": "reading_started",
+      "value": "Reading started"
+    },
+    {
+      "name": "topic_vexillology",
+      "value": "Vexillology"
+    },
+    {
+      "name": "topic_vexillology_desc",
+      "value": "Basic knowledge, research methods, and historical evolution of vexillology (flag studies)"
+    },
+    {
+      "name": "topic_etiquette",
+      "value": "Flag Etiquette"
+    },
+    {
+      "name": "topic_etiquette_desc",
+      "value": "Standards and etiquette for flag use in international settings"
+    },
+    {
+      "name": "topic_manufacturing",
+      "value": "Flag Manufacturing"
+    },
+    {
+      "name": "topic_manufacturing_desc",
+      "value": "Process, materials, factories, and quality standards for flag manufacturing"
+    },
+    {
+      "name": "topic_similar_flags",
+      "value": "Similar Flags"
+    },
+    {
+      "name": "topic_similar_flags_desc",
+      "value": "National flags with high similarity, differing only in proportions, color depth, or details"
+    },
+    {
+      "name": "topic_international",
+      "value": "International Organizations"
+    },
+    {
+      "name": "topic_international_desc",
+      "value": "Flags of major international organizations"
+    },
+    {
+      "name": "topic_nordic",
+      "value": "Nordic Flags"
+    },
+    {
+      "name": "topic_nordic_desc",
+      "value": "Scandinavian flags featuring the Nordic cross"
+    },
+    {
+      "name": "topic_tricolor",
+      "value": "Tricolor Flags"
+    },
+    {
+      "name": "topic_tricolor_desc",
+      "value": "Classic flag design with three color stripes"
+    },
+    {
+      "name": "topic_pan_arab",
+      "value": "Pan-Arab Flags"
+    },
+    {
+      "name": "topic_pan_arab_desc",
+      "value": "Flags using pan-Arab colors: red, white, black, and green"
+    },
+    {
+      "name": "topic_pan_african",
+      "value": "Pan-African Flags"
+    },
+    {
+      "name": "topic_pan_african_desc",
+      "value": "Flags using pan-African colors: red, yellow, and green"
+    },
+    {
+      "name": "topic_sun",
+      "value": "Sun Flags"
+    },
+    {
+      "name": "topic_sun_desc",
+      "value": "Countries with sun patterns on their flags"
+    },
+    {
+      "name": "topic_crescent_moon",
+      "value": "Crescent Moon Flags"
+    },
+    {
+      "name": "topic_crescent_moon_desc",
+      "value": "Countries with crescent moon symbols on their flags"
+    },
+    {
+      "name": "topic_animals",
+      "value": "Animal Flags"
+    },
+    {
+      "name": "topic_animals_desc",
+      "value": "Countries with animal patterns on their flags"
+    },
+    {
+      "name": "topic_blue_ensign",
+      "value": "Blue Ensign"
+    },
+    {
+      "name": "topic_blue_ensign_desc",
+      "value": "British civil ensign, Union Jack represents former British colonies, symbolizing Commonwealth membership"
+    },
+    {
+      "name": "topic_pan_slavic",
+      "value": "Pan-Slavic Flags"
+    },
+    {
+      "name": "topic_pan_slavic_desc",
+      "value": "Flags using pan-Slavic colors: red, white, and blue, representing Slavic unity"
+    },
+    {
+      "name": "topic_central_america",
+      "value": "Central American Federal Colors"
+    },
+    {
+      "name": "topic_central_america_desc",
+      "value": "Central American Federal flag, blue represents Caribbean and Pacific, white represents peace, adopted by many former Central American Federal Republic members"
+    },
+    {
+      "name": "topic_miranda",
+      "value": "Miranda Colors"
+    },
+    {
+      "name": "topic_miranda_desc",
+      "value": "Flag used by Francisco de Miranda in the South American independence movement, red represents South America, yellow represents Spain, blue represents the sea. Later adopted by former Gran Colombia Republic members"
+    },
+    {
       "name": "watch_flag_desc_unavailable",
       "value": "No flag details"
+    },
+    {
+      "name": "fun_fact_1",
+      "value": "🇳🇵 Nepal has the world's only non-rectangular flag, made of two triangles!"
+    },
+    {
+      "name": "fun_fact_2",
+      "value": "🇨🇭 Switzerland and Vatican City are the only two countries with square flags!"
+    },
+    {
+      "name": "fun_fact_3",
+      "value": "🇯🇵 The red circle on Japan's flag represents the sun, Japan is called the \"Land of the Rising Sun\"!"
+    },
+    {
+      "name": "fun_fact_4",
+      "value": "🇱🇾 Libya used the world's only solid-color flag (green) from 1977-2011!"
+    },
+    {
+      "name": "fun_fact_5",
+      "value": "🇲🇨 Monaco and Indonesia have almost identical flags, differing only in aspect ratio!"
+    },
+    {
+      "name": "fun_fact_6",
+      "value": "🇩🇰 Denmark's flag is the world's oldest flag, in use since 1219!"
+    },
+    {
+      "name": "fun_fact_7",
+      "value": "🇧🇷 Brazil's flag has 27 stars representing 26 states and 1 federal district!"
+    },
+    {
+      "name": "fun_fact_8",
+      "value": "🇺🇸 The US flag has 50 stars for 50 states, and 13 stripes for the original 13 colonies!"
+    },
+    {
+      "name": "fun_fact_9",
+      "value": "🇨🇦 Canada's maple leaf has 11 points, designed for maximum clarity in wind tunnel tests!"
+    },
+    {
+      "name": "fun_fact_10",
+      "value": "🇬🇧 The UK's \"Union Jack\" combines the flags of England, Scotland, and Ireland!"
+    },
+    {
+      "name": "theme_light",
+      "value": "Light"
+    },
+    {
+      "name": "theme_dark",
+      "value": "Dark"
+    },
+    {
+      "name": "theme_follow_system",
+      "value": "Follow System"
+    },
+    {
+      "name": "cannot_open_market",
+      "value": "Cannot open app market"
+    },
+    {
+      "name": "cannot_open_market_manual",
+      "value": "Cannot open app market, please manually go to app market for rating"
+    },
+    {
+      "name": "data_statistics",
+      "value": "Data Statistics"
+    },
+    {
+      "name": "game_progress",
+      "value": "Game Progress"
+    },
+    {
+      "name": "settings",
+      "value": "Settings"
+    },
+    {
+      "name": "vibration_feedback",
+      "value": "Vibration Feedback"
+    },
+    {
+      "name": "app_rating",
+      "value": "App Rating"
+    },
+    {
+      "name": "game_flag_quiz",
+      "value": "Flag Quiz"
+    },
+    {
+      "name": "game_quiz",
+      "value": "Flag Quiz"
+    },
+    {
+      "name": "game_fake_flag",
+      "value": "Find the Fake"
+    },
+    {
+      "name": "game_input",
+      "value": "Input Game"
+    },
+    {
+      "name": "game_memory",
+      "value": "Memory Game"
+    },
+    {
+      "name": "game_connections",
+      "value": "Connections"
+    },
+    {
+      "name": "game_spelling_challenge",
+      "value": "Spelling Challenge"
+    },
+    {
+      "name": "game_trivia",
+      "value": "Trivia"
+    },
+    {
+      "name": "levels_separator",
+      "value": " / "
+    },
+    {
+      "name": "levels_unit",
+      "value": " levels"
+    },
+    {
+      "name": "share_app_title",
+      "value": "Flag Wiki"
+    },
+    {
+      "name": "enter_country_name",
+      "value": "Enter country name"
+    },
+    {
+      "name": "find_fake_flag",
+      "value": "Find the Fake Flag"
+    },
+    {
+      "name": "correct_found",
+      "value": "Correctly Found"
+    },
+    {
+      "name": "correct_found_count",
+      "value": "Correctly found %s fake flags"
+    },
+    {
+      "name": "quiz_flag_to_name",
+      "value": "Flag to Name"
+    },
+    {
+      "name": "quiz_name_to_flag",
+      "value": "Name to Flag"
+    },
+    {
+      "name": "quiz_flag_to_name_desc",
+      "value": "Select the correct country name based on the flag pattern"
+    },
+    {
+      "name": "quiz_name_to_flag_desc",
+      "value": "Select the correct flag pattern based on the country name"
+    },
+    {
+      "name": "complete_levels_to_unlock",
+      "value": "Complete each level challenge to unlock more levels"
+    },
+    {
+      "name": "which_country_flag",
+      "value": "Which country's flag is this?"
+    },
+    {
+      "name": "select_correct_flag",
+      "value": "Please select the correct flag"
+    },
+    {
+      "name": "challenge_failed",
+      "value": "Challenge Failed"
+    },
+    {
+      "name": "correct_answers_count",
+      "value": "Correctly answered %s questions"
+    },
+    {
+      "name": "max_combo",
+      "value": "Max Combo %s"
+    },
+    {
+      "name": "next_question",
+      "value": "Next Question"
+    },
+    {
+      "name": "view_results",
+      "value": "View Results"
+    },
+    {
+      "name": "correct_answers",
+      "value": "Correct Answers"
+    },
+    {
+      "name": "remaining_lives",
+      "value": "Remaining Lives"
+    },
+    {
+      "name": "share_score",
+      "value": "Share Score"
+    },
+    {
+      "name": "combo_streak",
+      "value": "%s Combo!"
+    },
+    {
+      "name": "correct_answers_share",
+      "value": "Correct Answers: %s / %s"
+    },
+    {
+      "name": "max_combo_share",
+      "value": "Max Combo: %s"
+    },
+    {
+      "name": "remaining_lives_share",
+      "value": "Remaining Lives: %s"
+    },
+    {
+      "name": "level_challenge_success",
+      "value": "Level %s Challenge Success"
+    },
+    {
+      "name": "progress_indicator",
+      "value": "%s / %s"
+    },
+    {
+      "name": "delete",
+      "value": "Delete"
+    },
+    {
+      "name": "search_country_or_region",
+      "value": "Search country or region"
+    },
+    {
+      "name": "search_country",
+      "value": "Search country"
+    },
+    {
+      "name": "no_matching_countries",
+      "value": "No matching countries found"
+    },
+    {
+      "name": "modify_keywords_or_select",
+      "value": "Modify keywords or select \"All\" or other continents"
     }
   ]
 }

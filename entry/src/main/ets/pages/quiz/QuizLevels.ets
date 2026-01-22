@@ -1,10 +1,42 @@
 // 猜猜关卡配置
+import common from '@ohos.app.ability.common';
 
 export interface QuizLevel {
   id: number;
   name: string;
   countries: string[];  // 国家代码列表
   lives: number;
+}
+
+// 获取关卡的本地化名称
+export function getQuizLevelName(levelId: number, context: common.UIAbilityContext): string {
+  const nameKeyMap: Record<number, Resource> = {
+    1: $r('app.string.quiz_level_1'),
+    2: $r('app.string.quiz_level_2'),
+    3: $r('app.string.quiz_level_3'),
+    4: $r('app.string.quiz_level_4'),
+    5: $r('app.string.quiz_level_5'),
+    6: $r('app.string.quiz_level_6'),
+    7: $r('app.string.quiz_level_7'),
+    8: $r('app.string.quiz_level_8'),
+    9: $r('app.string.quiz_level_9'),
+    10: $r('app.string.quiz_level_10')
+  };
+  
+  const resource = nameKeyMap[levelId];
+  if (resource) {
+    try {
+      return context.resourceManager.getStringSync(resource.id);
+    } catch (e) {
+      // 如果资源获取失败，返回默认值
+      const level = QuizLevels.find(l => l.id === levelId);
+      return level ? level.name : `Level ${levelId}`;
+    }
+  }
+  
+  // 如果找不到资源，返回默认值
+  const level = QuizLevels.find(l => l.id === levelId);
+  return level ? level.name : `Level ${levelId}`;
 }
 
 // 关卡数据 - 10关覆盖195个国家，前9关20个，最后一关15个

@@ -2,6 +2,119 @@
 
 ## [未发布]
 
+### 修复 (Fixed)
+- **ArkTS 编译错误修复**：
+  - 在 `PaintGameData.ets` 中定义并导出 `PaintLevel` 和 `PaintCategory` 接口
+  - 移除 catch 块中的类型注解（ArkTS 不支持在 catch 子句中使用类型注解）
+  - 在 `countryData.ets` 中添加 `ContinentNames` 和 `ContinentNamesEN` 导出
+  - 在 `countryData.ets` 中添加 `getLocalizedRegionName` 函数
+- **本地化修复**：
+  - 修复 `FlagDetailPage.ets` 中首都（capital）和国旗设计（flag design）文本的本地化问题
+  - 使用 `getLocalizedCapital` 和 `getLocalizedFlagDesign` 函数确保根据当前语言正确显示
+  - 在英文资源文件中（entry 和 AppScope）添加缺失的 `next` 和 `complete` 字符串，修复涂鸦游戏中按钮文本的本地化问题
+  - 在英文资源文件中添加缺失的 `find_fake_flag`、`enter_country_name`、`correct_found` 和 `correct_found_count` 字符串，修复假旗找茬游戏中的本地化问题
+  - 在英文资源文件中添加所有测验游戏相关的缺失字符串：
+    - 游戏描述：`quiz_flag_to_name_desc`、`quiz_name_to_flag_desc`、`complete_levels_to_unlock`
+    - 问题提示：`which_country_flag`、`select_correct_flag`
+    - 游戏状态：`challenge_failed`、`correct_answers_count`、`max_combo`、`next_question`、`view_results`
+    - 统计信息：`correct_answers`、`remaining_lives`、`share_score`、`combo_streak`
+    - 分享文本：`correct_answers_share`、`max_combo_share`、`remaining_lives_share`、`level_challenge_success`
+    - 进度指示：`progress_indicator`
+  - 在英文资源文件中添加收藏页面相关的缺失字符串：
+    - `no_favorites`: "No Favorites"
+    - `favorite_removed`: "Removed from Favorites"
+    - `navigation_failed`: "Navigation Failed"
+    - `delete`: "Delete"
+  - 在英文资源文件中添加搜索相关的缺失字符串：
+    - `search_country_or_region`: "Search country or region"（修复"搜索国家或地区"显示中文的问题）
+    - `search_country`: "Search country"
+    - `no_matching_countries`: "No matching countries found"
+    - `modify_keywords_or_select`: "Modify keywords or select \"All\" or other continents"
+  - 修复 `HomePage.ets` 中 fun facts 在英文环境下为空的问题：
+    - 改用资源映射表替代动态构建资源ID的方式，确保资源能正确查找
+    - 将 `funFacts` 从 getter 改为 `@State` 变量 `funFactsList`，确保在语言切换时能重新加载
+    - 添加 `loadFunFacts()` 方法，在 `aboutToAppear` 和 `onCurrentLanguageChanged` 中调用
+    - 添加 `@Watch` 监听 `currentLanguage` 变化，当语言切换时自动重新加载 fun facts
+  - 修复专题页面中国家名称显示中文的问题：
+    - 在 `TopicDetailPage.ets` 中使用 `getLocalizedCountryName` 和 `getLocalizedOrgName` 来获取本地化的国家/组织名称
+    - 修复 `FlagGridItem` 中直接显示 `item.nameCN` 的问题，改为使用 `getItemDisplayName` 方法
+    - 修复 `SimilarFlagsView` 中硬编码中文名称的问题，改为使用 `getCountryNameByCode` 方法动态获取本地化名称
+    - 修复相似旗标题显示，根据当前语言显示 "and" 或 "和"
+  - 修复涂鸦游戏中美国州名在英文环境下未本地化的问题：
+    - 在 `PaintPlayPage.ets` 中修改 `getFlagDisplayName` 方法，当资源文件查找失败时，从 `StateFlagData` 获取本地化的州名
+    - 添加代码格式转换逻辑，将涂鸦游戏中的州代码格式（如 `california`, `new_york`）转换为 `StateFlagData` 中的格式（如 `California`, `New York`）
+    - 根据当前语言返回英文或中文州名
+  - 修复涂鸦游戏胜利屏幕上美国州旗未加载的问题：
+    - 修改 `getFlagImagePath` 方法，优先检查 `categoryId` 是否为 'us'，如果是则直接返回州旗路径
+    - 确保美国州旗在胜利屏幕上能正确显示（无论是英文还是中文环境）
+  - 修复手表页面编译错误：
+    - 移除 `LearnPage.ets`、`SettingsPage.ets`、`ContinentPage.ets`、`CountryDetailPage.ets` 中不存在的 `onRotate` API 调用
+    - `onRotate` 和 `RotationEvent` 在当前版本的 ArkUI `Scroll` 组件上不可用
+    - 保留 `.focusable(true)` 和 `.defaultFocus(true)` 属性以支持默认滚动交互
+  - 改进涂色游戏布局：
+    - 将"下一个"按钮从 Column 布局中移出，改为浮动按钮
+    - 使用 Stack 和 position 属性让按钮浮动在内容上方
+    - 确保名称和旗帜的位置保持一致，不受按钮显示/隐藏影响
+    - 修复 Stack 结构，将顶部状态栏和提示国旗也放入 Stack 中，确保正确叠加
+    - 修复 @Builder 方法中在独立函数（ForEach、onClick 回调）中使用 this 的问题，改用闭包变量
+  - 修复测验关卡屏幕标题未本地化的问题：
+    - 在 `QuizLevelsPage.ets` 中添加 `getQuizLevelName` 函数的导入
+    - 修改关卡信息显示，使用 `getQuizLevelName` 函数获取本地化的关卡名称（如"入门"、"初级"等）
+    - 现在关卡列表会显示"第 X 关 · 关卡名称"的格式，并根据当前语言显示对应的本地化名称
+  - 修复连接游戏中按钮未本地化的问题：
+    - 在英文资源文件中添加缺失的字符串：`shuffle` ("Shuffle")、`unselect_all` ("Unselect All")、`submit` ("Submit")
+    - 在 base 和 en_US 资源文件中添加 `hint` ("提示"/"Hint") 和 `solve` ("解答"/"Solve") 字符串
+    - 修改 `ConnectionsPlayPage.ets` 中的 Hint 和 Solve 按钮，从使用 emoji 改为使用资源字符串
+    - 现在所有按钮都会根据当前语言显示对应的本地化文本
+  - 修复记忆游戏中步数和配对文本未本地化的问题：
+    - 在英文资源文件中添加缺失的字符串：`moves` ("Moves")、`pairs` ("Pairs")、`total_moves` ("Total Moves")、`pairs_completed` ("Pairs Completed")
+    - 现在记忆游戏中的步数和配对信息会根据当前语言显示对应的本地化文本
+  - 修复关卡屏幕导航标题未本地化的问题：
+    - 在英文资源文件中添加缺失的游戏名称字符串：`game_quiz` ("Flag Quiz")、`game_input` ("Input Game")、`game_memory` ("Memory Game")、`game_connections` ("Connections")
+    - 现在所有游戏的关卡屏幕导航标题都会根据当前语言显示对应的本地化文本（除了"Find the Fake"已经本地化）
+  - 修复假旗找茬游戏中文本未本地化的问题：
+    - 在 AppScope 的英文资源文件中添加缺失的字符串：`enter_country_name` ("Enter country name")、`correct_found` ("Correctly Found")、`correct_found_count` ("Correctly found %s fake flags")
+    - 统一 AppScope 和 entry 资源文件中的文本，将"找对了"改为"正确找出"，"找对了 %s 个"改为"正确找出了 %s 个假旗"
+    - 现在所有相关文本都会根据当前语言显示对应的本地化文本
+  - 修复测验游戏标题未本地化的问题：
+    - 在英文资源文件中添加缺失的字符串：`quiz_flag_to_name` ("Flag to Name")、`quiz_name_to_flag` ("Name to Flag")
+    - 现在"看旗猜国名"和"看名猜国旗"的标题会根据当前语言显示对应的本地化文本
+  - 修复 watch 的 home 和 settings 页面表冠滚动支持：
+    - 在 `SettingsPage.ets` 中为 Scroll 组件添加 `Scroller` 控制器和 `onRotate` 事件处理
+    - 在 `ContinentPage.ets` 中为 Scroll 组件添加 `Scroller` 控制器和 `onRotate` 事件处理
+    - 在 `CountryDetailPage.ets` 中为 Scroll 组件添加 `onRotate` 事件处理
+    - 现在这些页面都支持通过表冠旋转进行滚动操作
+  - 修复资源冲突错误：
+    - 删除 `AppScope/resources/en_US/element/string.json` 中重复的 `progress_indicator` 定义
+    - 删除 `AppScope/resources/en_US/element/string.json` 中重复的 `favorite_removed` 定义
+    - 删除 `entry/src/main/resources/base/element/string.json` 中重复的资源定义
+  - 修复资源缺失警告：
+    - 在 `AppScope/resources/base/element/string.json` 中添加所有在英文资源文件中存在但 base 资源文件中缺失的资源字符串
+    - 包括：`challenge_failed`、`combo_streak`、`complete`、`complete_levels_to_unlock`、`correct_answers`、`correct_answers_count`、`correct_answers_share`、`delete`、`find_fake_flag`、`level_challenge_success`、`max_combo`、`max_combo_share`、`modify_keywords_or_select`、`navigation_failed`、`next`、`next_question`、`no_favorites`、`no_matching_countries`、`quiz_flag_to_name_desc`、`quiz_name_to_flag_desc`、`remaining_lives`、`remaining_lives_share`、`search_country`、`search_country_or_region`、`select_correct_flag`、`share_score`、`view_results`、`which_country_flag` 等
+
+### 本地化 (Localization)
+- **硬编码文本本地化**：将所有硬编码的中文文本移到资源文件，支持中英文切换
+  - **HomePage.ets**：
+    - 将 Fun Facts（趣味小知识）从硬编码数组移到资源文件（`fun_fact_1` 到 `fun_fact_10`）
+    - 支持根据当前语言自动加载对应的资源
+  - **ProfilePage.ets**：
+    - 主题设置文本本地化（`theme_light`、`theme_dark`、`theme_follow_system`）
+    - 错误消息本地化（`save_failed_toast`、`share_failed`、`cannot_open_market`、`cannot_open_market_manual`）
+    - 对话框内容本地化（`about_app`、`about_app_message`、`feedback`、`feedback_message`）
+    - 菜单项本地化（`my_favorites`、`dark_mode`、`vibration_feedback`、`app_rating`、`share_app`、`feedback`、`about_app`）
+    - 游戏名称本地化（`game_flag_quiz`、`game_fake_flag`、`game_spelling_challenge`、`game_trivia`）
+    - 统计标签本地化（`exploration_progress`、`completed`、`levels_separator`、`levels_unit`）
+    - 分享文本本地化（`share_app_text`、`share_app_title`、`share_app_description`）
+  - 新增资源字符串（中英文）：
+    - `fun_fact_1` 到 `fun_fact_10`：10个趣味小知识
+    - `theme_light`、`theme_dark`、`theme_follow_system`：主题选项
+    - `cannot_open_market`、`cannot_open_market_manual`：应用市场错误消息
+    - `my_favorites`、`data_statistics`、`game_progress`、`settings`：菜单项
+    - `dark_mode`、`vibration_feedback`、`app_rating`：设置项
+    - `game_flag_quiz`、`game_fake_flag`、`game_spelling_challenge`、`game_trivia`：游戏名称
+    - `levels_separator`、`levels_unit`：统计标签
+    - `share_app_title`、`share_app_description`：分享相关
+
 ### 新增 (Added)
 - **资源优化和Tree Shaking支持**：
   - 新增SVG优化脚本 (`scripts/optimize-svgs.js`)：压缩SVG文件，移除元数据、注释和空白，可节省10-30%空间

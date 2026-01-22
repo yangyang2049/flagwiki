@@ -105,6 +105,8 @@ export default class EntryAbility extends UIAbility {
   onForeground(): void {
     // Ability has brought to foreground
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onForeground');
+    // Ensure English language is maintained
+    void this.initializeLanguage();
   }
 
   onBackground(): void {

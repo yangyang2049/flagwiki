@@ -1,5 +1,6 @@
 import router from '@ohos.router';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
+import UiConstants from '../../utils/UiConstants';
 
 @Component
 export struct ExplorePage {
@@ -11,7 +12,7 @@ export struct ExplorePage {
         // 国旗猜猜卡片
         Row() {
           Column() {
-            Text('🎯')
+            Text(UiConstants.TARGET)
               .fontSize(40)
           }
         .width(72)
@@ -51,7 +52,7 @@ export struct ExplorePage {
         // 假旗找茬卡片
         Row() {
           Column() {
-            Text('🔍')
+            Text(UiConstants.MAGNIFYING_GLASS)
               .fontSize(40)
           }
         .width(72)
@@ -91,7 +92,7 @@ export struct ExplorePage {
         // 拼写挑战卡片
         Row() {
           Column() {
-            Text('⌨️')
+            Text(UiConstants.KEYBOARD)
               .fontSize(40)
           }
         .width(72)
@@ -131,7 +132,7 @@ export struct ExplorePage {
         // 知识问答卡片
         Row() {
           Column() {
-            Text('🧩')
+            Text(UiConstants.PUZZLE_PIECE)
               .fontSize(40)
           }
         .width(72)
@@ -171,7 +172,7 @@ export struct ExplorePage {
         // 记忆翻牌卡片
         Row() {
           Column() {
-            Text('🃏')
+            Text(UiConstants.JOKER_CARD)
               .fontSize(40)
           }
         .width(72)
@@ -211,7 +212,7 @@ export struct ExplorePage {
         // 分组连线卡片
         Row() {
           Column() {
-            Text('🔗')
+            Text(UiConstants.LINK_EMOJI)
               .fontSize(40)
           }
         .width(72)
@@ -251,7 +252,7 @@ export struct ExplorePage {
         // HeadsUp 卡片
         Row() {
           Column() {
-            Text('👀')
+            Text(UiConstants.EYES_EMOJI)
               .fontSize(40)
           }
         .width(72)

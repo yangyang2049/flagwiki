@@ -6,11 +6,13 @@ import { WatchLayout } from '../../utils/WatchUiConstants'
 
 @Component
 export struct SettingsPage {
+  @StorageLink('currentLanguage') currentLanguage: string = 'zh'
   @State vibrationEnabled: boolean = true
   @State soundEnabled: boolean = true
 
   private prefs: preferences.Preferences | null = null
   private context: common.UIAbilityContext | null = null
+  private scroller: Scroller = new Scroller()
 
   async aboutToAppear() {
     await this.initPreferences()
@@ -62,7 +64,7 @@ export struct SettingsPage {
         .textAlign(TextAlign.Center)
         .margin({ top: 8, bottom: 8 })
 
-      Scroll() {
+      Scroll(this.scroller) {
         Column() {
           Row() {
             Text($r('app.string.sound'))

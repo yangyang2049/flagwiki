@@ -2,6 +2,7 @@
  * 涂鸦游戏数据
  * 包含国旗颜色信息和关卡配置
  */
+import UiConstants from '../../utils/UiConstants';
 
 // 国旗涂鸦信息
 export interface FlagPaintInfo {
@@ -10,21 +11,21 @@ export interface FlagPaintInfo {
   aspectRatio: number;    // 宽高比
 }
 
-// 涂鸦游戏关卡
+// 涂鸦关卡
 export interface PaintLevel {
-  level: number;
-  flags: string[];
+  level: number;          // 关卡编号
+  flags: string[];        // 该关卡包含的国旗代码列表
 }
 
-// 国家/地区分类配置
+// 涂鸦分类
 export interface PaintCategory {
-  id: string;
-  name: string;
-  nameResId: Resource; // 名称资源ID
-  emoji: string;
-  description: string;
-  descResId: Resource; // 描述资源ID
-  levels: PaintLevel[];
+  id: string;             // 分类ID
+  name: string;           // 分类名称（已废弃，使用 nameResId）
+  nameResId: Resource;    // 分类名称资源ID
+  emoji: string;           // 分类表情符号
+  description: string;    // 分类描述（已废弃，使用 descResId）
+  descResId: Resource;    // 分类描述资源ID
+  levels: PaintLevel[];   // 该分类的关卡列表
 }
 
 // 世界国旗涂鸦关卡配置（20关）
@@ -76,19 +77,19 @@ export const usPaintLevels: PaintLevel[] = [
 export const paintCategories: PaintCategory[] = [
   {
     id: 'world',
-    name: '世界',
+    name: '', // 不再使用，使用 nameResId
     nameResId: $r('app.string.paint_category_world'),
-    emoji: '🌍',
-    description: '世界各国国旗涂鸦',
+    emoji: UiConstants.WORLD_EMOJI,
+    description: '', // 不再使用，使用 descResId
     descResId: $r('app.string.paint_category_world_desc'),
     levels: worldPaintLevels
   },
   {
     id: 'us',
-    name: '美国',
+    name: '', // 不再使用，使用 nameResId
     nameResId: $r('app.string.paint_category_us'),
-    emoji: '🇺🇸',
-    description: '美国各州州旗涂鸦',
+    emoji: UiConstants.US_FLAG_EMOJI,
+    description: '', // 不再使用，使用 descResId
     descResId: $r('app.string.paint_category_us_desc'),
     levels: usPaintLevels
   }

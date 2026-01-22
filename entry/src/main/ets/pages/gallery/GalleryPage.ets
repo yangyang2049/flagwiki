@@ -4,13 +4,10 @@ import display from '@ohos.display';
 import {
   Country,
   Continent,
-  ContinentNames,
-  ContinentNamesEN,
   getCountriesByContinent,
   getAllContinents,
   getFlagImageSource,
-  getLocalizedCountryName,
-  getLocalizedRegionName
+  getLocalizedCountryName
 } from '../../utils/countryData';
 import { LocalizationUtil } from '../../utils/LocalizationUtil';
 import { DeviceHelper } from '../../utils/DeviceHelper';
@@ -43,23 +40,11 @@ export struct GalleryPage {
   }
 
   private getGridColumns(): string {
-    // 根据屏幕宽度和是否为pad/2in1调整列数
-    const isPadOr2in1 = DeviceHelper.isPadOr2in1();
-    if (isPadOr2in1) {
-      // pad/2in1: 根据宽度调整，但保持全屏
-      if (this.screenWidth >= 1200) {
-        return '1fr 1fr 1fr 1fr 1fr 1fr'; // 6列
-      } else if (this.screenWidth >= 900) {
-        return '1fr 1fr 1fr 1fr 1fr'; // 5列
-      } else if (this.screenWidth >= 600) {
-        return '1fr 1fr 1fr 1fr'; // 4列
-      } else {
-        return '1fr 1fr 1fr'; // 3列
-      }
-    } else {
-      // 手机: 保持3列
-      return '1fr 1fr 1fr';
-    }
+    // 自适应列数：最小120vp每列
+    const minColumnWidth = 120;
+    const maxColumns = Math.floor(this.screenWidth / minColumnWidth);
+    const columns = Math.max(2, Math.min(maxColumns, 6)); // 2-6列之间
+    return '1fr '.repeat(columns).trim();
   }
 
   private onLanguageChanged(): void {
@@ -120,6 +105,37 @@ export struct GalleryPage {
     }).catch((err: Error) => {
       console.error(`Navigation failed: ${err.message}`);
     });
+  }
+
+  private getLocalizedContinentName(continent: Continent): string {
+    try {
+      let resource: Resource;
+      switch (continent) {
+        case 'World':
+          resource = $r('app.string.region_world');
+          break;
+        case 'Asia':
+          resource = $r('app.string.region_asia');
+          break;
+        case 'Europe':
+          resource = $r('app.string.region_europe');
+          break;
+        case 'Africa':
+          resource = $r('app.string.region_africa');
+          break;
+        case 'Americas':
+          resource = $r('app.string.region_americas');
+          break;
+        case 'Oceania':
+          resource = $r('app.string.region_oceania');
+          break;
+        default:
+          return continent;
+      }
+      return this.appContext.resourceManager.getStringSync(resource.id);
+    } catch (e) {
+      return continent;
+    }
   }
 
   build() {
@@ -206,7 +222,7 @@ export struct GalleryPage {
 
   @Builder
   ContinentChip(continent: Continent) {
-    Text(LocalizationUtil.isEnglish(this.systemLanguage) ? ContinentNamesEN[continent] : ContinentNames[continent])
+    Text(this.getLocalizedContinentName(continent))
       .fontSize(14)
       .fontWeight(this.selectedContinent === continent ? FontWeight.Medium : FontWeight.Normal)
       .fontColor(this.selectedContinent === continent ? $r('app.color.white') : $r('app.color.text_secondary'))

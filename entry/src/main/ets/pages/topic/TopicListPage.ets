@@ -1,10 +1,14 @@
 import router from '@ohos.router';
-import { TopicItem, getAllTopics } from './TopicData';
+import common from '@ohos.app.ability.common';
+import { TopicItem, getAllTopics, getTopicName, getTopicDescription } from './TopicData';
+import { LocalizationUtil } from '../../utils/LocalizationUtil';
 
 @Entry
 @Component
   struct TopicListPage {
   @State topics: TopicItem[] = [];
+  @StorageLink('currentLanguage') currentLanguage: string = 'zh';
+  private context = getContext(this) as common.UIAbilityContext;
 
   aboutToAppear() {
     this.topics = getAllTopics();
@@ -31,12 +35,12 @@ import { TopicItem, getAllTopics } from './TopicData';
 
                   // 中间文字
                   Column() {
-                    Text(topic.name)
+                    Text(getTopicName(topic.id, this.context, this.currentLanguage))
                       .fontSize(18)
                       .fontWeight(FontWeight.Bold)
                       .fontColor($r('app.color.text_primary'))
 
-                    Text(topic.description)
+                    Text(getTopicDescription(topic.id, this.context, this.currentLanguage))
                       .fontSize(13)
                       .fontColor($r('app.color.text_secondary'))
                       .margin({ top: 4 })
@@ -74,13 +78,13 @@ import { TopicItem, getAllTopics } from './TopicData';
         }
         .width('100%')
         .height('100%')
-        .constraintSize({ maxWidth: 320 })
+        .constraintSize({ maxWidth: 600 })
       }
       .width('100%')
       .height('100%')
       .justifyContent(FlexAlign.Center)
     }
-    .title('专题')
+    .title(this.context.resourceManager.getStringSync($r('app.string.topic').id))
     .titleMode(NavigationTitleMode.Mini)
     .mode(NavigationMode.Stack)
     .backgroundColor($r('app.color.bg_page'))

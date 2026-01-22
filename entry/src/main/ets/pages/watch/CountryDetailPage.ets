@@ -1,4 +1,5 @@
 import router from '@ohos.router'
+import common from '@ohos.app.ability.common'
 import { Country, FlagDesign, getCountryByCode, getFlagDesign, getLocalizedCountryName, getLocalizedCapital, getLocalizedFlagDesign, getLocalizedRegionName } from '../../utils/countryData'
 import { LocalizationUtil } from '../../utils/LocalizationUtil'
 
@@ -35,38 +36,40 @@ struct CountryDetailPage {
   }
 
   private formatPopulation(population: number): string {
+    const rm = getContext(this) as common.UIAbilityContext;
     if (LocalizationUtil.isEnglish(this.currentLanguage)) {
       if (population >= 1_000_000_000) {
-        return `${(population / 1_000_000_000).toFixed(2)} B`
+        return `${(population / 1_000_000_000).toFixed(2)}${rm.resourceManager.getStringSync($r('app.string.population_unit_billion_short').id)}`;
       }
       if (population >= 1_000_000) {
-        return `${(population / 1_000_000).toFixed(1)} M`
+        return `${(population / 1_000_000).toFixed(1)}${rm.resourceManager.getStringSync($r('app.string.population_unit_million_short').id)}`;
       }
       if (population >= 1_000) {
-        return `${(population / 1_000).toFixed(0)} K`
+        return `${(population / 1_000).toFixed(0)}${rm.resourceManager.getStringSync($r('app.string.population_unit_thousand_short').id)}`;
       }
-      return population.toString()
+      return population.toString();
     }
     if (population >= 100000000) {
-      return `${(population / 100000000).toFixed(2)} 亿人`
+      return `${(population / 100000000).toFixed(2)}${rm.resourceManager.getStringSync($r('app.string.population_unit_billion_short').id)}`;
     }
     if (population >= 10000) {
-      return `${(population / 10000).toFixed(0)} 万人`
+      return `${(population / 10000).toFixed(0)}${rm.resourceManager.getStringSync($r('app.string.population_unit_million_short').id)}`;
     }
-    return `${population} 人`
+    return `${population}${rm.resourceManager.getStringSync($r('app.string.population_unit_person').id)}`;
   }
 
   private formatArea(area: number): string {
+    const rm = getContext(this) as common.UIAbilityContext;
     if (LocalizationUtil.isEnglish(this.currentLanguage)) {
       if (area >= 1_000_000) {
-        return `${(area / 1_000_000).toFixed(2)} M km²`
+        return `${(area / 1_000_000).toFixed(2)}${rm.resourceManager.getStringSync($r('app.string.area_unit_million_km2_short').id)}`;
       }
-      return `${area.toFixed(0)} km²`
+      return `${area.toFixed(0)}${rm.resourceManager.getStringSync($r('app.string.area_unit_km2_short').id)}`;
     }
     if (area >= 10000) {
-      return `${(area / 10000).toFixed(2)} 万km²`
+      return `${(area / 10000).toFixed(2)}${rm.resourceManager.getStringSync($r('app.string.area_unit_million_km2_short').id)}`;
     }
-    return `${area.toFixed(0)} km²`
+    return `${area.toFixed(0)}${rm.resourceManager.getStringSync($r('app.string.area_unit_km2_short').id)}`;
   }
 
   @Builder

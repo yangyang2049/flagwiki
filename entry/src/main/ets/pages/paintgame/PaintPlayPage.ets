@@ -10,127 +10,19 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
 import curves from '@ohos.curves';
 import { getCountryByCode, Country, getLocalizedCountryName } from '../../utils/countryData';
+import { getCountryStateData, StateInfo } from '../../utils/StateFlagData';
 import { getPaintLevel, getFlagPaintInfo, getTotalLevels, PaintLevel } from './PaintGameData';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil, SoundType } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 import { LocalizationUtil } from '../../utils/LocalizationUtil';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
+import UiConstants from '../../utils/UiConstants';
 
 interface RouterParams {
   categoryId: string;
   levelId: number;
 }
-
-// 美国州名中文映射
-const US_STATE_NAMES_CN: Record<string, string> = {
-  'alabama': '阿拉巴马州',
-  'alaska': '阿拉斯加州',
-  'arizona': '亚利桑那州',
-  'arkansas': '阿肯色州',
-  'california': '加利福尼亚州',
-  'colorado': '科罗拉多州',
-  'connecticut': '康涅狄格州',
-  'delaware': '特拉华州',
-  'district_of_columbia': '华盛顿特区',
-  'florida': '佛罗里达州',
-  'georgia': '佐治亚州',
-  'hawaii': '夏威夷州',
-  'idaho': '爱达荷州',
-  'illinois': '伊利诺伊州',
-  'indiana': '印第安纳州',
-  'iowa': '艾奥瓦州',
-  'kansas': '堪萨斯州',
-  'kentucky': '肯塔基州',
-  'louisiana': '路易斯安那州',
-  'maine': '缅因州',
-  'maryland': '马里兰州',
-  'massachusetts': '马萨诸塞州',
-  'michigan': '密歇根州',
-  'minnesota': '明尼苏达州',
-  'mississippi': '密西西比州',
-  'missouri': '密苏里州',
-  'montana': '蒙大拿州',
-  'nebraska': '内布拉斯加州',
-  'nevada': '内华达州',
-  'new_hampshire': '新罕布什尔州',
-  'new_jersey': '新泽西州',
-  'new_mexico': '新墨西哥州',
-  'new_york': '纽约州',
-  'north_carolina': '北卡罗来纳州',
-  'north_dakota': '北达科他州',
-  'ohio': '俄亥俄州',
-  'oklahoma': '俄克拉荷马州',
-  'oregon': '俄勒冈州',
-  'pennsylvania': '宾夕法尼亚州',
-  'rhode_island': '罗德岛州',
-  'south_carolina': '南卡罗来纳州',
-  'south_dakota': '南达科他州',
-  'tennessee': '田纳西州',
-  'texas': '德克萨斯州',
-  'utah': '犹他州',
-  'vermont': '佛蒙特州',
-  'virginia': '弗吉尼亚州',
-  'washington': '华盛顿州',
-  'west_virginia': '西弗吉尼亚州',
-  'wisconsin': '威斯康星州',
-  'wyoming': '怀俄明州'
-};
-
-// 美国州名英文映射
-const US_STATE_NAMES_EN: Record<string, string> = {
-  'alabama': 'Alabama',
-  'alaska': 'Alaska',
-  'arizona': 'Arizona',
-  'arkansas': 'Arkansas',
-  'california': 'California',
-  'colorado': 'Colorado',
-  'connecticut': 'Connecticut',
-  'delaware': 'Delaware',
-  'district_of_columbia': 'District of Columbia',
-  'florida': 'Florida',
-  'georgia': 'Georgia',
-  'hawaii': 'Hawaii',
-  'idaho': 'Idaho',
-  'illinois': 'Illinois',
-  'indiana': 'Indiana',
-  'iowa': 'Iowa',
-  'kansas': 'Kansas',
-  'kentucky': 'Kentucky',
-  'louisiana': 'Louisiana',
-  'maine': 'Maine',
-  'maryland': 'Maryland',
-  'massachusetts': 'Massachusetts',
-  'michigan': 'Michigan',
-  'minnesota': 'Minnesota',
-  'mississippi': 'Mississippi',
-  'missouri': 'Missouri',
-  'montana': 'Montana',
-  'nebraska': 'Nebraska',
-  'nevada': 'Nevada',
-  'new_hampshire': 'New Hampshire',
-  'new_jersey': 'New Jersey',
-  'new_mexico': 'New Mexico',
-  'new_york': 'New York',
-  'north_carolina': 'North Carolina',
-  'north_dakota': 'North Dakota',
-  'ohio': 'Ohio',
-  'oklahoma': 'Oklahoma',
-  'oregon': 'Oregon',
-  'pennsylvania': 'Pennsylvania',
-  'rhode_island': 'Rhode Island',
-  'south_carolina': 'South Carolina',
-  'south_dakota': 'South Dakota',
-  'tennessee': 'Tennessee',
-  'texas': 'Texas',
-  'utah': 'Utah',
-  'vermont': 'Vermont',
-  'virginia': 'Virginia',
-  'washington': 'Washington',
-  'west_virginia': 'West Virginia',
-  'wisconsin': 'Wisconsin',
-  'wyoming': 'Wyoming'
-};
 
 @Entry
 @Component
@@ -248,20 +140,45 @@ const US_STATE_NAMES_EN: Record<string, string> = {
 
   private getFlagDisplayName(code: string): string {
     const isEnglish = LocalizationUtil.isEnglish(this.currentLanguage);
+    const rm = this.context.resourceManager;
     
-    // 先尝试获取美国州名
-    if (US_STATE_NAMES_EN[code] || US_STATE_NAMES_CN[code]) {
-      // 这是美国州旗，直接返回州名
-      if (isEnglish) {
-        return US_STATE_NAMES_EN[code];
-      } else {
-        return US_STATE_NAMES_CN[code];
+    // 先尝试从资源文件获取州名（适用于美国州）
+    const stateKey = `state_${code}`;
+    try {
+      const stateName = rm.getStringSync($r(`app.string.${stateKey}`).id);
+      return stateName;
+    } catch (e) {
+      // 如果资源查找失败，尝试从 StateFlagData 获取州名
+      // 检查是否为美国州旗（涂鸦游戏中的美国州代码格式）
+      const usStateData = getCountryStateData('us');
+      if (usStateData) {
+        // 将代码格式转换为 StateFlagData 中的格式
+        // 例如：california -> California, new_york -> New York, district_of_columbia -> District of Columbia
+        const words = code.split('_');
+        const normalizedCode = words.map((word: string) => 
+          word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ).join(' ');
+        
+        // 查找匹配的州信息（不区分大小写）
+        const stateInfo = usStateData.states.find((s: StateInfo) => 
+          s.code.toLowerCase() === normalizedCode.toLowerCase()
+        );
+        if (stateInfo) {
+          return isEnglish ? stateInfo.name : stateInfo.nameCN;
+        }
+        
+        // 如果找不到，可能是 District of Columbia（在 StateFlagData 中可能不存在）
+        // 尝试使用资源文件中的 fallback
+        if (code === 'district_of_columbia') {
+          // District of Columbia 可能不在 StateFlagData 中，返回资源文件中的值或英文名称
+          return isEnglish ? 'District of Columbia' : '华盛顿特区';
+        }
       }
+      
+      // 如果不是州旗，则尝试获取国家本地化名称
+      const country = getCountryByCode(code);
+      return country ? getLocalizedCountryName(country, this.currentLanguage) : code;
     }
-    
-    // 否则尝试获取国家本地化名称
-    const country = getCountryByCode(code);
-    return country ? getLocalizedCountryName(country, this.currentLanguage) : code;
   }
 
 
@@ -427,12 +344,22 @@ const US_STATE_NAMES_EN: Record<string, string> = {
   }
 
   private getFlagImagePath(code: string): string {
-    // 美国州旗使用 state_flags/us/ 目录
-    if (US_STATE_NAMES_CN[code]) {
+    // 如果当前分类是美国州旗，使用州旗路径
+    if (this.categoryId === 'us') {
       return `state_flags/us/${code}.svg`;
     }
-    // 其他国旗使用 flags/ 目录
-    return `flags/${code}.svg`;
+    
+    // 否则尝试通过资源文件判断是否为美国州旗
+    const rm = this.context.resourceManager;
+    const stateKey = `state_${code}`;
+    try {
+      // Check if it's a US state by attempting to get its localized name
+      rm.getStringSync($r(`app.string.${stateKey}`).id);
+      return `state_flags/us/${code}.svg`;
+    } catch (e) {
+      // If not a US state or resource not found, it's a regular country flag
+      return `flags/${code}.svg`;
+    }
   }
 
   build() {
@@ -535,28 +462,6 @@ const US_STATE_NAMES_EN: Record<string, string> = {
                     })
                     .width('100%')
                     .layoutWeight(1)
-
-                  // 底部按钮区域（延迟显示）
-                  if (this.showNextButton) {
-                    Button(this.currentFlagIndex < (this.currentLevel?.flags.length || 0) - 1
-                      ? this.context.resourceManager.getStringSync($r('app.string.next').id)
-                      : this.context.resourceManager.getStringSync($r('app.string.complete').id))
-                      .constraintSize({ minWidth: 320 })
-                      .height(48)
-                      .fontSize(17)
-                      .fontWeight(FontWeight.Bold)
-                      .backgroundColor($r('app.color.button_primary'))
-                      .margin({ bottom: 32 })
-                      .opacity(this.showNextButtonAnimated ? 1 : 0)
-                      .scale({ x: this.showNextButtonAnimated ? 1 : 0.8, y: this.showNextButtonAnimated ? 1 : 0.8 })
-                      .animation({
-                        duration: 300,
-                        curve: Curve.EaseOut
-                      })
-                      .onClick(async () => {
-                        await this.onNext();
-                      })
-                  }
                 }
                 .width('100%')
                 .height('100%')
@@ -608,6 +513,7 @@ const US_STATE_NAMES_EN: Record<string, string> = {
                   .height(56)
                   .padding({ left: 16, right: 16 })
                   .backgroundColor(Color.Transparent)
+                  .position({ x: 0, y: 0 })
 
                 // 提示国旗显示
                 if (this.showHint) {
@@ -619,17 +525,47 @@ const US_STATE_NAMES_EN: Record<string, string> = {
                   }
                   .width(160)
                     .height(110)
-                    .backgroundColor(Color.White)
-                    .borderRadius(8)
-                    .justifyContent(FlexAlign.Center)
+                  .backgroundColor(Color.White)
+                  .borderRadius(8)
+                  .justifyContent(FlexAlign.Center)
+                  .shadow({
+                    radius: 8,
+                    color: 'rgba(0, 0, 0, 0.2)',
+                    offsetX: 0,
+                    offsetY: 3
+                  })
+                  .position({ x: '50%', y: 70 })
+                  .translate({ x: '-50%' })
+                }
+
+                // 浮动按钮区域（延迟显示）
+                if (this.showNextButton) {
+                  Button(this.currentFlagIndex < (this.currentLevel?.flags.length || 0) - 1
+                    ? this.context.resourceManager.getStringSync($r('app.string.next').id)
+                    : this.context.resourceManager.getStringSync($r('app.string.complete').id))
+                    .constraintSize({ minWidth: 320 })
+                    .height(48)
+                    .fontSize(17)
+                    .fontWeight(FontWeight.Bold)
+                    .backgroundColor($r('app.color.button_primary'))
+                    .opacity(this.showNextButtonAnimated ? 1 : 0)
+                    .scale({ x: this.showNextButtonAnimated ? 1 : 0.8, y: this.showNextButtonAnimated ? 1 : 0.8 })
+                    .animation({
+                      duration: 300,
+                      curve: Curve.EaseOut
+                    })
+                    .onClick(async () => {
+                      await this.onNext();
+                    })
+                    .position({ x: '50%', y: '100%' })
+                    .translate({ x: '-50%', y: '-100%' })
+                    .margin({ bottom: 32 })
                     .shadow({
                       radius: 8,
                       color: 'rgba(0, 0, 0, 0.2)',
                       offsetX: 0,
-                      offsetY: 3
+                      offsetY: 2
                     })
-                    .position({ x: '50%', y: 70 })
-                    .translate({ x: '-50%' })
                 }
               }
               .width('100%')
@@ -656,7 +592,7 @@ const US_STATE_NAMES_EN: Record<string, string> = {
     Column() {
       // 内容区域（从底部向上滑入）
       Column() {
-        Text('🎉')
+        Text(UiConstants.CELEBRATION)
           .fontSize(72)
           .margin({ top: 80 })
 
@@ -684,7 +620,7 @@ const US_STATE_NAMES_EN: Record<string, string> = {
                 offsetX: 0,
                 offsetY: 2
               })
-          })
+          }, (code: string) => code)
         }
         .margin({ top: 32 })
       }
@@ -716,12 +652,12 @@ const US_STATE_NAMES_EN: Record<string, string> = {
               duration: 300,
               curve: Curve.EaseOut
             })
-            .onClick(async () => {
+            .onClick(() => {
               if (this.levelId < getTotalLevels(this.categoryId)) {
-                await this.onNextLevel();
+                this.onNextLevel();
               } else {
                 // 完美收官，退出
-                await SoundEffectUtil.playButton();
+                SoundEffectUtil.playButton();
                 VibratorUtil.vibrateTap();
                 router.back();
               }
@@ -744,8 +680,8 @@ const US_STATE_NAMES_EN: Record<string, string> = {
               curve: Curve.EaseOut,
               delay: 100
             })
-            .onClick(async () => {
-              await SoundEffectUtil.playButton();
+            .onClick(() => {
+              SoundEffectUtil.playButton();
               VibratorUtil.vibrateTap();
               router.back();
             })

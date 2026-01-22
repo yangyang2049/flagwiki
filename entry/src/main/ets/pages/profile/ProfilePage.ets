@@ -11,6 +11,7 @@ import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { PreferencesManager } from '../../utils/PreferencesManager';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
+import UiConstants from '../../utils/UiConstants';
 
 // 总关卡数
 const QUIZ_TOTAL_LEVELS = 10;
@@ -92,7 +93,7 @@ export struct ProfilePage {
       console.error(`Failed to save color mode: ${JSON.stringify(err)}`);
       try {
         promptAction.showToast({
-          message: '保存失败',
+          message: this.context.resourceManager.getStringSync($r('app.string.save_failed_toast').id),
           duration: 2000
         });
       } catch (toastErr) {
@@ -116,12 +117,12 @@ export struct ProfilePage {
   private getThemeText(): string {
     switch (this.colorMode) {
       case ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT:
-        return '浅色';
+        return this.context.resourceManager.getStringSync($r('app.string.theme_light').id);
       case ConfigurationConstant.ColorMode.COLOR_MODE_DARK:
-        return '深色';
+        return this.context.resourceManager.getStringSync($r('app.string.theme_dark').id);
       case ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET:
       default:
-        return '跟随系统';
+        return this.context.resourceManager.getStringSync($r('app.string.theme_follow_system').id);
     }
   }
 
@@ -154,10 +155,10 @@ export struct ProfilePage {
   private showAboutApp(): void {
     try {
       promptAction.showDialog({
-        title: '关于应用',
-        message: '国旗小百科 v1.1.0\n\n一款有趣的国旗知识应用，带你探索世界各国国旗的故事与历史。',
+        title: this.context.resourceManager.getStringSync($r('app.string.about_app').id),
+        message: this.context.resourceManager.getStringSync($r('app.string.about_app_message').id),
         buttons: [
-          { text: '确定', color: $r('app.color.button_primary') }
+          { text: this.context.resourceManager.getStringSync($r('app.string.confirm').id), color: $r('app.color.button_primary') }
         ]
       }).then(() => {
       }).catch((err: Error) => {
@@ -171,10 +172,10 @@ export struct ProfilePage {
   private showFeedback(): void {
     try {
       promptAction.showDialog({
-        title: '意见反馈',
-        message: '如有建议或问题，可通过应用商店评论，或者发邮件到 ssz2048@163.com 反馈。感谢您的支持。',
+        title: this.context.resourceManager.getStringSync($r('app.string.feedback').id),
+        message: this.context.resourceManager.getStringSync($r('app.string.feedback_message').id),
         buttons: [
-          { text: '好的', color: $r('app.color.button_primary') }
+          { text: this.context.resourceManager.getStringSync($r('app.string.ok').id), color: $r('app.color.button_primary') }
         ]
       }).then(() => {
       }).catch((err: Error) => {
@@ -189,13 +190,14 @@ export struct ProfilePage {
     try {
       const bundleName = 'com.douhua.flag';
       const appGalleryUrl = `https://appgallery.huawei.com/app/detail?id=${bundleName}&channelId=SHARE&source=appshare`;
-      const shareText = `国旗小百科 - 一款有趣的国旗知识应用，带你探索世界各国国旗的故事与历史。\n\n下载链接：${appGalleryUrl}`;
+      const shareTextTemplate = this.context.resourceManager.getStringSync($r('app.string.share_app_text').id);
+      const shareText = shareTextTemplate.replace('{url}', appGalleryUrl);
 
       const shareData: systemShare.SharedData = new systemShare.SharedData({
         utd: uniformTypeDescriptor.UniformDataType.TEXT,
         content: shareText,
-        title: '国旗小百科',
-        description: '探索世界国旗的奥秘'
+        title: this.context.resourceManager.getStringSync($r('app.string.share_app_title').id),
+        description: this.context.resourceManager.getStringSync($r('app.string.share_app_description').id)
       });
 
       const controller: systemShare.ShareController = new systemShare.ShareController(shareData);
@@ -211,7 +213,7 @@ export struct ProfilePage {
       console.error(`Failed to share: code: ${error?.code}, message: ${error?.message}`);
       try {
         promptAction.showToast({
-          message: '分享失败',
+          message: this.context.resourceManager.getStringSync($r('app.string.share_failed').id),
           duration: 2000
         });
       } catch (toastErr) {
@@ -241,7 +243,7 @@ export struct ProfilePage {
         } catch (fallbackErr) {
           console.error(`Failed to open app market: ${JSON.stringify(fallbackErr)}`);
           promptAction.showToast({
-            message: '无法打开应用市场，请手动前往应用市场评分',
+            message: this.context.resourceManager.getStringSync($r('app.string.cannot_open_market_manual').id),
             duration: 2000
           });
         }
@@ -250,7 +252,7 @@ export struct ProfilePage {
       console.error(`Failed to open app market: ${JSON.stringify(err)}`);
       try {
         promptAction.showToast({
-          message: '无法打开应用市场',
+          message: this.context.resourceManager.getStringSync($r('app.string.cannot_open_market').id),
           duration: 2000
         });
       } catch (toastErr) {
@@ -271,28 +273,28 @@ export struct ProfilePage {
   private getChallengeProgressList(): ChallengeProgress[] {
     return [
       {
-        name: '国旗猜猜',
+        name: this.context.resourceManager.getStringSync($r('app.string.game_flag_quiz').id),
         emoji: '🎯',
         current: this.quizLevel - 1,
         total: QUIZ_TOTAL_LEVELS,
         color: $r('app.color.button_primary')
       },
       {
-        name: '假旗找茬',
+        name: this.context.resourceManager.getStringSync($r('app.string.game_fake_flag').id),
         emoji: '🔍',
         current: this.fakeFlagLevel - 1,
         total: FAKE_FLAG_TOTAL_LEVELS,
         color: $r('app.color.color_green')
       },
       {
-        name: '拼写挑战',
+        name: this.context.resourceManager.getStringSync($r('app.string.game_spelling_challenge').id),
         emoji: '⌨️',
         current: this.inputLevel - 1,
         total: INPUT_TOTAL_LEVELS,
         color: $r('app.color.color_orange')
       },
       {
-        name: '知识问答',
+        name: this.context.resourceManager.getStringSync($r('app.string.game_trivia').id),
         emoji: '🧩',
         current: this.triviaLevel - 1,
         total: TRIVIA_TOTAL_LEVELS,
@@ -311,7 +313,7 @@ export struct ProfilePage {
               // 顶部总览
               Row() {
                 Column() {
-                  Text('🏆')
+                  Text(UiConstants.TROPHY)
                     .fontSize(40)
                 }
                 .width(64)
@@ -321,20 +323,20 @@ export struct ProfilePage {
                   .justifyContent(FlexAlign.Center)
 
                 Column() {
-                  Text('探索进度')
+                  Text(this.context.resourceManager.getStringSync($r('app.string.exploration_progress').id))
                     .fontSize(18)
                     .fontWeight(FontWeight.Bold)
                     .fontColor($r('app.color.text_primary'))
 
                   Row() {
-                    Text(`已完成 `)
+                    Text(`${this.context.resourceManager.getStringSync($r('app.string.completed').id)} `)
                       .fontSize(14)
                       .fontColor($r('app.color.text_secondary'))
                     Text(`${this.getTotalCompletedLevels()}`)
                       .fontSize(16)
                       .fontWeight(FontWeight.Bold)
                       .fontColor($r('app.color.button_primary'))
-                    Text(` / ${this.getTotalLevels()} 关`)
+                    Text(`${this.context.resourceManager.getStringSync($r('app.string.levels_separator').id)}${this.getTotalLevels()}${this.context.resourceManager.getStringSync($r('app.string.levels_unit').id)}`)
                       .fontSize(14)
                       .fontColor($r('app.color.text_secondary'))
                   }
@@ -395,7 +397,7 @@ export struct ProfilePage {
 
             // 我的收藏
             Column() {
-              this.settingItem($r('app.media.icon_favorite'), '我的收藏', '', () => {
+              this.settingItem($r('app.media.icon_favorite'), this.context.resourceManager.getStringSync($r('app.string.my_favorites').id), '', () => {
                 router.pushUrl({ url: 'pages/profile/FavoritesPage' })
                   .catch((err: Error) => {
                     console.error(`Failed to navigate to FavoritesPage: ${err.message}`);
@@ -409,35 +411,35 @@ export struct ProfilePage {
 
             // 设置项
             Column() {
-              this.settingItemWithValue($r('app.media.icon_theme'), '深色模式', () => this.getThemeText(), () => {
+              this.settingItemWithValue($r('app.media.icon_theme'), this.context.resourceManager.getStringSync($r('app.string.dark_mode').id), () => this.getThemeText(), () => {
                 this.showThemeSettings();
               })
               Divider()
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.settingItemWithToggle($r('app.media.icon_vibration'), '振动反馈', this.vibrationEnabled, (enabled: boolean) => {
+              this.settingItemWithToggle($r('app.media.icon_vibration'), this.context.resourceManager.getStringSync($r('app.string.vibration_feedback').id), this.vibrationEnabled, (enabled: boolean) => {
                 this.saveVibrationPreference(enabled);
               })
               Divider()
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.settingItem($r('app.media.icon_star'), '应用评分', '', () => {
+              this.settingItem($r('app.media.icon_star'), this.context.resourceManager.getStringSync($r('app.string.app_rating').id), '', () => {
                 this.rateApp();
               })
               Divider()
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.settingItem($r('app.media.icon_share'), '分享应用', '', () => {
+              this.settingItem($r('app.media.icon_share'), this.context.resourceManager.getStringSync($r('app.string.share_app').id), '', () => {
                 this.shareApp();
               })
               Divider()
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.settingItem($r('app.media.icon_feedback'), '意见反馈', '', () => {
+              this.settingItem($r('app.media.icon_feedback'), this.context.resourceManager.getStringSync($r('app.string.feedback').id), '', () => {
                 this.showFeedback();
               })
               Divider()
@@ -448,7 +450,7 @@ export struct ProfilePage {
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.settingItem($r('app.media.icon_about'), '关于应用', '', () => {
+              this.settingItem($r('app.media.icon_about'), this.context.resourceManager.getStringSync($r('app.string.about_app').id), '', () => {
                 this.showAboutApp();
               })
             }
@@ -613,17 +615,17 @@ export struct ProfilePage {
 
       // 对话框
       Column() {
-        Text('深色模式')
+        Text(this.context.resourceManager.getStringSync($r('app.string.dark_mode').id))
           .fontSize(18)
           .fontWeight(FontWeight.Bold)
           .fontColor($r('app.color.text_primary'))
           .margin({ bottom: 20 })
 
-        this.ThemeOption('跟随系统', ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET)
-        this.ThemeOption('浅色', ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT)
-        this.ThemeOption('深色', ConfigurationConstant.ColorMode.COLOR_MODE_DARK)
+        this.ThemeOption(this.context.resourceManager.getStringSync($r('app.string.theme_follow_system').id), ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET)
+        this.ThemeOption(this.context.resourceManager.getStringSync($r('app.string.theme_light').id), ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT)
+        this.ThemeOption(this.context.resourceManager.getStringSync($r('app.string.theme_dark').id), ConfigurationConstant.ColorMode.COLOR_MODE_DARK)
 
-        Button('确定')
+        Button(this.context.resourceManager.getStringSync($r('app.string.confirm').id))
           .type(ButtonType.Normal)
           .backgroundColor($r('app.color.button_primary'))
           .fontColor($r('app.color.white'))
