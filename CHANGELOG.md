@@ -51,6 +51,12 @@
     - 移除 `LearnPage.ets`、`SettingsPage.ets`、`ContinentPage.ets`、`CountryDetailPage.ets` 中不存在的 `onRotate` API 调用
     - `onRotate` 和 `RotationEvent` 在当前版本的 ArkUI `Scroll` 组件上不可用
     - 保留 `.focusable(true)` 和 `.defaultFocus(true)` 属性以支持默认滚动交互
+  - 修复手表首页表冠滚动支持：
+    - 在 `Index.ets` 中为 `ArcSwiper` 组件添加 `.focusable(true)` 和 `.defaultFocus(true)` 属性
+    - 当 `ArcSwiper` 获得焦点时，可以自动响应表冠旋转，实现在 LearnPage、PracticePage、SettingsPage 之间的页面切换
+  - 修复平板设备底部导航条适配问题：
+    - 移除 `Index.ets` 中手动添加的底部内边距，让系统自动处理安全区域
+    - `Tabs` 组件会自动处理底部安全区域，手动添加 padding 会导致双重避让，出现多余空间
   - 改进涂色游戏布局：
     - 将"下一个"按钮从 Column 布局中移出，改为浮动按钮
     - 使用 Stack 和 position 属性让按钮浮动在内容上方

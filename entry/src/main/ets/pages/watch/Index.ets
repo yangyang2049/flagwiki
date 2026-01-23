@@ -45,6 +45,8 @@ struct Index {
           }
           return GestureJudgeResult.CONTINUE
         })
+        .focusable(true)
+        .defaultFocus(true)
         .width('100%')
         .height('100%')
         .backgroundColor('#000000')

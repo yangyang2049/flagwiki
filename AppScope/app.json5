@@ -2,7 +2,7 @@
   "app": {
     "bundleName": "com.douhua.flag",
     "vendor": "Douhua Tech",
-    "versionCode": 22,
+    "versionCode": 24,
     "versionName": "2.0.0",
     "icon": "$media:layered_image",
     "label": "$string:app_name"
