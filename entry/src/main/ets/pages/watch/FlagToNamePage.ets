@@ -5,6 +5,7 @@ import { BusinessError } from '@kit.BasicServicesKit'
 import { preferences } from '@kit.ArkData'
 import { common } from '@kit.AbilityKit'
 import { Countries, Country, getLocalizedCountryName } from '../../utils/countryData'
+import { FlagSvgAssets } from '../../utils/FlagSvgAssets'
 import { PreferencesManager } from '../../utils/PreferencesManager'
 import { WatchSoundManager } from '../../utils/WatchSoundManager'
 
@@ -592,7 +593,7 @@ struct FlagToNamePage {
           Column() {
             Column() {
               if (this.currentCountry) {
-                Image($rawfile(`flags/${this.currentCountry.code}.svg`))
+                Image(FlagSvgAssets.getUriForRelativePath(`flags/${this.currentCountry.code}.svg`))
                   .key(`${this.promptToken}-${this.currentCountry.code}`)
                   .width(64)
                   .height(40)

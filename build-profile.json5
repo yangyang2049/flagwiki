@@ -93,6 +93,32 @@
       ]
     },
     {
+      "name": "stateflags",
+      "srcPath": "./stateflags",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default",
+            "release"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "coatofarms",
+      "srcPath": "./coatofarms",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default",
+            "release"
+          ]
+        }
+      ]
+    },
+    {
       "name": "entry",
       "srcPath": "./entry",
       "targets": [

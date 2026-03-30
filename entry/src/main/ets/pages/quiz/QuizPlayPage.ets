@@ -15,6 +15,7 @@ import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 import { screenshotManager } from '../../utils/ScreenshotManager';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
+import { FlagSvgAssets } from '../../utils/FlagSvgAssets';
 import UiConstants from '../../utils/UiConstants';
 
 interface RouterParams {
@@ -535,7 +536,7 @@ interface QuizQuestion {
           Column() {
             // 显示国旗
             Column() {
-              Image($rawfile(`flags/${this.questions[this.currentIndex].correctCountry.code}.svg`))
+              Image(FlagSvgAssets.getUriForRelativePath(`flags/${this.questions[this.currentIndex].correctCountry.code}.svg`))
                 .width('80%')
                 .height(160)
                 .objectFit(ImageFit.Contain)
@@ -605,7 +606,7 @@ interface QuizQuestion {
               ForEach(this.questions[this.currentIndex].choices, (country: Country, index: number) => {
                 GridItem() {
                   Column() {
-                    Image($rawfile(`flags/${country.code}.svg`))
+                    Image(FlagSvgAssets.getUriForRelativePath(`flags/${country.code}.svg`))
                       .width('100%')
                       .height('100%')
                       .objectFit(ImageFit.Contain)
@@ -768,7 +769,7 @@ interface QuizQuestion {
     Column() {
       // 显示国旗
       Column() {
-        Image($rawfile(`flags/${this.questions[this.currentIndex].correctCountry.code}.svg`))
+        Image(FlagSvgAssets.getUriForRelativePath(`flags/${this.questions[this.currentIndex].correctCountry.code}.svg`))
           .width('80%')
           .height(160)
           .objectFit(ImageFit.Contain)
@@ -885,7 +886,7 @@ interface QuizQuestion {
   FlagChoiceButton(country: Country, index: number) {
     Stack({ alignContent: Alignment.TopStart }) {
       Column() {
-        Image($rawfile(`flags/${country.code}.svg`))
+        Image(FlagSvgAssets.getUriForRelativePath(`flags/${country.code}.svg`))
           .width('100%')
           .height('100%')
           .objectFit(ImageFit.Contain)

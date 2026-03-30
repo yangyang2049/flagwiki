@@ -1,3 +1,5 @@
+import { FlagSvgAssets } from './FlagSvgAssets';
+
 // 国家数据模型
 export interface Country {
     code: string;        // 两字母国家代码 (如 cn, us)
@@ -560,7 +562,7 @@ const INTERNATIONAL_ORGS = ['un', 'eu', 'olympic', 'nato', 'asean', 'au_org', 'a
 // 使用PNG格式的国家代码列表（目前为空，所有国家都使用SVG）
 const PNG_FLAG_COUNTRIES: string[] = [];
 
-// 根据国家代码获取旗帜图片资源
+// 根据国家代码获取旗帜图片资源（安装包内为 zip，首次启动解压至 filesDir，见 FlagSvgBundleUnpacker）
 export function getFlagImageSource(code: string): Resource | string {
     const lowerCode = code.toLowerCase();
     if (INTERNATIONAL_ORGS.includes(lowerCode)) {
@@ -570,8 +572,10 @@ export function getFlagImageSource(code: string): Resource | string {
         // 指定国家使用PNG图片
         return $r(`app.media.flag_${lowerCode}`);
     } else {
-        // 普通国家使用SVG图片
-        return $rawfile(`flags/${lowerCode}.svg`);
+        if (FlagSvgAssets.isReady()) {
+            return FlagSvgAssets.getFlagFileUri(lowerCode);
+        }
+        return $r('app.media.icon_tab_explore');
     }
 }
 

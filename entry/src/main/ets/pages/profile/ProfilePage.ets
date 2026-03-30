@@ -7,52 +7,36 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { Want } from '@kit.AbilityKit';
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import router from '@ohos.router';
-import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { PreferencesManager } from '../../utils/PreferencesManager';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
-import UiConstants from '../../utils/UiConstants';
 import {
   MODULE_ANTHEM,
   MODULE_FLAGHISTORY,
+  MODULE_STATE_FLAGS,
+  MODULE_COAT_OF_ARMS,
   openOptionalModuleInstallFlow,
   refreshOptionalModuleAppStorage
 } from '../../utils/OptionalModuleHelper';
-
-// 总关卡数
-const QUIZ_TOTAL_LEVELS = 10;
-const FAKE_FLAG_TOTAL_LEVELS = 10;
-const INPUT_TOTAL_LEVELS = 39;
-const TRIVIA_TOTAL_LEVELS = 10;
-
-interface ChallengeProgress {
-  name: string;
-  emoji: string;
-  current: number;
-  total: number;
-  color: Resource;
-}
 
 @Component
 export struct ProfilePage {
   @StorageLink('optionalModuleAnthemReady') anthemModuleReady: boolean = false;
   @StorageLink('optionalModuleFlagHistoryReady') flagHistoryModuleReady: boolean = false;
+  @StorageLink('optionalModuleStateFlagsReady') stateFlagsModuleReady: boolean = false;
+  @StorageLink('optionalModuleCoatOfArmsReady') coatOfArmsModuleReady: boolean = false;
   @State colorMode: ConfigurationConstant.ColorMode = ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET;
   @State showThemeDialog: boolean = false;
+  /** 扩展包详情弹窗：'' | anthem | flaghistory | stateflags | coatofarms */
+  @State optionalModuleDialogTarget: string = '';
+  @State optionalModuleDownloadStartedInDialog: boolean = false;
   @State vibrationEnabled: boolean = true; // 振动反馈开关，默认启用
   @Prop @Watch('onRefreshKeyChanged') refreshKey: number = 0;
   private prefs: preferences.Preferences | null = null;
   private context = getContext(this) as common.UIAbilityContext;
 
-  // 游戏进度状态
-  @State quizLevel: number = 1;
-  @State fakeFlagLevel: number = 1;
-  @State inputLevel: number = 1;
-  @State triviaLevel: number = 1;
-
   async aboutToAppear() {
     await this.loadColorMode();
-    await this.loadGameProgress();
     await this.loadVibrationPreference();
     await VibratorUtil.init(this.context);
     await refreshOptionalModuleAppStorage(this.context);
@@ -60,7 +44,6 @@ export struct ProfilePage {
 
   private onRefreshKeyChanged(): void {
     this.loadColorMode();
-    this.loadGameProgress();
     this.loadVibrationPreference();
     void refreshOptionalModuleAppStorage(this.context);
   }
@@ -71,11 +54,112 @@ export struct ProfilePage {
       : this.context.resourceManager.getStringSync($r('app.string.optional_module_status_missing').id);
   }
 
-  private async downloadOptionalModule(moduleName: 'anthem' | 'flaghistory'): Promise<void> {
+  private openOptionalModuleDetailDialog(moduleName: string): void {
+    this.optionalModuleDialogTarget = moduleName;
+    this.optionalModuleDownloadStartedInDialog = false;
+    void refreshOptionalModuleAppStorage(this.context);
+  }
+
+  private closeOptionalModuleDetailDialog(): void {
+    this.optionalModuleDialogTarget = '';
+    this.optionalModuleDownloadStartedInDialog = false;
+  }
+
+  private isOptionalDialogTargetReady(): boolean {
+    if (this.optionalModuleDialogTarget === MODULE_ANTHEM) {
+      return this.anthemModuleReady;
+    }
+    if (this.optionalModuleDialogTarget === MODULE_FLAGHISTORY) {
+      return this.flagHistoryModuleReady;
+    }
+    if (this.optionalModuleDialogTarget === MODULE_STATE_FLAGS) {
+      return this.stateFlagsModuleReady;
+    }
+    if (this.optionalModuleDialogTarget === MODULE_COAT_OF_ARMS) {
+      return this.coatOfArmsModuleReady;
+    }
+    return false;
+  }
+
+  private getOptionalModuleDialogTitle(): string {
+    if (this.optionalModuleDialogTarget === MODULE_ANTHEM) {
+      return this.context.resourceManager.getStringSync($r('app.string.optional_module_anthem_title').id);
+    }
+    if (this.optionalModuleDialogTarget === MODULE_FLAGHISTORY) {
+      return this.context.resourceManager.getStringSync($r('app.string.optional_module_flaghistory_title').id);
+    }
+    if (this.optionalModuleDialogTarget === MODULE_STATE_FLAGS) {
+      return this.context.resourceManager.getStringSync($r('app.string.optional_module_state_flags_title').id);
+    }
+    if (this.optionalModuleDialogTarget === MODULE_COAT_OF_ARMS) {
+      return this.context.resourceManager.getStringSync($r('app.string.optional_module_coat_of_arms_title').id);
+    }
+    return '';
+  }
+
+  private getOptionalModuleApproxSizeHint(): string {
+    if (this.optionalModuleDialogTarget === MODULE_ANTHEM) {
+      return this.context.resourceManager.getStringSync($r('app.string.optional_module_anthem_size_hint').id);
+    }
+    if (this.optionalModuleDialogTarget === MODULE_STATE_FLAGS) {
+      return this.context.resourceManager.getStringSync($r('app.string.optional_module_state_flags_size_hint').id);
+    }
+    if (this.optionalModuleDialogTarget === MODULE_COAT_OF_ARMS) {
+      return this.context.resourceManager.getStringSync($r('app.string.optional_module_coat_of_arms_size_hint').id);
+    }
+    return this.context.resourceManager.getStringSync($r('app.string.optional_module_flaghistory_size_hint').id);
+  }
+
+  /** 安装完成后在应用内的入口位置（简短说明） */
+  private getOptionalModuleEntryHint(): string {
+    if (this.optionalModuleDialogTarget === MODULE_ANTHEM) {
+      return this.context.resourceManager.getStringSync($r('app.string.optional_module_anthem_entry').id);
+    }
+    if (this.optionalModuleDialogTarget === MODULE_FLAGHISTORY) {
+      return this.context.resourceManager.getStringSync($r('app.string.optional_module_flaghistory_entry').id);
+    }
+    if (this.optionalModuleDialogTarget === MODULE_STATE_FLAGS) {
+      return this.context.resourceManager.getStringSync($r('app.string.optional_module_state_flags_entry').id);
+    }
+    if (this.optionalModuleDialogTarget === MODULE_COAT_OF_ARMS) {
+      return this.context.resourceManager.getStringSync($r('app.string.optional_module_coat_of_arms_entry').id);
+    }
+    return '';
+  }
+
+  private getOptionalModuleDetailScrollText(): string {
+    if (this.optionalModuleDialogTarget === MODULE_ANTHEM) {
+      return this.context.resourceManager.getStringSync($r('app.string.optional_module_anthem_detail').id);
+    }
+    if (this.optionalModuleDialogTarget === MODULE_STATE_FLAGS) {
+      return this.context.resourceManager.getStringSync($r('app.string.optional_module_state_flags_detail').id);
+    }
+    if (this.optionalModuleDialogTarget === MODULE_COAT_OF_ARMS) {
+      return this.context.resourceManager.getStringSync($r('app.string.optional_module_coat_of_arms_detail').id);
+    }
+    return this.context.resourceManager.getStringSync($r('app.string.optional_module_flaghistory_detail').id);
+  }
+
+  private async onOptionalModuleDialogDownload(): Promise<void> {
+    if (this.optionalModuleDialogTarget !== MODULE_ANTHEM && this.optionalModuleDialogTarget !== MODULE_FLAGHISTORY &&
+      this.optionalModuleDialogTarget !== MODULE_STATE_FLAGS && this.optionalModuleDialogTarget !== MODULE_COAT_OF_ARMS) {
+      return;
+    }
+    const moduleName = this.optionalModuleDialogTarget as 'anthem' | 'flaghistory' | 'stateflags' | 'coatofarms';
     try {
       await openOptionalModuleInstallFlow(this.context, moduleName);
+      this.optionalModuleDownloadStartedInDialog = true;
+      await refreshOptionalModuleAppStorage(this.context);
+      try {
+        promptAction.showToast({
+          message: this.context.resourceManager.getStringSync($r('app.string.optional_module_dialog_toast_after_download').id),
+          duration: 3500
+        });
+      } catch (_t) {
+        void 0;
+      }
     } catch (err) {
-      console.error(`downloadOptionalModule: ${JSON.stringify(err)}`);
+      console.error(`onOptionalModuleDialogDownload: ${JSON.stringify(err)}`);
       try {
         promptAction.showToast({
           message: this.context.resourceManager.getStringSync($r('app.string.cannot_open_market').id),
@@ -84,19 +168,6 @@ export struct ProfilePage {
       } catch (_e2) {
         void 0;
       }
-    }
-  }
-
-  private async loadGameProgress(): Promise<void> {
-    try {
-      // 使用 GameProgressManager 统一读取进度
-      await GameProgressManager.init(this.context);
-      this.quizLevel = await GameProgressManager.getUnlockedLevel(GameType.QUIZ);
-      this.fakeFlagLevel = await GameProgressManager.getUnlockedLevel(GameType.FAKE_FLAG);
-      this.inputLevel = await GameProgressManager.getUnlockedLevel(GameType.INPUT);
-      this.triviaLevel = await GameProgressManager.getUnlockedLevel(GameType.TRIVIA);
-    } catch (err) {
-      console.error(`Failed to load game progress: ${JSON.stringify(err)}`);
     }
   }
 
@@ -293,140 +364,11 @@ export struct ProfilePage {
     }
   }
 
-  private getTotalCompletedLevels(): number {
-    return (this.quizLevel - 1) + (this.fakeFlagLevel - 1) + (this.inputLevel - 1) + (this.triviaLevel - 1);
-  }
-
-
-  private getTotalLevels(): number {
-    return QUIZ_TOTAL_LEVELS + FAKE_FLAG_TOTAL_LEVELS + INPUT_TOTAL_LEVELS + TRIVIA_TOTAL_LEVELS;
-  }
-
-  private getChallengeProgressList(): ChallengeProgress[] {
-    return [
-      {
-        name: this.context.resourceManager.getStringSync($r('app.string.game_flag_quiz').id),
-        emoji: '🎯',
-        current: this.quizLevel - 1,
-        total: QUIZ_TOTAL_LEVELS,
-        color: $r('app.color.button_primary')
-      },
-      {
-        name: this.context.resourceManager.getStringSync($r('app.string.game_fake_flag').id),
-        emoji: '🔍',
-        current: this.fakeFlagLevel - 1,
-        total: FAKE_FLAG_TOTAL_LEVELS,
-        color: $r('app.color.color_green')
-      },
-      {
-        name: this.context.resourceManager.getStringSync($r('app.string.game_spelling_challenge').id),
-        emoji: '⌨️',
-        current: this.inputLevel - 1,
-        total: INPUT_TOTAL_LEVELS,
-        color: $r('app.color.color_orange')
-      },
-      {
-        name: this.context.resourceManager.getStringSync($r('app.string.game_trivia').id),
-        emoji: '🧩',
-        current: this.triviaLevel - 1,
-        total: TRIVIA_TOTAL_LEVELS,
-        color: $r('app.color.color_purple')
-      }
-    ];
-  }
-
   build() {
     Stack() {
       Scroll() {
         Column() {
           Column() {
-            // 统计 Banner
-            Column() {
-              // 顶部总览
-              Row() {
-                Column() {
-                  Text(UiConstants.TROPHY)
-                    .fontSize(40)
-                }
-                .width(64)
-                  .height(64)
-                  .backgroundColor($r('app.color.bg_yellow_light'))
-                  .borderRadius(32)
-                  .justifyContent(FlexAlign.Center)
-
-                Column() {
-                  Text(this.context.resourceManager.getStringSync($r('app.string.exploration_progress').id))
-                    .fontSize(18)
-                    .fontWeight(FontWeight.Bold)
-                    .fontColor($r('app.color.text_primary'))
-
-                  Row() {
-                    Text(`${this.context.resourceManager.getStringSync($r('app.string.completed').id)} `)
-                      .fontSize(14)
-                      .fontColor($r('app.color.text_secondary'))
-                    Text(`${this.getTotalCompletedLevels()}`)
-                      .fontSize(16)
-                      .fontWeight(FontWeight.Bold)
-                      .fontColor($r('app.color.button_primary'))
-                    Text(`${this.context.resourceManager.getStringSync($r('app.string.levels_separator').id)}${this.getTotalLevels()}${this.context.resourceManager.getStringSync($r('app.string.levels_unit').id)}`)
-                      .fontSize(14)
-                      .fontColor($r('app.color.text_secondary'))
-                  }
-                  .margin({ top: 4 })
-                }
-                .alignItems(HorizontalAlign.Start)
-                  .margin({ left: 16 })
-              }
-              .width('100%')
-                .margin({ bottom: 20 })
-
-              // 各项进度
-              ForEach(this.getChallengeProgressList(), (game: ChallengeProgress) => {
-                Row() {
-                  Text(game.emoji)
-                    .fontSize(20)
-                    .width(32)
-
-                  Text(game.name)
-                    .fontSize(14)
-                    .fontColor($r('app.color.text_primary'))
-                    .width(72)
-
-                  // 进度条
-                  Stack({ alignContent: Alignment.Start }) {
-                    // 背景
-                    Row()
-                      .width('100%')
-                      .height(8)
-                      .backgroundColor($r('app.color.bg_secondary'))
-                      .borderRadius(4)
-
-                    // 进度
-                    Row()
-                      .width(`${(game.current / game.total) * 100}%`)
-                      .height(8)
-                      .backgroundColor(game.color)
-                      .borderRadius(4)
-                  }
-                  .layoutWeight(1)
-                    .margin({ left: 12, right: 12 })
-
-                  Text(`${game.current}/${game.total}`)
-                    .fontSize(13)
-                    .fontColor($r('app.color.text_tertiary'))
-                    .width(50)
-                    .textAlign(TextAlign.End)
-                }
-                .width('100%')
-                  .margin({ bottom: 12 })
-              })
-            }
-            .width('100%')
-              .padding(20)
-              .backgroundColor($r('app.color.bg_card'))
-              .borderRadius(16)
-              .margin({ top: 16 })
-
             // 我的收藏
             Column() {
               this.settingItem($r('app.media.icon_favorite'), this.context.resourceManager.getStringSync($r('app.string.my_favorites').id), '', () => {
@@ -441,23 +383,44 @@ export struct ProfilePage {
               .borderRadius(12)
               .margin({ top: 16, bottom: 0 })
 
-            // 扩展模块（按需下载，安装后自动出现国歌 Tab、国旗详情历史国旗等）
+            // 扩展资源包（顺序：国徽 → 历史国旗 → 州旗 → 国歌）
+            // 图标与底部 Tab 同形（国徽无对应 Tab，沿用星形 icon_star）；使用 icon_optional_* 独立文件以便列表配色（base #000 / dark #FFF），不与 Tab 资源混用
             Column() {
-              this.settingItemWithValue($r('app.media.icon_tab_anthem'),
-                this.context.resourceManager.getStringSync($r('app.string.optional_module_anthem_title').id),
-                () => this.getOptionalStatusText(this.anthemModuleReady),
+              this.settingItemWithValue($r('app.media.icon_optional_coat_of_arms'),
+                this.context.resourceManager.getStringSync($r('app.string.optional_module_coat_of_arms_title').id),
+                () => this.getOptionalStatusText(this.coatOfArmsModuleReady),
                 () => {
-                  void this.downloadOptionalModule(MODULE_ANTHEM);
+                  this.openOptionalModuleDetailDialog(MODULE_COAT_OF_ARMS);
                 })
               Divider()
                 .strokeWidth(0.5)
                 .color($r('app.color.gray_border'))
                 .margin({ left: 16, right: 16 })
-              this.settingItemWithValue($r('app.media.icon_tab_gallery'),
+              this.settingItemWithValue($r('app.media.icon_optional_flag_history'),
                 this.context.resourceManager.getStringSync($r('app.string.optional_module_flaghistory_title').id),
                 () => this.getOptionalStatusText(this.flagHistoryModuleReady),
                 () => {
-                  void this.downloadOptionalModule(MODULE_FLAGHISTORY);
+                  this.openOptionalModuleDetailDialog(MODULE_FLAGHISTORY);
+                })
+              Divider()
+                .strokeWidth(0.5)
+                .color($r('app.color.gray_border'))
+                .margin({ left: 16, right: 16 })
+              this.settingItemWithValue($r('app.media.icon_optional_state_flags'),
+                this.context.resourceManager.getStringSync($r('app.string.optional_module_state_flags_title').id),
+                () => this.getOptionalStatusText(this.stateFlagsModuleReady),
+                () => {
+                  this.openOptionalModuleDetailDialog(MODULE_STATE_FLAGS);
+                })
+              Divider()
+                .strokeWidth(0.5)
+                .color($r('app.color.gray_border'))
+                .margin({ left: 16, right: 16 })
+              this.settingItemWithValue($r('app.media.icon_optional_anthem'),
+                this.context.resourceManager.getStringSync($r('app.string.optional_module_anthem_title').id),
+                () => this.getOptionalStatusText(this.anthemModuleReady),
+                () => {
+                  this.openOptionalModuleDetailDialog(MODULE_ANTHEM);
                 })
             }
             .width('100%')
@@ -540,6 +503,10 @@ export struct ProfilePage {
       // 主题设置对话框
       if (this.showThemeDialog) {
         this.ThemeDialog()
+      }
+
+      if (this.optionalModuleDialogTarget !== '') {
+        this.OptionalModuleDetailDialog()
       }
     }
     .width('100%')
@@ -655,6 +622,122 @@ export struct ProfilePage {
     .width('100%')
       .height(56)
       .padding({ left: 16, right: 16 })
+  }
+
+  @Builder
+  OptionalModuleDetailDialog() {
+    Stack({ alignContent: Alignment.Center }) {
+      Column()
+        .width('100%')
+        .height('100%')
+        .backgroundColor('rgba(0, 0, 0, 0.5)')
+        .onClick(() => {
+          this.closeOptionalModuleDetailDialog();
+        })
+
+      Column() {
+        Text(this.getOptionalModuleDialogTitle())
+          .fontSize(18)
+          .fontWeight(FontWeight.Bold)
+          .fontColor($r('app.color.text_primary'))
+          .width('100%')
+          .textAlign(TextAlign.Start)
+          .margin({ bottom: 8 })
+
+        Text(
+          this.isOptionalDialogTargetReady()
+            ? this.context.resourceManager.getStringSync($r('app.string.optional_module_status_ready').id)
+            : this.context.resourceManager.getStringSync($r('app.string.optional_module_status_missing').id)
+        )
+          .fontSize(13)
+          .fontColor($r('app.color.text_tertiary'))
+          .width('100%')
+          .margin({ bottom: 8 })
+
+        Text(this.getOptionalModuleApproxSizeHint())
+          .fontSize(12)
+          .fontColor($r('app.color.text_tertiary'))
+          .width('100%')
+          .opacity(0.9)
+          .margin({ bottom: 12 })
+
+        Text(this.getOptionalModuleEntryHint())
+          .fontSize(13)
+          .fontColor($r('app.color.text_secondary'))
+          .lineHeight(20)
+          .width('100%')
+          .margin({ bottom: 12 })
+
+        Scroll() {
+          Text(this.getOptionalModuleDetailScrollText())
+            .fontSize(14)
+            .fontColor($r('app.color.text_secondary'))
+            .lineHeight(22)
+            .width('100%')
+        }
+        .width('100%')
+        .constraintSize({ maxHeight: 220 })
+        .scrollBar(BarState.Auto)
+        .margin({ bottom: 16 })
+
+        if (this.isOptionalDialogTargetReady()) {
+          Text(this.context.resourceManager.getStringSync($r('app.string.optional_module_dialog_installed_hint').id))
+            .fontSize(14)
+            .fontColor($r('app.color.color_green'))
+            .width('100%')
+            .margin({ bottom: 16 })
+        }
+
+        if (!this.isOptionalDialogTargetReady()) {
+          if (!this.optionalModuleDownloadStartedInDialog) {
+            Button(this.context.resourceManager.getStringSync($r('app.string.optional_module_dialog_download').id))
+              .type(ButtonType.Normal)
+              .backgroundColor($r('app.color.button_primary'))
+              .fontColor($r('app.color.white'))
+              .fontSize(16)
+              .width('100%')
+              .height(48)
+              .borderRadius(8)
+              .margin({ bottom: 12 })
+              .onClick(() => {
+                void this.onOptionalModuleDialogDownload();
+              })
+          } else {
+            Text(this.context.resourceManager.getStringSync($r('app.string.optional_module_dialog_after_download_hint').id))
+              .fontSize(13)
+              .fontColor($r('app.color.text_secondary'))
+              .lineHeight(20)
+              .width('100%')
+              .margin({ bottom: 16 })
+          }
+        }
+
+        Button(this.context.resourceManager.getStringSync($r('app.string.optional_module_dialog_close').id))
+          .type(ButtonType.Normal)
+          .backgroundColor($r('app.color.bg_secondary'))
+          .fontColor($r('app.color.text_primary'))
+          .fontSize(16)
+          .width('100%')
+          .height(48)
+          .borderRadius(8)
+          .onClick(() => {
+            this.closeOptionalModuleDetailDialog();
+          })
+      }
+      .width('85%')
+      .constraintSize({ maxWidth: 340 })
+      .padding({ left: 22, right: 22, top: 22, bottom: 22 })
+      .backgroundColor($r('app.color.bg_card'))
+      .borderRadius(16)
+      .shadow({
+        radius: 20,
+        color: $r('app.color.shadow'),
+        offsetX: 0,
+        offsetY: 4
+      })
+    }
+    .width('100%')
+      .height('100%')
   }
 
   @Builder

@@ -3,16 +3,39 @@ import common from '@ohos.app.ability.common';
 import { CountryStateData, getAllCountryStateData } from '../../utils/StateFlagData';
 import { LocalizationUtil } from '../../utils/LocalizationUtil';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
+import { FlagSvgAssets } from '../../utils/FlagSvgAssets';
+import {
+  MODULE_STATE_FLAGS,
+  openOptionalModuleInstallFlow,
+  refreshOptionalModuleStatus
+} from '../../utils/OptionalModuleHelper';
 
 @Entry
 @Component
 struct StateFlagCountryListPage {
   @State countryList: CountryStateData[] = [];
   @StorageLink('currentLanguage') currentLanguage: string = 'zh';
+  @StorageLink('optionalModuleStateFlagsReady') @Watch('onStateFlagsReadyChanged') stateFlagsModuleReady: boolean = false;
   private context = getContext(this) as common.UIAbilityContext;
 
   aboutToAppear() {
-    this.countryList = getAllCountryStateData();
+    void refreshOptionalModuleStatus(MODULE_STATE_FLAGS);
+    this.reloadListIfReady();
+  }
+
+  private onStateFlagsReadyChanged(): void {
+    this.reloadListIfReady();
+  }
+
+  private reloadListIfReady(): void {
+    this.countryList = this.stateFlagsModuleReady ? getAllCountryStateData() : [];
+  }
+
+  private async openInstallFlow(): Promise<void> {
+    const ready = await openOptionalModuleInstallFlow(this.context, MODULE_STATE_FLAGS);
+    if (ready) {
+      this.reloadListIfReady();
+    }
   }
   
   private getCountryName(country: CountryStateData): string {
@@ -56,12 +79,15 @@ struct StateFlagCountryListPage {
     Navigation() {
       Row() {
         Column() {
+          if (!this.stateFlagsModuleReady) {
+            this.OptionalModuleUnavailable()
+          } else {
           List() {
             ForEach(this.countryList, (country: CountryStateData) => {
               ListItem() {
                 Row() {
                   // 国旗图片
-                  Image($rawfile(`flags/${country.countryCode}.svg`))
+                  Image(FlagSvgAssets.getUriForRelativePath(`flags/${country.countryCode}.svg`))
                     .width(60)
                     .height(40)
                     .objectFit(ImageFit.Contain)
@@ -104,6 +130,7 @@ struct StateFlagCountryListPage {
           .padding({ left: 16, right: 16, top: 16 })
           .edgeEffect(EdgeEffect.Spring)
           .constraintSize({ maxWidth: getContentMaxWidth() })
+          }
         }
         .width('100%')
         .height('100%')
@@ -117,6 +144,41 @@ struct StateFlagCountryListPage {
     .titleMode(NavigationTitleMode.Mini)
     .mode(NavigationMode.Stack)
     .backgroundColor($r('app.color.bg_page'))
+  }
+
+  @Builder
+  OptionalModuleUnavailable() {
+    Column({ space: 12 }) {
+      Text(this.context.resourceManager.getStringSync($r('app.string.optional_module_unavailable_title').id))
+        .fontSize(18)
+        .fontWeight(FontWeight.Bold)
+        .fontColor($r('app.color.text_primary'))
+
+      Text(this.context.resourceManager.getStringSync(
+        $r('app.string.optional_module_missing_message').id,
+        this.context.resourceManager.getStringSync($r('app.string.optional_module_state_flags_title').id)
+      ))
+        .fontSize(14)
+        .fontColor($r('app.color.text_secondary'))
+        .textAlign(TextAlign.Center)
+        .lineHeight(22)
+
+      Button(this.context.resourceManager.getStringSync($r('app.string.optional_module_open_market').id))
+        .height(44)
+        .padding({ left: 20, right: 20 })
+        .backgroundColor($r('app.color.button_primary'))
+        .fontColor($r('app.color.white'))
+        .borderRadius(22)
+        .margin({ top: 8 })
+        .onClick(() => {
+          void this.openInstallFlow();
+        })
+    }
+    .width('100%')
+    .layoutWeight(1)
+    .padding({ left: 24, right: 24, top: 48 })
+    .justifyContent(FlexAlign.Start)
+    .alignItems(HorizontalAlign.Center)
   }
 }
 

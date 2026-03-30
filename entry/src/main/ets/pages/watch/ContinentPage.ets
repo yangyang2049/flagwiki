@@ -1,6 +1,7 @@
 import router from '@ohos.router'
 import common from '@ohos.app.ability.common'
 import { Countries, Country, Continent, getLocalizedCountryName } from '../../utils/countryData'
+import { FlagSvgAssets } from '../../utils/FlagSvgAssets'
 import { LocalizationUtil } from '../../utils/LocalizationUtil'
 
 @Entry
@@ -68,7 +69,7 @@ struct ContinentPage {
         Column() {
           ForEach(this.continentCountries, (country: Country) => {
             Row() {
-              Image($rawfile(`flags/${country.code}.svg`))
+              Image(FlagSvgAssets.getUriForRelativePath(`flags/${country.code}.svg`))
                 .width(32)
                 .height(26)
                 .objectFit(ImageFit.Contain)

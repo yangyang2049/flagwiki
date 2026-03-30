@@ -3,7 +3,8 @@ import common from '@ohos.app.ability.common';
 import promptAction from '@ohos.promptAction';
 import { FavoritesManager, FavoriteItem } from '../../utils/favoritesManager';
 import { getFlagImageSource, getInternationalOrgByCode, isInternationalOrg, getLocalizedOrgName } from '../../utils/countryData';
-import { getStateFlagPath, getCountryStateData, CountryStateData, StateInfo } from '../../utils/StateFlagData';
+import { getCountryStateData, CountryStateData, StateInfo } from '../../utils/StateFlagData';
+import { getStateFlagImageResource } from '../../utils/RegionAssetsUtil';
 import { LocalizationUtil } from '../../utils/LocalizationUtil';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
@@ -41,13 +42,15 @@ export struct FavoritesPage {
     }
   }
 
-  private getStateFlagImagePath(pageUrl: string): string {
-    // 格式: stateflag:countryCode:stateCode
+  private getStateFlagImageResourceForFavorite(pageUrl: string): Resource {
     const parts = pageUrl.substring(10).split(':');
     if (parts.length >= 2) {
-      return getStateFlagPath(parts[0], parts[1]);
+      const res = getStateFlagImageResource(parts[0], parts[1]);
+      if (res !== null) {
+        return res;
+      }
     }
-    return '';
+    return $r('app.media.icon_tab_explore');
   }
 
   private isValidStateFlagUrl(pageUrl: string): boolean {
@@ -204,8 +207,8 @@ export struct FavoritesPage {
                         .margin({ right: 12 })
                         .borderRadius(2)
                     } else if (item.pageUrl.startsWith('stateflag:') && this.isValidStateFlagUrl(item.pageUrl)) {
-                      // 州旗类型，显示州旗图片
-                      Image($rawfile(this.getStateFlagImagePath(item.pageUrl)))
+                      // 州旗类型，显示州旗图片（扩展包未安装时显示占位图标）
+                      Image(this.getStateFlagImageResourceForFavorite(item.pageUrl))
                         .width(32)
                         .height(22)
                         .objectFit(ImageFit.Contain)

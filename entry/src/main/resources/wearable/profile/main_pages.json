@@ -5,6 +5,7 @@
     "pages/watch/FlagToNamePage",
     "pages/watch/FlashcardPage",
     "pages/watch/ContinentPage",
-    "pages/watch/CountryDetailPage"
+    "pages/watch/CountryDetailPage",
+    "pages/topic/TopicDetailPage"
   ]
 }

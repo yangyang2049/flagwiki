@@ -30,6 +30,7 @@ export struct AnthemPage {
   @State searchText: string = '';
   @State isLoading: boolean = true;
   @Prop @Watch('onSearchExpandedChanged') isSearchExpanded: boolean = false;
+  @Prop @Watch('onAnthemPageRefreshKeyChanged') refreshKey: number = 0;
   @StorageLink('currentLanguage') @Watch('onLanguageChanged') systemLanguage: string = 'zh';
   @StorageLink('optionalModuleAnthemReady') @Watch('onAnthemModuleReadyChanged') anthemModuleReady: boolean = false;
   @Prop context: common.UIAbilityContext;
@@ -48,6 +49,10 @@ export struct AnthemPage {
   }
 
   private onAnthemModuleReadyChanged(): void {
+    void this.loadCountriesIfReady();
+  }
+
+  private onAnthemPageRefreshKeyChanged(): void {
     void this.loadCountriesIfReady();
   }
 

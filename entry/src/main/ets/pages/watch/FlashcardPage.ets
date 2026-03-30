@@ -7,6 +7,7 @@ import { preferences } from '@kit.ArkData'
 import { Countries, Country, getLocalizedCountryName } from '../../utils/countryData'
 import { FavoritesManager } from '../../utils/favoritesManager'
 import { PreferencesManager } from '../../utils/PreferencesManager'
+import { FlagSvgAssets } from '../../utils/FlagSvgAssets'
 
 @Entry
 @Component
@@ -230,7 +231,7 @@ struct FlashcardPage {
                   curve: curves.springMotion(0.4, 0.8)
                 })
             } else {
-              Image($rawfile(`flags/${this.currentCountry.code}.svg`))
+              Image(FlagSvgAssets.getUriForRelativePath(`flags/${this.currentCountry.code}.svg`))
                 .width(110)
                 .height(72)
                 .objectFit(ImageFit.Contain)

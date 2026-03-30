@@ -2,6 +2,7 @@ import { ArcSwiper, ArcSwiperAttribute, ArcSwiperController, ArcDotIndicator } f
 import { common } from '@kit.AbilityKit'
 import { LearnPage } from './LearnPage'
 import { PracticePage } from './PracticePage'
+import { WatchTopicPage } from './WatchTopicPage'
 import { SettingsPage } from './SettingsPage'
 import { WatchPrivacyAgreement } from './WatchPrivacyAgreement'
 
@@ -27,6 +28,7 @@ struct Index {
         ArcSwiper(this.arcSwiperController) {
           LearnPage()
           PracticePage()
+          WatchTopicPage()
           SettingsPage()
         }
         .index(this.currentTab)

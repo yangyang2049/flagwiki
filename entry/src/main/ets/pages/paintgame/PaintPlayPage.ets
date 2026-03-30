@@ -13,11 +13,16 @@ import { getCountryByCode, Country, getLocalizedCountryName } from '../../utils/
 import { getCountryStateData, StateInfo } from '../../utils/StateFlagData';
 import { getPaintLevel, getFlagPaintInfo, getTotalLevels, PaintLevel } from './PaintGameData';
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
+import { PreferencesManager } from '../../utils/PreferencesManager';
 import { SoundEffectUtil, SoundType } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 import { LocalizationUtil } from '../../utils/LocalizationUtil';
+import fs from '@ohos.file.fs';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
 import UiConstants from '../../utils/UiConstants';
+import { FlagSvgAssets } from '../../utils/FlagSvgAssets';
+import { getStateFlagImageResource, isStateFlagsModuleReady } from '../../utils/RegionAssetsUtil';
+import { MODULE_STATE_FLAGS, refreshOptionalModuleStatus } from '../../utils/OptionalModuleHelper';
 
 interface RouterParams {
   categoryId: string;
@@ -36,7 +41,6 @@ interface RouterParams {
   @State showHint: boolean = false;
   @State levelCompleted: boolean = false;
   @State isWebReady: boolean = false;
-  @State currentFlagPath: string = 'flags/us.svg';
   @State webOpacity: number = 0; // Web 组件透明度，用于渐显动画
   @State contentTranslateY: number = 0; // 内容向上移动的距离
   @State showButtons: boolean = false; // 按钮是否显示
@@ -59,6 +63,19 @@ interface RouterParams {
     if (params) {
       this.categoryId = params.categoryId || 'world';
       this.levelId = params.levelId || 1;
+    }
+
+    await refreshOptionalModuleStatus(MODULE_STATE_FLAGS);
+    if (this.categoryId === 'us' && !isStateFlagsModuleReady()) {
+      promptAction.showToast({
+        message: this.context.resourceManager.getStringSync($r('app.string.optional_module_missing_message').id,
+          this.context.resourceManager.getStringSync($r('app.string.optional_module_state_flags_title').id)),
+        duration: 2500
+      });
+      setTimeout(() => {
+        router.back();
+      }, 400);
+      return;
     }
     
     // 检查关卡是否有效
@@ -87,7 +104,49 @@ interface RouterParams {
       }, 500);
       return;
     }
-    this.updateCurrentFlagPath();
+
+    if (this.levelId === 1) {
+      const tutorialTimer = setTimeout((): void => {
+        void this.maybeShowPaintTutorialFirstLevel();
+      }, 450);
+      this.timeoutIds.push(tutorialTimer);
+    }
+  }
+
+  /** 第一关首次进入时弹出玩法说明（按分类分别记录） */
+  private async maybeShowPaintTutorialFirstLevel(): Promise<void> {
+    if (this.levelId !== 1) {
+      return;
+    }
+    try {
+      const prefs = await PreferencesManager.getPreferences('app_settings');
+      const prefKey = `paint_howto_seen_${this.categoryId}`;
+      const seen = await prefs.get(prefKey, false) as boolean;
+      if (seen) {
+        return;
+      }
+      const rm = this.context.resourceManager;
+      const msg = [
+        rm.getStringSync($r('app.string.paint_instruction_1').id),
+        rm.getStringSync($r('app.string.paint_instruction_2').id),
+        rm.getStringSync($r('app.string.paint_instruction_3').id),
+        rm.getStringSync($r('app.string.paint_instruction_4').id)
+      ].join('\n\n');
+      promptAction.showDialog({
+        title: rm.getStringSync($r('app.string.paint_instructions_title').id),
+        message: msg,
+        buttons: [
+          { text: rm.getStringSync($r('app.string.got_it').id), color: $r('app.color.button_primary') }
+        ]
+      }).then(async () => {
+        await prefs.put(prefKey, true);
+        await prefs.flush();
+      }).catch((err: Error) => {
+        console.error(`[PaintPlayPage] tutorial dialog: ${err.message}`);
+      });
+    } catch (e) {
+      console.error(`[PaintPlayPage] maybeShowPaintTutorialFirstLevel: ${JSON.stringify(e)}`);
+    }
   }
 
   aboutToDisappear() {
@@ -102,13 +161,6 @@ interface RouterParams {
       clearTimeout(id);
     }
     this.timeoutIds = [];
-  }
-
-  private updateCurrentFlagPath(): void {
-    if (this.currentLevel) {
-      const code = this.currentLevel.flags[this.currentFlagIndex];
-      this.currentFlagPath = this.getFlagImagePath(code);
-    }
   }
 
   private getCurrentCountry(): Country | undefined {
@@ -126,10 +178,13 @@ interface RouterParams {
 
   private async loadSvgAsBase64(countryCode: string): Promise<string> {
     try {
-      const resourceManager = this.context.resourceManager;
-      const svgPath = `paint_flags/${countryCode}.svg`;
-      const uint8Array = await resourceManager.getRawFileContent(svgPath);
-      // 使用 Base64 编码
+      const path = FlagSvgAssets.getPaintFlagFilePath(countryCode);
+      const stat = fs.statSync(path);
+      const handle = fs.openSync(path, fs.OpenMode.READ_ONLY);
+      const buf = new ArrayBuffer(stat.size);
+      fs.readSync(handle.fd, buf);
+      fs.closeSync(handle);
+      const uint8Array = new Uint8Array(buf);
       const base64Helper = new util.Base64Helper();
       return base64Helper.encodeToStringSync(uint8Array);
     } catch (e) {
@@ -194,9 +249,6 @@ interface RouterParams {
       console.error('No colors found for:', countryCode);
       return;
     }
-
-    // 更新当前旗帜路径（用于提示显示）
-    this.updateCurrentFlagPath();
 
     const colorsJson = JSON.stringify(colors);
     const displayName = this.getFlagDisplayName(countryCode);
@@ -343,23 +395,23 @@ interface RouterParams {
     this.showHint = !this.showHint;
   }
 
-  private getFlagImagePath(code: string): string {
-    // 如果当前分类是美国州旗，使用州旗路径
+  /** 关卡内任意国旗 code：州旗动态模块优先，否则解压后的 paint_flags / flags */
+  private getCompletionFlagImageSrc(code: string): string | Resource {
     if (this.categoryId === 'us') {
-      return `state_flags/us/${code}.svg`;
+      if (isStateFlagsModuleReady()) {
+        const modRes = getStateFlagImageResource('us', code);
+        if (modRes !== null) {
+          return modRes;
+        }
+      }
+      return FlagSvgAssets.getPaintFlagFileUri(code);
     }
-    
-    // 否则尝试通过资源文件判断是否为美国州旗
-    const rm = this.context.resourceManager;
-    const stateKey = `state_${code}`;
-    try {
-      // Check if it's a US state by attempting to get its localized name
-      rm.getStringSync($r(`app.string.${stateKey}`).id);
-      return `state_flags/us/${code}.svg`;
-    } catch (e) {
-      // If not a US state or resource not found, it's a regular country flag
-      return `flags/${code}.svg`;
-    }
+    return FlagSvgAssets.getUriForRelativePath(`flags/${code}.svg`);
+  }
+
+  private getHintFlagImageSrc(): string | Resource {
+    const code = this.currentLevel?.flags[this.currentFlagIndex] ?? '';
+    return this.getCompletionFlagImageSrc(code);
   }
 
   build() {
@@ -518,7 +570,7 @@ interface RouterParams {
                 // 提示国旗显示
                 if (this.showHint) {
                   Column() {
-                    Image($rawfile(this.currentFlagPath))
+                    Image(this.getHintFlagImageSrc())
                       .width(140)
                       .height(90)
                       .objectFit(ImageFit.Contain)
@@ -610,7 +662,7 @@ interface RouterParams {
         // 完成的国旗展示
         Row({ space: 12 }) {
           ForEach(this.currentLevel?.flags || [], (code: string) => {
-            Image($rawfile(this.getFlagImagePath(code)))
+            Image(this.getCompletionFlagImageSrc(code))
               .width(80)
               .height(50)
               .objectFit(ImageFit.Contain)

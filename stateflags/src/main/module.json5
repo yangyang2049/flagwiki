@@ -1,0 +1,15 @@
+{
+  "module": {
+    "name": "stateflags",
+    "type": "shared",
+    "description": "$string:module_desc",
+    "deviceTypes": [
+      "phone",
+      "tablet",
+      "2in1",
+      "wearable"
+    ],
+    "deliveryWithInstall": false,
+    "installationFree": false
+  }
+}

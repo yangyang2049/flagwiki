@@ -77,6 +77,82 @@
       "value": "Not installed"
     },
     {
+      "name": "optional_module_anthem_detail",
+      "value": "Includes national anthem audio for many countries. After installation, an \"Anthems\" tab appears on the home screen for browsing, search, and playback.\n\nThe pack is large and is downloaded on demand over the network; it may take several minutes. Keep your connection stable."
+    },
+    {
+      "name": "optional_module_flaghistory_detail",
+      "value": "Includes historical flag images and descriptions. After installation, you can view a country's past flags on the flag detail page.\n\nDownload requires a network connection; please wait until it finishes."
+    },
+    {
+      "name": "optional_module_dialog_close",
+      "value": "Close"
+    },
+    {
+      "name": "optional_module_dialog_download",
+      "value": "Start download"
+    },
+    {
+      "name": "optional_module_dialog_after_download_hint",
+      "value": "Download has started. You can tap \"Close\" anytime; the download continues in the background. You can also check progress at the top of the app."
+    },
+    {
+      "name": "optional_module_dialog_toast_after_download",
+      "value": "Download started — you can close this window"
+    },
+    {
+      "name": "optional_module_dialog_installed_hint",
+      "value": "This pack is installed. You can use the related features now."
+    },
+    {
+      "name": "optional_module_anthem_size_hint",
+      "value": "Download size about 150 MB (approximate; see AppGallery for actual size)"
+    },
+    {
+      "name": "optional_module_flaghistory_size_hint",
+      "value": "Download size about 45 MB (approximate; see AppGallery for actual size)"
+    },
+    {
+      "name": "optional_module_state_flags_title",
+      "value": "State / region flags pack"
+    },
+    {
+      "name": "optional_module_state_flags_detail",
+      "value": "Administrative region flag images. After installation, use State Flags on the home screen and the US states category in the paint game.\n\nRequires a network download."
+    },
+    {
+      "name": "optional_module_state_flags_size_hint",
+      "value": "Download size about 20 MB (approximate; see AppGallery for actual size)"
+    },
+    {
+      "name": "optional_module_coat_of_arms_title",
+      "value": "Coat of arms pack"
+    },
+    {
+      "name": "optional_module_coat_of_arms_detail",
+      "value": "Coat-of-arms images for countries. After installation, they appear on flag detail pages where available.\n\nRequires a network download."
+    },
+    {
+      "name": "optional_module_coat_of_arms_size_hint",
+      "value": "Download size about 5 MB (approximate; see AppGallery for actual size)"
+    },
+    {
+      "name": "optional_module_anthem_entry",
+      "value": "Find it on the home screen under the \"Anthems\" tab"
+    },
+    {
+      "name": "optional_module_flaghistory_entry",
+      "value": "On any country flag page, open \"Historical flags\""
+    },
+    {
+      "name": "optional_module_state_flags_entry",
+      "value": "Home — \"State flags\"; paint game — \"US states\" category"
+    },
+    {
+      "name": "optional_module_coat_of_arms_entry",
+      "value": "On flag detail pages — coat of arms when available"
+    },
+    {
       "name": "optional_module_market_hint",
       "value": "Preparing add-on download"
     },
@@ -109,6 +185,14 @@
       "value": "Downloading \"%s\""
     },
     {
+      "name": "optional_module_download_started_detail",
+      "value": "Downloading \"%s\". The pack is large and may take several minutes. Keep the network connected. You can see progress at the top of the app."
+    },
+    {
+      "name": "optional_module_downloading_banner",
+      "value": "Downloading \"%s\"… This may take a few minutes."
+    },
+    {
       "name": "optional_module_download_success",
       "value": "\"%s\" is ready"
     },
@@ -139,6 +223,14 @@
     {
       "name": "national_day",
       "value": "National Day"
+    },
+    {
+      "name": "home_paint_entry_title",
+      "value": "Flag Paint"
+    },
+    {
+      "name": "home_paint_entry_subtitle",
+      "value": "Color flags and learn them through play"
     },
     {
       "name": "quick_entrance",
@@ -1079,6 +1171,10 @@
     {
       "name": "watch_flag_desc_unavailable",
       "value": "No flag details"
+    },
+    {
+      "name": "watch_org_detail_unavailable",
+      "value": "International organization details are unavailable on watch"
     },
     {
       "name": "fun_fact_1",

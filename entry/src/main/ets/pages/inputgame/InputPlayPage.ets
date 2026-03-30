@@ -7,6 +7,7 @@ import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
+import { FlagSvgAssets } from '../../utils/FlagSvgAssets';
 
 interface RouterParams {
   levelId: number;
@@ -256,7 +257,7 @@ interface RouterParams {
 
           // 国旗展示
           Column() {
-            Image($rawfile(`flags/${this.getCurrentCountryCode()}.svg`))
+            Image(FlagSvgAssets.getUriForRelativePath(`flags/${this.getCurrentCountryCode()}.svg`))
               .width('80%')
               .height(180)
               .objectFit(ImageFit.Contain)

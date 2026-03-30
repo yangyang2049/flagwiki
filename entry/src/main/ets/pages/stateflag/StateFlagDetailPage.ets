@@ -7,7 +7,13 @@ import { uniformTypeDescriptor } from '@kit.ArkData';
 import { BusinessError } from '@kit.BasicServicesKit';
 import fs from '@ohos.file.fs';
 import { fileUri } from '@kit.CoreFileKit';
-import { CountryStateData, StateInfo, getCountryStateData, getStateFlagPath } from '../../utils/StateFlagData';
+import { CountryStateData, StateInfo, getCountryStateData } from '../../utils/StateFlagData';
+import { getStateFlagImageResource } from '../../utils/RegionAssetsUtil';
+import {
+  MODULE_STATE_FLAGS,
+  openOptionalModuleInstallFlow,
+  refreshOptionalModuleStatus
+} from '../../utils/OptionalModuleHelper';
 import { screenshotManager } from '../../utils/ScreenshotManager';
 import { SaveFlagDialog } from '../../components/SaveFlagDialog';
 import { FavoritesManager } from '../../utils/favoritesManager';
@@ -30,6 +36,7 @@ struct StateFlagDetailPage {
   @State isReading: boolean = false;
   @State isSharing: boolean = false;
   @State sharePixelMap: image.PixelMap | null = null;
+  @StorageLink('optionalModuleStateFlagsReady') stateFlagsModuleReady: boolean = false;
   private context = getContext(this) as common.UIAbilityContext;
   private readonly FLAG_CONTAINER_ID = 'stateFlagContainer';
   private readonly FLAG_DOWNLOAD_CONTAINER_ID = 'stateFlagDownloadContainer';
@@ -39,6 +46,7 @@ struct StateFlagDetailPage {
   private stateCode: string = '';
 
   async aboutToAppear() {
+    void refreshOptionalModuleStatus(MODULE_STATE_FLAGS);
     const params = router.getParams() as RouterParams;
     if (params && params.countryCode && params.stateCode) {
       this.countryCode = params.countryCode;
@@ -64,6 +72,23 @@ struct StateFlagDetailPage {
 
     // 初始化收藏管理器
     await FavoritesManager.init(this.context);
+  }
+
+  private getStateFlagImageOrPlaceholder(): Resource {
+    if (!this.countryData || !this.stateInfo) {
+      return $r('app.media.icon_tab_explore');
+    }
+    return getStateFlagImageResource(this.countryData.countryCode, this.stateInfo.code) ?? $r('app.media.icon_tab_explore');
+  }
+
+  private async openInstallFlow(): Promise<void> {
+    const ready = await openOptionalModuleInstallFlow(this.context, MODULE_STATE_FLAGS);
+    if (ready && this.countryCode && this.stateCode) {
+      this.countryData = getCountryStateData(this.countryCode);
+      if (this.countryData) {
+        this.stateInfo = this.countryData.states.find(s => s.code === this.stateCode);
+      }
+    }
   }
 
   private async checkFavoriteStatus(): Promise<void> {
@@ -210,6 +235,8 @@ struct StateFlagDetailPage {
         .height('100%')
         .justifyContent(FlexAlign.Center)
         .backgroundColor($r('app.color.bg_page'))
+      } else if (this.countryData && this.stateInfo && !this.stateFlagsModuleReady) {
+        this.OptionalModuleUnavailable()
       } else if (this.countryData && this.stateInfo) {
         Scroll() {
           Row() {
@@ -218,7 +245,7 @@ struct StateFlagDetailPage {
             Column({ space: 16 }) {
               // 州旗图片
               Column() {
-                Image($rawfile(getStateFlagPath(this.countryData.countryCode, this.stateInfo.code)))
+                Image(this.getStateFlagImageOrPlaceholder())
                   .width('100%')
                   .height(200)
                   .objectFit(ImageFit.Contain)
@@ -277,7 +304,7 @@ struct StateFlagDetailPage {
 
             // 隐藏的下载容器（无 padding，仅用于截图）
             Column() {
-              Image($rawfile(getStateFlagPath(this.countryData.countryCode, this.stateInfo.code)))
+              Image(this.getStateFlagImageOrPlaceholder())
                 .width('100%')
                 .height('100%')
                 .objectFit(ImageFit.Fill)
@@ -289,7 +316,7 @@ struct StateFlagDetailPage {
 
             // 州旗图片（展示用，有 padding）
             Column() {
-              Image($rawfile(getStateFlagPath(this.countryData.countryCode, this.stateInfo.code)))
+              Image(this.getStateFlagImageOrPlaceholder())
                 .width('100%')
                 .height(240)
                 .objectFit(ImageFit.Contain)
@@ -414,6 +441,42 @@ struct StateFlagDetailPage {
     .mode(NavigationMode.Stack)
     .backgroundColor($r('app.color.bg_page'))
     .menus(this.MenuBuilder)
+  }
+
+  @Builder
+  OptionalModuleUnavailable() {
+    Column({ space: 12 }) {
+      Text(this.context.resourceManager.getStringSync($r('app.string.optional_module_unavailable_title').id))
+        .fontSize(18)
+        .fontWeight(FontWeight.Bold)
+        .fontColor($r('app.color.text_primary'))
+
+      Text(this.context.resourceManager.getStringSync(
+        $r('app.string.optional_module_missing_message').id,
+        this.context.resourceManager.getStringSync($r('app.string.optional_module_state_flags_title').id)
+      ))
+        .fontSize(14)
+        .fontColor($r('app.color.text_secondary'))
+        .textAlign(TextAlign.Center)
+        .lineHeight(22)
+
+      Button(this.context.resourceManager.getStringSync($r('app.string.optional_module_open_market').id))
+        .height(44)
+        .padding({ left: 20, right: 20 })
+        .backgroundColor($r('app.color.button_primary'))
+        .fontColor($r('app.color.white'))
+        .borderRadius(22)
+        .margin({ top: 8 })
+        .onClick(() => {
+          void this.openInstallFlow();
+        })
+    }
+    .width('100%')
+    .height('100%')
+    .padding({ left: 24, right: 24 })
+    .justifyContent(FlexAlign.Center)
+    .alignItems(HorizontalAlign.Center)
+    .backgroundColor($r('app.color.bg_page'))
   }
 
   @Builder

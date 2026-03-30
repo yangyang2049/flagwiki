@@ -332,6 +332,33 @@ interface SimilarFlagPair {
     }
   }
 
+  private openFlagDetail(code: string): void {
+    if (DeviceHelper.isWearable()) {
+      if (isInternationalOrg(code)) {
+        promptAction.showToast({
+          message: this.context.resourceManager.getStringSync($r('app.string.watch_org_detail_unavailable').id),
+          duration: 2000
+        });
+        return;
+      }
+
+      router.pushUrl({
+        url: 'pages/watch/CountryDetailPage',
+        params: { code }
+      }).catch((err: Error) => {
+        console.error(`Navigation failed: ${err.message}`);
+      });
+      return;
+    }
+
+    router.pushUrl({
+      url: 'pages/gallery/FlagDetailPage',
+      params: { countryCode: code }
+    }).catch((err: Error) => {
+      console.error(`Navigation failed: ${err.message}`);
+    });
+  }
+
   @Builder
   SimilarFlagsView() {
     if (this.isLoading) {
@@ -381,12 +408,7 @@ interface SimilarFlagPair {
                 }
                 .layoutWeight(1)
                   .onClick(() => {
-                    router.pushUrl({
-                      url: 'pages/gallery/FlagDetailPage',
-                      params: { countryCode: pair.code1 }
-                    }).catch((err: Error) => {
-                      console.error(`Navigation failed: ${err.message}`);
-                    });
+                    this.openFlagDetail(pair.code1);
                   })
 
                 // 中间分隔
@@ -410,12 +432,7 @@ interface SimilarFlagPair {
                 }
                 .layoutWeight(1)
                   .onClick(() => {
-                    router.pushUrl({
-                      url: 'pages/gallery/FlagDetailPage',
-                      params: { countryCode: pair.code2 }
-                    }).catch((err: Error) => {
-                      console.error(`Navigation failed: ${err.message}`);
-                    });
+                    this.openFlagDetail(pair.code2);
                   })
               }
               .width('100%')
@@ -567,12 +584,7 @@ interface SimilarFlagPair {
       .backgroundColor($r('app.color.bg_card'))
       .borderRadius(12)
       .onClick(() => {
-        router.pushUrl({
-          url: 'pages/gallery/FlagDetailPage',
-          params: { countryCode: item.code }
-        }).catch((err: Error) => {
-          console.error(`Navigation failed: ${err.message}`);
-        });
+        this.openFlagDetail(item.code);
       })
   }
 

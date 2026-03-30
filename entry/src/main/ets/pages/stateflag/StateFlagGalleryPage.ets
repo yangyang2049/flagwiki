@@ -1,8 +1,15 @@
 import router from '@ohos.router';
 import common from '@ohos.app.ability.common';
-import { CountryStateData, StateInfo, getCountryStateData, getStateFlagPath } from '../../utils/StateFlagData';
+import { CountryStateData, StateInfo, getCountryStateData } from '../../utils/StateFlagData';
 import { LocalizationUtil } from '../../utils/LocalizationUtil';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
+import { FlagSvgAssets } from '../../utils/FlagSvgAssets';
+import { getStateFlagImageResource } from '../../utils/RegionAssetsUtil';
+import {
+  MODULE_STATE_FLAGS,
+  openOptionalModuleInstallFlow,
+  refreshOptionalModuleStatus
+} from '../../utils/OptionalModuleHelper';
 
 interface RouterParams {
   countryCode: string;
@@ -15,9 +22,11 @@ interface RouterParams {
   @State isLoading: boolean = true;
   @State clickedItemKey: string = '';
   @StorageLink('currentLanguage') currentLanguage: string = 'zh';
+  @StorageLink('optionalModuleStateFlagsReady') stateFlagsModuleReady: boolean = false;
   private context = getContext(this) as common.UIAbilityContext;
 
   aboutToAppear() {
+    void refreshOptionalModuleStatus(MODULE_STATE_FLAGS);
     const params = router.getParams() as RouterParams;
     // 延迟加载以显示loading状态
     setTimeout(() => {
@@ -92,6 +101,16 @@ interface RouterParams {
     }
   }
 
+  private async openInstallFlow(): Promise<void> {
+    const ready = await openOptionalModuleInstallFlow(this.context, MODULE_STATE_FLAGS);
+    if (ready) {
+      const params = router.getParams() as RouterParams;
+      if (params && params.countryCode) {
+        this.countryData = getCountryStateData(params.countryCode);
+      }
+    }
+  }
+
   build() {
     Navigation() {
       if (this.isLoading) {
@@ -109,12 +128,14 @@ interface RouterParams {
           .height('100%')
           .justifyContent(FlexAlign.Center)
           .backgroundColor($r('app.color.bg_page'))
+      } else if (this.countryData && !this.stateFlagsModuleReady) {
+        this.OptionalModuleUnavailable()
       } else if (this.countryData) {
         Row() {
           Column() {
             // 顶部国家信息
             Column() {
-              Image($rawfile(`flags/${this.countryData.countryCode}.svg`))
+              Image(FlagSvgAssets.getUriForRelativePath(`flags/${this.countryData.countryCode}.svg`))
                 .width(64)
                 .height(42)
                 .objectFit(ImageFit.Contain)
@@ -141,7 +162,7 @@ interface RouterParams {
                 ForEach(this.countryData.states, (state: StateInfo) => {
                   GridItem() {
                     Column() {
-                      Image($rawfile(getStateFlagPath(this.countryData!.countryCode, state.code)))
+                      Image(getStateFlagImageResource(this.countryData!.countryCode, state.code) ?? $r('app.media.icon_tab_explore'))
                         .width('100%')
                         .height(72)
                         .objectFit(ImageFit.Contain)
@@ -203,6 +224,42 @@ interface RouterParams {
     .title('')
     .titleMode(NavigationTitleMode.Mini)
     .mode(NavigationMode.Stack)
+    .backgroundColor($r('app.color.bg_page'))
+  }
+
+  @Builder
+  OptionalModuleUnavailable() {
+    Column({ space: 12 }) {
+      Text(this.context.resourceManager.getStringSync($r('app.string.optional_module_unavailable_title').id))
+        .fontSize(18)
+        .fontWeight(FontWeight.Bold)
+        .fontColor($r('app.color.text_primary'))
+
+      Text(this.context.resourceManager.getStringSync(
+        $r('app.string.optional_module_missing_message').id,
+        this.context.resourceManager.getStringSync($r('app.string.optional_module_state_flags_title').id)
+      ))
+        .fontSize(14)
+        .fontColor($r('app.color.text_secondary'))
+        .textAlign(TextAlign.Center)
+        .lineHeight(22)
+
+      Button(this.context.resourceManager.getStringSync($r('app.string.optional_module_open_market').id))
+        .height(44)
+        .padding({ left: 20, right: 20 })
+        .backgroundColor($r('app.color.button_primary'))
+        .fontColor($r('app.color.white'))
+        .borderRadius(22)
+        .margin({ top: 8 })
+        .onClick(() => {
+          void this.openInstallFlow();
+        })
+    }
+    .width('100%')
+    .height('100%')
+    .padding({ left: 24, right: 24 })
+    .justifyContent(FlexAlign.Center)
+    .alignItems(HorizontalAlign.Center)
     .backgroundColor($r('app.color.bg_page'))
   }
 }

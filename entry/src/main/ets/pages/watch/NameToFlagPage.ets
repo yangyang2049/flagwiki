@@ -4,6 +4,7 @@ import { BusinessError } from '@kit.BasicServicesKit'
 import { preferences } from '@kit.ArkData'
 import { common } from '@kit.AbilityKit'
 import { Countries, Country, getLocalizedCountryName } from '../../utils/countryData'
+import { FlagSvgAssets } from '../../utils/FlagSvgAssets'
 import { PreferencesManager } from '../../utils/PreferencesManager'
 import { WatchSoundManager } from '../../utils/WatchSoundManager'
 
@@ -447,7 +448,7 @@ struct NameToFlagPage {
   @Builder
   private FlagGridItem(country: Country, index: number) {
     Column() {
-      Image($rawfile(`flags/${country.code}.svg`))
+      Image(FlagSvgAssets.getUriForRelativePath(`flags/${country.code}.svg`))
         .width(52)
         .height(36)
         .objectFit(ImageFit.Contain)

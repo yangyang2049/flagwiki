@@ -32,7 +32,14 @@ const COUNTRIES_WITH_ANTHEM_STATIC: string[] = [
 
 let countriesWithAnthemCache: Set<string> = new Set<string>();
 
-export async function initAnthemCache(context: common.UIAbilityContext): Promise<void> {
+const INIT_ANTHEM_CACHE_MAX_ATTEMPTS = 8;
+const INIT_ANTHEM_CACHE_RETRY_DELAY_MS = 450;
+
+async function sleepMs(ms: number): Promise<void> {
+  return new Promise<void>((resolve: () => void) => setTimeout(resolve, ms));
+}
+
+async function initAnthemCacheOnce(context: common.UIAbilityContext): Promise<boolean> {
   try {
     const resourceManager = context.createModuleContext('anthem').resourceManager;
     const availableCountries = await Promise.all(COUNTRIES_WITH_ANTHEM_STATIC.map(async (countryCode) => {
@@ -51,11 +58,29 @@ export async function initAnthemCache(context: common.UIAbilityContext): Promise
       }
     }
     countriesWithAnthemCache = new Set<string>(verifiedCountries);
-    hilog.info(DOMAIN, 'AnthemUtilCore', `Initialized anthem cache from installed resources: ${countriesWithAnthemCache.size}`);
+    hilog.info(DOMAIN, 'AnthemUtilCore', `Anthem cache pass: ${countriesWithAnthemCache.size} files visible`);
+    return countriesWithAnthemCache.size > 0;
   } catch (e) {
     countriesWithAnthemCache = new Set<string>();
-    hilog.warn(DOMAIN, 'AnthemUtilCore', `createModuleContext(anthem) failed: ${JSON.stringify(e)}`);
+    hilog.warn(DOMAIN, 'AnthemUtilCore', `createModuleContext(anthem) or scan failed: ${JSON.stringify(e)}`);
+    return false;
   }
+}
+
+/**
+ * 动态模块刚安装完成时，createModuleContext / 资源可能短暂不可用，需重试以免列表为空（「暂无国歌」）。
+ */
+export async function initAnthemCache(context: common.UIAbilityContext): Promise<void> {
+  for (let attempt = 0; attempt < INIT_ANTHEM_CACHE_MAX_ATTEMPTS; attempt++) {
+    if (attempt > 0) {
+      await sleepMs(INIT_ANTHEM_CACHE_RETRY_DELAY_MS);
+    }
+    const ok = await initAnthemCacheOnce(context);
+    if (ok) {
+      return;
+    }
+  }
+  hilog.error(DOMAIN, 'AnthemUtilCore', 'initAnthemCache exhausted retries, cache still empty');
 }
 
 export function hasAnthemFile(countryCode: string): boolean {

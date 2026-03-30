@@ -1,7 +1,6 @@
 import { HomePage } from './home/HomePage';
 import { GalleryPage } from './gallery/GalleryPage';
 import { AnthemPage } from './anthem/AnthemPage';
-import { PaintHomePage } from './paintgame/PaintHomePage';
 import { ExplorePage } from './explore/ExplorePage';
 import { ProfilePage } from './profile/ProfilePage';
 import { preferences } from '@kit.ArkData';
@@ -9,7 +8,13 @@ import common from '@ohos.app.ability.common';
 import { PreferencesManager } from '../utils/PreferencesManager';
 import router from '@ohos.router';
 import { shouldAllowEdgeSwipeExit } from '../utils/WatchGestureHelper';
-import { refreshOptionalModuleAppStorage } from '../utils/OptionalModuleHelper';
+import {
+  MODULE_ANTHEM,
+  MODULE_FLAGHISTORY,
+  MODULE_STATE_FLAGS,
+  MODULE_COAT_OF_ARMS,
+  refreshOptionalModuleAppStorage
+} from '../utils/OptionalModuleHelper';
 
 interface MainTabSpec {
   id: string;
@@ -23,10 +28,14 @@ interface MainTabSpec {
 struct Index {
   @State currentTabIndex: number = 0;
   @State profileRefreshKey: number = 0;
+  @State exploreRefreshKey: number = 0;
   @State homeRefreshKey: number = 0;
   @State isGallerySearchExpanded: boolean = false;
   @State isAnthemSearchExpanded: boolean = false;
   @StorageLink('optionalModuleAnthemReady') anthemModuleReady: boolean = false;
+  @StorageLink('optionalModuleInstallBusy') optionalModuleInstallBusy: boolean = false;
+  @StorageLink('optionalModuleInstallBusyId') optionalModuleInstallBusyId: string = '';
+  @State anthemPageRefreshKey: number = 0;
   private tabController: TabsController = new TabsController();
   private prefs: preferences.Preferences | null = null;
   private context = getContext(this) as common.UIAbilityContext;
@@ -50,12 +59,6 @@ struct Index {
       iconNormal: $r('app.media.icon_tab_gallery'),
       iconSelected: $r('app.media.icon_tab_gallery_selected')
     };
-    const paint: MainTabSpec = {
-      id: 'paint',
-      title: $r('app.string.tab_paint'),
-      iconNormal: $r('app.media.icon_tab_paint'),
-      iconSelected: $r('app.media.icon_tab_paint_selected')
-    };
     const explore: MainTabSpec = {
       id: 'explore',
       title: $r('app.string.tab_explore'),
@@ -68,7 +71,7 @@ struct Index {
       iconNormal: $r('app.media.icon_tab_profile'),
       iconSelected: $r('app.media.icon_tab_profile_selected')
     };
-    return [home, anthem, gallery, paint, explore, profile];
+    return [home, anthem, gallery, explore, profile];
   }
 
   private getTitleText(): Resource {
@@ -101,8 +104,13 @@ struct Index {
 
     if (this.currentTabIndex === 0) {
       this.homeRefreshKey++;
+    } else if (this.currentSpecId() === 'explore') {
+      this.exploreRefreshKey++;
     } else if (this.currentTabIndex === this.getTabSpecs().length - 1) {
       this.profileRefreshKey++;
+    }
+    if (this.getTabSpecs()[this.currentTabIndex]?.id === 'anthem') {
+      this.anthemPageRefreshKey++;
     }
   }
 
@@ -111,17 +119,25 @@ struct Index {
     this.tabController.changeIndex(index);
   }
 
+  private getOptionalDownloadBannerText(): string {
+    const id = this.optionalModuleInstallBusyId;
+    let title = '';
+    if (id === MODULE_ANTHEM) {
+      title = this.context.resourceManager.getStringSync($r('app.string.optional_module_anthem_title').id);
+    } else if (id === MODULE_FLAGHISTORY) {
+      title = this.context.resourceManager.getStringSync($r('app.string.optional_module_flaghistory_title').id);
+    } else if (id === MODULE_STATE_FLAGS) {
+      title = this.context.resourceManager.getStringSync($r('app.string.optional_module_state_flags_title').id);
+    } else if (id === MODULE_COAT_OF_ARMS) {
+      title = this.context.resourceManager.getStringSync($r('app.string.optional_module_coat_of_arms_title').id);
+    }
+    return this.context.resourceManager.getStringSync($r('app.string.optional_module_downloading_banner').id, title);
+  }
+
   @Builder
   TabBarForSpec(spec: MainTabSpec, index: number) {
     Column() {
       Stack() {
-        if (this.currentTabIndex === index) {
-          Circle()
-            .width(40)
-            .height(40)
-            .fill($r('app.color.bg_blue_light'))
-            .opacity(0.3)
-        }
         Image(this.currentTabIndex === index ? spec.iconSelected : spec.iconNormal)
           .width(24)
           .height(24)
@@ -162,14 +178,13 @@ struct Index {
     } else if (spec.id === 'anthem') {
       AnthemPage({
         context: this.context,
-        isSearchExpanded: this.isAnthemSearchExpanded
+        isSearchExpanded: this.isAnthemSearchExpanded,
+        refreshKey: this.anthemPageRefreshKey
       })
     } else if (spec.id === 'gallery') {
       GalleryPage({ isSearchExpanded: this.isGallerySearchExpanded, context: this.context })
-    } else if (spec.id === 'paint') {
-      PaintHomePage()
     } else if (spec.id === 'explore') {
-      ExplorePage()
+      ExplorePage({ refreshKey: this.exploreRefreshKey })
     } else if (spec.id === 'profile') {
       ProfilePage({
         refreshKey: this.profileRefreshKey
@@ -212,6 +227,29 @@ struct Index {
         .justifyContent(FlexAlign.SpaceBetween)
         .alignItems(VerticalAlign.Center)
 
+        if (this.optionalModuleInstallBusy) {
+          Row({ space: 10 }) {
+            LoadingProgress()
+              .width(22)
+              .height(22)
+              .color($r('app.color.button_primary'))
+            Text(this.getOptionalDownloadBannerText())
+              .fontSize(13)
+              .fontColor($r('app.color.text_primary'))
+              .layoutWeight(1)
+              .maxLines(3)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+          }
+          .width('100%')
+          .padding({
+            left: 16,
+            right: 16,
+            top: 10,
+            bottom: 10
+          })
+          .backgroundColor($r('app.color.bg_blue_light'))
+        }
+
         Tabs({ barPosition: BarPosition.End, controller: this.tabController }) {
           ForEach(this.getTabSpecs(), (spec: MainTabSpec, index: number) => {
             TabContent() {
@@ -239,6 +277,9 @@ struct Index {
           }
           if (index === this.getTabSpecs().length - 1) {
             this.profileRefreshKey++;
+          }
+          if (sid === 'anthem') {
+            this.anthemPageRefreshKey++;
           }
         })
         .onGestureRecognizerJudgeBegin((event: BaseGestureEvent, current: GestureRecognizer,

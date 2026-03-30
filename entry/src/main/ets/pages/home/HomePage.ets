@@ -15,6 +15,7 @@ export struct HomePage {
   @State weeklyFlag: WeeklyFlagItem | undefined = undefined;
   @State funFactsList: string[] = [];
   @StorageLink('currentLanguage') @Watch('onCurrentLanguageChanged') currentLanguage: string = 'zh';
+  @StorageLink('optionalModuleStateFlagsReady') stateFlagsModuleReady: boolean = false;
   private context = getContext(this) as common.UIAbilityContext;
   onTabChange: (index: number) => void = () => {};
 
@@ -326,7 +327,9 @@ export struct HomePage {
 
           Row() {
             this.shortcutItem('🇺🇳', this.context.resourceManager.getStringSync($r('app.string.flag_gallery').id), () => this.onTabChange(this.galleryTabIndex))
-            this.shortcutItem('🇺🇸', this.context.resourceManager.getStringSync($r('app.string.state_flags').id), () => router.pushUrl({ url: 'pages/stateflag/StateFlagCountryListPage' }))
+            if (this.stateFlagsModuleReady) {
+              this.shortcutItem('🇺🇸', this.context.resourceManager.getStringSync($r('app.string.state_flags').id), () => router.pushUrl({ url: 'pages/stateflag/StateFlagCountryListPage' }))
+            }
             this.shortcutItem('🎯', this.context.resourceManager.getStringSync($r('app.string.flag_quiz').id), () => router.pushUrl({ url: 'pages/quiz/QuizSelectPage' }))
             this.shortcutItem('⭐', this.context.resourceManager.getStringSync($r('app.string.favorites').id), () => router.pushUrl({ url: 'pages/profile/FavoritesPage' }))
           }
@@ -337,6 +340,49 @@ export struct HomePage {
         .backgroundColor($r('app.color.bg_card'))
         .borderRadius(16)
         .margin({ top: 16 })
+
+        // 国旗涂鸦（单独入口）
+        Row() {
+          Stack() {
+            Circle()
+              .width(48)
+              .height(48)
+              .fill($r('app.color.bg_blue_light'))
+            Text('🎨')
+              .fontSize(22)
+          }
+          .margin({ right: 14 })
+
+          Column() {
+            Text(this.context.resourceManager.getStringSync($r('app.string.home_paint_entry_title').id))
+              .fontSize(17)
+              .fontWeight(FontWeight.Bold)
+              .fontColor($r('app.color.text_primary'))
+            Text(this.context.resourceManager.getStringSync($r('app.string.home_paint_entry_subtitle').id))
+              .fontSize(13)
+              .fontColor($r('app.color.text_secondary'))
+              .margin({ top: 4 })
+              .maxLines(2)
+          }
+          .alignItems(HorizontalAlign.Start)
+          .layoutWeight(1)
+
+          Text('›')
+            .fontSize(22)
+            .fontColor($r('app.color.gray_disabled'))
+        }
+        .width('100%')
+        .padding({ left: 18, right: 18, top: 16, bottom: 16 })
+        .backgroundColor($r('app.color.bg_card'))
+        .borderRadius(16)
+        .margin({ top: 16 })
+        .alignItems(VerticalAlign.Center)
+        .onClick(() => {
+          router.pushUrl({ url: 'pages/paintgame/PaintHomePage' })
+            .catch((err: Error) => {
+              console.error(`Failed to open PaintHomePage: ${err.message}`);
+            });
+        })
 
         // 专题推荐
         Column() {

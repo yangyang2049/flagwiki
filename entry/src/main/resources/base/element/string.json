@@ -77,6 +77,82 @@
       "value": "未安装"
     },
     {
+      "name": "optional_module_anthem_detail",
+      "value": "包含多国国歌音频资源。安装成功后，主界面会出现「国歌」标签，可浏览、搜索并播放各国国歌。\n\n资源体积较大，需联网通过应用市场按需下载，耗时可能达数分钟，请保持网络畅通。"
+    },
+    {
+      "name": "optional_module_flaghistory_detail",
+      "value": "包含各国历史国旗图片与文字说明。安装成功后，在国旗详情页可查看该国历史旗帜变迁。\n\n需联网下载，请耐心等待。"
+    },
+    {
+      "name": "optional_module_dialog_close",
+      "value": "关闭"
+    },
+    {
+      "name": "optional_module_dialog_download",
+      "value": "开始下载"
+    },
+    {
+      "name": "optional_module_dialog_after_download_hint",
+      "value": "下载任务已开始。您可随时点击「关闭」收起本窗口，下载将在后台继续；也可在应用顶部查看进度。"
+    },
+    {
+      "name": "optional_module_dialog_toast_after_download",
+      "value": "已开始下载，可关闭本窗口继续等待"
+    },
+    {
+      "name": "optional_module_dialog_installed_hint",
+      "value": "当前已安装，可直接使用相关功能。"
+    },
+    {
+      "name": "optional_module_anthem_size_hint",
+      "value": "下载大小约 150 MB（仅供参考，以应用市场显示为准）"
+    },
+    {
+      "name": "optional_module_flaghistory_size_hint",
+      "value": "下载大小约 45 MB（仅供参考，以应用市场显示为准）"
+    },
+    {
+      "name": "optional_module_state_flags_title",
+      "value": "州旗资源包"
+    },
+    {
+      "name": "optional_module_state_flags_detail",
+      "value": "包含各国行政区州旗/省旗矢量图。安装成功后，可在首页进入「州旗专区」，并在涂鸦游戏中使用美国州旗分类。\n\n需联网下载。"
+    },
+    {
+      "name": "optional_module_state_flags_size_hint",
+      "value": "下载大小约 20 MB（仅供参考，以应用市场显示为准）"
+    },
+    {
+      "name": "optional_module_coat_of_arms_title",
+      "value": "国徽资源包"
+    },
+    {
+      "name": "optional_module_coat_of_arms_detail",
+      "value": "包含各国国徽图片。安装成功后，可在国旗详情页查看对应国徽。\n\n需联网下载。"
+    },
+    {
+      "name": "optional_module_coat_of_arms_size_hint",
+      "value": "下载大小约 5 MB（仅供参考，以应用市场显示为准）"
+    },
+    {
+      "name": "optional_module_anthem_entry",
+      "value": "入口在主界面底部「国歌」标签"
+    },
+    {
+      "name": "optional_module_flaghistory_entry",
+      "value": "入口在任意国家国旗详情页的「历史国旗」"
+    },
+    {
+      "name": "optional_module_state_flags_entry",
+      "value": "入口在主界面「州旗专区」，以及涂鸦游戏中的「美国州旗」分类"
+    },
+    {
+      "name": "optional_module_coat_of_arms_entry",
+      "value": "入口在国旗详情页的国徽展示（若该国提供）"
+    },
+    {
       "name": "optional_module_market_hint",
       "value": "正在准备扩展下载"
     },
@@ -107,6 +183,14 @@
     {
       "name": "optional_module_download_started",
       "value": "开始下载「%s」"
+    },
+    {
+      "name": "optional_module_download_started_detail",
+      "value": "开始下载「%s」。资源较大，可能需要数分钟，请保持网络畅通，可在应用内顶部查看进度提示。"
+    },
+    {
+      "name": "optional_module_downloading_banner",
+      "value": "正在下载「%s」，请稍候（可能需要数分钟）…"
     },
     {
       "name": "optional_module_download_success",
@@ -211,6 +295,14 @@
     {
       "name": "national_day",
       "value": "国庆日"
+    },
+    {
+      "name": "home_paint_entry_title",
+      "value": "国旗涂鸦"
+    },
+    {
+      "name": "home_paint_entry_subtitle",
+      "value": "填色挑战，轻松记忆各国国旗"
     },
     {
       "name": "quick_entrance",
@@ -1863,6 +1955,10 @@
     {
       "name": "watch_flag_desc_unavailable",
       "value": "暂无国旗说明"
+    },
+    {
+      "name": "watch_org_detail_unavailable",
+      "value": "手表暂不支持国际组织详情"
     },
     {
       "name": "theme_light",

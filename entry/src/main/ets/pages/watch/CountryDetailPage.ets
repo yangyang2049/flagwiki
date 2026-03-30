@@ -1,6 +1,7 @@
 import router from '@ohos.router'
 import common from '@ohos.app.ability.common'
 import { Country, FlagDesign, getCountryByCode, getFlagDesign, getLocalizedCountryName, getLocalizedCapital, getLocalizedFlagDesign, getLocalizedRegionName } from '../../utils/countryData'
+import { FlagSvgAssets } from '../../utils/FlagSvgAssets'
 import { LocalizationUtil } from '../../utils/LocalizationUtil'
 
 @Entry
@@ -117,11 +118,11 @@ struct CountryDetailPage {
     return this.country !== null
   }
 
-  private getFlagSource(): Resource {
+  private getFlagSource(): Resource | string {
     if (!this.country) {
       return $r('app.media.icon_close')
     }
-    return $rawfile(`flags/${this.country.code}.svg`)
+    return FlagSvgAssets.getUriForRelativePath(`flags/${this.country.code}.svg`)
   }
 
   build() {

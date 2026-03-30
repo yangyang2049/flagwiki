@@ -10,64 +10,7 @@ import { paintCategories, PaintCategory, getTotalLevels } from './PaintGameData'
 import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
 import UiConstants from '../../utils/UiConstants';
-
-@CustomDialog
-struct HowToPlayDialog {
-  controller: CustomDialogController;
-  private context = getContext(this) as common.UIAbilityContext;
-
-  build() {
-    Column() {
-      Row() {
-        Text(UiConstants.PAINT_PALETTE)
-          .fontSize(28)
-        Text(` ${this.context.resourceManager.getStringSync($r('app.string.paint_instructions_title').id)}`)
-          .fontSize(20)
-          .fontWeight(FontWeight.Bold)
-          .fontColor($r('app.color.text_primary'))
-      }
-      .margin({ bottom: 20 })
-
-      Column() {
-        Text(this.context.resourceManager.getStringSync($r('app.string.paint_instruction_1').id))
-          .fontSize(15)
-          .fontColor($r('app.color.text_secondary'))
-          .margin({ bottom: 10 })
-
-        Text(this.context.resourceManager.getStringSync($r('app.string.paint_instruction_2').id))
-          .fontSize(15)
-          .fontColor($r('app.color.text_secondary'))
-          .margin({ bottom: 10 })
-
-        Text(this.context.resourceManager.getStringSync($r('app.string.paint_instruction_3').id))
-          .fontSize(15)
-          .fontColor($r('app.color.text_secondary'))
-          .margin({ bottom: 10 })
-
-        Text(this.context.resourceManager.getStringSync($r('app.string.paint_instruction_4').id))
-          .fontSize(15)
-          .fontColor($r('app.color.text_secondary'))
-      }
-      .alignItems(HorizontalAlign.Start)
-      .width('100%')
-
-      Button(this.context.resourceManager.getStringSync($r('app.string.got_it').id))
-        .width('100%')
-        .height(44)
-        .fontSize(16)
-        .fontWeight(FontWeight.Medium)
-        .backgroundColor($r('app.color.button_primary'))
-        .margin({ top: 24 })
-        .onClick(() => {
-          this.controller.close();
-        })
-    }
-    .width(320)
-    .padding(24)
-    .backgroundColor($r('app.color.bg_card'))
-    .borderRadius(20)
-  }
-}
+import { MODULE_STATE_FLAGS, refreshOptionalModuleStatus } from '../../utils/OptionalModuleHelper';
 
 @CustomDialog
 struct AllLevelsCompletedDialog {
@@ -143,16 +86,13 @@ export struct PaintHomePage {
   @State screenWidth: number = 360;
   @State screenHeight: number = 780;
   @State dialogCategoryName: string = '';
+  @StorageLink('optionalModuleStateFlagsReady') stateFlagsModuleReady: boolean = false;
   private context = getContext(this) as common.UIAbilityContext;
-  private howToPlayDialogController: CustomDialogController = new CustomDialogController({
-    builder: HowToPlayDialog(),
-    alignment: DialogAlignment.Center,
-    customStyle: true
-  });
   private allLevelsCompletedDialogController: CustomDialogController | null = null;
   private currentCategoryForRestart: PaintCategory | null = null;
 
   async aboutToAppear() {
+    void refreshOptionalModuleStatus(MODULE_STATE_FLAGS);
     // 获取屏幕尺寸
     const displayInfo = display.getDefaultDisplaySync();
     this.screenWidth = px2vp(displayInfo.width);
@@ -262,10 +202,6 @@ export struct PaintHomePage {
     }
   }
 
-  private showHowToPlayDialog(): void {
-    this.howToPlayDialogController.open();
-  }
-
   build() {
     Scroll() {
       Row() {
@@ -331,7 +267,9 @@ export struct PaintHomePage {
         })
 
         // 其他分类 - 全宽卡片（带浮动圆环进度）
-        ForEach(paintCategories.filter(c => c.id !== 'world'), (category: PaintCategory) => {
+        ForEach(
+          paintCategories.filter(c => c.id !== 'world' && (c.id !== 'us' || this.stateFlagsModuleReady)),
+          (category: PaintCategory) => {
           Stack({ alignContent: Alignment.TopEnd }) {
             // 中心内容
             Column() {
@@ -388,32 +326,6 @@ export struct PaintHomePage {
           .onClick(() => {
             this.navigateToGame(category);
           })
-        })
-
-        // 涂鸦说明 Banner
-        Row() {
-          Text(UiConstants.PAINT_PALETTE)
-            .fontSize(20)
-          Text(` ${this.context.resourceManager.getStringSync($r('app.string.paint_instructions_banner').id)}`)
-            .fontSize(15)
-            .fontWeight(FontWeight.Medium)
-            .fontColor($r('app.color.text_primary'))
-
-          Blank()
-
-          Image($r('app.media.icon_arrow_right'))
-            .width(20)
-            .height(20)
-        }
-        .width('100%')
-        .height(52)
-        .padding({ left: 16, right: 16 })
-        .backgroundColor($r('app.color.bg_card'))
-        .borderRadius(12)
-        .alignItems(VerticalAlign.Center)
-        .margin({ top: 20, bottom: 20 })
-        .onClick(() => {
-          this.showHowToPlayDialog();
         })
         }
         .width('100%')

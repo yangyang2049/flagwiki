@@ -1,0 +1,9 @@
+{
+  "name": "stateflags",
+  "version": "1.0.0",
+  "description": "行政区州旗/省旗资源（HSP，按需分发）",
+  "main": "src/main/ets/Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {}
+}

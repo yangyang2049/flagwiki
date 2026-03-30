@@ -8,6 +8,7 @@ import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
+import { FlagSvgAssets } from '../../utils/FlagSvgAssets';
 import UiConstants from '../../utils/UiConstants';
 
 interface RouterParams {
@@ -448,7 +449,7 @@ interface Card {
     Column() {
       if (card.isFlipped || card.isMatched) {
         // 显示国旗 - 应用反向旋转以抵消卡片翻转
-        Image($rawfile(`flags/${card.code}.svg`))
+        Image(FlagSvgAssets.getUriForRelativePath(`flags/${card.code}.svg`))
           .width('75%')
           .height('75%')
           .objectFit(ImageFit.Contain)

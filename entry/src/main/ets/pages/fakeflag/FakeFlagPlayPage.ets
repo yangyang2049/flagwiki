@@ -7,6 +7,7 @@ import { GameProgressManager, GameType } from '../../utils/GameProgressManager';
 import { SoundEffectUtil } from '../../utils/SoundEffectUtil';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
+import { FlagSvgAssets } from '../../utils/FlagSvgAssets';
 
 interface RouterParams {
   levelId: number;
@@ -450,7 +451,7 @@ interface RouterParams {
   @Builder
   FlagCard(code: string, index: number) {
     Column() {
-      Image($rawfile(this.getFlagSourceForCode(code)))
+      Image(FlagSvgAssets.getUriForRelativePath(this.getFlagSourceForCode(code)))
         .width('90%')
         .height('70%')
         .objectFit(ImageFit.Contain)
@@ -496,7 +497,7 @@ interface RouterParams {
         // 假旗部分（带左侧浮动X标记）
         Stack({ alignContent: Alignment.Start }) {
           // 国旗居中
-          Image($rawfile(this.getFakeFlagSource()))
+          Image(FlagSvgAssets.getUriForRelativePath(this.getFakeFlagSource()))
             .width('100%')
             .height(100)
             .objectFit(ImageFit.Contain)
@@ -529,7 +530,7 @@ interface RouterParams {
         // 真旗部分（带左侧浮动✓标记）
         Stack({ alignContent: Alignment.Start }) {
           // 国旗居中
-          Image($rawfile(this.getTrueFlagSource()))
+          Image(FlagSvgAssets.getUriForRelativePath(this.getTrueFlagSource()))
             .width('100%')
             .height(100)
             .objectFit(ImageFit.Contain)

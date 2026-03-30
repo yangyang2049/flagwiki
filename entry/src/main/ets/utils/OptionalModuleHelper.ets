@@ -11,17 +11,38 @@ export const MODULE_ANTHEM = 'anthem';
 /** 历史国旗 HSP 模块名 */
 export const MODULE_FLAGHISTORY = 'flaghistory';
 
+/** 州旗资源 HSP 模块名 */
+export const MODULE_STATE_FLAGS = 'stateflags';
+
+/** 国徽资源 HSP 模块名 */
+export const MODULE_COAT_OF_ARMS = 'coatofarms';
+
 /** 与 UI @StorageLink 绑定的键名 */
 export const STORAGE_KEY_ANTHEM_READY = 'optionalModuleAnthemReady';
 export const STORAGE_KEY_FLAGHISTORY_READY = 'optionalModuleFlagHistoryReady';
+export const STORAGE_KEY_STATE_FLAGS_READY = 'optionalModuleStateFlagsReady';
+export const STORAGE_KEY_COAT_OF_ARMS_READY = 'optionalModuleCoatOfArmsReady';
+/** 扩展包正在从应用市场下载/安装（用于顶部横幅） */
+export const STORAGE_KEY_INSTALL_BUSY = 'optionalModuleInstallBusy';
+/** 模块名或 '' */
+export const STORAGE_KEY_INSTALL_BUSY_ID = 'optionalModuleInstallBusyId';
 
-export type OptionalModuleName = 'anthem' | 'flaghistory';
+export type OptionalModuleName = 'anthem' | 'flaghistory' | 'stateflags' | 'coatofarms';
 
 const MODULE_INSTALL_LISTEN_TIMEOUT_SECONDS = 30 * 60;
 const activeInstallTasks: Map<OptionalModuleName, Promise<boolean>> = new Map();
 
 function getOptionalModuleStorageKey(moduleName: OptionalModuleName): string {
-  return moduleName === MODULE_ANTHEM ? STORAGE_KEY_ANTHEM_READY : STORAGE_KEY_FLAGHISTORY_READY;
+  if (moduleName === MODULE_ANTHEM) {
+    return STORAGE_KEY_ANTHEM_READY;
+  }
+  if (moduleName === MODULE_FLAGHISTORY) {
+    return STORAGE_KEY_FLAGHISTORY_READY;
+  }
+  if (moduleName === MODULE_STATE_FLAGS) {
+    return STORAGE_KEY_STATE_FLAGS_READY;
+  }
+  return STORAGE_KEY_COAT_OF_ARMS_READY;
 }
 
 function setOptionalModuleReady(moduleName: OptionalModuleName, ready: boolean): void {
@@ -58,25 +79,42 @@ export async function refreshOptionalModuleStatus(moduleName: OptionalModuleName
 export async function refreshOptionalModuleAppStorage(_context: common.UIAbilityContext): Promise<void> {
   const anthemOk = await refreshOptionalModuleStatus(MODULE_ANTHEM);
   const historyOk = await refreshOptionalModuleStatus(MODULE_FLAGHISTORY);
-  hilog.info(DOMAIN, 'OptionalModule', `anthem=${anthemOk}, flaghistory=${historyOk}`);
+  const stateFlagsOk = await refreshOptionalModuleStatus(MODULE_STATE_FLAGS);
+  const coatOk = await refreshOptionalModuleStatus(MODULE_COAT_OF_ARMS);
+  hilog.info(DOMAIN, 'OptionalModule', `anthem=${anthemOk}, flaghistory=${historyOk}, stateflags=${stateFlagsOk}, coatofarms=${coatOk}`);
 }
 
 function getOptionalModuleTitle(context: common.UIAbilityContext, moduleName: OptionalModuleName): string {
-  const resource = moduleName === MODULE_ANTHEM
-    ? $r('app.string.optional_module_anthem_title')
-    : $r('app.string.optional_module_flaghistory_title');
+  let resource: Resource;
+  if (moduleName === MODULE_ANTHEM) {
+    resource = $r('app.string.optional_module_anthem_title');
+  } else if (moduleName === MODULE_FLAGHISTORY) {
+    resource = $r('app.string.optional_module_flaghistory_title');
+  } else if (moduleName === MODULE_STATE_FLAGS) {
+    resource = $r('app.string.optional_module_state_flags_title');
+  } else {
+    resource = $r('app.string.optional_module_coat_of_arms_title');
+  }
   return context.resourceManager.getStringSync(resource.id);
 }
 
-function showOptionalModuleToast(context: common.UIAbilityContext, message: string): void {
+function showOptionalModuleToast(context: common.UIAbilityContext, message: string, durationMs: number = 2200): void {
   try {
     promptAction.showToast({
       message: message,
-      duration: 2200
+      duration: durationMs
     });
   } catch (_e) {
     void 0;
   }
+}
+
+function setOptionalModuleInstallBusy(busy: boolean, moduleName: OptionalModuleName | ''): void {
+  const id = busy ? moduleName : '';
+  AppStorage.setOrCreate(STORAGE_KEY_INSTALL_BUSY, busy);
+  AppStorage.setOrCreate(STORAGE_KEY_INSTALL_BUSY_ID, id);
+  AppStorage.set(STORAGE_KEY_INSTALL_BUSY, busy);
+  AppStorage.set(STORAGE_KEY_INSTALL_BUSY_ID, id);
 }
 
 function createInstallStateHandler(
@@ -192,6 +230,7 @@ export async function openOptionalModuleInstallFlow(
   const installTask = new Promise<boolean>((resolve) => {
     let installStatusCallback: ((state: moduleInstallManager.ModuleInstallSessionState) => void) | undefined;
     const cleanup = (): void => {
+      setOptionalModuleInstallBusy(false, '');
       if (installStatusCallback) {
         try {
           moduleInstallManager.off('moduleInstallStatus', installStatusCallback);
@@ -227,12 +266,12 @@ export async function openOptionalModuleInstallFlow(
         return;
       }
 
+      const moduleTitle = getOptionalModuleTitle(context, moduleName);
+      setOptionalModuleInstallBusy(true, moduleName);
       showOptionalModuleToast(
         context,
-        context.resourceManager.getStringSync(
-          $r('app.string.optional_module_download_started').id,
-          getOptionalModuleTitle(context, moduleName)
-        )
+        context.resourceManager.getStringSync($r('app.string.optional_module_download_started_detail').id, moduleTitle),
+        10000
       );
 
       void moduleInstallManager.fetchModules(request)

@@ -9,8 +9,13 @@ import { LocalizationUtil } from '../utils/LocalizationUtil';
 import {
   refreshOptionalModuleAppStorage,
   STORAGE_KEY_ANTHEM_READY,
-  STORAGE_KEY_FLAGHISTORY_READY
+  STORAGE_KEY_FLAGHISTORY_READY,
+  STORAGE_KEY_STATE_FLAGS_READY,
+  STORAGE_KEY_COAT_OF_ARMS_READY,
+  STORAGE_KEY_INSTALL_BUSY,
+  STORAGE_KEY_INSTALL_BUSY_ID
 } from '../utils/OptionalModuleHelper';
+import { FlagSvgBundleUnpacker } from '../utils/FlagSvgBundleUnpacker';
 
 const DOMAIN = 0x0000;
 
@@ -20,6 +25,10 @@ export default class EntryAbility extends UIAbility {
     AppStorage.setOrCreate('context', this.context);
     AppStorage.setOrCreate(STORAGE_KEY_ANTHEM_READY, false);
     AppStorage.setOrCreate(STORAGE_KEY_FLAGHISTORY_READY, false);
+    AppStorage.setOrCreate(STORAGE_KEY_STATE_FLAGS_READY, false);
+    AppStorage.setOrCreate(STORAGE_KEY_COAT_OF_ARMS_READY, false);
+    AppStorage.setOrCreate(STORAGE_KEY_INSTALL_BUSY, false);
+    AppStorage.setOrCreate(STORAGE_KEY_INSTALL_BUSY_ID, '');
     void refreshOptionalModuleAppStorage(this.context);
 
     // 初始化 PreferencesManager
@@ -96,9 +105,14 @@ export default class EntryAbility extends UIAbility {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onDestroy');
   }
 
-  onWindowStageCreate(windowStage: window.WindowStage): void {
+  async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+    try {
+      await FlagSvgBundleUnpacker.ensureUnpacked(this.context);
+    } catch (err) {
+      hilog.error(DOMAIN, 'testTag', 'Flag SVG bundle unpack failed: %{public}s', JSON.stringify(err));
+    }
     const mainPage = DeviceHelper.isWearable() ? 'pages/watch/Index' : 'pages/Index';
     windowStage.loadContent(mainPage, (err) => {
       if (err.code) {
