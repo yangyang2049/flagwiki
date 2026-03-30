@@ -81,6 +81,18 @@
       "value": "请在应用市场完成资源下载后，返回本页点击「刷新扩展状态」"
     },
     {
+      "name": "optional_module_unavailable_title",
+      "value": "扩展内容未就绪"
+    },
+    {
+      "name": "optional_module_missing_message",
+      "value": "此页面需要安装「%s」。请前往应用市场下载后返回。"
+    },
+    {
+      "name": "optional_module_open_market",
+      "value": "前往应用市场"
+    },
+    {
       "name": "optional_module_refreshed",
       "value": "已刷新扩展状态"
     },

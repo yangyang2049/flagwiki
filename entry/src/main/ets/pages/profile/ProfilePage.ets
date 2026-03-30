@@ -12,7 +12,7 @@ import { PreferencesManager } from '../../utils/PreferencesManager';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
 import UiConstants from '../../utils/UiConstants';
-import { openAppGalleryAppDetail, refreshOptionalModuleAppStorage } from '../../utils/OptionalModuleHelper';
+import { openOptionalModuleInstallFlow, refreshOptionalModuleAppStorage } from '../../utils/OptionalModuleHelper';
 
 // 总关卡数
 const QUIZ_TOTAL_LEVELS = 10;
@@ -68,15 +68,7 @@ export struct ProfilePage {
 
   private async openMarketForOptionalModules(): Promise<void> {
     try {
-      await openAppGalleryAppDetail(this.context);
-      try {
-        promptAction.showToast({
-          message: this.context.resourceManager.getStringSync($r('app.string.optional_module_market_hint').id),
-          duration: 2500
-        });
-      } catch (_e) {
-        void 0;
-      }
+      await openOptionalModuleInstallFlow(this.context);
     } catch (err) {
       console.error(`openMarketForOptionalModules: ${JSON.stringify(err)}`);
       try {

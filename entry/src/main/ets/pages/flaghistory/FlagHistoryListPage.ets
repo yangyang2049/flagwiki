@@ -8,15 +8,43 @@ import common from '@ohos.app.ability.common';
 import { getAllFlagHistory, CountryFlagHistory } from 'flaghistory';
 import { getCountryByCode } from '../../utils/countryData';
 import { getFlagImageSource } from '../../utils/countryData';
+import {
+    MODULE_FLAGHISTORY,
+    openOptionalModuleInstallFlow,
+    refreshOptionalModuleStatus
+} from '../../utils/OptionalModuleHelper';
 
 @Entry
 @Component
     struct FlagHistoryListPage {
     @State historyList: CountryFlagHistory[] = [];
+    @StorageLink('optionalModuleFlagHistoryReady') @Watch('onFlagHistoryModuleReadyChanged') flagHistoryModuleReady: boolean = false;
     private context = getContext(this) as common.UIAbilityContext;
 
-    aboutToAppear() {
+    async aboutToAppear() {
+        await refreshOptionalModuleStatus(MODULE_FLAGHISTORY);
+        this.loadHistoryListIfReady();
+    }
+
+    onPageShow(): void {
+        void refreshOptionalModuleStatus(MODULE_FLAGHISTORY);
+        this.loadHistoryListIfReady();
+    }
+
+    private onFlagHistoryModuleReadyChanged(): void {
+        this.loadHistoryListIfReady();
+    }
+
+    private loadHistoryListIfReady(): void {
+        if (!this.flagHistoryModuleReady) {
+            this.historyList = [];
+            return;
+        }
         this.historyList = getAllFlagHistory();
+    }
+
+    private async openInstallFlow(): Promise<void> {
+        await openOptionalModuleInstallFlow(this.context);
     }
 
     private getCountryName(countryCode: string): string {
@@ -28,7 +56,9 @@ import { getFlagImageSource } from '../../utils/countryData';
         Navigation() {
             Scroll() {
                 Column() {
-                    if (this.historyList.length === 0) {
+                    if (!this.flagHistoryModuleReady) {
+                        this.OptionalModuleUnavailable()
+                    } else if (this.historyList.length === 0) {
                         // 无历史数据
                         Column() {
                             Text(this.context.resourceManager.getStringSync($r('app.string.no_data').id))
@@ -101,5 +131,39 @@ import { getFlagImageSource } from '../../utils/countryData';
             .titleMode(NavigationTitleMode.Mini)
             .hideBackButton(false)
     }
-}
 
+    @Builder
+    OptionalModuleUnavailable() {
+        Column({ space: 12 }) {
+            Text(this.context.resourceManager.getStringSync($r('app.string.optional_module_unavailable_title').id))
+                .fontSize(18)
+                .fontWeight(FontWeight.Bold)
+                .fontColor($r('app.color.text_primary'))
+
+            Text(this.context.resourceManager.getStringSync(
+                $r('app.string.optional_module_missing_message').id,
+                this.context.resourceManager.getStringSync($r('app.string.optional_module_flaghistory_title').id)
+            ))
+                .fontSize(14)
+                .fontColor($r('app.color.text_secondary'))
+                .textAlign(TextAlign.Center)
+                .lineHeight(22)
+
+            Button(this.context.resourceManager.getStringSync($r('app.string.optional_module_open_market').id))
+                .height(44)
+                .padding({ left: 20, right: 20 })
+                .backgroundColor($r('app.color.button_primary'))
+                .fontColor($r('app.color.white'))
+                .borderRadius(22)
+                .margin({ top: 8 })
+                .onClick(() => {
+                    void this.openInstallFlow();
+                })
+        }
+        .width('100%')
+        .height('100%')
+        .padding({ left: 24, right: 24, top: 80 })
+        .justifyContent(FlexAlign.Center)
+        .alignItems(HorizontalAlign.Center)
+    }
+}

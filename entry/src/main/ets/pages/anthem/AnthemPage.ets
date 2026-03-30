@@ -16,6 +16,7 @@ import { SongItem } from 'anthem';
 import { getMusicModel, MusicModel } from 'anthem';
 import { MediaService } from 'anthem';
 import { AnthemPlayer } from '../../components/AnthemPlayer';
+import { MODULE_ANTHEM, openOptionalModuleInstallFlow, refreshOptionalModuleStatus } from '../../utils/OptionalModuleHelper';
 
 @Component
 export struct AnthemPage {
@@ -26,20 +27,28 @@ export struct AnthemPage {
   @State isLoading: boolean = true;
   @Prop @Watch('onSearchExpandedChanged') isSearchExpanded: boolean = false;
   @StorageLink('currentLanguage') @Watch('onLanguageChanged') systemLanguage: string = 'zh';
-  @Prop context?: common.UIAbilityContext;
+  @StorageLink('optionalModuleAnthemReady') @Watch('onAnthemModuleReadyChanged') anthemModuleReady: boolean = false;
+  @Prop context: common.UIAbilityContext;
   private appContext = getContext(this) as common.UIAbilityContext;
   private musicModel: MusicModel = getMusicModel();
   private mediaService: MediaService = MediaService.getInstance();
 
   async aboutToAppear() {
-    const context = this.context || this.appContext;
-    await initAnthemCache(context);
-    this.loadCountries();
-    this.isLoading = false;
+    await this.loadCountriesIfReady();
+  }
+
+  onPageShow(): void {
+    void this.loadCountriesIfReady();
   }
 
   private onLanguageChanged(): void {
-    this.loadCountries();
+    if (this.anthemModuleReady) {
+      this.loadCountries();
+    }
+  }
+
+  private onAnthemModuleReadyChanged(): void {
+    void this.loadCountriesIfReady();
   }
 
   private onSearchExpandedChanged(): void {
@@ -47,6 +56,24 @@ export struct AnthemPage {
       this.searchText = '';
       this.filterCountries();
     }
+  }
+
+  private async loadCountriesIfReady(): Promise<void> {
+    this.isLoading = true;
+    const ready = await refreshOptionalModuleStatus(MODULE_ANTHEM);
+    if (!ready) {
+      this.countries = [];
+      this.filteredCountries = [];
+      this.isLoading = false;
+      return;
+    }
+    await initAnthemCache(this.context);
+    this.loadCountries();
+    this.isLoading = false;
+  }
+
+  private async openInstallFlow(): Promise<void> {
+    await openOptionalModuleInstallFlow(this.appContext);
   }
 
   private loadCountries(): void {
@@ -212,91 +239,95 @@ export struct AnthemPage {
   build() {
     Stack() {
       Column() {
-        // 搜索区域
-        if (this.isSearchExpanded) {
-          Row() {
-            Search({ 
-              value: this.searchText, 
-              placeholder: this.appContext.resourceManager.getStringSync($r('app.string.search_country').id) 
-            })
-              .layoutWeight(1)
-              .height(40)
-              .onChange((value: string) => {
-                this.onSearchChange(value);
+        if (!this.anthemModuleReady) {
+          this.OptionalModuleUnavailable()
+        } else {
+          // 搜索区域
+          if (this.isSearchExpanded) {
+            Row() {
+              Search({
+                value: this.searchText,
+                placeholder: this.appContext.resourceManager.getStringSync($r('app.string.search_country').id)
               })
-              .onSubmit((value: string) => {
-                this.onSearchChange(value);
-              })
+                .layoutWeight(1)
+                .height(40)
+                .onChange((value: string) => {
+                  this.onSearchChange(value);
+                })
+                .onSubmit((value: string) => {
+                  this.onSearchChange(value);
+                })
+            }
+            .width('100%')
+            .padding({ left: 16, right: 16, top: 8, bottom: 8 })
+            .backgroundColor($r('app.color.bg_title_bar'))
           }
+
+          // 洲际筛选器
+          Scroll() {
+            Row() {
+              ForEach(getAllContinents(), (continent: Continent) => {
+                this.ContinentChip(continent)
+              })
+            }
+            .padding({ left: 16, right: 16 })
+          }
+          .scrollable(ScrollDirection.Horizontal)
+          .scrollBar(BarState.Off)
           .width('100%')
-          .padding({ left: 16, right: 16, top: 8, bottom: 8 })
+          .height(44)
           .backgroundColor($r('app.color.bg_title_bar'))
-        }
 
-        // 洲际筛选器
-        Scroll() {
-          Row() {
-            ForEach(getAllContinents(), (continent: Continent) => {
-              this.ContinentChip(continent)
-            })
-          }
-          .padding({ left: 16, right: 16 })
-        }
-        .scrollable(ScrollDirection.Horizontal)
-        .scrollBar(BarState.Off)
-        .width('100%')
-        .height(44)
-        .backgroundColor($r('app.color.bg_title_bar'))
-
-        // 国歌列表
-        if (this.isLoading) {
-          Column() {
-            Text(this.appContext.resourceManager.getStringSync($r('app.string.loading').id))
-              .fontSize(16)
-              .fontColor($r('app.color.text_tertiary'))
-          }
-          .width('100%')
-          .layoutWeight(1)
-          .justifyContent(FlexAlign.Center)
-          .alignItems(HorizontalAlign.Center)
-        } else if (this.filteredCountries.length === 0) {
-          Column() {
-            if (this.searchText.trim() !== '') {
-              Text(this.appContext.resourceManager.getStringSync($r('app.string.no_matching_countries').id))
-                .fontSize(16)
-                .fontColor($r('app.color.text_tertiary'))
-
-              Text(this.appContext.resourceManager.getStringSync($r('app.string.modify_keywords_or_select').id))
-                .fontSize(12)
-                .fontColor($r('app.color.text_tertiary'))
-                .margin({ top: 8 })
-                .opacity(0.7)
-            } else {
-              Text(this.appContext.resourceManager.getStringSync($r('app.string.no_anthem_available').id))
+          // 国歌列表
+          if (this.isLoading) {
+            Column() {
+              Text(this.appContext.resourceManager.getStringSync($r('app.string.loading').id))
                 .fontSize(16)
                 .fontColor($r('app.color.text_tertiary'))
             }
-          }
-          .width('100%')
-          .layoutWeight(1)
-          .justifyContent(FlexAlign.Center)
-          .alignItems(HorizontalAlign.Center)
-        } else {
-          List() {
-            ForEach(this.filteredCountries, (country: Country) => {
-              ListItem() {
-                this.AnthemItem(country)
+            .width('100%')
+            .layoutWeight(1)
+            .justifyContent(FlexAlign.Center)
+            .alignItems(HorizontalAlign.Center)
+          } else if (this.filteredCountries.length === 0) {
+            Column() {
+              if (this.searchText.trim() !== '') {
+                Text(this.appContext.resourceManager.getStringSync($r('app.string.no_matching_countries').id))
+                  .fontSize(16)
+                  .fontColor($r('app.color.text_tertiary'))
+
+                Text(this.appContext.resourceManager.getStringSync($r('app.string.modify_keywords_or_select').id))
+                  .fontSize(12)
+                  .fontColor($r('app.color.text_tertiary'))
+                  .margin({ top: 8 })
+                  .opacity(0.7)
+              } else {
+                Text(this.appContext.resourceManager.getStringSync($r('app.string.no_anthem_available').id))
+                  .fontSize(16)
+                  .fontColor($r('app.color.text_tertiary'))
               }
+            }
+            .width('100%')
+            .layoutWeight(1)
+            .justifyContent(FlexAlign.Center)
+            .alignItems(HorizontalAlign.Center)
+          } else {
+            List() {
+              ForEach(this.filteredCountries, (country: Country) => {
+                ListItem() {
+                  this.AnthemItem(country)
+                }
+              })
+            }
+            .width('100%')
+            .layoutWeight(1)
+            .padding({
+              top: 8,
+              bottom: this.musicModel.currentSong ? 100 : 8
             })
+            .edgeEffect(EdgeEffect.Spring)
+            .divider({ strokeWidth: 0.5, color: $r('app.color.gray_border'), startMargin: 16, endMargin: 16 })
           }
-          .width('100%')
-          .layoutWeight(1)
-          .padding({ 
-            top: 8, 
-            bottom: this.musicModel.currentSong ? 100 : 8 
-          })
-          .edgeEffect(EdgeEffect.Spring)
-          .divider({ strokeWidth: 0.5, color: $r('app.color.gray_border'), startMargin: 16, endMargin: 16 })
         }
       }
       .width('100%')
@@ -305,7 +336,7 @@ export struct AnthemPage {
       .justifyContent(FlexAlign.Start)
       
       // 音乐播放控制器 - 固定在底部
-      if (this.musicModel.currentSong) {
+      if (this.anthemModuleReady && this.musicModel.currentSong) {
         AnthemPlayer()
           .width('100%')
           .align(Alignment.Bottom)
@@ -329,6 +360,41 @@ export struct AnthemPage {
       .onClick(() => {
         this.selectContinent(continent);
       })
+  }
+
+  @Builder
+  OptionalModuleUnavailable() {
+    Column({ space: 12 }) {
+      Text(this.appContext.resourceManager.getStringSync($r('app.string.optional_module_unavailable_title').id))
+        .fontSize(18)
+        .fontWeight(FontWeight.Bold)
+        .fontColor($r('app.color.text_primary'))
+
+      Text(this.appContext.resourceManager.getStringSync(
+        $r('app.string.optional_module_missing_message').id,
+        this.appContext.resourceManager.getStringSync($r('app.string.optional_module_anthem_title').id)
+      ))
+        .fontSize(14)
+        .fontColor($r('app.color.text_secondary'))
+        .textAlign(TextAlign.Center)
+        .lineHeight(22)
+
+      Button(this.appContext.resourceManager.getStringSync($r('app.string.optional_module_open_market').id))
+        .height(44)
+        .padding({ left: 20, right: 20 })
+        .backgroundColor($r('app.color.button_primary'))
+        .fontColor($r('app.color.white'))
+        .borderRadius(22)
+        .margin({ top: 8 })
+        .onClick(() => {
+          void this.openInstallFlow();
+        })
+    }
+    .width('100%')
+    .layoutWeight(1)
+    .padding({ left: 24, right: 24 })
+    .justifyContent(FlexAlign.Center)
+    .alignItems(HorizontalAlign.Center)
   }
 
   @Builder
@@ -377,5 +443,3 @@ export struct AnthemPage {
     })
   }
 }
-
-

@@ -81,6 +81,18 @@
       "value": "After downloading resources in AppGallery, return here and tap \"Refresh add-on status\"."
     },
     {
+      "name": "optional_module_unavailable_title",
+      "value": "Add-on not ready"
+    },
+    {
+      "name": "optional_module_missing_message",
+      "value": "This page requires \"%s\". Download it from AppGallery, then return here."
+    },
+    {
+      "name": "optional_module_open_market",
+      "value": "Open AppGallery"
+    },
+    {
       "name": "optional_module_refreshed",
       "value": "Add-on status refreshed"
     },

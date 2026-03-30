@@ -70,10 +70,7 @@ struct Index {
       iconNormal: $r('app.media.icon_tab_profile'),
       iconSelected: $r('app.media.icon_tab_profile_selected')
     };
-    if (this.anthemModuleReady) {
-      return [home, anthem, gallery, paint, explore, profile];
-    }
-    return [home, gallery, paint, explore, profile];
+    return [home, anthem, gallery, paint, explore, profile];
   }
 
   private getTitleText(): Resource {
@@ -115,8 +112,6 @@ struct Index {
       } catch (_e) {
         void 0;
       }
-      this.currentTabIndex = 0;
-      this.tabController.changeIndex(0);
     }
     this.prevAnthemReady = afterAnthem;
 
@@ -171,7 +166,7 @@ struct Index {
       Column() {
         HomePage({
           refreshKey: this.homeRefreshKey,
-          galleryTabIndex: this.anthemModuleReady ? 2 : 1,
+          galleryTabIndex: 2,
           onTabChange: (index: number) => {
             this.switchTab(index);
           }
@@ -217,7 +212,7 @@ struct Index {
               })
           }
 
-          if (this.currentSpecId() === 'anthem') {
+          if (this.currentSpecId() === 'anthem' && this.anthemModuleReady) {
             Image(this.isAnthemSearchExpanded ? $r('app.media.icon_close') : $r('app.media.icon_search'))
               .width(22)
               .height(22)

@@ -30,19 +30,36 @@ const COUNTRIES_WITH_ANTHEM_STATIC: string[] = [
   'za', 'zm', 'zw'
 ];
 
-let countriesWithAnthemCache: string[] | null = null;
+let countriesWithAnthemCache: Set<string> = new Set<string>();
 
-export async function initAnthemCache(_context: common.UIAbilityContext): Promise<void> {
-  countriesWithAnthemCache = COUNTRIES_WITH_ANTHEM_STATIC;
-  hilog.info(DOMAIN, 'AnthemUtilCore', `Initialized anthem cache: ${COUNTRIES_WITH_ANTHEM_STATIC.length}`);
+export async function initAnthemCache(context: common.UIAbilityContext): Promise<void> {
+  try {
+    const resourceManager = context.createModuleContext('anthem').resourceManager;
+    const availableCountries = await Promise.all(COUNTRIES_WITH_ANTHEM_STATIC.map(async (countryCode) => {
+      try {
+        const anthemPath = getAnthemFilePath(countryCode);
+        const rawFile = await resourceManager.getRawFd(anthemPath);
+        return rawFile ? countryCode : null;
+      } catch (_e) {
+        return null;
+      }
+    }));
+    const verifiedCountries: string[] = [];
+    for (const countryCode of availableCountries) {
+      if (countryCode !== null) {
+        verifiedCountries.push(countryCode);
+      }
+    }
+    countriesWithAnthemCache = new Set<string>(verifiedCountries);
+    hilog.info(DOMAIN, 'AnthemUtilCore', `Initialized anthem cache from installed resources: ${countriesWithAnthemCache.size}`);
+  } catch (e) {
+    countriesWithAnthemCache = new Set<string>();
+    hilog.warn(DOMAIN, 'AnthemUtilCore', `createModuleContext(anthem) failed: ${JSON.stringify(e)}`);
+  }
 }
 
 export function hasAnthemFile(countryCode: string): boolean {
-  const lowerCode = countryCode.toLowerCase();
-  if (countriesWithAnthemCache !== null) {
-    return countriesWithAnthemCache.includes(lowerCode);
-  }
-  return COUNTRIES_WITH_ANTHEM_STATIC.includes(lowerCode);
+  return countriesWithAnthemCache.has(countryCode.toLowerCase());
 }
 
 export function getAnthemFilePath(countryCode: string): string {

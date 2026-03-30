@@ -2,6 +2,7 @@ import common from '@ohos.app.ability.common';
 import bundleManager from '@ohos.bundle.bundleManager';
 import { Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import promptAction from '@ohos.promptAction';
 
 const DOMAIN = 0xF1A9;
 
@@ -14,6 +15,18 @@ export const MODULE_FLAGHISTORY = 'flaghistory';
 /** 与 UI @StorageLink 绑定的键名 */
 export const STORAGE_KEY_ANTHEM_READY = 'optionalModuleAnthemReady';
 export const STORAGE_KEY_FLAGHISTORY_READY = 'optionalModuleFlagHistoryReady';
+
+export type OptionalModuleName = 'anthem' | 'flaghistory';
+
+function getOptionalModuleStorageKey(moduleName: OptionalModuleName): string {
+  return moduleName === MODULE_ANTHEM ? STORAGE_KEY_ANTHEM_READY : STORAGE_KEY_FLAGHISTORY_READY;
+}
+
+function setOptionalModuleReady(moduleName: OptionalModuleName, ready: boolean): void {
+  const storageKey = getOptionalModuleStorageKey(moduleName);
+  AppStorage.setOrCreate(storageKey, ready);
+  AppStorage.set(storageKey, ready);
+}
 
 /**
  * 使用包管理查询当前应用已安装的 HAP/HSP 模块列表，判断是否包含指定模块。
@@ -35,15 +48,20 @@ export async function isModuleInstalled(moduleName: string): Promise<boolean> {
 }
 
 /**
+ * 刷新单个可选模块的安装状态，并同步到 AppStorage。
+ */
+export async function refreshOptionalModuleStatus(moduleName: OptionalModuleName): Promise<boolean> {
+  const ready = await isModuleInstalled(moduleName);
+  setOptionalModuleReady(moduleName, ready);
+  return ready;
+}
+
+/**
  * 同步 AppStorage 中的模块就绪标记（供 Tab、详情页等绑定）。
  */
-export async function refreshOptionalModuleAppStorage(context: common.UIAbilityContext): Promise<void> {
-  const anthemOk = await isModuleInstalled(MODULE_ANTHEM);
-  const historyOk = await isModuleInstalled(MODULE_FLAGHISTORY);
-  AppStorage.setOrCreate(STORAGE_KEY_ANTHEM_READY, anthemOk);
-  AppStorage.set(STORAGE_KEY_ANTHEM_READY, anthemOk);
-  AppStorage.setOrCreate(STORAGE_KEY_FLAGHISTORY_READY, historyOk);
-  AppStorage.set(STORAGE_KEY_FLAGHISTORY_READY, historyOk);
+export async function refreshOptionalModuleAppStorage(_context: common.UIAbilityContext): Promise<void> {
+  const anthemOk = await refreshOptionalModuleStatus(MODULE_ANTHEM);
+  const historyOk = await refreshOptionalModuleStatus(MODULE_FLAGHISTORY);
   hilog.info(DOMAIN, 'OptionalModule', `anthem=${anthemOk}, flaghistory=${historyOk}`);
 }
 
@@ -70,5 +88,21 @@ export async function openAppGalleryAppDetail(context: common.UIAbilityContext):
     } catch (e2) {
       throw (e2 instanceof Error ? e2 : new Error(String(e2)));
     }
+  }
+}
+
+/**
+ * 统一的扩展包获取入口。
+ * 当前版本通过应用市场触发下载，返回应用后可再次刷新状态。
+ */
+export async function openOptionalModuleInstallFlow(context: common.UIAbilityContext): Promise<void> {
+  await openAppGalleryAppDetail(context);
+  try {
+    promptAction.showToast({
+      message: context.resourceManager.getStringSync($r('app.string.optional_module_market_hint').id),
+      duration: 2500
+    });
+  } catch (_e) {
+    void 0;
   }
 }

@@ -16,6 +16,11 @@ import { getFlagHistory, FlagHistoryItem } from 'flaghistory';
 import { getCountryByCode, getLocalizedCountryName } from '../../utils/countryData';
 import { screenshotManager } from '../../utils/ScreenshotManager';
 import { LocalizationUtil } from '../../utils/LocalizationUtil';
+import {
+  MODULE_FLAGHISTORY,
+  openOptionalModuleInstallFlow,
+  refreshOptionalModuleStatus
+} from '../../utils/OptionalModuleHelper';
 
 @Entry
 @Component
@@ -25,19 +30,26 @@ import { LocalizationUtil } from '../../utils/LocalizationUtil';
   @State countryName: string = '';
   @State isSharing: boolean = false;
   @State sharePixelMap: image.PixelMap | null = null;
+  @StorageLink('optionalModuleFlagHistoryReady') @Watch('onFlagHistoryModuleReadyChanged') flagHistoryModuleReady: boolean = false;
   @StorageLink('currentLanguage') @Watch('onLanguageChanged') currentLanguage: string = 'zh';
   private context = getContext(this) as common.UIAbilityContext;
   private readonly SHARE_CONTAINER_ID = 'flagHistoryShareContainer';
 
-  aboutToAppear() {
+  async aboutToAppear() {
     // 初始化截图管理器
     screenshotManager.init(this.getUIContext());
 
     const params = router.getParams() as Record<string, string>;
     if (params && params['countryCode']) {
       this.countryCode = params['countryCode'];
-      this.loadHistoryData();
     }
+    await refreshOptionalModuleStatus(MODULE_FLAGHISTORY);
+    this.loadHistoryDataIfReady();
+  }
+
+  onPageShow(): void {
+    void refreshOptionalModuleStatus(MODULE_FLAGHISTORY);
+    this.loadHistoryDataIfReady();
   }
 
   private onLanguageChanged(): void {
@@ -45,6 +57,18 @@ import { LocalizationUtil } from '../../utils/LocalizationUtil';
     if (this.countryCode) {
       this.updateCountryName();
     }
+  }
+
+  private onFlagHistoryModuleReadyChanged(): void {
+    this.loadHistoryDataIfReady();
+  }
+
+  private loadHistoryDataIfReady(): void {
+    if (!this.flagHistoryModuleReady || !this.countryCode) {
+      this.historyItems = [];
+      return;
+    }
+    this.loadHistoryData();
   }
 
   private loadHistoryData(): void {
@@ -203,6 +227,10 @@ import { LocalizationUtil } from '../../utils/LocalizationUtil';
     }
   }
 
+  private async openInstallFlow(): Promise<void> {
+    await openOptionalModuleInstallFlow(this.context);
+  }
+
   build() {
     Navigation() {
       Scroll() {
@@ -218,7 +246,9 @@ import { LocalizationUtil } from '../../utils/LocalizationUtil';
           .width(400)
           .backgroundColor($r('app.color.bg_page'))
 
-          if (this.historyItems.length === 0) {
+          if (!this.flagHistoryModuleReady) {
+            this.OptionalModuleUnavailable()
+          } else if (this.historyItems.length === 0) {
             // 无历史数据
             Column() {
               Text(this.context.resourceManager.getStringSync($r('app.string.no_data').id))
@@ -258,17 +288,54 @@ import { LocalizationUtil } from '../../utils/LocalizationUtil';
   @Builder
   MenuBuilder() {
     Row({ space: 20 }) {
-      Image($r('app.media.icon_share'))
-        .width(22)
-        .height(22)
-        .onClick(() => {
-          this.onShareClick();
-        })
+      if (this.flagHistoryModuleReady && this.historyItems.length > 0) {
+        Image($r('app.media.icon_share'))
+          .width(22)
+          .height(22)
+          .onClick(() => {
+            this.onShareClick();
+          })
+      }
     }
     .height('100%')
       .justifyContent(FlexAlign.End)
       .alignItems(VerticalAlign.Center)
       .padding({ right: 16 })
+  }
+
+  @Builder
+  OptionalModuleUnavailable() {
+    Column({ space: 12 }) {
+      Text(this.context.resourceManager.getStringSync($r('app.string.optional_module_unavailable_title').id))
+        .fontSize(18)
+        .fontWeight(FontWeight.Bold)
+        .fontColor($r('app.color.text_primary'))
+
+      Text(this.context.resourceManager.getStringSync(
+        $r('app.string.optional_module_missing_message').id,
+        this.context.resourceManager.getStringSync($r('app.string.optional_module_flaghistory_title').id)
+      ))
+        .fontSize(14)
+        .fontColor($r('app.color.text_secondary'))
+        .textAlign(TextAlign.Center)
+        .lineHeight(22)
+
+      Button(this.context.resourceManager.getStringSync($r('app.string.optional_module_open_market').id))
+        .height(44)
+        .padding({ left: 20, right: 20 })
+        .backgroundColor($r('app.color.button_primary'))
+        .fontColor($r('app.color.white'))
+        .borderRadius(22)
+        .margin({ top: 8 })
+        .onClick(() => {
+          void this.openInstallFlow();
+        })
+    }
+    .width('100%')
+    .height('100%')
+    .padding({ left: 24, right: 24, top: 80 })
+    .justifyContent(FlexAlign.Center)
+    .alignItems(HorizontalAlign.Center)
   }
 
   @Builder
@@ -422,4 +489,3 @@ import { LocalizationUtil } from '../../utils/LocalizationUtil';
       .padding({ left: 16, right: 16 })
   }
 }
-
