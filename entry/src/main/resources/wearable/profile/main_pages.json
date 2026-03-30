@@ -1,0 +1,10 @@
+{
+  "src": [
+    "pages/watch/Index",
+    "pages/watch/NameToFlagPage",
+    "pages/watch/FlagToNamePage",
+    "pages/watch/FlashcardPage",
+    "pages/watch/ContinentPage",
+    "pages/watch/CountryDetailPage"
+  ]
+}

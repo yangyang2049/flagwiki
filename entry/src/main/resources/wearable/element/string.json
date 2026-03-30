@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "国旗小百科 Watch 版"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "国旗小百科 Watch 版入口"
+    },
+    {
+      "name": "vibrate_permission_reason",
+      "value": "用于手表振动反馈"
+    }
+  ]
+}

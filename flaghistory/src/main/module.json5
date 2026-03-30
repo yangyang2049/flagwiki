@@ -1,0 +1,16 @@
+{
+  "module": {
+    // 与 anthem 模块均为按需分发：上架时需在 AppGallery Connect 为对应动态包配置分发策略，并在应用内处理模块未安装时的下载/引导（见 bundleManager 等文档）。
+    "name": "flaghistory",
+    "type": "shared",
+    "description": "$string:module_desc",
+    "deviceTypes": [
+      "phone",
+      "tablet",
+      "2in1",
+      "wearable"
+    ],
+    "deliveryWithInstall": false,
+    "installationFree": false
+  }
+}

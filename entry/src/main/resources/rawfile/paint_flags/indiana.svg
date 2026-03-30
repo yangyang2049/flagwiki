@@ -1,0 +1,317 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="500" fill="none" viewBox="0 0 750 500">
+  <g id="indiana" clip-path="url(#clip0_1030_1421)">
+    <g id="Group">
+      <path id="1" fill="#EEE" d="M0 0h750v500H0V0Z"/>
+      <g id="2">
+        <path id="Vector" fill="#DDD" d="M346.554 222.898a1.902 1.902 0 0 1-.113-.154c-16.592-20.453.312-32.758.685-49.705 13.223 22.029-3.998 28.773 15.324 49.875l-15.896-.016Z"/>
+        <path id="Vector_2" fill="#DDD" d="M366.585 222.913c-6.385-8.982-10.864-23.319-8.948-32.685 1.9-9.362 8.387-18.581 7.488-25.667 1.12 2.695 5.106 8.835 6.303 15.392 5.832-15.071 16.017-21.433 31.838-22.211-28.454 21.622 8.689 38.239-15.871 65.197l-20.81-.026Z"/>
+        <path id="Vector_3" fill="#DDD" d="M392.668 222.952c11.582-14.622 8.519-25.728 7.472-34.603-.905-7.674-.518-12.496 11.971-18.462-.972 2.211-2.282 3.628-3.063 5.54-.926 2.268-2.242 4.862-.446 10.307 1.904 4.226 1.961 10.156.411 13.143-1.483.409 6.625-10.024 9.729-10.762-3.445 7.125-2.024 15.281-7.495 24.309-2.014 3.324-5.474 7.131-9.725 10.527m-12.89 58.954c1.008-25.563 6.477-33.53 16.847-44.221-20.122-.048-42.609.011-60.906-.064 10.326 10.707 15.85 18.743 16.804 44.303 9.168.004 18.149-.04 27.255-.018Zm-13.667 62.282 7.961 24.97 4.397-74.147c-8.198-.028-16.396.024-24.594.012l4.22 74.119 8.016-24.954Zm.009 111.963c3.512-3.257 4.509-13.866 4.509-13.866l2.185-45.299-6.635-4.662-6.649 4.647 2.115 45.31s.942 10.579 4.459 13.873l.016-.003Zm-36.992-344.158-15.482-7.939 1.078-2.102 15.482 7.939-1.078 2.102Zm2.638-5.718-12.51-12.092 1.798-1.86 14.735 2.94c.324.063.62.13.889.203.269.073.507.156.714.247l-10.139-9.802 1.568-1.622 12.509 12.093-1.782 1.842-14.985-2.937a8.023 8.023 0 0 1-.688-.172 11.189 11.189 0 0 1-.689-.255l10.14 9.802-1.56 1.613Zm13.206-28.688-3.786 1.476 4.819 12.358 3.785-1.476c1.622-.632 2.643-1.634 3.062-3.006.417-1.38.224-3.1-.58-5.162-.769-1.974-1.78-3.321-3.033-4.041-1.253-.72-2.675-.77-4.267-.15Zm-.396 16.673-6.32-16.211 6.173-2.407c2.26-.882 4.251-.88 5.973.004 1.73.88 3.091 2.593 4.083 5.14 1.027 2.634 1.203 4.927.528 6.88-.671 1.944-2.121 3.35-4.351 4.22l-6.086 2.374Zm16.362-4.931-1.375-17.344 2.355-.187 1.375 17.344-2.355.187Zm10.644-7.121 5.324 1.02-1.198-8.046-4.126 7.026Zm-6.304 6.15 9.624-15.87 2.563.493 3.09 18.309-2.517-.483-.83-5.451-6.728-1.291-2.801 4.754-2.401-.461Zm17.006 3.859 9.835-14.353 2.134 1.462-.44 15.02c-.007.33-.024.633-.051.91a4.95 4.95 0 0 1-.124.745l7.971-11.634 1.861 1.275-9.834 14.353-2.115-1.45.394-15.264a7.96 7.96 0 0 1 .055-.707c.036-.233.082-.474.137-.723l-7.971 11.635-1.852-1.27Zm21.632 9.467 2.888 4.589 5.063-6.37-7.951 1.781Zm-8.798-.407 18.166-3.801 1.391 2.209-11.27 14.757-1.366-2.169 3.417-4.328-3.65-5.798-5.386 1.199-1.302-2.069Z"/>
+        <g id="Mask group">
+          <mask id="mask0_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_2">
+              <path id="Vector_4" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask0_1030_1421)">
+            <g id="Group_3">
+              <path id="Vector_5" fill="#DDD" fill-rule="evenodd" d="M344.811 115.088h23.062L375 93.18l7.127 21.908h23.062l-18.658 13.539 7.127 21.907L375 136.995l-18.658 13.539 7.127-21.907-18.658-13.539Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_2">
+          <mask id="mask1_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_4">
+              <path id="Vector_6" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask1_1030_1421)">
+            <g id="Group_5">
+              <path id="Vector_7" fill="#DDD" fill-rule="evenodd" d="M353.858 43.449h16.151L375 28.102l4.991 15.348h16.151l-13.067 9.486 4.991 15.347L375 58.797l-13.066 9.485 4.991-15.347-13.067-9.486Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_3">
+          <mask id="mask2_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_6">
+              <path id="Vector_8" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask2_1030_1421)">
+            <g id="Group_7">
+              <path id="Vector_9" fill="#DDD" fill-rule="evenodd" d="M449.614 69.551h16.151l4.991-15.348 4.991 15.348h16.151l-13.067 9.485 4.991 15.348-13.066-9.486-13.066 9.486 4.991-15.348-13.067-9.485Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_4">
+          <mask id="mask3_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_8">
+              <path id="Vector_10" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask3_1030_1421)">
+            <g id="Group_9">
+              <path id="Vector_11" fill="#DDD" fill-rule="evenodd" d="M520.201 132.16h16.151l4.99-15.348 4.991 15.348h16.151l-13.066 9.486 4.991 15.347-13.067-9.486-13.066 9.486 4.991-15.347-13.066-9.486Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_5">
+          <mask id="mask4_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_10">
+              <path id="Vector_12" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask4_1030_1421)">
+            <g id="Group_11">
+              <path id="Vector_13" fill="#DDD" fill-rule="evenodd" d="M339.154 226.727h71.692v6.756h-71.692v-6.756Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_6">
+          <mask id="mask5_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_12">
+              <path id="Vector_14" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask5_1030_1421)">
+            <g id="Group_13">
+              <path id="Vector_15" fill="#DDD" fill-rule="evenodd" d="M558.25 222.215h16.151l4.991-15.348 4.99 15.348h16.151l-13.066 9.485 4.991 15.348-13.066-9.485-13.067 9.485 4.991-15.348-13.066-9.485Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_7">
+          <mask id="mask6_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_14">
+              <path id="Vector_16" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask6_1030_1421)">
+            <g id="Group_15">
+              <path id="Vector_17" fill="#DDD" fill-rule="evenodd" d="M545.833 322.066h16.151l4.99-15.347 4.991 15.347h16.151l-13.066 9.486 4.991 15.348-13.067-9.486-13.066 9.486 4.991-15.348-13.066-9.486Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_8">
+          <mask id="mask7_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_16">
+              <path id="Vector_18" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask7_1030_1421)">
+            <g id="Group_17">
+              <path id="Vector_19" fill="#DDD" fill-rule="evenodd" d="m490.718 399.183 16.151.001 4.991-15.348 4.991 15.348 16.151-.001-13.067 9.486 4.991 15.348-13.066-9.486-13.066 9.486 4.991-15.348-13.067-9.486Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_9">
+          <mask id="mask8_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_18">
+              <path id="Vector_20" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask8_1030_1421)">
+            <g id="Group_19">
+              <path id="Vector_21" fill="#DDD" fill-rule="evenodd" d="M406.856 447.066h16.151l4.991-15.347 4.991 15.347h16.151l-13.067 9.486 4.991 15.348-13.066-9.486-13.066 9.486 4.991-15.348-13.067-9.486Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_10">
+          <mask id="mask9_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_20">
+              <path id="Vector_22" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask9_1030_1421)">
+            <g id="Group_21">
+              <path id="Vector_23" fill="#DDD" fill-rule="evenodd" d="m442.803 335.058 16.151.001 4.991-15.348 4.991 15.348 16.15-.001-13.066 9.486 4.991 15.348-13.066-9.486-13.067 9.486 4.992-15.348-13.067-9.486Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_11">
+          <mask id="mask10_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_22">
+              <path id="Vector_24" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask10_1030_1421)">
+            <g id="Group_23">
+              <path id="Vector_25" fill="#DDD" fill-rule="evenodd" d="M480.886 245.661h16.151l4.99-15.349 4.991 15.349h16.151l-13.066 9.485 4.991 15.348-13.067-9.487-13.066 9.487 4.991-15.348-13.066-9.485Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_12">
+          <mask id="mask11_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_24">
+              <path id="Vector_26" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask11_1030_1421)">
+            <g id="Group_25">
+              <path id="Vector_27" fill="#DDD" fill-rule="evenodd" d="M353.858 372.051h16.151L375 356.703l4.991 15.348h16.151l-13.067 9.485 4.991 15.348L375 387.398l-13.066 9.486 4.991-15.348-13.067-9.485Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_13">
+          <mask id="mask12_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_26">
+              <path id="Vector_28" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask12_1030_1421)">
+            <g id="Group_27">
+              <path id="Vector_29" fill="#DDD" fill-rule="evenodd" d="m526.22 141.719 1.371 3.401-104.575 42.26-1.37-3.402 104.574-42.259Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_14">
+          <mask id="mask13_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_28">
+              <path id="Vector_30" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask13_1030_1421)">
+            <g id="Group_29">
+              <path id="Vector_31" fill="#DDD" fill-rule="evenodd" d="m555.218 222.379-.401 3.637-137.174-14.433.402-3.638 137.173 14.434Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_15">
+          <mask id="mask14_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_30">
+              <path id="Vector_32" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask14_1030_1421)">
+            <g id="Group_31">
+              <path id="Vector_33" fill="#DDD" fill-rule="evenodd" d="M300.386 69.551h-16.151l-4.991-15.348-4.991 15.348h-16.151l13.067 9.485-4.991 15.348 13.066-9.486 13.066 9.486-4.991-15.348 13.067-9.485Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_16">
+          <mask id="mask15_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_32">
+              <path id="Vector_34" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask15_1030_1421)">
+            <g id="Group_33">
+              <path id="Vector_35" fill="#DDD" fill-rule="evenodd" d="M229.799 132.16h-16.151l-4.99-15.348-4.991 15.348h-16.151l13.066 9.486-4.991 15.347 13.067-9.486 13.066 9.486-4.991-15.347 13.066-9.486Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_17">
+          <mask id="mask16_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_34">
+              <path id="Vector_36" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask16_1030_1421)">
+            <g id="Group_35">
+              <path id="Vector_37" fill="#DDD" fill-rule="evenodd" d="M191.75 222.215h-16.151l-4.991-15.348-4.99 15.348h-16.151l13.066 9.485-4.991 15.348 13.066-9.485 13.067 9.485-4.991-15.348 13.066-9.485Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_18">
+          <mask id="mask17_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_36">
+              <path id="Vector_38" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask17_1030_1421)">
+            <g id="Group_37">
+              <path id="Vector_39" fill="#DDD" fill-rule="evenodd" d="M204.167 322.066h-16.151l-4.99-15.347-4.991 15.347h-16.151l13.066 9.486-4.991 15.348 13.067-9.486 13.066 9.486-4.991-15.348 13.066-9.486Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_19">
+          <mask id="mask18_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_38">
+              <path id="Vector_40" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask18_1030_1421)">
+            <g id="Group_39">
+              <path id="Vector_41" fill="#DDD" fill-rule="evenodd" d="m259.282 399.183-16.151.001-4.991-15.348-4.991 15.348-16.151-.001 13.067 9.486-4.991 15.348 13.066-9.486 13.066 9.486-4.991-15.348 13.067-9.486Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_20">
+          <mask id="mask19_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_40">
+              <path id="Vector_42" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask19_1030_1421)">
+            <g id="Group_41">
+              <path id="Vector_43" fill="#DDD" fill-rule="evenodd" d="M343.144 447.066h-16.151l-4.991-15.347-4.991 15.347H300.86l13.067 9.486-4.991 15.348 13.066-9.486 13.066 9.486-4.991-15.348 13.067-9.486Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_21">
+          <mask id="mask20_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_42">
+              <path id="Vector_44" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask20_1030_1421)">
+            <g id="Group_43">
+              <path id="Vector_45" fill="#DDD" fill-rule="evenodd" d="m307.197 335.058-16.151.001-4.991-15.348-4.991 15.348-16.15-.001 13.066 9.486-4.991 15.348 13.066-9.486 13.066 9.486-4.991-15.348 13.067-9.486Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_22">
+          <mask id="mask21_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_44">
+              <path id="Vector_46" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask21_1030_1421)">
+            <g id="Group_45">
+              <path id="Vector_47" fill="#DDD" fill-rule="evenodd" d="M269.114 245.661h-16.151l-4.99-15.349-4.991 15.349h-16.151l13.066 9.485-4.991 15.348 13.067-9.487 13.066 9.487-4.991-15.348 13.066-9.485Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_23">
+          <mask id="mask22_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_46">
+              <path id="Vector_48" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask22_1030_1421)">
+            <g id="Group_47">
+              <path id="Vector_49" fill="#DDD" fill-rule="evenodd" d="m223.78 141.719-1.371 3.401 112.134 45.307 1.37-3.401-112.133-45.307Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_24">
+          <mask id="mask23_1030_1421" width="1000" height="667" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_48">
+              <path id="Vector_50" fill="#fff" d="M0 0h1000v666.667H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask23_1030_1421)">
+            <g id="Group_49">
+              <path id="Vector_51" fill="#DDD" fill-rule="evenodd" d="m194.782 222.379.401 3.637 137.174-14.433-.402-3.638-137.173 14.434Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+        <g id="Mask group_25">
+          <mask id="mask24_1030_1421" width="750" height="500" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+            <g id="Group_50">
+              <path id="Vector_52" fill="#fff" d="M0 0h750v500H0V0Z"/>
+            </g>
+          </mask>
+          <g mask="url(#mask24_1030_1421)">
+            <g id="Group_51">
+              <path id="Vector_53" fill="#DDD" fill-rule="evenodd" d="M373.146 141.719h3.708v25.606h-3.708v-25.606Zm-78.211-46.164-3.047 2.103 49.157 71.504 3.047-2.103-49.157-71.504Zm160.01.343L457.992 98l-45.519 66.213-3.048-2.103 45.52-66.212Z" clip-rule="evenodd"/>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <defs>
+    <clipPath id="clip0_1030_1421">
+      <path fill="#fff" d="M0 0h750v500H0z"/>
+    </clipPath>
+  </defs>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" fill="none" viewBox="0 0 900 600">
+  <g id="arizona" clip-path="url(#clip0_969_6020)">
+    <path id="1" fill="#EEE" d="M0 0h900v600H0V0Z"/>
+    <path id="2" fill="#DDD" d="M0 0h900v300H0V0Z"/>
+    <g id="3">
+      <path id="a" fill="#CCC" d="M900 70.313v124.999L450 300 900 70.312ZM667.188 0h129.687L450 300 667.188 0Zm-175 0h75L450 300 492.188 0Z"/>
+      <path id="a_2" fill="#CCC" d="M0 70.313v124.999L450 300 0 70.312ZM232.812 0H103.125L450 300 232.812 0Zm175 0h-75L450 300 407.812 0Z"/>
+    </g>
+    <path id="4" fill="#BBB" d="m450 150 97.477 300L292.68 263.406h314.656L352.539 450 450 150Z"/>
+  </g>
+  <defs>
+    <clipPath id="clip0_969_6020">
+      <path fill="#fff" d="M0 0h900v600H0z"/>
+    </clipPath>
+  </defs>
+</svg>

@@ -1,0 +1,24 @@
+<svg width="900" height="600" viewBox="0 0 900 600" fill="none"
+    xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_2055_283)">
+        <path id="1" d="M0 300H900V600H0V300Z" fill="#DDDDDD"/>
+        <path id="2" d="M0 0H900V300H0V0Z" fill="#EDEDF0"/>
+        <g id="3">
+            <path d="M450 200L419.098 295.106L466.651 310.557" fill="#CCCCCC"/>
+            <path d="M450 200L480.902 295.106L433.349 310.557" fill="#CCCCCC"/>
+            <path d="M545.105 269.102H445.105V319.102" fill="#CCCCCC"/>
+            <path d="M545.105 269.102L464.204 327.88L434.814 287.429" fill="#CCCCCC"/>
+            <path d="M508.777 380.906L477.876 285.801L430.323 301.251" fill="#CCCCCC"/>
+            <path d="M508.777 380.906L427.876 322.128L457.265 281.677" fill="#CCCCCC"/>
+            <path d="M391.219 380.898L472.12 322.12L442.731 281.669" fill="#CCCCCC"/>
+            <path d="M391.219 380.898L422.12 285.793L469.673 301.244" fill="#CCCCCC"/>
+            <path d="M354.895 269.094L435.796 327.872L465.186 287.421" fill="#CCCCCC"/>
+            <path d="M354.895 269.094H454.895V319.094" fill="#CCCCCC"/>
+        </g>
+    </g>
+    <defs>
+        <clipPath id="clip0_2055_283">
+            <rect width="900" height="600" fill="white"/>
+        </clipPath>
+    </defs>
+</svg>

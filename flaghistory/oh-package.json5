@@ -1,0 +1,9 @@
+{
+  "name": "flaghistory",
+  "version": "1.0.0",
+  "description": "历史国旗数据与资源（HSP，可配置为按需分发）",
+  "main": "src/main/ets/Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {}
+}

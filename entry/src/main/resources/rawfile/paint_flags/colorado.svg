@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1200" fill="none" viewBox="0 0 1800 1200">
+  <g id="colorado" clip-path="url(#clip0_969_5905)">
+    <path id="1" fill="#EEE" d="M0 0h1800v1200H0"/>
+    <path id="2" fill="#DDD" d="M0 400h1800v400H0"/>
+    <path id="3" fill="#CCC" d="M1130.81 750.001a400.015 400.015 0 0 1-180.058 201.587A399.998 399.998 0 0 1 360 600.001a399.998 399.998 0 0 1 590.752-351.588 400.017 400.017 0 0 1 180.058 201.588l-370.81 150"/>
+    <path id="4" fill="#BBB" d="M760 800c110.457 0 200-89.543 200-200s-89.543-200-200-200-200 89.543-200 200 89.543 200 200 200Z"/>
+  </g>
+  <defs>
+    <clipPath id="clip0_969_5905">
+      <path fill="#fff" d="M0 0h1800v1200H0z"/>
+    </clipPath>
+  </defs>
+</svg>

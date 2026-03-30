@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600" fill="none">
+    <!-- Yellow Band -->
+    <path id="1" d="M0 0H900V300H0V0Z" fill="#EDEDF0"/>
+    <!-- Blue Band -->
+    <path id="2" d="M0 300H900V450H0V300Z" fill="#EDEDF0"/>
+    <!-- Red Band -->
+    <path id="3" d="M0 450H900V600H0V450Z" fill="#EDEDF0"/>
+    <!-- Vertical Dividers -->
+    <path class="divider" d="M0 300H900" fill="none" stroke="#ccc" stroke-width="2"/>
+    <path class="divider" d="M0 450H900" fill="none" stroke="#ccc" stroke-width="2"/>
+</svg>

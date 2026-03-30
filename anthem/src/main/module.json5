@@ -1,0 +1,16 @@
+{
+  "module": {
+    // 按需分发模块：上架时在 AppGallery Connect 配置与 flaghistory 一致的动态包策略；未安装时 createModuleContext('anthem') 可能失败，需引导用户下载模块。
+    "name": "anthem",
+    "type": "shared",
+    "description": "$string:module_desc",
+    "deviceTypes": [
+      "phone",
+      "tablet",
+      "2in1",
+      "wearable"
+    ],
+    "deliveryWithInstall": false,
+    "installationFree": false
+  }
+}

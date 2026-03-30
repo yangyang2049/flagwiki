@@ -1,0 +1,708 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "国旗小百科"
+    },
+    {
+      "name": "fun_fact_1",
+      "value": "🇳🇵 尼泊尔是世界上唯一非矩形的国旗，由两个三角形组成！"
+    },
+    {
+      "name": "fun_fact_2",
+      "value": "🇨🇭 瑞士和梵蒂冈是世界上仅有的两个正方形国旗！"
+    },
+    {
+      "name": "fun_fact_3",
+      "value": "🇯🇵 日本国旗上的红色圆形代表太阳，日本被称为“日出之国”！"
+    },
+    {
+      "name": "fun_fact_4",
+      "value": "🇱🇾 利比亚在1977-2011年使用过世界上唯一的纯色国旗（绿色）！"
+    },
+    {
+      "name": "fun_fact_5",
+      "value": "🇲🇨 摩纳哥和印度尼西亚的国旗几乎相同，只是尺寸比例不同！"
+    },
+    {
+      "name": "fun_fact_6",
+      "value": "🇩🇰 丹麦国旗是世界上使用时间最长的国旗，自1219年开始使用！"
+    },
+    {
+      "name": "fun_fact_7",
+      "value": "🇧🇷 巴西国旗上的27颗星星代表26个州和1个联邦区！"
+    },
+    {
+      "name": "fun_fact_8",
+      "value": "🇺🇸 美国国旗的50颗星代表50个州，13道条纹代表最初的13个殖民地！"
+    },
+    {
+      "name": "fun_fact_9",
+      "value": "🇨🇦 加拿大国旗上的枫叶有11个尖角，这是经过风洞测试最清晰的设计！"
+    },
+    {
+      "name": "fun_fact_10",
+      "value": "🇬🇧 英国国旗“米字旗”由英格兰、苏格兰和爱尔兰的旗帜组合而成！"
+    },
+    {
+      "name": "region_asia",
+      "value": "亚洲"
+    },
+    {
+      "name": "region_europe",
+      "value": "欧洲"
+    },
+    {
+      "name": "region_africa",
+      "value": "非洲"
+    },
+    {
+      "name": "region_americas",
+      "value": "美洲"
+    },
+    {
+      "name": "region_oceania",
+      "value": "大洋洲"
+    },
+    {
+      "name": "region_world",
+      "value": "全部"
+    },
+    {
+      "name": "loading",
+      "value": "加载中..."
+    },
+    {
+      "name": "favorite",
+      "value": "收藏"
+    },
+    {
+      "name": "favorited",
+      "value": "已收藏"
+    },
+    {
+      "name": "download",
+      "value": "下载"
+    },
+    {
+      "name": "basic_info",
+      "value": "基本信息"
+    },
+    {
+      "name": "about_flag",
+      "value": "关于这面国旗"
+    },
+    {
+      "name": "coat_of_arms",
+      "value": "国徽"
+    },
+    {
+      "name": "no_data",
+      "value": "暂无数据"
+    },
+    {
+      "name": "population_unit_billion",
+      "value": " 亿人"
+    },
+    {
+      "name": "population_unit_million",
+      "value": " 万人"
+    },
+    {
+      "name": "population_unit_thousand",
+      "value": " 千人"
+    },
+    {
+      "name": "population_unit_person",
+      "value": " 人"
+    },
+    {
+      "name": "area_unit_million_km2",
+      "value": " 万平方公里"
+    },
+    {
+      "name": "area_unit_thousand_km2",
+      "value": " 千平方公里"
+    },
+    {
+      "name": "area_unit_km2",
+      "value": " 平方公里"
+    },
+    {
+      "name": "default_flag_description",
+      "value": "%s的国旗是这个国家的重要象征，代表着国家的历史、文化和价值观。"
+    },
+    {
+      "name": "share_capital",
+      "value": "📍 首都："
+    },
+    {
+      "name": "share_region",
+      "value": "🌍 地区："
+    },
+    {
+      "name": "share_population",
+      "value": "👥 人口："
+    },
+    {
+      "name": "share_area",
+      "value": "📐 面积："
+    },
+    {
+      "name": "share_flag_proportion",
+      "value": "📏 国旗比例："
+    },
+    {
+      "name": "share_adopted_date",
+      "value": "📅 采用日期："
+    },
+    {
+      "name": "share_design",
+      "value": "🎨 "
+    },
+    {
+      "name": "share_headquarters",
+      "value": "📍 总部："
+    },
+    {
+      "name": "share_org_type",
+      "value": "🏛️ 组织类型："
+    },
+    {
+      "name": "share_coverage_population",
+      "value": "👥 覆盖人口："
+    },
+    {
+      "name": "share_website",
+      "value": "🌐 网站："
+    },
+    {
+      "name": "share_introduction",
+      "value": "📝 简介："
+    },
+    {
+      "name": "read_capital",
+      "value": "首都是%s。"
+    },
+    {
+      "name": "read_region",
+      "value": "所属地区是%s。"
+    },
+    {
+      "name": "read_population",
+      "value": "人口%s。"
+    },
+    {
+      "name": "read_area",
+      "value": "面积%s。"
+    },
+    {
+      "name": "read_flag_proportion",
+      "value": "国旗比例为%s。"
+    },
+    {
+      "name": "read_adopted_date",
+      "value": "采用日期是%s。"
+    },
+    {
+      "name": "read_org_headquarters",
+      "value": "总部位于%s。"
+    },
+    {
+      "name": "read_org_region",
+      "value": "地区是%s。"
+    },
+    {
+      "name": "read_org_type",
+      "value": "组织类型是%s。"
+    },
+    {
+      "name": "read_org_population",
+      "value": "覆盖人口约%s。"
+    },
+    {
+      "name": "read_org_website",
+      "value": "网站：%s。"
+    },
+    {
+      "name": "read_other_name",
+      "value": "，英文名%s。"
+    },
+    {
+      "name": "state_flag_details",
+      "value": "州旗详情"
+    },
+    {
+      "name": "belongs_to_country",
+      "value": "所属国家"
+    },
+    {
+      "name": "capital",
+      "value": "首府"
+    },
+    {
+      "name": "region",
+      "value": "地区"
+    },
+    {
+      "name": "favorite_removed",
+      "value": "已取消收藏"
+    },
+    {
+      "name": "favorite_added",
+      "value": "已添加到收藏"
+    },
+    {
+      "name": "preparing_image",
+      "value": "正在准备图片..."
+    },
+    {
+      "name": "screenshot_failed",
+      "value": "截取图片失败"
+    },
+    {
+      "name": "flag_saved_to_album",
+      "value": "旗帜图片已保存到相册"
+    },
+    {
+      "name": "save_failed_with_error",
+      "value": "保存失败: %s"
+    },
+    {
+      "name": "download_failed",
+      "value": "下载失败"
+    },
+    {
+      "name": "image_or_state_info_not_exist",
+      "value": "图片或州旗信息不存在"
+    },
+    {
+      "name": "failed_to_save_to_album",
+      "value": "保存到相册失败"
+    },
+    {
+      "name": "stop_reading",
+      "value": "已停止朗读"
+    },
+    {
+      "name": "start_reading",
+      "value": "开始朗读"
+    },
+    {
+      "name": "reading_unavailable",
+      "value": "朗读功能暂不可用"
+    },
+    {
+      "name": "preparing_share",
+      "value": "正在准备分享..."
+    },
+    {
+      "name": "share_state_flag_title",
+      "value": "%s州旗"
+    },
+    {
+      "name": "from_app",
+      "value": "来自国旗小百科"
+    },
+    {
+      "name": "share_failed",
+      "value": "分享失败"
+    },
+    {
+      "name": "read_state_belongs_to",
+      "value": "所属国家是%s。"
+    },
+    {
+      "name": "read_state_capital",
+      "value": "首府是%s。"
+    },
+    {
+      "name": "read_state_region",
+      "value": "地区是%s。"
+    },
+    {
+      "name": "share_state_country",
+      "value": "📍 所属国家："
+    },
+    {
+      "name": "share_state_capital",
+      "value": "🏛️ 首府："
+    },
+    {
+      "name": "share_state_region",
+      "value": "🌍 地区："
+    },
+    {
+      "name": "from_app_plain",
+      "value": "国旗小百科"
+    },
+    {
+      "name": "save_flag_to_album",
+      "value": "保存国旗图片到相册"
+    },
+    {
+      "name": "cancel",
+      "value": "取消"
+    },
+    {
+      "name": "level_not_found",
+      "value": "关卡超出范围，返回首页"
+    },
+    {
+      "name": "level_data_load_failed",
+      "value": "关卡数据不存在，返回首页"
+    },
+    {
+      "name": "state_alabama",
+      "value": "阿拉巴马州"
+    },
+    {
+      "name": "state_alaska",
+      "value": "阿拉斯加州"
+    },
+    {
+      "name": "state_arizona",
+      "value": "亚利桑那州"
+    },
+    {
+      "name": "state_arkansas",
+      "value": "阿肯色州"
+    },
+    {
+      "name": "state_california",
+      "value": "加利福尼亚州"
+    },
+    {
+      "name": "state_colorado",
+      "value": "科罗拉多州"
+    },
+    {
+      "name": "state_connecticut",
+      "value": "康涅狄格州"
+    },
+    {
+      "name": "state_delaware",
+      "value": "特拉华州"
+    },
+    {
+      "name": "state_district_of_columbia",
+      "value": "华盛顿特区"
+    },
+    {
+      "name": "state_florida",
+      "value": "佛罗里达州"
+    },
+    {
+      "name": "state_georgia",
+      "value": "佐治亚州"
+    },
+    {
+      "name": "state_hawaii",
+      "value": "夏威夷州"
+    },
+    {
+      "name": "state_idaho",
+      "value": "爱达荷州"
+    },
+    {
+      "name": "state_illinois",
+      "value": "伊利诺伊州"
+    },
+    {
+      "name": "state_indiana",
+      "value": "印第安纳州"
+    },
+    {
+      "name": "state_iowa",
+      "value": "艾奥瓦州"
+    },
+    {
+      "name": "state_kansas",
+      "value": "堪萨斯州"
+    },
+    {
+      "name": "state_kentucky",
+      "value": "肯塔基州"
+    },
+    {
+      "name": "state_louisiana",
+      "value": "路易斯安那州"
+    },
+    {
+      "name": "state_maine",
+      "value": "缅因州"
+    },
+    {
+      "name": "state_maryland",
+      "value": "马里兰州"
+    },
+    {
+      "name": "state_massachusetts",
+      "value": "马萨诸塞州"
+    },
+    {
+      "name": "state_michigan",
+      "value": "密歇根州"
+    },
+    {
+      "name": "state_minnesota",
+      "value": "明尼苏达州"
+    },
+    {
+      "name": "state_mississippi",
+      "value": "密西西比州"
+    },
+    {
+      "name": "state_missouri",
+      "value": "密苏里州"
+    },
+    {
+      "name": "state_montana",
+      "value": "蒙大拿州"
+    },
+    {
+      "name": "state_nebraska",
+      "value": "内布拉斯加州"
+    },
+    {
+      "name": "state_nevada",
+      "value": "内华达州"
+    },
+    {
+      "name": "state_new_hampshire",
+      "value": "新罕布什尔州"
+    },
+    {
+      "name": "state_new_jersey",
+      "value": "新泽西州"
+    },
+    {
+      "name": "state_new_mexico",
+      "value": "新墨西哥州"
+    },
+    {
+      "name": "state_new_york",
+      "value": "纽约州"
+    },
+    {
+      "name": "state_north_carolina",
+      "value": "北卡罗来纳州"
+    },
+    {
+      "name": "state_north_dakota",
+      "value": "北达科他州"
+    },
+    {
+      "name": "state_ohio",
+      "value": "俄亥俄州"
+    },
+    {
+      "name": "state_oklahoma",
+      "value": "俄克拉荷马州"
+    },
+    {
+      "name": "state_oregon",
+      "value": "俄勒冈州"
+    },
+    {
+      "name": "state_pennsylvania",
+      "value": "宾夕法尼亚州"
+    },
+    {
+      "name": "state_rhode_island",
+      "value": "罗德岛州"
+    },
+    {
+      "name": "state_south_carolina",
+      "value": "南卡罗来纳州"
+    },
+    {
+      "name": "state_south_dakota",
+      "value": "南达科他州"
+    },
+    {
+      "name": "state_tennessee",
+      "value": "田纳西州"
+    },
+    {
+      "name": "state_texas",
+      "value": "德克萨斯州"
+    },
+    {
+      "name": "state_utah",
+      "value": "犹他州"
+    },
+    {
+      "name": "state_vermont",
+      "value": "佛蒙特州"
+    },
+    {
+      "name": "state_virginia",
+      "value": "弗吉尼亚州"
+    },
+    {
+      "name": "state_washington",
+      "value": "华盛顿州"
+    },
+    {
+      "name": "state_west_virginia",
+      "value": "西弗吉尼亚州"
+    },
+    {
+      "name": "state_wisconsin",
+      "value": "威斯康星州"
+    },
+    {
+      "name": "state_wyoming",
+      "value": "怀俄明州"
+    },
+    {
+      "name": "progress_indicator",
+      "value": "%s / %s"
+    },
+    {
+      "name": "population_unit_billion_short",
+      "value": " 亿人"
+    },
+    {
+      "name": "population_unit_million_short",
+      "value": " 万人"
+    },
+    {
+      "name": "population_unit_thousand_short",
+      "value": " 千人"
+    },
+    {
+      "name": "area_unit_million_km2_short",
+      "value": " 万km²"
+    },
+    {
+      "name": "area_unit_km2_short",
+      "value": " km²"
+    },
+    {
+      "name": "next",
+      "value": "下一步"
+    },
+    {
+      "name": "complete",
+      "value": "完成"
+    },
+    {
+      "name": "find_fake_flag",
+      "value": "找出假旗"
+    },
+    {
+      "name": "enter_country_name",
+      "value": "请输入国家名称"
+    },
+    {
+      "name": "correct_found",
+      "value": "正确找出"
+    },
+    {
+      "name": "correct_found_count",
+      "value": "正确找出了 %s 个假旗"
+    },
+    {
+      "name": "quiz_flag_to_name_desc",
+      "value": "根据国旗图案选择正确的国家名称"
+    },
+    {
+      "name": "quiz_name_to_flag_desc",
+      "value": "根据国家名称选择正确的国旗图案"
+    },
+    {
+      "name": "complete_levels_to_unlock",
+      "value": "完成每关挑战，解锁更多关卡"
+    },
+    {
+      "name": "which_country_flag",
+      "value": "这是哪个国家的国旗？"
+    },
+    {
+      "name": "select_correct_flag",
+      "value": "请选择正确的国旗"
+    },
+    {
+      "name": "challenge_failed",
+      "value": "挑战失败"
+    },
+    {
+      "name": "correct_answers_count",
+      "value": "正确回答了 %s 道题"
+    },
+    {
+      "name": "max_combo",
+      "value": "最高连击 %s"
+    },
+    {
+      "name": "next_question",
+      "value": "下一题"
+    },
+    {
+      "name": "view_results",
+      "value": "查看结果"
+    },
+    {
+      "name": "correct_answers",
+      "value": "正确答题"
+    },
+    {
+      "name": "remaining_lives",
+      "value": "剩余生命"
+    },
+    {
+      "name": "share_score",
+      "value": "分享成绩"
+    },
+    {
+      "name": "combo_streak",
+      "value": "%s 连击！"
+    },
+    {
+      "name": "correct_answers_share",
+      "value": "正确答题：%s / %s"
+    },
+    {
+      "name": "max_combo_share",
+      "value": "最高连击：%s"
+    },
+    {
+      "name": "remaining_lives_share",
+      "value": "剩余生命：%s"
+    },
+    {
+      "name": "level_challenge_success",
+      "value": "第%s关挑战成功"
+    },
+    {
+      "name": "no_favorites",
+      "value": "暂无收藏"
+    },
+    {
+      "name": "navigation_failed",
+      "value": "导航失败"
+    },
+    {
+      "name": "delete",
+      "value": "删除"
+    },
+    {
+      "name": "search_country_or_region",
+      "value": "搜索国家或地区"
+    },
+    {
+      "name": "search_country",
+      "value": "搜索国家"
+    },
+    {
+      "name": "no_matching_countries",
+      "value": "未找到匹配的国家"
+    },
+    {
+      "name": "modify_keywords_or_select",
+      "value": "修改关键词或选择\"全部\"或其他大洲"
+    }
+  ]
+}

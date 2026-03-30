@@ -1,0 +1,12 @@
+<svg width="1200" height="600" viewBox="0 0 1200 600" fill="none"
+    xmlns="http://www.w3.org/2000/svg">
+    <!-- Green Band 1 -->
+    <path id="1" d="M0 0H400V600H0V0Z" fill="#EDEDF0"/>
+    <!-- White Band -->
+    <path id="2" d="M400 0H800V600H400V0Z" fill="#EDEDF0"/>
+    <!-- Green Band 2 -->
+    <path id="3" d="M800 0H1200V600H800V0Z" fill="#EDEDF0"/>
+    <!-- Vertical Dividers -->
+    <path class="divider" d="M400 0V600" fill="none" stroke="#dddddd" stroke-width="2"/>
+    <path class="divider" d="M800 0V600" fill="none" stroke="#dddddd" stroke-width="2"/>
+</svg>

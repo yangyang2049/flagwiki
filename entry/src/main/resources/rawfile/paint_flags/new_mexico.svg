@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1200" fill="none" viewBox="0 0 1800 1200">
+  <g id="new_mexico" clip-path="url(#clip0_969_6518)">
+    <path id="1" fill="#EEE" d="M0 0h1800v1200H0V0Z"/>
+    <g id="2">
+      <g id="Vector">
+        <path fill="#000" d="M956.5 353.395v493.21-493.21ZM918.818 313.5v573-573Zm-37.636 0v573-573ZM843.5 353.395v493.21-493.21ZM653.395 543.5H1146.6 653.395ZM613.5 581.182h573-573Zm0 37.636h573-573Zm39.895 37.682H1146.6 653.395Z"/>
+        <path stroke="#DDD" stroke-linecap="round" stroke-width="27" d="M956.5 353.395v493.21M918.818 313.5v573m-37.636-573v573M843.5 353.395v493.21M653.395 543.5H1146.6m-533.1 37.682h573m-573 37.636h573M653.395 656.5H1146.6"/>
+      </g>
+    </g>
+    <path id="Vector_2" fill="gold" stroke="#BF0A30" stroke-width="13.5" d="M900 693.25c51.501 0 93.25-41.749 93.25-93.25s-41.749-93.25-93.25-93.25-93.25 41.749-93.25 93.25 41.749 93.25 93.25 93.25Z"/>
+  </g>
+  <defs>
+    <clipPath id="clip0_969_6518">
+      <path fill="#fff" d="M0 0h1800v1200H0z"/>
+    </clipPath>
+  </defs>
+</svg>
