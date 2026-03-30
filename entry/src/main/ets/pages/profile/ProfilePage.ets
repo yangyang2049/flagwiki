@@ -12,7 +12,12 @@ import { PreferencesManager } from '../../utils/PreferencesManager';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
 import UiConstants from '../../utils/UiConstants';
-import { openOptionalModuleInstallFlow, refreshOptionalModuleAppStorage } from '../../utils/OptionalModuleHelper';
+import {
+  MODULE_ANTHEM,
+  MODULE_FLAGHISTORY,
+  openOptionalModuleInstallFlow,
+  refreshOptionalModuleAppStorage
+} from '../../utils/OptionalModuleHelper';
 
 // 总关卡数
 const QUIZ_TOTAL_LEVELS = 10;
@@ -66,11 +71,11 @@ export struct ProfilePage {
       : this.context.resourceManager.getStringSync($r('app.string.optional_module_status_missing').id);
   }
 
-  private async openMarketForOptionalModules(): Promise<void> {
+  private async downloadOptionalModule(moduleName: 'anthem' | 'flaghistory'): Promise<void> {
     try {
-      await openOptionalModuleInstallFlow(this.context);
+      await openOptionalModuleInstallFlow(this.context, moduleName);
     } catch (err) {
-      console.error(`openMarketForOptionalModules: ${JSON.stringify(err)}`);
+      console.error(`downloadOptionalModule: ${JSON.stringify(err)}`);
       try {
         promptAction.showToast({
           message: this.context.resourceManager.getStringSync($r('app.string.cannot_open_market').id),
@@ -79,18 +84,6 @@ export struct ProfilePage {
       } catch (_e2) {
         void 0;
       }
-    }
-  }
-
-  private async refreshOptionalModulesManual(): Promise<void> {
-    await refreshOptionalModuleAppStorage(this.context);
-    try {
-      promptAction.showToast({
-        message: this.context.resourceManager.getStringSync($r('app.string.optional_module_refreshed').id),
-        duration: 2000
-      });
-    } catch (_e) {
-      void 0;
     }
   }
 
@@ -450,17 +443,11 @@ export struct ProfilePage {
 
             // 扩展模块（按需下载，安装后自动出现国歌 Tab、国旗详情历史国旗等）
             Column() {
-              Text(this.context.resourceManager.getStringSync($r('app.string.optional_modules_section_title').id))
-                .fontSize(13)
-                .fontColor($r('app.color.text_tertiary'))
-                .width('100%')
-                .padding({ left: 4, bottom: 8 })
-
               this.settingItemWithValue($r('app.media.icon_tab_anthem'),
                 this.context.resourceManager.getStringSync($r('app.string.optional_module_anthem_title').id),
                 () => this.getOptionalStatusText(this.anthemModuleReady),
                 () => {
-                  void this.openMarketForOptionalModules();
+                  void this.downloadOptionalModule(MODULE_ANTHEM);
                 })
               Divider()
                 .strokeWidth(0.5)
@@ -470,15 +457,8 @@ export struct ProfilePage {
                 this.context.resourceManager.getStringSync($r('app.string.optional_module_flaghistory_title').id),
                 () => this.getOptionalStatusText(this.flagHistoryModuleReady),
                 () => {
-                  void this.openMarketForOptionalModules();
+                  void this.downloadOptionalModule(MODULE_FLAGHISTORY);
                 })
-              Divider()
-                .strokeWidth(0.5)
-                .color($r('app.color.gray_border'))
-                .margin({ left: 16, right: 16 })
-              this.settingItem($r('app.media.icon_search'), this.context.resourceManager.getStringSync($r('app.string.optional_module_refresh').id), '', () => {
-                void this.refreshOptionalModulesManual();
-              })
             }
             .width('100%')
               .backgroundColor($r('app.color.bg_card'))

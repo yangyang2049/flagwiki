@@ -9,8 +9,7 @@ import common from '@ohos.app.ability.common';
 import { PreferencesManager } from '../utils/PreferencesManager';
 import router from '@ohos.router';
 import { shouldAllowEdgeSwipeExit } from '../utils/WatchGestureHelper';
-import { refreshOptionalModuleAppStorage, STORAGE_KEY_ANTHEM_READY } from '../utils/OptionalModuleHelper';
-import promptAction from '@ohos.promptAction';
+import { refreshOptionalModuleAppStorage } from '../utils/OptionalModuleHelper';
 
 interface MainTabSpec {
   id: string;
@@ -31,7 +30,6 @@ struct Index {
   private tabController: TabsController = new TabsController();
   private prefs: preferences.Preferences | null = null;
   private context = getContext(this) as common.UIAbilityContext;
-  private prevAnthemReady: boolean = false;
 
   private getTabSpecs(): MainTabSpec[] {
     const home: MainTabSpec = {
@@ -96,24 +94,10 @@ struct Index {
       console.error(`Failed to load preferences: ${JSON.stringify(err)}`);
     }
     await refreshOptionalModuleAppStorage(this.context);
-    this.prevAnthemReady = AppStorage.get<boolean>(STORAGE_KEY_ANTHEM_READY) ?? false;
   }
 
   async onPageShow() {
-    const beforeAnthem = this.prevAnthemReady;
     await refreshOptionalModuleAppStorage(this.context);
-    const afterAnthem = AppStorage.get<boolean>(STORAGE_KEY_ANTHEM_READY) ?? false;
-    if (!beforeAnthem && afterAnthem) {
-      try {
-        promptAction.showToast({
-          message: this.context.resourceManager.getStringSync($r('app.string.optional_module_toast_anthem_ready').id),
-          duration: 2000
-        });
-      } catch (_e) {
-        void 0;
-      }
-    }
-    this.prevAnthemReady = afterAnthem;
 
     if (this.currentTabIndex === 0) {
       this.homeRefreshKey++;

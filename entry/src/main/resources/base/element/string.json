@@ -58,7 +58,7 @@
     },
     {
       "name": "optional_modules_section_title",
-      "value": "扩展内容（应用市场按需下载）"
+      "value": "扩展内容（点按后应用内下载）"
     },
     {
       "name": "optional_module_anthem_title",
@@ -78,7 +78,7 @@
     },
     {
       "name": "optional_module_market_hint",
-      "value": "请在应用市场完成资源下载后，返回本页点击「刷新扩展状态」"
+      "value": "正在准备扩展下载"
     },
     {
       "name": "optional_module_unavailable_title",
@@ -86,11 +86,11 @@
     },
     {
       "name": "optional_module_missing_message",
-      "value": "此页面需要安装「%s」。请前往应用市场下载后返回。"
+      "value": "此页面需要安装「%s」。点下面按钮即可在应用内下载。"
     },
     {
       "name": "optional_module_open_market",
-      "value": "前往应用市场"
+      "value": "下载扩展"
     },
     {
       "name": "optional_module_refreshed",
@@ -103,6 +103,22 @@
     {
       "name": "optional_module_toast_anthem_ready",
       "value": "国歌扩展已就绪，可在第二个 Tab 使用"
+    },
+    {
+      "name": "optional_module_download_started",
+      "value": "开始下载「%s」"
+    },
+    {
+      "name": "optional_module_download_success",
+      "value": "「%s」已下载完成"
+    },
+    {
+      "name": "optional_module_download_failed",
+      "value": "「%s」下载失败，请稍后重试"
+    },
+    {
+      "name": "optional_module_wait_wifi",
+      "value": "「%s」需要确认网络后继续下载"
     },
     {
       "name": "tab_paint",

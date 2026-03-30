@@ -1,16 +1,14 @@
-import { SongItem } from 'anthem';
-import { getMusicModel, MusicModel } from 'anthem';
-import { MediaService } from 'anthem';
 import { promptAction } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
+import { AnthemMediaService, AnthemMusicModel } from '../utils/AnthemFeatureLoader';
 
 /**
  * 简化的国歌播放控制器
  */
 @Component
 export struct AnthemPlayer {
-  private musicModel: MusicModel = getMusicModel();
-  private mediaService: MediaService = MediaService.getInstance();
+  @Prop musicModel: AnthemMusicModel | null = null;
+  @Prop mediaService: AnthemMediaService | null = null;
   private context = getContext(this) as common.UIAbilityContext;
 
   private singleClick(func: () => void, interval: number = 500): () => void {
@@ -28,7 +26,7 @@ export struct AnthemPlayer {
   build() {
     Column() {
       // 进度条
-      if (this.musicModel.currentSong) {
+      if (this.musicModel && this.musicModel.currentSong) {
         Column() {
           Slider({
             min: 0,
@@ -41,7 +39,7 @@ export struct AnthemPlayer {
             .trackColor($r('app.color.gray_border'))
             .blockSize({ width: 12, height: 12 })
             .onChange((value: number, mode: SliderChangeMode) => {
-              if (mode === SliderChangeMode.End) {
+              if (mode === SliderChangeMode.End && this.mediaService) {
                 this.mediaService.seek(value);
               }
             })
@@ -66,7 +64,7 @@ export struct AnthemPlayer {
 
       // 播放控制栏
       Row() {
-        if (!this.musicModel.currentSong) {
+        if (!this.musicModel || !this.musicModel.currentSong) {
           this.NoSong()
         } else {
           // 左侧：当前歌曲信息
@@ -120,7 +118,7 @@ export struct AnthemPlayer {
   SongInfoBuild() {
     Row() {
       // 圆形图标
-      Image(this.musicModel.currentSong?.label as Resource)
+      Image(this.musicModel?.currentSong?.label as Resource)
         .height(32)
         .width(32)
         .borderRadius(16)
@@ -129,7 +127,7 @@ export struct AnthemPlayer {
 
       Column() {
         // 第一行：歌曲名称（国歌名称）
-        Text(this.musicModel.currentSong?.title ?? '')
+        Text(this.musicModel?.currentSong?.title ?? '')
           .fontSize(14)
           .fontWeight(500)
           .fontColor($r('app.color.text_primary'))
@@ -138,7 +136,7 @@ export struct AnthemPlayer {
           .width(150)
 
         // 第二行：国家名称
-        Text(this.musicModel.currentSong?.singer ?? '')
+        Text(this.musicModel?.currentSong?.singer ?? '')
           .fontSize(10)
           .fontColor($r('app.color.text_secondary'))
           .maxLines(1)
@@ -149,7 +147,7 @@ export struct AnthemPlayer {
     }
     .layoutWeight(1)
     .onClick(() => {
-      if (this.musicModel.songList.length <= 0) {
+      if (!this.musicModel || this.musicModel.songList.length <= 0) {
         promptAction.showToast({ message: this.context.resourceManager.getStringSync($r('app.string.select_song_to_play').id) });
         return;
       }
@@ -166,15 +164,19 @@ export struct AnthemPlayer {
         .height(24)
         .margin({ right: 16 })
         .onClick(this.singleClick(() => {
-          this.mediaService.playPrevious();
+          if (this.mediaService) {
+            this.mediaService.playPrevious();
+          }
         }, 1000))
 
       // 播放/暂停
-      Image(this.musicModel.isPlay ? $r('app.media.icon_pause') : $r('app.media.icon_play'))
+      Image(this.musicModel?.isPlay ? $r('app.media.icon_pause') : $r('app.media.icon_play'))
         .width(28)
         .height(28)
         .onClick(this.singleClick(() => {
-          this.mediaService.playAndPause();
+          if (this.mediaService) {
+            this.mediaService.playAndPause();
+          }
         }, 1000))
 
       // 下一首
@@ -183,10 +185,10 @@ export struct AnthemPlayer {
         .height(24)
         .margin({ left: 16 })
         .onClick(this.singleClick(() => {
-          this.mediaService.playNext();
+          if (this.mediaService) {
+            this.mediaService.playNext();
+          }
         }, 1000))
     }
   }
 }
-
-

@@ -13,10 +13,10 @@ import { screenshotManager } from '../../utils/ScreenshotManager';
 import { SaveFlagDialog } from '../../components/SaveFlagDialog';
 import { FavoritesManager } from '../../utils/favoritesManager';
 import { getCoatOfArmsImageSource } from '../../utils/coatOfArmsUtil';
-import { getFlagHistory, FlagHistoryItem } from 'flaghistory';
 import { DeviceHelper } from '../../utils/DeviceHelper';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
 import { LocalizationUtil } from '../../utils/LocalizationUtil';
+import { FlagHistoryItem, getFlagHistoryItems } from '../../utils/FlagHistoryFeatureLoader';
 
 interface RouterParams {
   countryCode: string;
@@ -49,19 +49,19 @@ struct FlagDetailPage {
   }
 
   private onFlagHistoryModuleReadyChanged(): void {
-    this.loadFlagHistoryIfReady();
+    void this.loadFlagHistoryIfReady();
   }
 
-  private loadFlagHistoryIfReady(): void {
+  private async loadFlagHistoryIfReady(): Promise<void> {
     if (!this.flagHistoryModuleReady || !this.countryCode) {
       this.flagHistoryItems = [];
       return;
     }
-    this.flagHistoryItems = getFlagHistory(this.countryCode);
+    this.flagHistoryItems = await getFlagHistoryItems(this.countryCode);
   }
 
   onPageShow(): void {
-    this.loadFlagHistoryIfReady();
+    void this.loadFlagHistoryIfReady();
   }
 
   // 保存对话框控制器
@@ -102,7 +102,7 @@ struct FlagDetailPage {
       } else {
         this.country = getCountryByCode(params.countryCode);
         this.flagDesign = getFlagDesign(params.countryCode);
-        this.loadFlagHistoryIfReady();
+        await this.loadFlagHistoryIfReady();
       }
     }
 

@@ -1,21 +1,22 @@
 import { Country, getCountriesByContinent } from './countryData';
 import { common } from '@kit.AbilityKit';
-import {
-  initAnthemCache as initAnthemCacheHsp,
-  hasAnthemFile as hasAnthemFileHsp,
-  getAnthemFilePath as getAnthemFilePathHsp
-} from 'anthem';
+import { getLoadedAnthemFeatureModule, loadAnthemFeatureModule } from './AnthemFeatureLoader';
 
 export async function initAnthemCache(context: common.UIAbilityContext): Promise<void> {
-  await initAnthemCacheHsp(context);
+  const anthemFeatureModule = await loadAnthemFeatureModule();
+  await anthemFeatureModule.initAnthemCache(context);
 }
 
 export function hasAnthemFile(countryCode: string): boolean {
-  return hasAnthemFileHsp(countryCode);
+  const anthemFeatureModule = getLoadedAnthemFeatureModule();
+  return anthemFeatureModule ? anthemFeatureModule.hasAnthemFile(countryCode) : false;
 }
 
 export function getAnthemFilePath(countryCode: string): string {
-  return getAnthemFilePathHsp(countryCode);
+  const anthemFeatureModule = getLoadedAnthemFeatureModule();
+  return anthemFeatureModule
+    ? anthemFeatureModule.getAnthemFilePath(countryCode)
+    : `anthems/anthem_${countryCode.toLowerCase()}.ogg`;
 }
 
 export function getCountriesWithAnthem(): Country[] {

@@ -5,9 +5,9 @@
 
 import router from '@ohos.router';
 import common from '@ohos.app.ability.common';
-import { getAllFlagHistory, CountryFlagHistory } from 'flaghistory';
 import { getCountryByCode } from '../../utils/countryData';
 import { getFlagImageSource } from '../../utils/countryData';
+import { CountryFlagHistory, getAllFlagHistoryItems } from '../../utils/FlagHistoryFeatureLoader';
 import {
     MODULE_FLAGHISTORY,
     openOptionalModuleInstallFlow,
@@ -23,28 +23,26 @@ import {
 
     async aboutToAppear() {
         await refreshOptionalModuleStatus(MODULE_FLAGHISTORY);
-        this.loadHistoryListIfReady();
-    }
-
-    onPageShow(): void {
-        void refreshOptionalModuleStatus(MODULE_FLAGHISTORY);
-        this.loadHistoryListIfReady();
+        await this.loadHistoryListIfReady();
     }
 
     private onFlagHistoryModuleReadyChanged(): void {
-        this.loadHistoryListIfReady();
+        void this.loadHistoryListIfReady();
     }
 
-    private loadHistoryListIfReady(): void {
+    private async loadHistoryListIfReady(): Promise<void> {
         if (!this.flagHistoryModuleReady) {
             this.historyList = [];
             return;
         }
-        this.historyList = getAllFlagHistory();
+        this.historyList = await getAllFlagHistoryItems();
     }
 
     private async openInstallFlow(): Promise<void> {
-        await openOptionalModuleInstallFlow(this.context);
+        const ready = await openOptionalModuleInstallFlow(this.context, MODULE_FLAGHISTORY);
+        if (ready) {
+            await this.loadHistoryListIfReady();
+        }
     }
 
     private getCountryName(countryCode: string): string {

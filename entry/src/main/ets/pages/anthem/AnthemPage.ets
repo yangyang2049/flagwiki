@@ -11,11 +11,15 @@ import {
 } from '../../utils/countryData';
 import { LocalizationUtil } from '../../utils/LocalizationUtil';
 import { getAnthemFilePath, hasAnthemFile, initAnthemCache } from '../../utils/AnthemUtil';
-import { getAnthemNameEN, getAnthemNameCN, hasAnthemName } from 'anthem';
-import { SongItem } from 'anthem';
-import { getMusicModel, MusicModel } from 'anthem';
-import { MediaService } from 'anthem';
 import { AnthemPlayer } from '../../components/AnthemPlayer';
+import {
+  AnthemMediaService,
+  AnthemMusicModel,
+  AnthemSongItem,
+  createAnthemSongItem,
+  getLoadedAnthemFeatureModule,
+  loadAnthemFeatureModule
+} from '../../utils/AnthemFeatureLoader';
 import { MODULE_ANTHEM, openOptionalModuleInstallFlow, refreshOptionalModuleStatus } from '../../utils/OptionalModuleHelper';
 
 @Component
@@ -30,15 +34,11 @@ export struct AnthemPage {
   @StorageLink('optionalModuleAnthemReady') @Watch('onAnthemModuleReadyChanged') anthemModuleReady: boolean = false;
   @Prop context: common.UIAbilityContext;
   private appContext = getContext(this) as common.UIAbilityContext;
-  private musicModel: MusicModel = getMusicModel();
-  private mediaService: MediaService = MediaService.getInstance();
+  private musicModel: AnthemMusicModel | null = null;
+  private mediaService: AnthemMediaService | null = null;
 
   async aboutToAppear() {
     await this.loadCountriesIfReady();
-  }
-
-  onPageShow(): void {
-    void this.loadCountriesIfReady();
   }
 
   private onLanguageChanged(): void {
@@ -64,16 +64,24 @@ export struct AnthemPage {
     if (!ready) {
       this.countries = [];
       this.filteredCountries = [];
+      this.musicModel = null;
+      this.mediaService = null;
       this.isLoading = false;
       return;
     }
+    const anthemFeatureModule = await loadAnthemFeatureModule();
     await initAnthemCache(this.context);
+    this.musicModel = anthemFeatureModule.getMusicModel();
+    this.mediaService = anthemFeatureModule.MediaService.getInstance();
     this.loadCountries();
     this.isLoading = false;
   }
 
   private async openInstallFlow(): Promise<void> {
-    await openOptionalModuleInstallFlow(this.appContext);
+    const ready = await openOptionalModuleInstallFlow(this.appContext, MODULE_ANTHEM);
+    if (ready) {
+      await this.loadCountriesIfReady();
+    }
   }
 
   private loadCountries(): void {
@@ -147,9 +155,12 @@ export struct AnthemPage {
   }
 
   private getAnthemName(countryCode: string): string {
-    if (hasAnthemName(countryCode)) {
+    const anthemFeatureModule = getLoadedAnthemFeatureModule();
+    if (anthemFeatureModule && anthemFeatureModule.hasAnthemName(countryCode)) {
       const isEnglish = LocalizationUtil.isEnglish(this.systemLanguage);
-      return isEnglish ? getAnthemNameEN(countryCode) : getAnthemNameCN(countryCode);
+      return isEnglish
+        ? anthemFeatureModule.getAnthemNameEN(countryCode)
+        : anthemFeatureModule.getAnthemNameCN(countryCode);
     }
     // 如果没有国歌名称数据，显示通用文本
     return this.appContext.resourceManager.getStringSync($r('app.string.national_anthem').id);
@@ -161,7 +172,7 @@ export struct AnthemPage {
    * @param songIndex 歌曲索引（从1开始，因为MediaService使用parseInt(id) - 1）
    * @returns 如果国家有国歌文件，返回SongItem；否则返回null
    */
-  private createSongItem(country: Country, songIndex: number): SongItem | null {
+  private createSongItem(country: Country, songIndex: number): AnthemSongItem | null {
     // 跳过没有国歌文件的国家
     if (!hasAnthemFile(country.code)) {
       return null;
@@ -169,7 +180,7 @@ export struct AnthemPage {
     
     const anthemPath = getAnthemFilePath(country.code);
     const countryName = getLocalizedCountryName(country, this.systemLanguage);
-    const song: SongItem = new SongItem();
+    const song: AnthemSongItem = createAnthemSongItem();
     song.id = `${songIndex}`; // MediaService使用parseInt(id) - 1，所以从1开始
     song.title = this.getAnthemName(country.code);
     song.singer = countryName;
@@ -184,9 +195,12 @@ export struct AnthemPage {
     if (!hasAnthemFile(country.code)) {
       return;
     }
+    if (!this.mediaService) {
+      return;
+    }
     
     // 创建歌曲列表
-    const songList: SongItem[] = [];
+    const songList: AnthemSongItem[] = [];
     
     // 找到当前国家在过滤列表中的索引
     const currentIndex = this.filteredCountries.findIndex(c => c.code === country.code);
@@ -323,7 +337,7 @@ export struct AnthemPage {
             .layoutWeight(1)
             .padding({
               top: 8,
-              bottom: this.musicModel.currentSong ? 100 : 8
+      bottom: this.musicModel && this.musicModel.currentSong ? 100 : 8
             })
             .edgeEffect(EdgeEffect.Spring)
             .divider({ strokeWidth: 0.5, color: $r('app.color.gray_border'), startMargin: 16, endMargin: 16 })
@@ -336,8 +350,11 @@ export struct AnthemPage {
       .justifyContent(FlexAlign.Start)
       
       // 音乐播放控制器 - 固定在底部
-      if (this.anthemModuleReady && this.musicModel.currentSong) {
-        AnthemPlayer()
+      if (this.anthemModuleReady && this.musicModel && this.mediaService && this.musicModel.currentSong) {
+        AnthemPlayer({
+          musicModel: this.musicModel,
+          mediaService: this.mediaService
+        })
           .width('100%')
           .align(Alignment.Bottom)
       }

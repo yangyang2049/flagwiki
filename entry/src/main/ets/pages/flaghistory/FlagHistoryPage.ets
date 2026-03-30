@@ -12,10 +12,10 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { image } from '@kit.ImageKit';
 import fs from '@ohos.file.fs';
 import { fileUri } from '@kit.CoreFileKit';
-import { getFlagHistory, FlagHistoryItem } from 'flaghistory';
 import { getCountryByCode, getLocalizedCountryName } from '../../utils/countryData';
 import { screenshotManager } from '../../utils/ScreenshotManager';
 import { LocalizationUtil } from '../../utils/LocalizationUtil';
+import { FlagHistoryItem, getFlagHistoryItems } from '../../utils/FlagHistoryFeatureLoader';
 import {
   MODULE_FLAGHISTORY,
   openOptionalModuleInstallFlow,
@@ -44,12 +44,7 @@ import {
       this.countryCode = params['countryCode'];
     }
     await refreshOptionalModuleStatus(MODULE_FLAGHISTORY);
-    this.loadHistoryDataIfReady();
-  }
-
-  onPageShow(): void {
-    void refreshOptionalModuleStatus(MODULE_FLAGHISTORY);
-    this.loadHistoryDataIfReady();
+    await this.loadHistoryDataIfReady();
   }
 
   private onLanguageChanged(): void {
@@ -60,19 +55,19 @@ import {
   }
 
   private onFlagHistoryModuleReadyChanged(): void {
-    this.loadHistoryDataIfReady();
+    void this.loadHistoryDataIfReady();
   }
 
-  private loadHistoryDataIfReady(): void {
+  private async loadHistoryDataIfReady(): Promise<void> {
     if (!this.flagHistoryModuleReady || !this.countryCode) {
       this.historyItems = [];
       return;
     }
-    this.loadHistoryData();
+    await this.loadHistoryData();
   }
 
-  private loadHistoryData(): void {
-    const items = getFlagHistory(this.countryCode);
+  private async loadHistoryData(): Promise<void> {
+    const items = await getFlagHistoryItems(this.countryCode);
     // 按年份倒序排序
     this.historyItems = items.slice().sort((a, b) => b.year - a.year);
     this.updateCountryName();
@@ -228,7 +223,10 @@ import {
   }
 
   private async openInstallFlow(): Promise<void> {
-    await openOptionalModuleInstallFlow(this.context);
+    const ready = await openOptionalModuleInstallFlow(this.context, MODULE_FLAGHISTORY);
+    if (ready) {
+      await this.loadHistoryDataIfReady();
+    }
   }
 
   build() {

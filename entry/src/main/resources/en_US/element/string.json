@@ -58,7 +58,7 @@
     },
     {
       "name": "optional_modules_section_title",
-      "value": "Add-ons (download on demand from AppGallery)"
+      "value": "Add-ons (tap to download in-app)"
     },
     {
       "name": "optional_module_anthem_title",
@@ -78,7 +78,7 @@
     },
     {
       "name": "optional_module_market_hint",
-      "value": "After downloading resources in AppGallery, return here and tap \"Refresh add-on status\"."
+      "value": "Preparing add-on download"
     },
     {
       "name": "optional_module_unavailable_title",
@@ -86,11 +86,11 @@
     },
     {
       "name": "optional_module_missing_message",
-      "value": "This page requires \"%s\". Download it from AppGallery, then return here."
+      "value": "This page requires \"%s\". Tap the button below to download it in-app."
     },
     {
       "name": "optional_module_open_market",
-      "value": "Open AppGallery"
+      "value": "Download add-on"
     },
     {
       "name": "optional_module_refreshed",
@@ -103,6 +103,22 @@
     {
       "name": "optional_module_toast_anthem_ready",
       "value": "Anthems pack is ready — use the second tab."
+    },
+    {
+      "name": "optional_module_download_started",
+      "value": "Downloading \"%s\""
+    },
+    {
+      "name": "optional_module_download_success",
+      "value": "\"%s\" is ready"
+    },
+    {
+      "name": "optional_module_download_failed",
+      "value": "Failed to download \"%s\". Try again later."
+    },
+    {
+      "name": "optional_module_wait_wifi",
+      "value": "\"%s\" is waiting for network confirmation"
     },
     {
       "name": "tab_paint",
