@@ -9,7 +9,7 @@ import { LocalizationUtil } from '../../utils/LocalizationUtil';
 @Component
 export struct HomePage {
   @Prop refreshKey: number = 0;
-  /** 画廊在主界面 Tab 中的索引（无国歌扩展时为 1，有国歌时为 2） */
+  /** 画廊在主界面 Tab 中的索引（首页为 0，画廊为 1） */
   @Prop galleryTabIndex: number = 1;
   @State funFactIndex: number = 0;
   @State weeklyFlag: WeeklyFlagItem | undefined = undefined;

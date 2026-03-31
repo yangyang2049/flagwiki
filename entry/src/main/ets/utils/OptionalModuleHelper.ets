@@ -5,9 +5,6 @@ import promptAction from '@ohos.promptAction';
 
 const DOMAIN = 0xF1A9;
 
-/** 国歌 HSP 模块名（与 module.json5 中 name 一致） */
-export const MODULE_ANTHEM = 'anthem';
-
 /** 历史国旗 HSP 模块名 */
 export const MODULE_FLAGHISTORY = 'flaghistory';
 
@@ -18,7 +15,6 @@ export const MODULE_STATE_FLAGS = 'stateflags';
 export const MODULE_COAT_OF_ARMS = 'coatofarms';
 
 /** 与 UI @StorageLink 绑定的键名 */
-export const STORAGE_KEY_ANTHEM_READY = 'optionalModuleAnthemReady';
 export const STORAGE_KEY_FLAGHISTORY_READY = 'optionalModuleFlagHistoryReady';
 export const STORAGE_KEY_STATE_FLAGS_READY = 'optionalModuleStateFlagsReady';
 export const STORAGE_KEY_COAT_OF_ARMS_READY = 'optionalModuleCoatOfArmsReady';
@@ -27,15 +23,12 @@ export const STORAGE_KEY_INSTALL_BUSY = 'optionalModuleInstallBusy';
 /** 模块名或 '' */
 export const STORAGE_KEY_INSTALL_BUSY_ID = 'optionalModuleInstallBusyId';
 
-export type OptionalModuleName = 'anthem' | 'flaghistory' | 'stateflags' | 'coatofarms';
+export type OptionalModuleName = 'flaghistory' | 'stateflags' | 'coatofarms';
 
 const MODULE_INSTALL_LISTEN_TIMEOUT_SECONDS = 30 * 60;
 const activeInstallTasks: Map<OptionalModuleName, Promise<boolean>> = new Map();
 
 function getOptionalModuleStorageKey(moduleName: OptionalModuleName): string {
-  if (moduleName === MODULE_ANTHEM) {
-    return STORAGE_KEY_ANTHEM_READY;
-  }
   if (moduleName === MODULE_FLAGHISTORY) {
     return STORAGE_KEY_FLAGHISTORY_READY;
   }
@@ -77,18 +70,15 @@ export async function refreshOptionalModuleStatus(moduleName: OptionalModuleName
  * 同步 AppStorage 中的模块就绪标记（供 Tab、详情页等绑定）。
  */
 export async function refreshOptionalModuleAppStorage(_context: common.UIAbilityContext): Promise<void> {
-  const anthemOk = await refreshOptionalModuleStatus(MODULE_ANTHEM);
   const historyOk = await refreshOptionalModuleStatus(MODULE_FLAGHISTORY);
   const stateFlagsOk = await refreshOptionalModuleStatus(MODULE_STATE_FLAGS);
   const coatOk = await refreshOptionalModuleStatus(MODULE_COAT_OF_ARMS);
-  hilog.info(DOMAIN, 'OptionalModule', `anthem=${anthemOk}, flaghistory=${historyOk}, stateflags=${stateFlagsOk}, coatofarms=${coatOk}`);
+  hilog.info(DOMAIN, 'OptionalModule', `flaghistory=${historyOk}, stateflags=${stateFlagsOk}, coatofarms=${coatOk}`);
 }
 
 function getOptionalModuleTitle(context: common.UIAbilityContext, moduleName: OptionalModuleName): string {
   let resource: Resource;
-  if (moduleName === MODULE_ANTHEM) {
-    resource = $r('app.string.optional_module_anthem_title');
-  } else if (moduleName === MODULE_FLAGHISTORY) {
+  if (moduleName === MODULE_FLAGHISTORY) {
     resource = $r('app.string.optional_module_flaghistory_title');
   } else if (moduleName === MODULE_STATE_FLAGS) {
     resource = $r('app.string.optional_module_state_flags_title');

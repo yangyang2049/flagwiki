@@ -37,18 +37,6 @@
       "value": "Gallery"
     },
     {
-      "name": "tab_anthem",
-      "value": "Anthems"
-    },
-    {
-      "name": "national_anthem",
-      "value": "National anthem"
-    },
-    {
-      "name": "no_anthem_available",
-      "value": "No anthem available"
-    },
-    {
       "name": "no_playing",
       "value": "Not playing"
     },
@@ -61,10 +49,6 @@
       "value": "Add-ons (tap to download in-app)"
     },
     {
-      "name": "optional_module_anthem_title",
-      "value": "National anthems pack"
-    },
-    {
       "name": "optional_module_flaghistory_title",
       "value": "Historical flags pack"
     },
@@ -75,10 +59,6 @@
     {
       "name": "optional_module_status_missing",
       "value": "Not installed"
-    },
-    {
-      "name": "optional_module_anthem_detail",
-      "value": "Includes national anthem audio for many countries. After installation, an \"Anthems\" tab appears on the home screen for browsing, search, and playback."
     },
     {
       "name": "optional_module_flaghistory_detail",
@@ -103,10 +83,6 @@
     {
       "name": "optional_module_dialog_installed_hint",
       "value": "This pack is installed. You can use the related features now."
-    },
-    {
-      "name": "optional_module_anthem_size_hint",
-      "value": "Download size about 150 MB (approximate; see AppGallery for actual size)"
     },
     {
       "name": "optional_module_flaghistory_size_hint",
@@ -135,10 +111,6 @@
     {
       "name": "optional_module_coat_of_arms_size_hint",
       "value": "Download size about 5 MB (approximate; see AppGallery for actual size)"
-    },
-    {
-      "name": "optional_module_anthem_entry",
-      "value": "Find it on the home screen under the \"Anthems\" tab"
     },
     {
       "name": "optional_module_flaghistory_entry",
@@ -175,10 +147,6 @@
     {
       "name": "optional_module_refresh",
       "value": "Refresh add-on status"
-    },
-    {
-      "name": "optional_module_toast_anthem_ready",
-      "value": "Anthems pack is ready — use the second tab."
     },
     {
       "name": "optional_module_download_started",

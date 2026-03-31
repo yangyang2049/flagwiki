@@ -37,18 +37,6 @@
       "value": "画廊"
     },
     {
-      "name": "tab_anthem",
-      "value": "国歌"
-    },
-    {
-      "name": "national_anthem",
-      "value": "国歌"
-    },
-    {
-      "name": "no_anthem_available",
-      "value": "暂无国歌"
-    },
-    {
       "name": "no_playing",
       "value": "暂无播放"
     },
@@ -61,10 +49,6 @@
       "value": "扩展内容（点按后应用内下载）"
     },
     {
-      "name": "optional_module_anthem_title",
-      "value": "国歌扩展包"
-    },
-    {
       "name": "optional_module_flaghistory_title",
       "value": "历史国旗扩展包"
     },
@@ -75,10 +59,6 @@
     {
       "name": "optional_module_status_missing",
       "value": "未安装"
-    },
-    {
-      "name": "optional_module_anthem_detail",
-      "value": "包含多国国歌音频资源。安装成功后，主界面会出现「国歌」标签，可浏览、搜索并播放各国国歌。"
     },
     {
       "name": "optional_module_flaghistory_detail",
@@ -103,10 +83,6 @@
     {
       "name": "optional_module_dialog_installed_hint",
       "value": "当前已安装，可直接使用相关功能。"
-    },
-    {
-      "name": "optional_module_anthem_size_hint",
-      "value": "下载大小约 150 MB（仅供参考，以应用市场显示为准）"
     },
     {
       "name": "optional_module_flaghistory_size_hint",
@@ -135,10 +111,6 @@
     {
       "name": "optional_module_coat_of_arms_size_hint",
       "value": "下载大小约 5 MB（仅供参考，以应用市场显示为准）"
-    },
-    {
-      "name": "optional_module_anthem_entry",
-      "value": "入口在主界面底部「国歌」标签"
     },
     {
       "name": "optional_module_flaghistory_entry",
@@ -175,10 +147,6 @@
     {
       "name": "optional_module_refresh",
       "value": "刷新扩展状态"
-    },
-    {
-      "name": "optional_module_toast_anthem_ready",
-      "value": "国歌扩展已就绪，可在第二个 Tab 使用"
     },
     {
       "name": "optional_module_download_started",

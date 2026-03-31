@@ -1,6 +1,5 @@
 import { HomePage } from './home/HomePage';
 import { GalleryPage } from './gallery/GalleryPage';
-import { AnthemPage } from './anthem/AnthemPage';
 import { ExplorePage } from './explore/ExplorePage';
 import { ProfilePage } from './profile/ProfilePage';
 import { preferences } from '@kit.ArkData';
@@ -9,7 +8,6 @@ import { PreferencesManager } from '../utils/PreferencesManager';
 import router from '@ohos.router';
 import { shouldAllowEdgeSwipeExit } from '../utils/WatchGestureHelper';
 import {
-  MODULE_ANTHEM,
   MODULE_FLAGHISTORY,
   MODULE_STATE_FLAGS,
   MODULE_COAT_OF_ARMS,
@@ -31,11 +29,8 @@ struct Index {
   @State exploreRefreshKey: number = 0;
   @State homeRefreshKey: number = 0;
   @State isGallerySearchExpanded: boolean = false;
-  @State isAnthemSearchExpanded: boolean = false;
-  @StorageLink('optionalModuleAnthemReady') anthemModuleReady: boolean = false;
   @StorageLink('optionalModuleInstallBusy') optionalModuleInstallBusy: boolean = false;
   @StorageLink('optionalModuleInstallBusyId') optionalModuleInstallBusyId: string = '';
-  @State anthemPageRefreshKey: number = 0;
   private tabController: TabsController = new TabsController();
   private prefs: preferences.Preferences | null = null;
   private context = getContext(this) as common.UIAbilityContext;
@@ -46,12 +41,6 @@ struct Index {
       title: $r('app.string.tab_home'),
       iconNormal: $r('app.media.icon_tab_home'),
       iconSelected: $r('app.media.icon_tab_home_selected')
-    };
-    const anthem: MainTabSpec = {
-      id: 'anthem',
-      title: $r('app.string.tab_anthem'),
-      iconNormal: $r('app.media.icon_tab_anthem'),
-      iconSelected: $r('app.media.icon_tab_anthem_selected')
     };
     const gallery: MainTabSpec = {
       id: 'gallery',
@@ -71,7 +60,7 @@ struct Index {
       iconNormal: $r('app.media.icon_tab_profile'),
       iconSelected: $r('app.media.icon_tab_profile_selected')
     };
-    return [home, anthem, gallery, explore, profile];
+    return [home, gallery, explore, profile];
   }
 
   private getTitleText(): Resource {
@@ -109,9 +98,6 @@ struct Index {
     } else if (this.currentTabIndex === this.getTabSpecs().length - 1) {
       this.profileRefreshKey++;
     }
-    if (this.getTabSpecs()[this.currentTabIndex]?.id === 'anthem') {
-      this.anthemPageRefreshKey++;
-    }
   }
 
   private switchTab(index: number): void {
@@ -122,9 +108,7 @@ struct Index {
   private getOptionalDownloadBannerText(): string {
     const id = this.optionalModuleInstallBusyId;
     let title = '';
-    if (id === MODULE_ANTHEM) {
-      title = this.context.resourceManager.getStringSync($r('app.string.optional_module_anthem_title').id);
-    } else if (id === MODULE_FLAGHISTORY) {
+    if (id === MODULE_FLAGHISTORY) {
       title = this.context.resourceManager.getStringSync($r('app.string.optional_module_flaghistory_title').id);
     } else if (id === MODULE_STATE_FLAGS) {
       title = this.context.resourceManager.getStringSync($r('app.string.optional_module_state_flags_title').id);
@@ -166,7 +150,7 @@ struct Index {
       Column() {
         HomePage({
           refreshKey: this.homeRefreshKey,
-          galleryTabIndex: 2,
+          galleryTabIndex: 1,
           onTabChange: (index: number) => {
             this.switchTab(index);
           }
@@ -175,12 +159,6 @@ struct Index {
       .padding({ left: 4, right: 4 })
       .width('100%')
       .height('100%')
-    } else if (spec.id === 'anthem') {
-      AnthemPage({
-        context: this.context,
-        isSearchExpanded: this.isAnthemSearchExpanded,
-        refreshKey: this.anthemPageRefreshKey
-      })
     } else if (spec.id === 'gallery') {
       GalleryPage({ isSearchExpanded: this.isGallerySearchExpanded, context: this.context })
     } else if (spec.id === 'explore') {
@@ -208,15 +186,6 @@ struct Index {
               .height(22)
               .onClick(() => {
                 this.isGallerySearchExpanded = !this.isGallerySearchExpanded;
-              })
-          }
-
-          if (this.currentSpecId() === 'anthem' && this.anthemModuleReady) {
-            Image(this.isAnthemSearchExpanded ? $r('app.media.icon_close') : $r('app.media.icon_search'))
-              .width(22)
-              .height(22)
-              .onClick(() => {
-                this.isAnthemSearchExpanded = !this.isAnthemSearchExpanded;
               })
           }
         }
@@ -256,7 +225,7 @@ struct Index {
               this.TabBodyForSpec(spec)
             }
             .tabBar(this.TabBarForSpec(spec, index))
-          }, (spec: MainTabSpec) => `${spec.id}_${this.anthemModuleReady ? 'a1' : 'a0'}`)
+          }, (spec: MainTabSpec) => spec.id)
         }
         .width('100%')
         .layoutWeight(1)
@@ -269,17 +238,11 @@ struct Index {
           if (sid !== 'gallery') {
             this.isGallerySearchExpanded = false;
           }
-          if (sid !== 'anthem') {
-            this.isAnthemSearchExpanded = false;
-          }
           if (index === 0) {
             this.homeRefreshKey++;
           }
           if (index === this.getTabSpecs().length - 1) {
             this.profileRefreshKey++;
-          }
-          if (sid === 'anthem') {
-            this.anthemPageRefreshKey++;
           }
         })
         .onGestureRecognizerJudgeBegin((event: BaseGestureEvent, current: GestureRecognizer,

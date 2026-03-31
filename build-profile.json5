@@ -80,19 +80,6 @@
       ]
     },
     {
-      "name": "anthem",
-      "srcPath": "./anthem",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default",
-            "release"
-          ]
-        }
-      ]
-    },
-    {
       "name": "stateflags",
       "srcPath": "./stateflags",
       "targets": [

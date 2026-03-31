@@ -8,7 +8,6 @@ import { PreferencesManager } from '../utils/PreferencesManager';
 import { LocalizationUtil } from '../utils/LocalizationUtil';
 import {
   refreshOptionalModuleAppStorage,
-  STORAGE_KEY_ANTHEM_READY,
   STORAGE_KEY_FLAGHISTORY_READY,
   STORAGE_KEY_STATE_FLAGS_READY,
   STORAGE_KEY_COAT_OF_ARMS_READY,
@@ -23,7 +22,6 @@ export default class EntryAbility extends UIAbility {
   async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
     // 存储 context 到 AppStorage，供 MediaService 等使用
     AppStorage.setOrCreate('context', this.context);
-    AppStorage.setOrCreate(STORAGE_KEY_ANTHEM_READY, false);
     AppStorage.setOrCreate(STORAGE_KEY_FLAGHISTORY_READY, false);
     AppStorage.setOrCreate(STORAGE_KEY_STATE_FLAGS_READY, false);
     AppStorage.setOrCreate(STORAGE_KEY_COAT_OF_ARMS_READY, false);

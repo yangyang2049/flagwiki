@@ -11,7 +11,6 @@ import { PreferencesManager } from '../../utils/PreferencesManager';
 import { VibratorUtil } from '../../utils/VibratorUtil';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
 import {
-  MODULE_ANTHEM,
   MODULE_FLAGHISTORY,
   MODULE_STATE_FLAGS,
   MODULE_COAT_OF_ARMS,
@@ -21,13 +20,12 @@ import {
 
 @Component
 export struct ProfilePage {
-  @StorageLink('optionalModuleAnthemReady') anthemModuleReady: boolean = false;
   @StorageLink('optionalModuleFlagHistoryReady') flagHistoryModuleReady: boolean = false;
   @StorageLink('optionalModuleStateFlagsReady') stateFlagsModuleReady: boolean = false;
   @StorageLink('optionalModuleCoatOfArmsReady') coatOfArmsModuleReady: boolean = false;
   @State colorMode: ConfigurationConstant.ColorMode = ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET;
   @State showThemeDialog: boolean = false;
-  /** 扩展包详情弹窗：'' | anthem | flaghistory | stateflags | coatofarms */
+  /** 扩展包详情弹窗：'' | flaghistory | stateflags | coatofarms */
   @State optionalModuleDialogTarget: string = '';
   @State optionalModuleDownloadStartedInDialog: boolean = false;
   @State vibrationEnabled: boolean = true; // 振动反馈开关，默认启用
@@ -66,9 +64,6 @@ export struct ProfilePage {
   }
 
   private isOptionalDialogTargetReady(): boolean {
-    if (this.optionalModuleDialogTarget === MODULE_ANTHEM) {
-      return this.anthemModuleReady;
-    }
     if (this.optionalModuleDialogTarget === MODULE_FLAGHISTORY) {
       return this.flagHistoryModuleReady;
     }
@@ -82,9 +77,6 @@ export struct ProfilePage {
   }
 
   private getOptionalModuleDialogTitle(): string {
-    if (this.optionalModuleDialogTarget === MODULE_ANTHEM) {
-      return this.context.resourceManager.getStringSync($r('app.string.optional_module_anthem_title').id);
-    }
     if (this.optionalModuleDialogTarget === MODULE_FLAGHISTORY) {
       return this.context.resourceManager.getStringSync($r('app.string.optional_module_flaghistory_title').id);
     }
@@ -98,9 +90,6 @@ export struct ProfilePage {
   }
 
   private getOptionalModuleApproxSizeHint(): string {
-    if (this.optionalModuleDialogTarget === MODULE_ANTHEM) {
-      return this.context.resourceManager.getStringSync($r('app.string.optional_module_anthem_size_hint').id);
-    }
     if (this.optionalModuleDialogTarget === MODULE_STATE_FLAGS) {
       return this.context.resourceManager.getStringSync($r('app.string.optional_module_state_flags_size_hint').id);
     }
@@ -111,9 +100,6 @@ export struct ProfilePage {
   }
 
   private getOptionalModuleDetailScrollText(): string {
-    if (this.optionalModuleDialogTarget === MODULE_ANTHEM) {
-      return this.context.resourceManager.getStringSync($r('app.string.optional_module_anthem_detail').id);
-    }
     if (this.optionalModuleDialogTarget === MODULE_STATE_FLAGS) {
       return this.context.resourceManager.getStringSync($r('app.string.optional_module_state_flags_detail').id);
     }
@@ -124,11 +110,11 @@ export struct ProfilePage {
   }
 
   private async onOptionalModuleDialogDownload(): Promise<void> {
-    if (this.optionalModuleDialogTarget !== MODULE_ANTHEM && this.optionalModuleDialogTarget !== MODULE_FLAGHISTORY &&
+    if (this.optionalModuleDialogTarget !== MODULE_FLAGHISTORY &&
       this.optionalModuleDialogTarget !== MODULE_STATE_FLAGS && this.optionalModuleDialogTarget !== MODULE_COAT_OF_ARMS) {
       return;
     }
-    const moduleName = this.optionalModuleDialogTarget as 'anthem' | 'flaghistory' | 'stateflags' | 'coatofarms';
+    const moduleName = this.optionalModuleDialogTarget as 'flaghistory' | 'stateflags' | 'coatofarms';
     try {
       await openOptionalModuleInstallFlow(this.context, moduleName);
       this.optionalModuleDownloadStartedInDialog = true;
@@ -366,7 +352,7 @@ export struct ProfilePage {
               .borderRadius(12)
               .margin({ top: 16, bottom: 0 })
 
-            // 扩展资源包（顺序：国徽 → 历史国旗 → 州旗 → 国歌）
+            // 扩展资源包（顺序：国徽 → 历史国旗 → 州旗）
             // 图标与底部 Tab 同形（国徽无对应 Tab，沿用星形 icon_star）；使用 icon_optional_* 独立文件以便列表配色（base #000 / dark #FFF），不与 Tab 资源混用
             Column() {
               this.settingItemWithValue($r('app.media.icon_optional_coat_of_arms'),
@@ -394,16 +380,6 @@ export struct ProfilePage {
                 () => this.getOptionalStatusText(this.stateFlagsModuleReady),
                 () => {
                   this.openOptionalModuleDetailDialog(MODULE_STATE_FLAGS);
-                })
-              Divider()
-                .strokeWidth(0.5)
-                .color($r('app.color.gray_border'))
-                .margin({ left: 16, right: 16 })
-              this.settingItemWithValue($r('app.media.icon_optional_anthem'),
-                this.context.resourceManager.getStringSync($r('app.string.optional_module_anthem_title').id),
-                () => this.getOptionalStatusText(this.anthemModuleReady),
-                () => {
-                  this.openOptionalModuleDetailDialog(MODULE_ANTHEM);
                 })
             }
             .width('100%')

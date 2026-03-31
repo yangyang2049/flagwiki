@@ -7,7 +7,6 @@
   "license": "",
   "dynamicDependencies": {
     "flaghistory": "file:../flaghistory",
-    "anthem": "file:../anthem",
     "stateflags": "file:../stateflags",
     "coatofarms": "file:../coatofarms"
   }
