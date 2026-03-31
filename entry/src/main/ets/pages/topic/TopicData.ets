@@ -218,3 +218,12 @@ export function getAllTopics(): TopicItem[] {
   return topics;
 }
 
+/**
+ * 列表/首页展示用：英文环境下不展示「五星红旗历史」专题（内容以中国语境为主）。
+ */
+export function getAllTopicsForDisplay(language: string): TopicItem[] {
+  if (LocalizationUtil.isEnglish(language)) {
+    return topics.filter((t: TopicItem) => t.id !== 'flag-history');
+  }
+  return topics;
+}

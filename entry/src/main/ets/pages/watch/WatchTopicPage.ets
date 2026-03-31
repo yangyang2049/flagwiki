@@ -1,17 +1,21 @@
 import router from '@ohos.router'
 import { common } from '@kit.AbilityKit'
-import { TopicItem, getAllTopics, getTopicName } from '../topic/TopicData'
+import { TopicItem, getAllTopicsForDisplay, getTopicName } from '../topic/TopicData'
 import { WatchLayout } from '../../utils/WatchUiConstants'
 
 @Component
 export struct WatchTopicPage {
   @State topics: TopicItem[] = []
-  @StorageLink('currentLanguage') currentLanguage: string = 'zh'
+  @StorageLink('currentLanguage') @Watch('onWatchTopicLanguageChanged') currentLanguage: string = 'zh'
   private scroller: Scroller = new Scroller()
   private context = getContext(this) as common.UIAbilityContext
 
+  private onWatchTopicLanguageChanged(): void {
+    this.topics = getAllTopicsForDisplay(this.currentLanguage)
+  }
+
   aboutToAppear(): void {
-    this.topics = getAllTopics()
+    this.topics = getAllTopicsForDisplay(this.currentLanguage)
   }
 
   build() {
@@ -35,17 +39,19 @@ export struct WatchTopicPage {
                 .fontSize(15)
                 .fontColor('#FFFFFF')
                 .layoutWeight(1)
-                .maxLines(1)
+                .maxLines(2)
+                .lineHeight(20)
+                .textAlign(TextAlign.Start)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
             }
             .width('80%')
-            .height(40)
-            .padding({ left: 10, right: 10, top: 6, bottom: 6 })
+            .alignItems(VerticalAlign.Center)
+            .padding({ left: 10, right: 10, top: 8, bottom: 8 })
             .backgroundColor('rgba(255, 255, 255, 0.1)')
             .borderRadius(8)
             .onClick(() => {
               router.pushUrl({
-                url: 'pages/topic/TopicDetailPage',
+                url: 'pages/watch/WatchTopicDetailPage',
                 params: { topicId: topic.id }
               })
             })

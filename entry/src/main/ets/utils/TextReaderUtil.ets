@@ -1,6 +1,7 @@
-import { ReadStateCode, TextReader } from '@kit.SpeechKit';
+import { TextReader } from '@kit.SpeechKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import common from '@ohos.app.ability.common';
+import { DeviceHelper } from './DeviceHelper';
 
 /**
  * TextReader 工具类
@@ -10,12 +11,22 @@ export class TextReaderUtil {
   private static context: common.UIAbilityContext | null = null;
   private static isInitialized: boolean = false;
   private static currentReadInfo: TextReader.ReadInfo | null = null;
+  /** 模拟器等环境下跳过 SpeechKit TextReader，避免 textReaderHsp 加载失败导致进程 SIGABRT */
+  private static skippedForEnvironment: boolean = false;
 
   /**
    * 初始化 TextReader
    */
   static async init(context: common.UIAbilityContext): Promise<void> {
     try {
+      if (TextReaderUtil.skippedForEnvironment) {
+        return;
+      }
+      if (DeviceHelper.isLikelyEmulator()) {
+        TextReaderUtil.skippedForEnvironment = true;
+        console.warn('[TextReaderUtil] Skip TextReader on emulator (SpeechKit textReaderHsp may abort process)');
+        return;
+      }
       if (TextReaderUtil.isInitialized) {
         return;
       }
@@ -74,8 +85,14 @@ export class TextReaderUtil {
    * @param content 内容
    */
   static async startRead(context: common.UIAbilityContext, title: string, content: string): Promise<void> {
+    if (TextReaderUtil.skippedForEnvironment) {
+      return;
+    }
     if (!TextReaderUtil.isInitialized || !TextReaderUtil.context) {
       await TextReaderUtil.init(context);
+      if (TextReaderUtil.skippedForEnvironment) {
+        return;
+      }
       TextReaderUtil.setEventListener();
       TextReaderUtil.setActionListener();
     }
@@ -109,6 +126,9 @@ export class TextReaderUtil {
    * 停止朗读
    */
   static stopRead(): void {
+    if (TextReaderUtil.skippedForEnvironment) {
+      return;
+    }
     if (TextReaderUtil.isInitialized) {
       TextReader.stop();
       TextReader.hidePanel();

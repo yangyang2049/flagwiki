@@ -917,6 +917,10 @@
       "value": "共 %s 对相似旗帜"
     },
     {
+      "name": "similar_flag_pair_title",
+      "value": "%s和%s"
+    },
+    {
       "name": "reading_stopped",
       "value": "已停止朗读"
     },

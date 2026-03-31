@@ -1,17 +1,20 @@
 import router from '@ohos.router';
 import common from '@ohos.app.ability.common';
-import { TopicItem, getAllTopics, getTopicName, getTopicDescription } from './TopicData';
-import { LocalizationUtil } from '../../utils/LocalizationUtil';
+import { TopicItem, getAllTopicsForDisplay, getTopicName, getTopicDescription } from './TopicData';
 
 @Entry
 @Component
   struct TopicListPage {
   @State topics: TopicItem[] = [];
-  @StorageLink('currentLanguage') currentLanguage: string = 'zh';
+  @StorageLink('currentLanguage') @Watch('onTopicListLanguageChanged') currentLanguage: string = 'zh';
   private context = getContext(this) as common.UIAbilityContext;
 
+  private onTopicListLanguageChanged(): void {
+    this.topics = getAllTopicsForDisplay(this.currentLanguage);
+  }
+
   aboutToAppear() {
-    this.topics = getAllTopics();
+    this.topics = getAllTopicsForDisplay(this.currentLanguage);
   }
 
   build() {
@@ -33,12 +36,14 @@ import { LocalizationUtil } from '../../utils/LocalizationUtil';
                     .borderRadius(16)
                     .justifyContent(FlexAlign.Center)
 
-                  // 中间文字
+                  // 中间文字（左对齐，占满剩余宽度）
                   Column() {
                     Text(getTopicName(topic.id, this.context, this.currentLanguage))
                       .fontSize(18)
                       .fontWeight(FontWeight.Bold)
                       .fontColor($r('app.color.text_primary'))
+                      .textAlign(TextAlign.Start)
+                      .width('100%')
 
                     Text(getTopicDescription(topic.id, this.context, this.currentLanguage))
                       .fontSize(13)
@@ -46,6 +51,8 @@ import { LocalizationUtil } from '../../utils/LocalizationUtil';
                       .margin({ top: 4 })
                       .maxLines(2)
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
+                      .textAlign(TextAlign.Start)
+                      .width('100%')
                   }
                   .alignItems(HorizontalAlign.Start)
                     .margin({ left: 16 })
@@ -57,6 +64,8 @@ import { LocalizationUtil } from '../../utils/LocalizationUtil';
                     .height(20)
                 }
                 .width('100%')
+                  .justifyContent(FlexAlign.Start)
+                  .alignItems(VerticalAlign.Center)
                   .padding(16)
                   .backgroundColor($r('app.color.bg_card'))
                   .borderRadius(16)

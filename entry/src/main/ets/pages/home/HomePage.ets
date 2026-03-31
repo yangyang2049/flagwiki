@@ -1,6 +1,6 @@
 import router from '@ohos.router';
 import common from '@ohos.app.ability.common';
-import { TopicItem, getAllTopics, getTopicName } from '../topic/TopicData';
+import { TopicItem, getAllTopicsForDisplay, getTopicName } from '../topic/TopicData';
 import { WeeklyFlagItem, getCurrentWeekFlag } from '../../utils/WeeklyFlagData';
 import { getCountryByCode, getFlagImageSource, getLocalizedCountryName } from '../../utils/countryData';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
@@ -405,7 +405,7 @@ export struct HomePage {
           // 横向滚动的专题卡片
           Scroll() {
             Row() {
-              ForEach(getAllTopics().slice(0, this.getTopicCount()), (topic: TopicItem) => {
+              ForEach(getAllTopicsForDisplay(this.currentLanguage).slice(0, this.getTopicCount()), (topic: TopicItem) => {
                 Column() {
                   Text(topic.emoji)
                     .fontSize(32)

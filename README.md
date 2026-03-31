@@ -431,6 +431,8 @@ cd flagwiki
 | 国歌「暂无国歌」 | `getRawFileList('anthems')` 建缓存；`getRawFd` 探测后必须 `closeRawFd` |
 | 扩展说明弹窗 | 去掉重复「入口」行；已安装则不显示体积提示 |
 | SVG  bundle | 解压逻辑与 `zip -0` 要求见 `FlagSvgBundleUnpacker.ets` |
+| 模拟器崩溃 | 若日志含 `textReaderHsp` / `LoadJSPandaFile`：为 SpeechKit 朗读 HSP 加载失败，**非国歌包本身**；`TextReaderUtil` 已在模拟器上跳过初始化 |
+| 国歌仍异常 | 请在**真机**验证已安装的 anthem HSP；模拟器环境与正式分发环境不一致 |
 
 脚本：`scripts/pack-flags-bundle.sh`（若仓库中有）用于打国旗 SVG 压缩包，与 entry `compressed/flags_bundle.zip` 配合。
 

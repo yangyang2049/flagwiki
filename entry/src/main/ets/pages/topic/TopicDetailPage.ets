@@ -1,17 +1,15 @@
 import router from '@ohos.router';
 import { TopicItem, getTopicById, getTopicName, getTopicDescription } from './TopicData';
 import { getCountryByCode, Country, getFlagImageSource, getInternationalOrgByCode, InternationalOrg, isInternationalOrg, getLocalizedCountryName, getLocalizedOrgName } from '../../utils/countryData';
-import { EtiquetteSection, getEtiquetteContent } from './FlagEtiquetteData';
-import { ManufacturingSection, getManufacturingContent } from './FlagManufacturingData';
-import { VexillologySection, getVexillologyContent } from './FlagVexillologyData';
+import { EtiquetteSection, getLocalizedEtiquetteContent } from './FlagEtiquetteData';
+import { ManufacturingSection, getLocalizedManufacturingContent } from './FlagManufacturingData';
+import { VexillologySection, getLocalizedVexillologyContent } from './FlagVexillologyData';
 import { HistorySection, getLocalizedFlagHistoryContent } from './FiveStarRedFlagHistoryData';
 import { TextReaderUtil } from '../../utils/TextReaderUtil';
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
 import { DeviceHelper } from '../../utils/DeviceHelper';
-import { LocalizationUtil } from '../../utils/LocalizationUtil';
-
 interface RouterParams {
   topicId: string;
 }
@@ -43,11 +41,14 @@ interface SimilarFlagPair {
   @State isKnowledgeTopic: boolean = false;
   @State isReading: boolean = false;
   @State similarFlagPairs: SimilarFlagPair[] = [];
-  @StorageLink('currentLanguage') currentLanguage: string = 'zh';
+  @StorageLink('currentLanguage') @Watch('onTopicDetailLanguageChanged') currentLanguage: string = 'zh';
   private context = getContext(this) as common.UIAbilityContext;
 
-  private get isEnglish(): boolean {
-    return LocalizationUtil.isEnglish(this.currentLanguage);
+  private onTopicDetailLanguageChanged(): void {
+    if (!this.topic || !this.isKnowledgeTopic) {
+      return;
+    }
+    this.loadKnowledgeContent();
   }
 
   async aboutToAppear() {
@@ -128,11 +129,11 @@ interface SimilarFlagPair {
 
     // 根据专题ID加载对应的知识内容
     if (this.topic.id === 'etiquette') {
-      this.etiquetteSections = getEtiquetteContent();
+      this.etiquetteSections = getLocalizedEtiquetteContent(this.currentLanguage);
     } else if (this.topic.id === 'manufacturing') {
-      this.manufacturingSections = getManufacturingContent();
+      this.manufacturingSections = getLocalizedManufacturingContent(this.currentLanguage);
     } else if (this.topic.id === 'vexillology') {
-      this.vexillologySections = getVexillologyContent();
+      this.vexillologySections = getLocalizedVexillologyContent(this.currentLanguage);
     } else if (this.topic.id === 'flag-history') {
       this.flagHistorySections = getLocalizedFlagHistoryContent(this.currentLanguage);
     }
@@ -606,10 +607,10 @@ interface SimilarFlagPair {
   private getSimilarFlagPairTitle(pair: SimilarFlagPair): string {
     const name1 = this.getCountryNameByCode(pair.code1);
     const name2 = this.getCountryNameByCode(pair.code2);
-    if (this.isEnglish) {
-      return `${name1} and ${name2}`;
-    } else {
-      return `${name1}和${name2}`;
-    }
+    return this.context.resourceManager.getStringSync(
+      $r('app.string.similar_flag_pair_title').id,
+      name1,
+      name2
+    );
   }
 }

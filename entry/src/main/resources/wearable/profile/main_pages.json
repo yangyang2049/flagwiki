@@ -6,6 +6,6 @@
     "pages/watch/FlashcardPage",
     "pages/watch/ContinentPage",
     "pages/watch/CountryDetailPage",
-    "pages/topic/TopicDetailPage"
+    "pages/watch/WatchTopicDetailPage"
   ]
 }

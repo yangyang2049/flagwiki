@@ -58,4 +58,16 @@ export class DeviceHelper {
       return 'phone'
     }
   }
+
+  /**
+   * 是否为模拟器环境（用于跳过依赖 HMS TextReader HSP 等能力，避免 LoadJSPandaFile 失败导致进程 abort）
+   */
+  static isLikelyEmulator(): boolean {
+    try {
+      const haystack = `${deviceInfo.productModel}|${deviceInfo.marketName}|${deviceInfo.softwareModel}`.toLowerCase()
+      return haystack.includes('emulator') || haystack.includes('simulator')
+    } catch (_e) {
+      return false
+    }
+  }
 }

@@ -1013,6 +1013,10 @@
       "value": "%s pairs of similar flags"
     },
     {
+      "name": "similar_flag_pair_title",
+      "value": "%s and %s"
+    },
+    {
       "name": "topic",
       "value": "Topics"
     },

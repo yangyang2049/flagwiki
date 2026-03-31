@@ -16,6 +16,8 @@
   - `FlagSvgBundleUnpacker`：ZIP 须为 STORED（`zip -0`）；版本号与校验逻辑见源码注释。
 - **设置 / 扩展说明对话框（Profile）**
   - 去掉与正文重复的「入口在 xxx」单行；**仅未安装时**显示「下载大小约 xx MB」类提示；精简各扩展 `detail` 文案（中/英 `string.json`）。
+- **模拟器与朗读（TextReader）**
+  - 模拟器上 `LoadJSPandaFile` 加载 `textReaderHsp` 失败可导致 **SIGABRT**，与国歌扩展无直接关系；`DeviceHelper.isLikelyEmulator()` + `TextReaderUtil` 跳过 `TextReader.init`，避免崩溃。
 
 ### 修复 (Fixed)
 - **ArkTS 编译错误修复**：
