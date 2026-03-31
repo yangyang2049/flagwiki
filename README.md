@@ -419,6 +419,21 @@ cd flagwiki
 - **类型安全**：不使用 `any` 或 `unknown` 类型
 - **保持现有逻辑和 UI**：修改时尽量保持现有逻辑和 UI 风格
 
+## 📝 开发备忘（下次继续）
+
+> **若你暂停数天后再开发**：请先读 **CHANGELOG「[未发布] → 扩展包与资源」** 一节，再动州旗/国歌/扩展包相关代码。
+
+**最近已记录事项（2026-03）**
+
+| 主题 | 要点 |
+|------|------|
+| 州旗空白 | 路径与 `stateflags` rawfile 一致；本地缓存 + 可选 PNG；BC 省旗优先 PNG |
+| 国歌「暂无国歌」 | `getRawFileList('anthems')` 建缓存；`getRawFd` 探测后必须 `closeRawFd` |
+| 扩展说明弹窗 | 去掉重复「入口」行；已安装则不显示体积提示 |
+| SVG  bundle | 解压逻辑与 `zip -0` 要求见 `FlagSvgBundleUnpacker.ets` |
+
+脚本：`scripts/pack-flags-bundle.sh`（若仓库中有）用于打国旗 SVG 压缩包，与 entry `compressed/flags_bundle.zip` 配合。
+
 ## 📄 许可证
 
 本项目采用 [MIT License](LICENSE) 许可证。

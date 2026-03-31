@@ -4,7 +4,7 @@ import { CountryStateData, StateInfo, getCountryStateData } from '../../utils/St
 import { LocalizationUtil } from '../../utils/LocalizationUtil';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
 import { FlagSvgAssets } from '../../utils/FlagSvgAssets';
-import { getStateFlagImageResource } from '../../utils/RegionAssetsUtil';
+import { ensureStateFlagImageCached, getStateFlagImageResource } from '../../utils/RegionAssetsUtil';
 import {
   MODULE_STATE_FLAGS,
   openOptionalModuleInstallFlow,
@@ -28,10 +28,12 @@ interface RouterParams {
   aboutToAppear() {
     void refreshOptionalModuleStatus(MODULE_STATE_FLAGS);
     const params = router.getParams() as RouterParams;
-    // 延迟加载以显示loading状态
-    setTimeout(() => {
+    // 延迟加载以显示 loading；先同步模块就绪再预取，避免与 refreshOptionalModuleStatus 竞态导致跳过缓存
+    setTimeout(async () => {
+      await refreshOptionalModuleStatus(MODULE_STATE_FLAGS);
       if (params && params.countryCode) {
         this.countryData = getCountryStateData(params.countryCode);
+        await this.preloadStateFlagImages();
       }
       this.isLoading = false;
     }, 600);
@@ -107,7 +109,17 @@ interface RouterParams {
       const params = router.getParams() as RouterParams;
       if (params && params.countryCode) {
         this.countryData = getCountryStateData(params.countryCode);
+        await this.preloadStateFlagImages();
       }
+    }
+  }
+
+  private async preloadStateFlagImages(): Promise<void> {
+    if (!this.countryData || !this.stateFlagsModuleReady) {
+      return;
+    }
+    for (let i = 0; i < this.countryData.states.length; i++) {
+      await ensureStateFlagImageCached(this.context, this.countryData.countryCode, this.countryData.states[i].code);
     }
   }
 
@@ -263,4 +275,3 @@ interface RouterParams {
     .backgroundColor($r('app.color.bg_page'))
   }
 }
-

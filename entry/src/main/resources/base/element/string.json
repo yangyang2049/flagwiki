@@ -78,11 +78,11 @@
     },
     {
       "name": "optional_module_anthem_detail",
-      "value": "包含多国国歌音频资源。安装成功后，主界面会出现「国歌」标签，可浏览、搜索并播放各国国歌。\n\n资源体积较大，需联网通过应用市场按需下载，耗时可能达数分钟，请保持网络畅通。"
+      "value": "包含多国国歌音频资源。安装成功后，主界面会出现「国歌」标签，可浏览、搜索并播放各国国歌。"
     },
     {
       "name": "optional_module_flaghistory_detail",
-      "value": "包含各国历史国旗图片与文字说明。安装成功后，在国旗详情页可查看该国历史旗帜变迁。\n\n需联网下载，请耐心等待。"
+      "value": "包含各国历史国旗图片与文字说明。安装成功后，在国旗详情页可查看该国历史旗帜变迁。"
     },
     {
       "name": "optional_module_dialog_close",
@@ -118,7 +118,7 @@
     },
     {
       "name": "optional_module_state_flags_detail",
-      "value": "包含各国行政区州旗/省旗矢量图。安装成功后，可在首页进入「州旗专区」，并在涂鸦游戏中使用美国州旗分类。\n\n需联网下载。"
+      "value": "包含各国行政区州旗/省旗矢量图。安装成功后，可在首页进入「州旗专区」，并在涂鸦游戏中使用美国州旗分类。"
     },
     {
       "name": "optional_module_state_flags_size_hint",
@@ -130,7 +130,7 @@
     },
     {
       "name": "optional_module_coat_of_arms_detail",
-      "value": "包含各国国徽图片。安装成功后，可在国旗详情页查看对应国徽。\n\n需联网下载。"
+      "value": "包含各国国徽图片。安装成功后，可在国旗详情页查看对应国徽。"
     },
     {
       "name": "optional_module_coat_of_arms_size_hint",

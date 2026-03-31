@@ -4,7 +4,7 @@ import promptAction from '@ohos.promptAction';
 import { FavoritesManager, FavoriteItem } from '../../utils/favoritesManager';
 import { getFlagImageSource, getInternationalOrgByCode, isInternationalOrg, getLocalizedOrgName } from '../../utils/countryData';
 import { getCountryStateData, CountryStateData, StateInfo } from '../../utils/StateFlagData';
-import { getStateFlagImageResource } from '../../utils/RegionAssetsUtil';
+import { ensureStateFlagImageCached, getStateFlagImageResource } from '../../utils/RegionAssetsUtil';
 import { LocalizationUtil } from '../../utils/LocalizationUtil';
 import { getContentMaxWidth } from '../../utils/LayoutHelper';
 
@@ -27,6 +27,20 @@ export struct FavoritesPage {
 
   private async loadFavorites() {
     this.favorites = await FavoritesManager.getFavorites();
+    await this.preloadFavoriteStateFlagImages();
+  }
+
+  private async preloadFavoriteStateFlagImages(): Promise<void> {
+    for (let i = 0; i < this.favorites.length; i++) {
+      const pageUrl = this.favorites[i].pageUrl;
+      if (!pageUrl.startsWith('stateflag:')) {
+        continue;
+      }
+      const parts = pageUrl.substring(10).split(':');
+      if (parts.length >= 2) {
+        await ensureStateFlagImageCached(this.context, parts[0], parts[1]);
+      }
+    }
   }
 
   private async deleteFavorite(item: FavoriteItem) {
@@ -42,7 +56,7 @@ export struct FavoritesPage {
     }
   }
 
-  private getStateFlagImageResourceForFavorite(pageUrl: string): Resource {
+  private getStateFlagImageResourceForFavorite(pageUrl: string): string | Resource {
     const parts = pageUrl.substring(10).split(':');
     if (parts.length >= 2) {
       const res = getStateFlagImageResource(parts[0], parts[1]);

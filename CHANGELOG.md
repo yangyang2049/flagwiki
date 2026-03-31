@@ -2,6 +2,21 @@
 
 ## [未发布]
 
+### 扩展包与资源（州旗 / 国歌 / 设置）— 2026-03 会话备忘
+以下为近期改动摘要，**恢复开发时请先通读本节与 README「开发备忘」**。
+
+- **州旗（stateflags HSP）**
+  - `StateFlagData.getStateFlagPath` 与模块 rawfile 一致：`{国家码}/{文件名}.svg`（不再使用错误的 `state_flags/` 前缀）。
+  - `RegionAssetsUtil`：通过 `createModuleContext('stateflags')` + `getRawFileContent` 缓存到 `filesDir/stateflags_module/`，用 `file://` 展示；支持 `.svg` 与 `.png` 候选；不列颠哥伦比亚（`ca/british_columbia`）因复杂 SVG 在部分机型空白，已增加同名 **PNG** 并 **优先加载 PNG**。
+  - `StateFlagGalleryPage` / `StateFlagDetailPage` / `FavoritesPage`：展示前预缓存；Gallery 打开前 `await refreshOptionalModuleStatus` 减少竞态。
+- **国歌（anthem HSP）**
+  - `AnthemUtilCore.initAnthemCache`：**优先 `getRawFileList('anthems')`** 解析 `anthem_xx.ogg` 建列表，避免对数百文件逐个 `getRawFd` 且未 **`closeRawFd`** 导致 FD 泄漏、列表恒为空（长时间加载后「暂无国歌」）。
+  - 列表失败时再回退逐个探测，成功打开后务必 `closeRawFd`。
+- **国旗 SVG 压缩包**
+  - `FlagSvgBundleUnpacker`：ZIP 须为 STORED（`zip -0`）；版本号与校验逻辑见源码注释。
+- **设置 / 扩展说明对话框（Profile）**
+  - 去掉与正文重复的「入口在 xxx」单行；**仅未安装时**显示「下载大小约 xx MB」类提示；精简各扩展 `detail` 文案（中/英 `string.json`）。
+
 ### 修复 (Fixed)
 - **ArkTS 编译错误修复**：
   - 在 `PaintGameData.ets` 中定义并导出 `PaintLevel` 和 `PaintCategory` 接口

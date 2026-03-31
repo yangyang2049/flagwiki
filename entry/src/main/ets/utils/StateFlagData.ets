@@ -460,37 +460,16 @@ const fileNameMap: Record<string, string> = {
   'rondônia': 'rondonia'
 };
 
-// 需要使用PNG格式的州旗（SVG在HarmonyOS上不兼容）
-const pngFlagList: string[] = [
-  'british_columbia',
-  // 巴西
-  'sao_paulo',
-  'rondonia',
-  'piaui',
-  'parana',
-  'para',
-  'paraiba',
-  'maranhao',
-  'espirito_santo',
-  'goias',
-  'ceara',
-  'amapa'
-];
-
-// 获取州旗文件路径
+// 获取州旗文件路径（与 stateflags 模块 rawfile 目录一致：{countryCode}/{file}.svg）
 export function getStateFlagPath(countryCode: string, stateCode: string): string {
   const lowerCode = stateCode.toLowerCase();
   let fileName: string;
-  
-  // 检查特殊映射
+
   if (fileNameMap[lowerCode]) {
     fileName = fileNameMap[lowerCode];
   } else {
-    // 将州代码转换为小写，替换空格和连字符为下划线
     fileName = lowerCode.replace(/ /g, '_').replace(/-/g, '_');
   }
-  
-  // 检查是否需要使用PNG格式
-  const ext = pngFlagList.includes(fileName) ? 'png' : 'svg';
-  return `state_flags/${countryCode}/${fileName}.${ext}`;
+
+  return `${countryCode}/${fileName}.svg`;
 }

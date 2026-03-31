@@ -7,8 +7,8 @@ import { FlagSvgAssets } from './FlagSvgAssets';
 const DOMAIN = 0xF2B0;
 const RAW_ZIP_PATH = 'compressed/flags_bundle.zip';
 const PREFS_KEY_VERSION = 'flag_svg_bundle_version';
-/** 与压缩包内容变更时递增，触发重新解压 */
-export const FLAG_SVG_BUNDLE_VERSION = 1;
+/** 与压缩包内容变更时递增，触发重新解压（含清空旧目录后全量解压） */
+export const FLAG_SVG_BUNDLE_VERSION = 2;
 
 /** PK\003\004 本地文件头 */
 const SIG_LOCAL = 0x04034b50;
@@ -46,6 +46,48 @@ function pathExists(path: string): boolean {
     return true;
   } catch (_e) {
     return false;
+  }
+}
+
+/** 删除目录或文件（递归），用于升级/损坏时清空旧解压结果 */
+function removePathRecursiveSync(path: string): void {
+  try {
+    const st = fs.statSync(path);
+    if (!st.isDirectory()) {
+      fs.unlinkSync(path);
+      return;
+    }
+  } catch (_e) {
+    return;
+  }
+  let children: string[] = [];
+  try {
+    children = fs.listFileSync(path);
+  } catch (_e2) {
+    return;
+  }
+  for (let i = 0; i < children.length; i++) {
+    removePathRecursiveSync(`${path}/${children[i]}`);
+  }
+  try {
+    fs.rmdirSync(path);
+  } catch (_e3) {
+    void 0;
+  }
+}
+
+function countSvgFilesInDir(dir: string): number {
+  try {
+    const names = fs.listFileSync(dir);
+    let n = 0;
+    for (let i = 0; i < names.length; i++) {
+      if (names[i].length > 4 && names[i].endsWith('.svg')) {
+        n++;
+      }
+    }
+    return n;
+  } catch (_e) {
+    return 0;
   }
 }
 
@@ -115,6 +157,11 @@ export class FlagSvgBundleUnpacker {
       }
 
       hilog.info(DOMAIN, 'FlagSvg', 'Extracting flag SVG bundle from rawfile...');
+      // 版本变化或标记缺失时先清空旧目录，避免与 zip 内容混杂
+      if (pathExists(destRoot)) {
+        removePathRecursiveSync(destRoot);
+      }
+
       const rm = context.resourceManager;
       const zipBytes = await rm.getRawFileContent(RAW_ZIP_PATH);
       const cacheZip = `${context.cacheDir}/flags_bundle.zip`;
@@ -130,6 +177,16 @@ export class FlagSvgBundleUnpacker {
       }
 
       unpackStoredZip(cacheZip, destRoot);
+
+      const flagsDir = `${destRoot}/flags`;
+      const paintDir = `${destRoot}/paint_flags`;
+      const nFlag = countSvgFilesInDir(flagsDir);
+      const nPaint = countSvgFilesInDir(paintDir);
+      if (nFlag < 1 || nPaint < 1) {
+        hilog.error(DOMAIN, 'FlagSvg', `Validation failed: flags=${nFlag}, paint_flags=${nPaint}`);
+        throw new Error('Flag bundle missing flags/ or paint_flags/ SVG files');
+      }
+      hilog.info(DOMAIN, 'FlagSvg', `Unpacked SVG counts: flags=${nFlag}, paint_flags=${nPaint}`);
 
       const okHandle = fs.openSync(markerPath, fs.OpenMode.CREATE | fs.OpenMode.WRITE_ONLY | fs.OpenMode.TRUNC);
       fs.writeSync(okHandle.fd, new ArrayBuffer(0));

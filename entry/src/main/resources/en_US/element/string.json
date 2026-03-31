@@ -78,11 +78,11 @@
     },
     {
       "name": "optional_module_anthem_detail",
-      "value": "Includes national anthem audio for many countries. After installation, an \"Anthems\" tab appears on the home screen for browsing, search, and playback.\n\nThe pack is large and is downloaded on demand over the network; it may take several minutes. Keep your connection stable."
+      "value": "Includes national anthem audio for many countries. After installation, an \"Anthems\" tab appears on the home screen for browsing, search, and playback."
     },
     {
       "name": "optional_module_flaghistory_detail",
-      "value": "Includes historical flag images and descriptions. After installation, you can view a country's past flags on the flag detail page.\n\nDownload requires a network connection; please wait until it finishes."
+      "value": "Includes historical flag images and descriptions. After installation, you can view a country's past flags on the flag detail page."
     },
     {
       "name": "optional_module_dialog_close",
@@ -118,7 +118,7 @@
     },
     {
       "name": "optional_module_state_flags_detail",
-      "value": "Administrative region flag images. After installation, use State Flags on the home screen and the US states category in the paint game.\n\nRequires a network download."
+      "value": "Administrative region flag images. After installation, use State Flags on the home screen and the US states category in the paint game."
     },
     {
       "name": "optional_module_state_flags_size_hint",
@@ -130,7 +130,7 @@
     },
     {
       "name": "optional_module_coat_of_arms_detail",
-      "value": "Coat-of-arms images for countries. After installation, they appear on flag detail pages where available.\n\nRequires a network download."
+      "value": "Coat-of-arms images for countries. After installation, they appear on flag detail pages where available."
     },
     {
       "name": "optional_module_coat_of_arms_size_hint",

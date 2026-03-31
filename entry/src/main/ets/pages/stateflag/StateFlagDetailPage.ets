@@ -8,7 +8,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import fs from '@ohos.file.fs';
 import { fileUri } from '@kit.CoreFileKit';
 import { CountryStateData, StateInfo, getCountryStateData } from '../../utils/StateFlagData';
-import { getStateFlagImageResource } from '../../utils/RegionAssetsUtil';
+import { ensureStateFlagImageCached, getStateFlagImageResource } from '../../utils/RegionAssetsUtil';
 import {
   MODULE_STATE_FLAGS,
   openOptionalModuleInstallFlow,
@@ -59,6 +59,9 @@ struct StateFlagDetailPage {
         this.countryData = getCountryStateData(this.countryCode);
         if (this.countryData) {
           this.stateInfo = this.countryData.states.find(s => s.code === this.stateCode);
+          if (this.stateInfo && this.stateFlagsModuleReady) {
+            await ensureStateFlagImageCached(this.context, this.countryData.countryCode, this.stateInfo.code);
+          }
         }
       }
       this.isLoading = false;
@@ -74,7 +77,7 @@ struct StateFlagDetailPage {
     await FavoritesManager.init(this.context);
   }
 
-  private getStateFlagImageOrPlaceholder(): Resource {
+  private getStateFlagImageOrPlaceholder(): string | Resource {
     if (!this.countryData || !this.stateInfo) {
       return $r('app.media.icon_tab_explore');
     }
@@ -87,6 +90,9 @@ struct StateFlagDetailPage {
       this.countryData = getCountryStateData(this.countryCode);
       if (this.countryData) {
         this.stateInfo = this.countryData.states.find(s => s.code === this.stateCode);
+        if (this.stateInfo) {
+          await ensureStateFlagImageCached(this.context, this.countryData.countryCode, this.stateInfo.code);
+        }
       }
     }
   }
@@ -689,4 +695,3 @@ struct StateFlagDetailPage {
     return lines.join('\n');
   }
 }
-

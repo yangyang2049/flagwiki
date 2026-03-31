@@ -33,32 +33,72 @@ const COUNTRIES_WITH_ANTHEM_STATIC: string[] = [
 let countriesWithAnthemCache: Set<string> = new Set<string>();
 
 const INIT_ANTHEM_CACHE_MAX_ATTEMPTS = 8;
-const INIT_ANTHEM_CACHE_RETRY_DELAY_MS = 450;
+const INIT_ANTHEM_CACHE_RETRY_DELAY_MS = 500;
 
 async function sleepMs(ms: number): Promise<void> {
   return new Promise<void>((resolve: () => void) => setTimeout(resolve, ms));
 }
 
+/** 从 anthems 目录下的文件名解析国家码，如 anthem_cn.ogg -> cn */
+function parseAnthemFileName(fileName: string): string | null {
+  const base = fileName.includes('/') ? fileName.substring(fileName.lastIndexOf('/') + 1) : fileName;
+  const lower = base.toLowerCase();
+  if (lower === 'readme.md') {
+    return null;
+  }
+  const m = /^anthem_([a-z0-9]+)\.(ogg|mp3)$/i.exec(base);
+  return m ? m[1].toLowerCase() : null;
+}
+
+/**
+ * 优先用 getRawFileList 枚举，避免对数百个国家逐个 getRawFd 且未 closeRawFd 导致 FD 耗尽、列表恒为空。
+ */
 async function initAnthemCacheOnce(context: common.UIAbilityContext): Promise<boolean> {
   try {
     const resourceManager = context.createModuleContext('anthem').resourceManager;
-    const availableCountries = await Promise.all(COUNTRIES_WITH_ANTHEM_STATIC.map(async (countryCode) => {
-      try {
-        const anthemPath = getAnthemFilePath(countryCode);
-        const rawFile = await resourceManager.getRawFd(anthemPath);
-        return rawFile ? countryCode : null;
-      } catch (_e) {
-        return null;
-      }
-    }));
     const verifiedCountries: string[] = [];
-    for (const countryCode of availableCountries) {
-      if (countryCode !== null) {
-        verifiedCountries.push(countryCode);
+
+    let listOk = false;
+    try {
+      const names = await resourceManager.getRawFileList('anthems');
+      for (let i = 0; i < names.length; i++) {
+        const code = parseAnthemFileName(names[i]);
+        if (code !== null) {
+          verifiedCountries.push(code);
+        }
+      }
+      listOk = verifiedCountries.length > 0;
+    } catch (e) {
+      hilog.warn(DOMAIN, 'AnthemUtilCore', `getRawFileList(anthems) failed, fallback to probe: ${JSON.stringify(e)}`);
+    }
+
+    if (!listOk) {
+      for (let i = 0; i < COUNTRIES_WITH_ANTHEM_STATIC.length; i++) {
+        const countryCode = COUNTRIES_WITH_ANTHEM_STATIC[i];
+        const anthemPath = getAnthemFilePath(countryCode);
+        let opened = false;
+        try {
+          const rawFile = await resourceManager.getRawFd(anthemPath);
+          opened = true;
+          if (rawFile.length > 0) {
+            verifiedCountries.push(countryCode);
+          }
+        } catch (_e) {
+          void 0;
+        } finally {
+          if (opened) {
+            try {
+              await resourceManager.closeRawFd(anthemPath);
+            } catch (_c) {
+              void 0;
+            }
+          }
+        }
       }
     }
+
     countriesWithAnthemCache = new Set<string>(verifiedCountries);
-    hilog.info(DOMAIN, 'AnthemUtilCore', `Anthem cache pass: ${countriesWithAnthemCache.size} files visible`);
+    hilog.info(DOMAIN, 'AnthemUtilCore', `Anthem cache: ${countriesWithAnthemCache.size} countries (listFirst=${listOk})`);
     return countriesWithAnthemCache.size > 0;
   } catch (e) {
     countriesWithAnthemCache = new Set<string>();

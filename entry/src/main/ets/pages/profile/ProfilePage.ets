@@ -110,23 +110,6 @@ export struct ProfilePage {
     return this.context.resourceManager.getStringSync($r('app.string.optional_module_flaghistory_size_hint').id);
   }
 
-  /** 安装完成后在应用内的入口位置（简短说明） */
-  private getOptionalModuleEntryHint(): string {
-    if (this.optionalModuleDialogTarget === MODULE_ANTHEM) {
-      return this.context.resourceManager.getStringSync($r('app.string.optional_module_anthem_entry').id);
-    }
-    if (this.optionalModuleDialogTarget === MODULE_FLAGHISTORY) {
-      return this.context.resourceManager.getStringSync($r('app.string.optional_module_flaghistory_entry').id);
-    }
-    if (this.optionalModuleDialogTarget === MODULE_STATE_FLAGS) {
-      return this.context.resourceManager.getStringSync($r('app.string.optional_module_state_flags_entry').id);
-    }
-    if (this.optionalModuleDialogTarget === MODULE_COAT_OF_ARMS) {
-      return this.context.resourceManager.getStringSync($r('app.string.optional_module_coat_of_arms_entry').id);
-    }
-    return '';
-  }
-
   private getOptionalModuleDetailScrollText(): string {
     if (this.optionalModuleDialogTarget === MODULE_ANTHEM) {
       return this.context.resourceManager.getStringSync($r('app.string.optional_module_anthem_detail').id);
@@ -654,19 +637,14 @@ export struct ProfilePage {
           .width('100%')
           .margin({ bottom: 8 })
 
-        Text(this.getOptionalModuleApproxSizeHint())
-          .fontSize(12)
-          .fontColor($r('app.color.text_tertiary'))
-          .width('100%')
-          .opacity(0.9)
-          .margin({ bottom: 12 })
-
-        Text(this.getOptionalModuleEntryHint())
-          .fontSize(13)
-          .fontColor($r('app.color.text_secondary'))
-          .lineHeight(20)
-          .width('100%')
-          .margin({ bottom: 12 })
+        if (!this.isOptionalDialogTargetReady()) {
+          Text(this.getOptionalModuleApproxSizeHint())
+            .fontSize(12)
+            .fontColor($r('app.color.text_tertiary'))
+            .width('100%')
+            .opacity(0.9)
+            .margin({ bottom: 12 })
+        }
 
         Scroll() {
           Text(this.getOptionalModuleDetailScrollText())
